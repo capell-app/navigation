@@ -13,6 +13,7 @@ use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Actions\SyncNavigationPageReferencesAction;
 use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Models\Navigation;
+use UnexpectedValueException;
 
 class NavigationObserver
 {
@@ -54,7 +55,13 @@ class NavigationObserver
             ->unique();
 
         if ($navigation->site_id === null || $navigation->getOriginal('site_id') === null) {
-            $siteIds = $siteIds->merge(Site::query()->pluck('id'));
+            $siteIds = $siteIds->merge(Site::query()->pluck('id')->map(static function (mixed $siteId): int {
+                if (! is_int($siteId)) {
+                    throw new UnexpectedValueException('Site identifiers must be integers.');
+                }
+
+                return $siteId;
+            }));
         }
 
         foreach ($siteIds->unique() as $siteId) {

@@ -157,6 +157,10 @@ it('can repeatedly load the same lazy mega menu fragment', function (): void {
 
     $firstContent = $firstResponse->getContent();
 
+    if ($firstContent === false) {
+        throw new RuntimeException('Expected the response to contain HTML.');
+    }
+
     foreach (range(1, 3) as $loadAttempt) {
         $this->get($url)
             ->assertSuccessful()

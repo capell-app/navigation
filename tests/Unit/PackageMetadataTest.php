@@ -17,6 +17,7 @@ use Capell\Core\Models\Site;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
 use Capell\Frontend\Contracts\RenderHookExtensionInterface;
 use Capell\Navigation\Console\Commands\DemoCommand;
+use Capell\Navigation\Console\Commands\SeedNavigationScreenshotFixtureCommand;
 use Capell\Navigation\Console\Commands\SetupCommand;
 use Capell\Navigation\Filament\Configurators\Navigations\DefaultNavigationConfigurator;
 use Capell\Navigation\Filament\Extenders\NavigationPageSchemaExtender;
@@ -227,10 +228,12 @@ it('declares navigation extension surfaces and contribution contracts', function
                 'commands' => [
                     'capell:navigation-setup',
                     'capell:navigation-demo',
+                    'capell:navigation:screenshot-fixture',
                 ],
                 'commandClasses' => [
                     SetupCommand::class,
                     DemoCommand::class,
+                    SeedNavigationScreenshotFixtureCommand::class,
                 ],
             ],
             [

@@ -67,10 +67,10 @@
             "class": "Capell\\Navigation\\Manifest\\NavigationMigrationsContribution",
             "tables": ["navigations", "navigation_page_references"],
             "migrationFiles": [
-                    "2026_05_10_190860_01_create_navigations_table",
-                    "2026_06_04_000001_create_navigation_page_references_table",
-                    "2026_08_28_000003_change_navigation_visibility_to_datetime"
-                ]
+                "2026_05_10_190860_01_create_navigations_table",
+                "2026_06_04_000001_create_navigation_page_references_table",
+                "2026_08_28_000003_change_navigation_visibility_to_datetime"
+            ]
         },
         {
             "type": "route",
@@ -110,10 +110,15 @@
         {
             "type": "console-command",
             "class": "Capell\\Navigation\\Manifest\\NavigationConsoleCommandsContribution",
-            "commands": ["capell:navigation-setup", "capell:navigation-demo"],
+            "commands": [
+                "capell:navigation-setup",
+                "capell:navigation-demo",
+                "capell:navigation:screenshot-fixture"
+            ],
             "commandClasses": [
                 "Capell\\Navigation\\Console\\Commands\\SetupCommand",
-                "Capell\\Navigation\\Console\\Commands\\DemoCommand"
+                "Capell\\Navigation\\Console\\Commands\\DemoCommand",
+                "Capell\\Navigation\\Console\\Commands\\SeedNavigationScreenshotFixtureCommand"
             ]
         },
         {
@@ -132,7 +137,8 @@
         "setup": "capell:navigation-setup",
         "setupParams": ["sites"],
         "demo": "capell:navigation-demo",
-        "doctor": null
+        "doctor": null,
+        "screenshotFixture": "capell:navigation:screenshot-fixture"
     },
     "settings": [],
     "permissions": [
@@ -235,7 +241,7 @@
         "privateDocsRequested": false
     },
     "marketplace": {
-        "summary": "Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
+        "summary": "Build and manage multilingual, per-site menus visually \u2014 link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",

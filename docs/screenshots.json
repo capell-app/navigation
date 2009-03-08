@@ -74,14 +74,22 @@
             "package": "navigation",
             "surface": "admin",
             "targetType": "admin-surface",
-            "target": "SiteResource/EditSite/NavigationsRelationManager",
-            "url": "/sites/{first-record}/edit",
-            "waitFor": "form",
+            "target": "/screenshot-fixtures/navigation/site",
+            "url": "/screenshot-fixtures/navigation/site",
+            "waitFor": ".fi-ta-row:has-text(\"Screenshot main menu\")",
             "required": false,
-            "notes": "Optional Beta evidence target. The current file is a shared host Site screen rather than proof of Navigation records; replace it with an independently captured populated relation manager before using it as release or Marketplace evidence.",
+            "notes": "Disposable fixture prepares real package records and opens the claimed installed component. Browser capture remains required.",
             "useCase": "An editor manages navigations directly from the site edit surface.",
             "screenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png",
-            "darkScreenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png"
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png",
+            "scenario": "frontend-page",
+            "user": "admin",
+            "beforeWait": [
+                {
+                    "type": "click",
+                    "selector": "[role=\"tab\"]:has-text(\"Navigations\")"
+                }
+            ]
         },
         {
             "id": "page-form-navigation-tab",
@@ -89,14 +97,22 @@
             "package": "navigation",
             "surface": "admin",
             "targetType": "admin-surface",
-            "target": "PageResource/EditPage",
-            "url": "/pages/{first-record}/edit",
-            "waitFor": "form",
+            "target": "/screenshot-fixtures/navigation/page",
+            "url": "/screenshot-fixtures/navigation/page",
+            "waitFor": "[role=\"tabpanel\"]:has-text(\"Screenshot main menu\")",
             "required": true,
-            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
+            "notes": "Disposable fixture prepares real package records and opens the claimed installed component. Browser capture remains required.",
             "useCase": "An editor controls page-level navigation metadata from the page form.",
             "screenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab.png",
-            "darkScreenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png"
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png",
+            "scenario": "frontend-page",
+            "user": "admin",
+            "beforeWait": [
+                {
+                    "type": "click",
+                    "selector": "[role=\"tab\"]:has-text(\"Navigation\")"
+                }
+            ]
         },
         {
             "id": "frontend-menu-output",
@@ -133,5 +149,6 @@
                 }
             ]
         }
-    ]
+    ],
+    "fixtureCommands": ["capell:navigation:screenshot-fixture"]
 }

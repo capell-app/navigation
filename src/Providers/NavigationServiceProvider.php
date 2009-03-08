@@ -28,6 +28,7 @@ use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
 use Capell\Navigation\Console\Commands\DemoCommand;
+use Capell\Navigation\Console\Commands\SeedNavigationScreenshotFixtureCommand;
 use Capell\Navigation\Console\Commands\SetupCommand;
 use Capell\Navigation\Contracts\NavigationNamesResolver;
 use Capell\Navigation\Contracts\NavigationPageSyncer;
@@ -86,6 +87,10 @@ final class NavigationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([SeedNavigationScreenshotFixtureCommand::class]);
+        }
+
         if (! $this->isPackageInstalled()) {
             return;
         }

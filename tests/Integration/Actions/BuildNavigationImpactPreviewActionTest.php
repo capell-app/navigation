@@ -154,8 +154,9 @@ it('limits the preview to the navigation language and excludes redirect URLs', f
         ->language($english)
         ->create();
 
-    assert(is_int($siteId = $site->getKey()));
-    assert(is_int($languageId = $english->getKey()));
+    $siteId = $site->getKey();
+    $languageId = $english->getKey();
+    throw_unless(is_int($siteId) && is_int($languageId), RuntimeException::class, 'Expected integer site and language IDs.');
 
     $preview = BuildNavigationImpactPreviewAction::run($navigation, $siteId, $languageId);
 
@@ -244,7 +245,8 @@ it('matches the public publication, blueprint, accessibility, translation, and d
     ]);
 
     $navigation = Navigation::factory()->language($language)->create(['site_id' => null]);
-    assert(is_int($languageId = $language->getKey()));
+    $languageId = $language->getKey();
+    throw_unless(is_int($languageId), RuntimeException::class, 'Expected an integer language ID.');
     $preview = BuildNavigationImpactPreviewAction::run($navigation, null, $languageId);
 
     expect($preview)->toBeInstanceOf(EditorImpactPreviewData::class);
@@ -263,8 +265,9 @@ it('excludes redirect-only and malformed URL entries from counts and links', fun
     $malformedPage->pageUrls()->update(['url' => 'javascript:alert(1)']);
 
     $navigation = Navigation::factory()->site($site)->language($language)->create();
-    assert(is_int($siteId = $site->getKey()));
-    assert(is_int($languageId = $language->getKey()));
+    $siteId = $site->getKey();
+    $languageId = $language->getKey();
+    throw_unless(is_int($siteId) && is_int($languageId), RuntimeException::class, 'Expected integer site and language IDs.');
     $preview = BuildNavigationImpactPreviewAction::run($navigation, $siteId, $languageId);
 
     expect($preview)->toBeInstanceOf(EditorImpactPreviewData::class);

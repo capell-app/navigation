@@ -228,6 +228,11 @@ function clearDynamicComponentResolverCache(): void
     $componentClasses->setValue([]);
 }
 
+/**
+ * @template TResponse of \Symfony\Component\HttpFoundation\Response
+ *
+ * @param  TestResponse<TResponse>  $response
+ */
 function assertNavigationPublicOutputContainsNoAdminInternals(TestResponse $response, Page $page): void
 {
     $response
