@@ -48,12 +48,14 @@ it('renders a package menu component with explicit frontend context', function (
     );
 
     $view
-        ->assertElementExists('nav[aria-label="Navigation"]')
         ->assertSee('Company')
         ->assertSee('Docs')
-        ->assertElementExists('a[href="/docs"]')
-        ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('a[href=""]'))
         ->assertDontSee('Hidden');
+
+    $view
+        ->assertElementExists('nav[aria-label="Navigation"]')
+        ->assertElementExists('a[href="/docs"]')
+        ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('a[href=""]'));
 });
 
 it('lets callers override the package menu landmark label', function (): void {

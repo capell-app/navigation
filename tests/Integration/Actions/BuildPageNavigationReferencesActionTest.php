@@ -257,9 +257,11 @@ it('ignores stale indexed references that are not present in navigation item dat
  */
 function navigationReferenceQueriesUsingItemsLike(): array
 {
+    $itemsColumn = DB::connection()->getQueryGrammar()->wrap('items');
+
     return array_values(collect(DB::getQueryLog())
         ->map(static fn (array $query): string => (string) ($query['query'] ?? ''))
-        ->filter(static fn (string $query): bool => str_contains($query, '"items" like') || str_contains($query, '`items` like'))
+        ->filter(static fn (string $query): bool => str_contains($query, $itemsColumn . ' like'))
         ->values()
         ->all());
 }
@@ -269,11 +271,13 @@ function navigationReferenceQueriesUsingItemsLike(): array
  */
 function navigationReferenceStandalonePivotQueries(): array
 {
+    $referencesTable = DB::connection()->getQueryGrammar()->wrapTable('navigation_page_references');
+    $navigationsTable = DB::connection()->getQueryGrammar()->wrapTable('navigations');
+
     return array_values(collect(DB::getQueryLog())
         ->map(static fn (array $query): string => (string) ($query['query'] ?? ''))
-        ->filter(static fn (string $query): bool => (str_contains($query, 'from "navigation_page_references"') || str_contains($query, 'from `navigation_page_references`'))
-            && ! str_contains($query, 'from "navigations"')
-            && ! str_contains($query, 'from `navigations`'))
+        ->filter(static fn (string $query): bool => str_contains($query, 'from ' . $referencesTable)
+            && ! str_contains($query, 'from ' . $navigationsTable))
         ->values()
         ->all());
 }
@@ -301,9 +305,12 @@ function navigationReferenceLookupQueryCount(): int
  */
 function navigationReferenceLookupQueries(): array
 {
+    $referencesTable = DB::connection()->getQueryGrammar()->wrapTable('navigation_page_references');
+    $navigationsTable = DB::connection()->getQueryGrammar()->wrapTable('navigations');
+
     return array_values(collect(DB::getQueryLog())
         ->map(static fn (array $query): string => (string) ($query['query'] ?? ''))
-        ->filter(static fn (string $query): bool => str_contains($query, 'navigation_page_references') || str_contains($query, 'from "navigations"') || str_contains($query, 'from `navigations`'))
+        ->filter(static fn (string $query): bool => str_contains($query, $referencesTable) || str_contains($query, 'from ' . $navigationsTable))
         ->values()
         ->all());
 }

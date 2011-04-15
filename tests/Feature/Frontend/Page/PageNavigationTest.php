@@ -51,12 +51,16 @@ test('frontend default theme displays the main navigation menu', function (): vo
 
     [$page] = createFrontendPageWithMainNavigation($theme);
 
-    get(navigationFeaturePageUrl($page))
+    $response = get(navigationFeaturePageUrl($page));
+
+    $response
         ->assertOk()
-        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
+        ->assertSee('window.capellHeaderNavigation', false);
+
+    $response
+        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('#header'));
 });
 
@@ -75,12 +79,16 @@ test('themed header displays the main navigation menu', function (): void {
 
     [$page] = createFrontendPageWithMainNavigation($theme);
 
-    get(navigationFeaturePageUrl($page))
+    $response = get(navigationFeaturePageUrl($page));
+
+    $response
         ->assertOk()
-        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
+        ->assertSee('window.capellHeaderNavigation', false);
+
+    $response
+        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists('#header');
 });
 
