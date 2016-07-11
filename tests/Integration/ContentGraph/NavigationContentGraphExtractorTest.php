@@ -7,16 +7,18 @@ use Capell\Core\Enums\ContentGraph\ContentGraphEdgeKind;
 use Capell\Core\Enums\ContentGraph\ContentGraphEdgeStrength;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageUrl;
+use Capell\Core\Models\Site;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Carbon\CarbonImmutable;
 
 it('extracts page dependencies from nested navigation items', function (): void {
     $publishedAt = CarbonImmutable::now()->subDay();
-    $page = Page::factory()->published($publishedAt)->create();
-    $childPage = Page::factory()->site($page->site)->published($publishedAt)->create();
-    PageUrl::factory()->page($page)->site($page->site)->create(['language_id' => $page->site->language_id]);
-    PageUrl::factory()->page($childPage)->site($childPage->site)->create(['language_id' => $childPage->site->language_id]);
+    $site = Site::factory()->withTranslations()->create();
+    $page = Page::factory()->site($site)->published($publishedAt)->create();
+    $childPage = Page::factory()->site($site)->published($publishedAt)->create();
+    PageUrl::factory()->page($page)->site($site)->create(['language_id' => $site->language_id]);
+    PageUrl::factory()->page($childPage)->site($site)->create(['language_id' => $site->language_id]);
     $navigation = Navigation::factory()->create([
         'site_id' => $page->site_id,
         'items' => [

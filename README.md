@@ -33,16 +33,14 @@ Evidence: [`src/Support/Registry/NavigableRegistry.php`](src/Support/Registry/Na
 
 Screenshot contract: `docs/screenshots.json`.
 
-The create/edit form's required evidence covers the exact desktop (1440x900),
-tablet (768x1024), and mobile (360x780) viewports in both light and dark
-colour schemes: six authentic installed-App captures in total.
-
 ![Navigation admin index](docs/screenshots/navigation-admin-index.png)
 
-![Page form navigation tab](docs/screenshots/page-form-navigation-tab.png)
+![Create/edit navigation form on desktop](docs/screenshots/create-edit-navigation-form-desktop.png)
 
 - Navigation admin index (admin, required evidence).
-- Create/edit navigation form (admin, required at desktop, tablet, and mobile in light and dark).
+- Create/edit navigation form on desktop (admin, required evidence).
+- Create/edit navigation form on tablet (admin, required evidence).
+- Create/edit navigation form on mobile (admin, required evidence).
 - Site relation manager for navigations (admin, supplementary evidence).
 - Page form navigation tab (admin, required evidence).
 - Frontend menu output (frontend, required evidence).
@@ -50,23 +48,129 @@ colour schemes: six authentic installed-App captures in total.
 
 ## Technical Shape
 
-- Service providers: `Capell\Navigation\Providers\NavigationServiceProvider`.
-- Migrations: `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`, `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`, `packages/navigation/database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php`.
-- Models: `Navigation`.
-- Filament classes: `TypeSelect`, `NavigationSelect`, `NavigationTab`, `NavigationItemsColumn`, `DefaultNavigationConfigurator`, `NavigationPageSchemaExtender`, `NavigationSiteExtender`, `NavigationResource`, `CreateNavigation`, `EditNavigation`, `ListNavigations`, `NavigationForm`, `and 2 more`.
-- Route files: `packages/navigation/routes/web.php`.
-- Policies: `NavigationPolicy`.
-- Extension contracts: `NavigationNamesResolver`, `NavigationPageSyncer`.
-- Events: `NavigationCreating`.
-- Listeners: `ReplicateSiteNavigationsListener`.
-- Actions: `AddPageToNavigationAction`, `ApplyNavigationSiteSpecAction`, `BuildNavigationBreadcrumbsAction`, `BuildNavigationChildFragmentAction`, `BuildNavigationRenderModelAction`, `BuildPageNavigationReferencesAction`, `EnsureNavigationItemKeysAction`, `RemovePageFromNavigationAction`, `ReplicateSiteNavigationsAction`, `ResolveNavigationItemModelsAction`, `SyncNavigationPageReferencesAction`.
-- Data objects: `NavigationItemData`, `NavigationItemRenderData`, `NavigationRenderContextData`, `NavigationRenderData`.
-- Command signatures: `capell:navigation-demo`, `capell:navigation-setup`.
-- Console command classes: `DemoCommand`, `SetupCommand`.
-- Manifest contributions: `admin-resource: Capell\Navigation\Manifest\NavigationAdminResourceContribution`, `configurator: Capell\Navigation\Manifest\NavigationConfiguratorContribution`, `configurator: Capell\Navigation\Manifest\NavigationContentGraphContribution`, `configurator: Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution`, `console-command: Capell\Navigation\Manifest\NavigationConsoleCommandsContribution`, `frontend-component: Capell\Navigation\Manifest\NavigationFrontendComponentsContribution`, `health-check: Capell\Navigation\Manifest\NavigationHealthContribution`, `migration: Capell\Navigation\Manifest\NavigationMigrationsContribution`, `model: Capell\Navigation\Manifest\NavigationModelsContribution`, `page-type: Capell\Navigation\Manifest\NavigationPageTypeContribution`, `render-hook: Capell\Navigation\Manifest\NavigationRenderHookContribution`, `route: Capell\Navigation\Manifest\NavigationFrontendRouteContribution`, `schema-extender: Capell\Navigation\Manifest\NavigationSchemaExtendersContribution`.
-- Health checks: `Capell\Navigation\Health\NavigationHealthCheck`.
-- Blade views: `packages/navigation/resources/views/components/breadcrumbs.blade.php`, `packages/navigation/resources/views/components/header/main-navigation.blade.php`, `packages/navigation/resources/views/components/header/menu/dropdown.blade.php`, `packages/navigation/resources/views/components/header/menu/item.blade.php`, `packages/navigation/resources/views/components/header/navigation.blade.php`, `packages/navigation/resources/views/components/menu-items.blade.php`, `packages/navigation/resources/views/components/menu.blade.php`, `packages/navigation/resources/views/components/page/navigations.blade.php`.
-- Cache tags: `navigation`.
+### Service providers
+
+- `Capell\Navigation\Providers\NavigationServiceProvider`
+
+### Migrations
+
+- `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`
+- `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`
+- `packages/navigation/database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php`
+
+### Models
+
+- `Navigation`
+
+### Filament classes
+
+- `TypeSelect`
+- `NavigationSelect`
+- `NavigationTab`
+- `NavigationItemsColumn`
+- `DefaultNavigationConfigurator`
+- `NavigationPageSchemaExtender`
+- `NavigationSiteExtender`
+- `NavigationResource`
+- `CreateNavigation`
+- `EditNavigation`
+- `ListNavigations`
+- `NavigationForm`
+- `NavigationsTable`
+- `NavigationsRelationManager`
+
+### Route files
+
+- `packages/navigation/routes/web.php`
+
+### Policies
+
+- `NavigationPolicy`
+
+### Extension contracts
+
+- `NavigationNamesResolver`
+- `NavigationPageSyncer`
+
+### Events
+
+- `NavigationCreating`
+
+### Listeners
+
+- `ReplicateSiteNavigationsListener`
+
+### Actions
+
+- `AddPageToNavigationAction`
+- `ApplyNavigationSiteSpecAction`
+- `BuildNavigationBreadcrumbsAction`
+- `BuildNavigationChildFragmentAction`
+- `BuildNavigationImpactPreviewAction`
+- `BuildNavigationRenderModelAction`
+- `BuildNavigationStarterItemsAction`
+- `BuildPageNavigationReferencesAction`
+- `EnsureNavigationItemKeysAction`
+- `RemovePageFromNavigationAction`
+- `ReplicateSiteNavigationsAction`
+- `ResolveNavigationItemModelsAction`
+- `SyncNavigationPageReferencesAction`
+
+### Data objects
+
+- `NavigationItemData`
+- `NavigationItemRenderData`
+- `NavigationRenderContextData`
+- `NavigationRenderData`
+- `NavigationStarterItemsData`
+- `NavigationStarterRequestData`
+
+### Command signatures
+
+- `capell:navigation-demo`
+- `capell:navigation-setup`
+
+### Console command classes
+
+- `DemoCommand`
+- `SetupCommand`
+
+### Manifest contributions
+
+- `admin-resource: Capell\Navigation\Manifest\NavigationAdminResourceContribution`
+- `configurator: Capell\Navigation\Manifest\NavigationConfiguratorContribution`
+- `configurator: Capell\Navigation\Manifest\NavigationContentGraphContribution`
+- `configurator: Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution`
+- `console-command: Capell\Navigation\Manifest\NavigationConsoleCommandsContribution`
+- `frontend-component: Capell\Navigation\Manifest\NavigationFrontendComponentsContribution`
+- `health-check: Capell\Navigation\Manifest\NavigationHealthContribution`
+- `migration: Capell\Navigation\Manifest\NavigationMigrationsContribution`
+- `model: Capell\Navigation\Manifest\NavigationModelsContribution`
+- `page-type: Capell\Navigation\Manifest\NavigationPageTypeContribution`
+- `render-hook: Capell\Navigation\Manifest\NavigationRenderHookContribution`
+- `route: Capell\Navigation\Manifest\NavigationFrontendRouteContribution`
+- `schema-extender: Capell\Navigation\Manifest\NavigationSchemaExtendersContribution`
+
+### Health checks
+
+- `Capell\Navigation\Health\NavigationHealthCheck`
+
+### Blade views
+
+- `packages/navigation/resources/views/components/breadcrumbs.blade.php`
+- `packages/navigation/resources/views/components/header/main-navigation.blade.php`
+- `packages/navigation/resources/views/components/header/menu/dropdown.blade.php`
+- `packages/navigation/resources/views/components/header/menu/item.blade.php`
+- `packages/navigation/resources/views/components/header/navigation.blade.php`
+- `packages/navigation/resources/views/components/menu-items.blade.php`
+- `packages/navigation/resources/views/components/menu.blade.php`
+- `packages/navigation/resources/views/components/page/navigations.blade.php`
+- `packages/navigation/resources/views/filament/forms/navigation-impact-preview.blade.php`
+
+### Cache tags
+
+- `navigation`
+
 
 ## Data Model
 
@@ -82,7 +186,7 @@ colour schemes: six authentic installed-App captures in total.
 - Required packages: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`.
 - Admin navigation: declares `admin-resource: NavigationAdminResourceContribution`; each Filament page or resource controls its own navigation visibility.
 - Admin/editor extensions: `configurator: NavigationConfiguratorContribution`, `configurator: NavigationContentGraphContribution`, `configurator: NavigationFrontendRuntimeContribution`, `schema-extender: NavigationSchemaExtendersContribution`.
-- Permissions: `ViewAny:Navigation`, `View:Navigation`, `Create:Navigation`, `Update:Navigation`, `Delete:Navigation`, `DeleteAny:Navigation`, `Restore:Navigation`, `RestoreAny:Navigation`, `ForceDelete:Navigation`, `ForceDeleteAny:Navigation`, `Reorder:Navigation`.
+- Permissions: `ViewAny:Navigation`, `View:Navigation`, `Create:Navigation`, `Update:Navigation`, `Delete:Navigation`, `DeleteAny:Navigation`, `Restore:Navigation`, `RestoreAny:Navigation`, `ForceDelete:Navigation`, `ForceDeleteAny:Navigation`, `Reorder:Navigation`; access also governed by package policies: `NavigationPolicy`.
 - Public routes: loads `routes/web.php`; registers `NavigationFrontendRouteContribution`.
 - Database changes: package migrations are declared.
 - Config: no package config files.
@@ -111,8 +215,9 @@ colour schemes: six authentic installed-App captures in total.
 ## Quick Start
 
 1. Install the package: `composer require capell-app/navigation`.
-2. Run the required setup: `php artisan capell:navigation-setup`.
-3. Open the package admin surface at `/navigation/navigations` and confirm Navigation is available.
+2. Run the package setup: `php artisan capell:navigation-setup`.
+3. See it working: run `php artisan capell:navigation-demo`.
+4. Open the package admin surface at `/navigation/navigations` and confirm Navigation is available.
 
 ## Next Steps
 

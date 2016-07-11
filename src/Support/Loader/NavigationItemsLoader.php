@@ -317,9 +317,7 @@ class NavigationItemsLoader
                 $pageableType = $pageableReference['pageable_type'];
                 $pageableId = $pageableReference['pageable_id'];
 
-                if (! isset($pageableIdsByType[$pageableType])) {
-                    $pageableIdsByType[$pageableType] = [];
-                }
+                $pageableIdsByType[$pageableType] ??= [];
 
                 if (! in_array($pageableId, $pageableIdsByType[$pageableType], true)) {
                     $pageableIdsByType[$pageableType][] = $pageableId;
@@ -332,9 +330,7 @@ class NavigationItemsLoader
                 $nestedPageableIdsByType = $this->extractMenuItemsPagesByType($children);
 
                 foreach ($nestedPageableIdsByType as $pageableType => $nestedPageableIds) {
-                    if (! isset($pageableIdsByType[$pageableType])) {
-                        $pageableIdsByType[$pageableType] = [];
-                    }
+                    $pageableIdsByType[$pageableType] ??= [];
 
                     foreach ($nestedPageableIds as $nestedPageableId) {
                         if (! in_array($nestedPageableId, $pageableIdsByType[$pageableType], true)) {
@@ -516,7 +512,7 @@ class NavigationItemsLoader
 
         $cache = $this->requestPageCache($request);
 
-        return array_key_exists($cacheKey, $cache) ? $cache[$cacheKey] : null;
+        return $cache[$cacheKey] ?? null;
     }
 
     /**
@@ -629,7 +625,9 @@ class NavigationItemsLoader
             && $role !== ''
             && is_object($user)
             && method_exists($user, 'hasRole')
-            && $user->hasRole($role) === true;
+            && (config('permission.teams')
+                ? method_exists($user, 'hasRoleForSite') && $user->hasRoleForSite($this->site, $role) === true
+                : $user->hasRole($role) === true);
     }
 
     /**

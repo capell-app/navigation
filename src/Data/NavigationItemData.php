@@ -31,21 +31,21 @@ class NavigationItemData extends Data
     }
 
     /**
-     * @param  Collection<array-key, mixed>  $pages
+     * @param  iterable<array-key, Pageable>  $pages
      * @return DataCollection<int|string, NavigationItemData>
      */
-    public static function fromPages(Collection $pages): DataCollection
+    public static function fromPages(iterable $pages): DataCollection
     {
         return new DataCollection(self::class, self::mapPages($pages)->values()->all());
     }
 
     /**
-     * @param  Collection<array-key, mixed>  $pages
-     * @return Collection<array-key, mixed>
+     * @param  iterable<array-key, Pageable>  $pages
+     * @return Collection<array-key, NavigationItemData>
      */
-    private static function mapPages(Collection $pages): Collection
+    private static function mapPages(iterable $pages): Collection
     {
-        return $pages->map(function (Pageable $page): self {
+        return collect($pages)->map(function (Pageable $page): self {
             $translation = $page->translation;
             $pageUrl = $page->pageUrl;
 
