@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Tests\Support\Concerns;
+
+use Capell\Tests\Models\User;
+use Capell\Tests\packages\AbstractTestCase;
+use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
+
+/**
+ * @property-read \Illuminate\Foundation\Application $app
+ * @property-read AbstractTestCase $this
+ *
+ * @mixin AbstractTestCase
+ */
+trait CreatesAdminUser
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function actingAs(UserContract $user, $guard = null): static
+    {
+        return parent::actingAs($user, $guard ?? 'web');
+    }
+
+    public function actingAsRole(string $role, array $attributes = []): static
+    {
+        return $this->actingAs($this->createUserWithRole($role, $attributes));
+    }
+
+    public function actingAsUser(array $attributes = []): static
+    {
+        return $this->actingAs($this->createUser($attributes));
+    }
+
+    public function actingAsAdmin(array $attributes = []): static
+    {
+        return $this->actingAsRole('super_admin', $attributes);
+    }
+
+    public function createUser(array $attributes = []): User
+    {
+        return User::factory()->create($attributes);
+    }
+
+    public function createUserWithRole(
+        array|string|int|Role|Collection $roles,
+        array $attributes = []
+    ): User {
+        return $this->createUser($attributes)->assignRole($roles);
+    }
+
+    public function createUserWithPermission(
+        string|int|array|Permission|Collection $permissions,
+        array $attributes = []
+    ): User {
+        return $this->createUser($attributes)->givePermissionTo($permissions);
+    }
+}

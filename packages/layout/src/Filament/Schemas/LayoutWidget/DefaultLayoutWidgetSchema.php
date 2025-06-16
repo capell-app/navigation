@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Filament\Schemas\Layout;
+namespace Capell\Layout\Filament\Schemas\LayoutWidget;
 
-use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Filament\Components\Forms\HtmlClassInput;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
+use Capell\Layout\Enums\SchemaEnum;
 use Filament\Forms;
 
 class DefaultLayoutWidgetSchema extends AbstractSchema
 {
-    protected static SchemaEnum $schemaType = SchemaEnum::LayoutContainerWidget;
+    protected static string $schemaType = SchemaEnum::LayoutWidget->value;
 
     public static function make(Forms\Form $form): array
     {

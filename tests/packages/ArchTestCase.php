@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Packages\Tests\packages;
+namespace Capell\Tests\packages;
 
 use Orchestra\Testbench\Concerns\WithWorkbench;
 

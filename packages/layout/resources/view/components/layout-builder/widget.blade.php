@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 ?>
 
-@use(Capell\Admin\Facades\CapellAdmin;use Capell\Core\Models\Content;use Filament\Support\Enums\ActionSize;use Filament\Support\Enums\FontWeight;use Filament\Support\Enums\IconSize;use Illuminate\Support\HtmlString;use Illuminate\View\ComponentAttributeBag)
+@use(Capell\Admin\Facades\CapellAdmin;use Capell\Layout\Models\Content;use Filament\Support\Enums\ActionSize;use Filament\Support\Enums\FontWeight;use Filament\Support\Enums\IconSize;use Illuminate\Support\HtmlString;use Illuminate\View\ComponentAttributeBag)
 
 @props([
     'containerKey',

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Resources\WidgetResource;
 use Capell\Core\Models;
+use Capell\Layout\Filament\Resources\WidgetResource;
 use Filament\Tables\Actions\CreateAction;
 
 use function Pest\Laravel\assertDatabaseHas;

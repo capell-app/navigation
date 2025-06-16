@@ -8,7 +8,7 @@ use Capell\Admin\Filament\Concerns\HideEmptyRelationManager;
 use Capell\Admin\Filament\RelationManagers\AbstractPagesRelationManager;
 
 /**
- * @property \Capell\Core\Models\Content $ownerRecord
+ * @property \Capell\Layout\Models\Content $ownerRecord
  */
 class PagesRelationManager extends AbstractPagesRelationManager
 {

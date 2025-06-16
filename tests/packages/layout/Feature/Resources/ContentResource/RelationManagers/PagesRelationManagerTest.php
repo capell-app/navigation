@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Resources\ContentResource;
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
+use Capell\Layout\Filament\Resources\ContentResource;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 
 use function Pest\Livewire\livewire;
 

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Filament\Schemas\Layout;
+namespace Capell\Layout\Filament\Schemas\LayoutContainer;
 
-use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Filament\Components\Forms\ColumnSpanInput;
 use Capell\Admin\Filament\Components\Forms\ContainerWidthSelect;
 use Capell\Admin\Filament\Components\Forms\HtmlClassInput;
@@ -12,11 +11,12 @@ use Capell\Admin\Filament\Components\Forms\MarginSelect;
 use Capell\Admin\Filament\Components\Forms\PaddingSelect;
 use Capell\Admin\Filament\Components\Forms\SpacingSelect;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
+use Capell\Layout\Enums\SchemaEnum;
 use Filament\Forms;
 
 class DefaultLayoutContainerSchema extends AbstractSchema
 {
-    protected static SchemaEnum $schemaType = SchemaEnum::LayoutContainer;
+    protected static string $schemaType = SchemaEnum::LayoutContainer->value;
 
     public static function make(Forms\Form $form): array
     {

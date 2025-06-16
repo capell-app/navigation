@@ -1,7 +1,7 @@
 @php
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader;
-    use Capell\Gizmo\Actions\PageHasHeroWidgetAction;
+    use Capell\Layout\Actions\PageHasHeroWidgetAction;
 @endphp
 
 @props([

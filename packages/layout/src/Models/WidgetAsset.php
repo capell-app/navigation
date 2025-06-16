@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Models;
 
-use Capell\Core\Concerns\HasMetaData;
-use Capell\Core\Concerns\HasResources;
-use Capell\Core\Contracts\CacheablePageInterface;
-use Capell\Core\Database\Factories\WidgetAssetFactory;
+use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\TypeEnum;
-use Eloquent;
+use Capell\Core\Models\Concerns\HasMetaData;
+use Capell\Core\Models\Concerns\HasPageCache;
+use Capell\Core\Models\Concerns\HasResources;
+use Capell\Core\Models\Media;
+use Capell\Core\Models\Page;
+use Capell\Layout\Database\Factories\WidgetAssetFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,48 +21,7 @@ use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 use Wildside\Userstamps\Userstamps;
 
-/**
- * @property int $id
- * @property int $widget_id
- * @property int|null $page_id
- * @property string|null $container
- * @property int|null $occurrence
- * @property string $asset_type
- * @property string $asset_id
- * @property int $order
- * @property array<array-key, mixed>|null $meta
- * @property int|null $created_by
- * @property int|null $updated_by
- * @property int|null $deleted_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\User|null $destroyer
- * @property-read \App\Models\User|null $editor
- * @property-read Media|null $image
- * @property-read Page|null $page
- * @property-read Page|null $relatedPage
- * @property-read Model|Eloquent $asset
- * @property-read Widget $widget
- * @property-read \Illuminate\Database\Eloquent\Collection|Content[] $related
- * @property-read int|null $related_count
- *
- * @method static \Capell\Core\Database\Factories\WidgetAssetFactory factory($count = null, $state = [])
- * @method staric Builder<static>|WidgetResource newModelQuery()
- * @method static Builder<static>|WidgetAsset newQuery()
- * @method static Builder<static>|WidgetAsset ordered(string $dir = 'asc')
- * @method static Builder<static>|WidgetAsset query()
- * @method static Builder<static>|WidgetAsset withResourceables(bool $withDrafts = true)
- *
- * @mixin \Eloquent
- *
- * @property-read string $asset_key
- *
- * @method static Builder<static>|WidgetAsset newModelQuery()
- *
- * @mixin Eloquent
- */
-class WidgetAsset extends Model implements CacheablePageInterface
+class WidgetAsset extends Model implements PageCacheable
 {
     /** @use HasFactory<WidgetAssetFactory> */
     use HasFactory;

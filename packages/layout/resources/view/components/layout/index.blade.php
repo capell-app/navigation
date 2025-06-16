@@ -5,9 +5,9 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Core\Models\Widget;
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader\LayoutLoader;
+    use Capell\Layout\Models\Widget;
     use Illuminate\Support\Collection;
 
     $previousColspan = null;

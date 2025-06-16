@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\View\Components\Widget;
+namespace Capell\Layout\View\Components\Widget;
 
-use Capell\Core\Models;
+use Capell\Layout\Models;
 use Closure;
 use Illuminate\View\Component;
 use stdClass;

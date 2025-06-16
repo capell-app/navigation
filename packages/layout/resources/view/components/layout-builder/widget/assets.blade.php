@@ -95,7 +95,7 @@ declare(strict_types=1);
         >
             @foreach ($assets as $asset)
                 @php
-                    /** @var Capell\Core\Models\Widget $widget */
+                    /** @var Capell\Layout\Models\Widget $widget */
                     $widgetAsset = $widget->assets
                         ->where('asset_type', $asset['asset_type'])
                         ->where('asset_id', $asset['asset_id'])

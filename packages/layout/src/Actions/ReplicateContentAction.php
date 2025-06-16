@@ -6,7 +6,7 @@ namespace Capell\Layout\Actions;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Content;
+use Capell\Layout\Models\Content;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**

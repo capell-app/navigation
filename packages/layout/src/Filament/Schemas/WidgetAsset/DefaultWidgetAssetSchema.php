@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\WidgetAsset;
 
-use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Filament\Components\Forms\MediaSchema;
-use Capell\Admin\Filament\Resources\ContentResource;
 use Capell\Admin\Filament\Resources\PageResource;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
 use Capell\Core\Models;
+use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Filament\Resources\ContentResource;
 use Filament\Forms;
 
 class DefaultWidgetAssetSchema extends AbstractSchema
 {
-    protected static SchemaEnum $schemaType = SchemaEnum::WidgetAsset;
+    protected static string $schemaType = SchemaEnum::WidgetAsset->value;
 
     public static function make(Forms\Form $form): array
     {

@@ -7,6 +7,7 @@ namespace Capell\Layout\Livewire\Widget;
 use Capell\Core\Enums\ResourceComponentEnum;
 use Capell\Core\Models;
 use Capell\Frontend\Facades\Frontend;
+use Capell\Layout\Models\Widget;
 use Closure;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -82,9 +83,9 @@ abstract class AbstractWidget extends Component
     }
 
     #[Computed]
-    public function widget(): Models\Widget
+    public function widget(): Widget
     {
-        return once(fn () => Models\Widget::firstWhere('key', $this->widgetData['widget_key']));
+        return once(fn () => Widget::firstWhere('key', $this->widgetData['widget_key']));
     }
 
     protected function getComponent(): string

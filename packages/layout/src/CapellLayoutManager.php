@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Capella\Layout;
+namespace Capell\Layout;
 
-class LayoutManager
+class CapellLayoutManager
 {
     public static function getMigrations(): array
     {

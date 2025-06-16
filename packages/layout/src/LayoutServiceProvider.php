@@ -10,10 +10,10 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Capella\Layout\LayoutManager;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,7 +32,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         self::registerRelationships();
 
-        self::registerFormSchemas();
+        CapellAdmin::registerSchemas('Widget', WidgetSchemaEnum::getAllSchemas());
 
         CapellCore::addCloneableRelations('page', 'widgetAssets');
 
@@ -58,7 +58,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package->name(self::$name)
-            ->hasMigrations(LayoutManager::getMigrations());
+            ->hasMigrations(CapellLayoutManager::getMigrations());
     }
 
     private static function registerModels(): void
@@ -117,10 +117,5 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         Models\Type::resolveRelationUsing('contents', fn (Models\Type $model): HasMany => $model->hasMany(Content::class, 'type_id'));
 
         Models\Type::resolveRelationUsing('widgets', fn (Models\Type $model): HasMany => $model->hasMany(Widget::class, 'type_id'));
-    }
-
-    private static function registerFormSchemas(): void
-    {
-        CapellAdmin::registerSchema();
     }
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 // tests/Integration/Models/SiteTest.php
 
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 
 it('has many widget assets', function (): void {
     $page = Page::factory()->create();

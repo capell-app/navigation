@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Database\Factories;
 
-use Capell\Core\Models\Content;
-use Capell\Core\Models\ContentAsset;
 use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Models\ContentAsset;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

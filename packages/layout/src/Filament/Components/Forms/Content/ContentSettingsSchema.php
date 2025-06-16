@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Components\Forms\Content;
 
 use Capell\Admin\Filament\Components\Forms\Site\SiteSelect;
-use Capell\Core\Models\Content;
+use Capell\Layout\Models\Content;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Builder;
 

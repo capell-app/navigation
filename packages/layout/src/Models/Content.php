@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Bkwld\Cloner\Cloneable;
-use Capell\Core\Concerns\HasDraftsAndNestedSet;
-use Capell\Core\Concerns\HasMetaData;
-use Capell\Core\Concerns\HasResources;
-use Capell\Core\Concerns\HasTags;
-use Capell\Core\Concerns\HasTranslations;
-use Capell\Core\Concerns\HasTypes;
-use Capell\Core\Concerns\Publishable;
-use Capell\Core\Contracts\CacheablePageInterface;
-use Capell\Core\Enums\TypeEnum;
+use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Models\Concerns\HasDraftsAndNestedSet;
+use Capell\Core\Models\Concerns\HasMetaData;
+use Capell\Core\Models\Concerns\HasPageCache;
+use Capell\Core\Models\Concerns\HasPublishDates;
+use Capell\Core\Models\Concerns\HasResources;
+use Capell\Core\Models\Concerns\HasTags;
+use Capell\Core\Models\Concerns\HasTranslations;
+use Capell\Core\Models\Concerns\HasTypes;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Tag;
 use Capell\Core\Models\Translation;
+use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\ContentFactory;
 use Capell\Layout\Observers\ContentObserver;
 use Eloquent;
@@ -173,7 +174,7 @@ use Wildside\Userstamps\Userstamps;
  * @mixin Eloquent
  */
 #[ObservedBy(ContentObserver::class)]
-class Content extends Model implements Auditable, CacheablePageInterface
+class Content extends Model implements Auditable, PageCacheable
 {
     use Cloneable;
     use HasDrafts {
@@ -189,6 +190,7 @@ class Content extends Model implements Auditable, CacheablePageInterface
     use HasJsonRelationships;
     use HasMetaData;
     use HasPageCache;
+    use HasPublishDates;
     use HasResources;
     use HasTags;
     use HasTranslations;
@@ -199,7 +201,6 @@ class Content extends Model implements Auditable, CacheablePageInterface
         NodeTrait::applyNestedSetScope as applyNestedSetScopeParent;
     }
     use \OwenIt\Auditing\Auditable;
-    use Publishable;
     use SoftDeletes;
     use Userstamps;
 
@@ -293,7 +294,7 @@ class Content extends Model implements Auditable, CacheablePageInterface
     public function type(): BelongsTo
     {
         return $this->belongsTo(Type::class)
-            ->where('type', TypeEnum::Content);
+            ->where('type', 'content');
     }
 
     public function site(): BelongsTo

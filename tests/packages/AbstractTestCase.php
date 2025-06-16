@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Packages\Tests\packages;
+namespace Capell\Tests\packages;
 
 use Awcodes\Curator\CuratorServiceProvider;
 use Awcodes\FilamentBadgeableColumn\BadgeableColumnServiceProvider;
@@ -46,6 +46,7 @@ use Intervention\Image\ImageServiceProvider;
 use Kalnoy\Nestedset\NestedSetServiceProvider;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
+use Orchestra\Testbench\TestCase;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use RyanChandler\FilamentNavigation\FilamentNavigationServiceProvider;
 use Silber\PageCache;
@@ -57,7 +58,7 @@ use Spatie\Tags\TagsServiceProvider;
 use StijnVanouplines\BladeCountryFlags\BladeCountryFlagsServiceProvider;
 use Tapp\FilamentAuthenticationLog\FilamentAuthenticationLogServiceProvider;
 
-abstract class AbstractTestCase extends \Orchestra\Testbench\TestCase
+abstract class AbstractTestCase extends TestCase
 {
     use InteractsWithSession;
     use LazilyRefreshDatabase;

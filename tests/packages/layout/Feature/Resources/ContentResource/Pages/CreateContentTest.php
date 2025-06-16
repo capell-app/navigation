@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Capell\Admin\Filament\Resources\ContentResource\Pages\CreateContent;
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
+use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;

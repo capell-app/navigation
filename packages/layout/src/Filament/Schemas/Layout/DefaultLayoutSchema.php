@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Layout;
 
-use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Filament\Components\Forms\Layout\LayoutDetailsSchema;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
-use Capell\Admin\Livewire\LayoutBuilder;
-use Capell\Layout\Models\Layout;
+use Capell\Layout\Enums\SchemaEnum;
 use Filament\Forms;
 use Filament\Forms\Get;
 
 class DefaultLayoutSchema extends AbstractSchema
 {
-    protected static SchemaEnum $schemaType = SchemaEnum::Layout;
+    protected static string $schemaType = SchemaEnum::Layout->value;
 
     public static function make(Forms\Form $form): array
     {

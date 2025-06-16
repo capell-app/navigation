@@ -10,6 +10,7 @@ use Capell\Admin\Filament\Components\Forms\ImageMediaPicker;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
 use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Models;
+use Capell\Layout\Models\WidgetAsset;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -86,8 +87,8 @@ class WidgetAssetsRepeater
             ])
             ->schema([
                 Forms\Components\Group::make()
-                    ->schema(function (?Models\WidgetAsset $record): array {
-                        if ($record instanceof Models\WidgetAsset) {
+                    ->schema(function (?WidgetAsset $record): array {
+                        if ($record instanceof WidgetAsset) {
                             return self::getEditResourceSchema($record);
                         }
 
@@ -134,7 +135,7 @@ class WidgetAssetsRepeater
         ];
     }
 
-    private static function getEditResourceSchema(?Models\WidgetAsset $record): array
+    private static function getEditResourceSchema(?WidgetAsset $record): array
     {
         return [
             Forms\Components\Group::make()

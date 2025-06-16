@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\Filament\Schemas\WidgetAsset;
+namespace Capell\Layout\Filament\Schemas\WidgetAsset;
 
 use Capell\Admin\Filament\Components\Forms\ActionsRepeater;
 use Capell\Admin\Filament\Components\Forms\BackgroundSettingsFieldset;

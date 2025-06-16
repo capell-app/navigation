@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Translation;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
 use Capell\Frontend\Facades\FrontendManager;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 

@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Bkwld\Cloner\Cloneable;
-use Capell\Core\Concerns\HasMetaData;
-use Capell\Core\Concerns\HasPageCache;
-use Capell\Core\Concerns\HasTranslations;
-use Capell\Core\Contracts\StatusAware;
-use Capell\Core\Enums\TypeEnum;
+use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Models\Concerns\HasMetaData;
+use Capell\Core\Models\Concerns\HasPageCache;
 use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasStatus;
+use Capell\Core\Models\Concerns\HasTranslations;
+use Capell\Core\Models\Contracts\Statusable;
 use Capell\Core\Models\Language;
+use Capell\Core\Models\Layout;
 use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
+use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\WidgetFactory;
 use Capell\Layout\Observers\WidgetObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -94,7 +96,7 @@ use Wildside\Userstamps\Userstamps;
  * @mixin \Eloquent
  */
 #[ObservedBy(WidgetObserver::class)]
-class Widget extends Model implements \Capell\Core\Contracts\PageCacheable, StatusAware
+class Widget extends Model implements PageCacheable, Statusable
 {
     use Cloneable;
 
@@ -188,8 +190,7 @@ class Widget extends Model implements \Capell\Core\Contracts\PageCacheable, Stat
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(Type::class)
-            ->where('type', TypeEnum::Widget);
+        return $this->belongsTo(Type::class)->where('type', 'widget');
     }
 
     public function assets(): HasMany

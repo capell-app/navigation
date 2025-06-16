@@ -6,7 +6,7 @@ namespace Capell\Layout\Filament\Resources\ContentResource\Pages;
 
 use Capell\Admin\Actions\MutateContentDataBeforeCreateAction;
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Admin\Filament\Resources\ContentResource;
+use Capell\Layout\Filament\Resources\ContentResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateContent extends CreateRecord

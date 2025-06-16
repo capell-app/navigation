@@ -6,13 +6,13 @@ use Capell\Admin\Livewire\Assets\Table\ContentsTable;
 use Capell\Admin\Livewire\Assets\Table\MediaTable;
 use Capell\Admin\Livewire\Assets\Table\PagesTable;
 use Capell\Admin\Livewire\LayoutBuilder;
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
+use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Layout;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Database\Eloquent\Model;
 

@@ -10,7 +10,7 @@ use Capell\Core\Enums\WidgetComponentEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Type;
-use Capell\Core\Models\Widget;
+use Capell\Layout\Models\Widget;
 
 class WidgetCreator
 {

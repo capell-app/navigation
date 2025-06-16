@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
-use Capell\Admin\Enums\WidgetTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Admin\Filament\Schemas;
-use Capell\Core\Enums\ResourceComponentEnum;
-use Capell\Core\Enums\TypeEnum;
-use Capell\Core\Enums\WidgetComponentEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
+use Capell\Layout\Enums\ResourceComponentEnum;
+use Capell\Layout\Enums\TypeEnum;
+use Capell\Layout\Enums\WidgetComponentEnum;
+use Capell\Layout\Enums\WidgetTypeEnum;
+use Capell\Layout\Filament\Schemas;
 
 class WidgetTypeCreator
 {

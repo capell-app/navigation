@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\View\Components\Widget\Pages;
+namespace Capell\Layout\View\Components\Widget\Pages;
 
-use Capell\Gizmo\View\Components\Widget\AbstractWidget;
+use Capell\Layout\View\Components\Widget\AbstractWidget;
 use Illuminate\Support\Collection;
 
 abstract class AbstractPagesWidget extends AbstractWidget

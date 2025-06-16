@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 
 it('has many widget assets', function (): void {
     $widget = Widget::factory()->create();

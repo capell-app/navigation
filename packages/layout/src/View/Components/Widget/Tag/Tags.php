@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\View\Components\Widget\Tag;
+namespace Capell\Layout\View\Components\Widget\Tag;
 
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Services\Loader\TagLoader;
-use Capell\Gizmo\View\Components\Widget\AbstractWidget;
+use Capell\Layout\View\Components\Widget\AbstractWidget;
 
 class Tags extends AbstractWidget
 {

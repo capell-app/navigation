@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\Filament\Schemas\Widget;
+namespace Capell\Layout\Filament\Schemas\Widget;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Components\Forms\BackgroundSettingsFieldset;

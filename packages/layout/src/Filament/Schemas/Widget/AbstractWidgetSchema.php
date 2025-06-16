@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Widget;
 
-use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
+use Capell\Layout\Enums\SchemaEnum;
 
 abstract class AbstractWidgetSchema extends AbstractSchema
 {
-    protected static SchemaEnum $schemaType = SchemaEnum::Widget;
+    protected static string $schemaType = SchemaEnum::Widget->value;
 }

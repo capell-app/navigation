@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Database\Factories;
 
 use Capell\Core\Models\Type;
-use Capell\Core\Models\Widget;
+use Capell\Layout\Models\Widget;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

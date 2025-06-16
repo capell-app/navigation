@@ -7,7 +7,7 @@ namespace Capell\Blog\View\Components\Widget\Page;
 use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\View\Components\Widget\AbstractWidget;
+use Capell\Layout\View\Components\Widget\AbstractWidget;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Resources\ContentResource;
-use Capell\Core\Models\Content;
 use Capell\Core\Models\Type;
+use Capell\Layout\Filament\Resources\ContentResource;
+use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;

@@ -6,7 +6,7 @@ namespace Capell\Layout\Filament\Actions\Page;
 
 use Capell\Admin\Enums\ModalWidthEnum;
 use Capell\Core\Models\Type;
-use Capell\Core\Models\Widget;
+use Capell\Layout\Models\Widget;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Form;
 

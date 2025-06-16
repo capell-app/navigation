@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\View\Components\Widget;
+namespace Capell\Layout\View\Components\Widget;
 
 use Capell\Core\Models\Media;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Services\Loader\MediaLoader;
-use Capell\Frontend\View\Components\Widget\AbstractWidget;
 use Illuminate\Database\Eloquent\Collection;
 
 class Hero extends AbstractWidget

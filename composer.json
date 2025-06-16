@@ -127,9 +127,11 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Capell\\Packages\\Tests\\": "tests/packages",
-            "Capell\\Packages\\Tests\\Database\\Factories\\": "tests/database/factories",
-            "Capell\\Packages\\Tests\\Database\\Seeders\\\\": "tests/database/seeders"
+            "Capell\\Tests\\": "tests",
+            "Capell\\Tests\\Blog\\": "tests/packages/blog",
+            "Capell\\Tests\\Layout\\": "tests/packages/layout",
+            "Capell\\Tests\\Database\\Factories\\": "tests/database/factories",
+            "Capell\\Tests\\Database\\Seeders\\\\": "tests/database/seeders"
         }
     },
     "config": {

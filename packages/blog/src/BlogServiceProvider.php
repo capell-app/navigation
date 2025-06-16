@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog;
 
+use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Blog\Actions\CreateBlogPagesAction;
@@ -14,7 +15,6 @@ use Capell\Blog\Filament\Schemas;
 use Capell\Blog\Services\BlogCreator;
 use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Blog\Services\Sitemap\ArchivePageSitemap;
-use Capell\Core\Enums\ComponentEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Composer\InstalledVersions;
@@ -80,21 +80,18 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
                         $installCommand->askToStarRepoOnGitHub('capell-app/site');
                     });
             });
-
-        CapellCore::registerPackage(self::$name, self::class);
-
-        CapellAdmin::setFilamentResource('article', Resources\ArticleResource::class);
-
-        CapellAdmin::addResourcePage('article', Resources\ArticleResource::class);
-
-        CapellAdmin::addComponent(ComponentEnum::Widget, 'capell-blog::widget.page.article');
-
-        CapellAdmin::addTypeSchema(SchemaEnum::Widget, Schemas\Widget\ArticleWidgetSchema::class);
-        CapellAdmin::addTypeSchema(SchemaEnum::Page, Schemas\Page\ArticleDefaultPageSchema::class);
     }
 
     private function registerDefaultPages(): void
     {
+        CapellCore::registerPackage(self::$name, self::class);
+
+        CapellAdmin::registerResource(ResourceEnum::Page, 'article', Resources\ArticleResource::class);
+
+        CapellCore::registerComponent('Widget', 'Article', 'capell-blog::widget.page.article');
+
+        CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\ArticleDefaultPageSchema::class);
+
         CapellCore::addDefaultPage('blog', 'Blog', function ($site, $languages): void {
             BlogCreator::createBlogPage($site, languages: $languages);
         });

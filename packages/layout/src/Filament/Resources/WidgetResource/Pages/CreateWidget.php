@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\WidgetResource\Pages;
 
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Admin\Filament\Resources\WidgetResource;
+use Capell\Layout\Filament\Resources\WidgetResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateWidget extends CreateRecord

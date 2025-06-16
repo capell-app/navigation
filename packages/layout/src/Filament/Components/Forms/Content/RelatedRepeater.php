@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Components\Forms\Content;
 
 use Capell\Admin\Actions\ReplicateContentAction;
-use Capell\Core\Models\Content;
+use Capell\Layout\Models\Content;
 use Exception;
 use Filament\Forms;
 

@@ -10,9 +10,9 @@ use Capell\Admin\Services\Creator\WidgetTypeCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
-use Capell\Core\Models\Widget;
-use Capell\Core\Models\WidgetAsset;
 use Capell\Layout\Models\Layout;
+use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;

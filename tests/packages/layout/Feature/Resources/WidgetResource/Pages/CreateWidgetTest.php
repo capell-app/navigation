@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use Capell\Admin\Enums\WidgetTypeEnum;
 use Capell\Admin\Filament\Actions\Page\CreateWidgetAction;
-use Capell\Admin\Filament\Resources\WidgetResource\Pages\EditWidget;
-use Capell\Admin\Filament\Resources\WidgetResource\Pages\ListWidgets;
 use Capell\Admin\Services\Creator\WidgetTypeCreator;
 use Capell\Core\Models\Navigation;
 use Capell\Core\Models\Type;
-use Capell\Core\Models\Widget;
+use Capell\Layout\Filament\Resources\WidgetResource\Pages\EditWidget;
+use Capell\Layout\Filament\Resources\WidgetResource\Pages\ListWidgets;
+use Capell\Layout\Models\Widget;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;

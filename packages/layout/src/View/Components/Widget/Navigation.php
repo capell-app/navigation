@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Gizmo\View\Components\Widget;
+namespace Capell\Layout\View\Components\Widget;
 
 use Capell\Core\Models;
 use Capell\Frontend\Facades\Frontend;

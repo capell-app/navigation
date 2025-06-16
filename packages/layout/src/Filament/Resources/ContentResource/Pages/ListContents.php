@@ -8,7 +8,7 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\Page\CreateContentAction;
 use Capell\Admin\Filament\Concerns\ApplySearchRelationsTable;
 use Capell\Admin\Filament\Concerns\HasSiteTableFilterTabs;
-use Capell\Admin\Filament\Resources\ContentResource;
+use Capell\Layout\Filament\Resources\ContentResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListContents extends ListRecords

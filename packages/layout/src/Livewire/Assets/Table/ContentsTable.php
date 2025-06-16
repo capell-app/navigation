@@ -9,9 +9,9 @@ use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeNameColumn;
-use Capell\Admin\Filament\Resources\ContentResource;
 use Capell\Core\Enums\TagTypeEnum;
 use Capell\Core\Facades\CapellCore;
+use Capell\Layout\Filament\Resources\ContentResource;
 use Filament\Tables;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
@@ -73,7 +73,7 @@ class ContentsTable extends AbstractAssetsTable
 
     protected function getTableQuery(): Builder
     {
-        /* @var \Capell\Core\Models\Content $model */
+        /* @var \Capell\Layout\Models\Content $model */
         $model = CapellCore::getModel('content');
 
         return $model::with([
