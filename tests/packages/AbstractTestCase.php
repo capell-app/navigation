@@ -19,7 +19,6 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Tests\Models\User;
 use Capell\Tests\Policies\RolePolicy;
-use CmsMulti\FilamentClearCache\FilamentClearCacheServiceProvider;
 use CodeWithDennis\SimpleAlert\SimpleAlertServiceProvider;
 use Dotswan\FilamentCodeEditor\FilamentCodeEditorServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
@@ -131,7 +130,6 @@ abstract class AbstractTestCase extends TestCase
             CuratorServiceProvider::class,
             SpatieLaravelTranslatablePluginServiceProvider::class,
             FilamentAuthenticationLogServiceProvider::class,
-            FilamentClearCacheServiceProvider::class,
             FilamentCodeEditorServiceProvider::class,
             FilamentNavigationServiceProvider::class,
             FilamentTableRepeaterServiceProvider::class,

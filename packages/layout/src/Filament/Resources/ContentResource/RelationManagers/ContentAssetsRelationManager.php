@@ -45,7 +45,7 @@ class ContentAssetsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets(withDrafts: true))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets())
             ->description(__('capell-admin::generic.content_assets_description'))
             ->columns([
                 Tables\Columns\TextColumn::make('asset_id')

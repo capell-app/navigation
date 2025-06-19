@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
-use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Enums\ResourceComponentEnum as CapellResourceComponentEnum;
 use Capell\Core\Facades\CapellCore;
@@ -89,7 +88,7 @@ class WidgetTypeCreator
             'group' => 'assets',
             'admin' => [
                 'schema' => Schemas\Widget\MediaWidgetSchema::getKey(),
-                'icon' => CapellAdmin::getAsset('media')->getIcon(),
+                'icon' => CapellCore::getAsset('media')->getIcon(),
                 'asset_types' => ['media'],
             ],
             'meta' => [

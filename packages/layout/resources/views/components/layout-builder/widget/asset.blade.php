@@ -20,6 +20,9 @@ declare(strict_types=1);
     'widgetIndex',
 ])
 @php
+    use Capell\Admin\Facades\CapellAdmin;
+    use Filament\Actions\Action;
+
     /** @var Action $editWidgetAssetAction */
     $editWidgetAssetAction = ($this->editWidgetAssetAction)([
         'containerKey' => $containerKey,

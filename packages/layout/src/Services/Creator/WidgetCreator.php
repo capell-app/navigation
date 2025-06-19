@@ -13,6 +13,7 @@ use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Models\Widget;
+use Illuminate\Support\Collection;
 
 class WidgetCreator
 {
@@ -32,7 +33,7 @@ class WidgetCreator
         $this->typeModel = CapellCore::getModel(ModelEnum::Type);
     }
 
-    public function createWidgets(Language $language): void
+    public function createWidgets(Collection $languages): void
     {
         $contentsWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Contents, 'type' => LayoutTypeEnum::Widget]);
         $mediaWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Media, 'type' => LayoutTypeEnum::Widget]);
@@ -43,18 +44,18 @@ class WidgetCreator
         $systemWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::System, 'type' => LayoutTypeEnum::Widget]);
 
         $this->breadcrumbWidget($systemWidgetType);
-        $this->childrenWidget($pageResultsWidgetType, $language);
+        $this->childrenWidget($pageResultsWidgetType, $languages);
         $this->contentsWidgets($contentsWidgetType);
-        $this->galleryWidget($mediaWidgetType, $language);
-        $this->latestPagesWidget($pageResultsWidgetType, $language);
+        $this->galleryWidget($mediaWidgetType, $languages);
+        $this->latestPagesWidget($pageResultsWidgetType, $languages);
         $this->mediaCarouselWidget($mediaWidgetType);
         $this->navigationWidget($navigationWidgetType);
         $this->pageContentWidget($pageContentWidgetType);
         $this->pageSlotWidget($systemWidgetType);
         $this->pagesCardWidget($pagesWidgetType);
-        $this->relatedPagesWidget($systemWidgetType, $language);
-        $this->siblingsWidget($pageResultsWidgetType, $language);
-        $this->tagsWidget($systemWidgetType, $language);
+        $this->relatedPagesWidget($systemWidgetType, $languages);
+        $this->siblingsWidget($pageResultsWidgetType, $languages);
+        $this->tagsWidget($systemWidgetType, $languages);
     }
 
     private function breadcrumbWidget(Type $systemWidgetType): void
@@ -73,7 +74,7 @@ class WidgetCreator
         ]);
     }
 
-    private function childrenWidget(Type $pageResultsWidgetType, Language $language): void
+    private function childrenWidget(Type $pageResultsWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'children',
@@ -93,11 +94,13 @@ class WidgetCreator
             ],
         ]);
 
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::heading.page_children'),
-        ]);
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::heading.page_children'),
+            ]);
+        });
     }
 
     private function contentsWidgets(Type $contentsWidgetType): void
@@ -122,7 +125,7 @@ class WidgetCreator
         ]);
     }
 
-    private function galleryWidget(Type $mediaWidgetType, Language $language): void
+    private function galleryWidget(Type $mediaWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'gallery',
@@ -138,14 +141,17 @@ class WidgetCreator
                 'notes' => 'Displays a breadcrumb navigation trail',
             ],
         ]);
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::heading.gallery'),
-        ]);
+
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::heading.gallery'),
+            ]);
+        });
     }
 
-    private function latestPagesWidget(Type $pageResultsWidgetType, Language $language): void
+    private function latestPagesWidget(Type $pageResultsWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'latest-pages',
@@ -167,11 +173,13 @@ class WidgetCreator
             ],
         ]);
 
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::heading.latest_pages'),
-        ]);
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::heading.latest_pages'),
+            ]);
+        });
     }
 
     private function mediaCarouselWidget(Type $mediaWidgetType): void
@@ -264,7 +272,7 @@ class WidgetCreator
         ]);
     }
 
-    private function relatedPagesWidget(Type $systemWidgetType, Language $language): void
+    private function relatedPagesWidget(Type $systemWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'related-pages',
@@ -286,14 +294,16 @@ class WidgetCreator
             ],
         ]);
 
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::heading.related_pages'),
-        ]);
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::heading.related_pages'),
+            ]);
+        });
     }
 
-    private function siblingsWidget(Type $pageResultsWidgetType, Language $language): void
+    private function siblingsWidget(Type $pageResultsWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'siblings',
@@ -311,14 +321,17 @@ class WidgetCreator
                 'notes' => 'Displays a list of sibling pages with the same parent as the current page',
             ],
         ]);
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::heading.page_siblings'),
-        ]);
+
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::heading.page_siblings'),
+            ]);
+        });
     }
 
-    private function tagsWidget(Type $systemWidgetType, Language $language): void
+    private function tagsWidget(Type $systemWidgetType, Collection $languages): void
     {
         $widget = $this->widgetModel::firstOrCreate([
             'key' => 'tags',
@@ -335,10 +348,12 @@ class WidgetCreator
             ],
         ]);
 
-        $widget->translations()->firstOrCreate([
-            'language_id' => $language->id,
-        ], [
-            'title' => __('capell-admin::generic.tags'),
-        ]);
+        $languages->each(function (Language $language) use ($widget): void {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => __('capell-admin::generic.tags'),
+            ]);
+        });
     }
 }

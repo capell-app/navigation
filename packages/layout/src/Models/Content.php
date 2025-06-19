@@ -226,6 +226,11 @@ class Content extends Model implements Auditable, PageCacheable
         return static::where('uuid', $value)->select($select)->first();
     }
 
+    public static function getMorphRelations(): array
+    {
+        return ['image', 'type', 'translation'];
+    }
+
     public function applyNestedSetScope($query, $table = null)
     {
         $builder = $this->usesSoftDelete()

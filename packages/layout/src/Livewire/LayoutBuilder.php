@@ -711,7 +711,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             ->closeModalByClickingAway(false)
             ->color('primary')
             ->size(ActionSize::ExtraSmall)
-            ->icon(fn (array $arguments): string => CapellAdmin::getAsset($arguments['assetType'])->getIcon())
+            ->icon(fn (array $arguments): string => CapellCore::getAsset($arguments['assetType'])->getIcon())
             ->iconSize(IconSize::Small)
             ->tooltip(
                 fn (array $arguments): string => __(
@@ -1690,7 +1690,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             ->groupBy('asset_type')
             ->mapWithKeys(
                 function (\Illuminate\Support\Collection $assets, string $type): array {
-                    $model = CapellAdmin::getAsset($type)->getModel();
+                    $model = CapellCore::getAsset($type)->getModel();
 
                     return [
                         $type => $model::query()
@@ -2037,7 +2037,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             return $this->cachedAssets[$type][$id];
         }
 
-        $model = CapellAdmin::getAsset($type)->getModel();
+        $model = CapellCore::getAsset($type)->getModel();
 
         $this->cachedAssets[$type][$id] = $model::findByUuid($id);
 

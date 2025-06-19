@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Admin\Enums\LayoutEnum;
+use Capell\Admin\Services\Creator\LayoutCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
@@ -12,7 +13,7 @@ use Capell\Layout\Filament\Schemas\LayoutWidget\DefaultLayoutWidgetSchema;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Capell\Layout\Services\Creator\LayoutCreator;
+use Capell\Layout\Services\Creator\LayoutUpdater;
 use Capell\Layout\Services\Creator\WidgetCreator;
 use Capell\Layout\Services\Creator\WidgetTypeCreator;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
@@ -35,22 +36,30 @@ test('Render layout builder', function (): void {
         ->assertSeeText($layout->name.' Layout');
 });
 
-test('can edit layouts', function (LayoutEnum $layoutEnum): void {
+test('can edit layouts', function (LayoutEnum|Capell\Layout\Enums\LayoutEnum $layoutEnum): void {
     $language = Language::factory()->create();
-    $layout = app(LayoutCreator::class)->create($layoutEnum->value);
+
+    if ($layoutEnum instanceof Capell\Layout\Enums\LayoutEnum) {
+        $layout = app(Capell\Layout\Services\Creator\LayoutCreator::class)->create($layoutEnum->value);
+    } else {
+        $layout = app(LayoutCreator::class)->create($layoutEnum->value);
+    }
 
     $widgetTypeCreator = app(WidgetTypeCreator::class);
     $widgetTypeCreator->createWidgetTypes();
 
     $widgetCreator = app(WidgetCreator::class);
-    $widgetCreator->createWidgets(language: $language);
+    $widgetCreator->createWidgets(collect([$language]));
+
+    $layoutUpdater = app(LayoutUpdater::class);
+    $layoutUpdater->setup($layout->key);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
         ->assertSeeText($layout->name.' Layout');
-})->with(LayoutEnum::cases());
+})->with([...LayoutEnum::cases(), ...Capell\Layout\Enums\LayoutEnum::cases()]);
 
 test('Render layout builder with page', function (): void {
     $layout = (new LayoutFactory())->containers()->create();

@@ -45,7 +45,7 @@ class WidgetAssetsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets(withDrafts: true))
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets())
             ->heading(__('capell-admin::heading.widget_page_resources'))
             ->description(__('capell-admin::generic.widget_page_resources_description'))
             ->columns([

@@ -6,6 +6,7 @@ namespace Capell\Blog\Services;
 
 use Capell\Admin\Actions\AddPageToNavigationAction;
 use Capell\Admin\Filament\Schemas\Page\ResultsPageSchema;
+use Capell\Admin\Services\Creator\LayoutCreator;
 use Capell\Admin\Services\Creator\PageTypeCreator;
 use Capell\Blog\Enums\BlogResourceEnum;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
@@ -24,7 +25,6 @@ use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\LayoutCreator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 

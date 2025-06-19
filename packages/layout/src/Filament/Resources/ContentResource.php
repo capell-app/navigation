@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources;
 
-use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Components\Forms\TypeSchema;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
@@ -128,7 +127,7 @@ class ContentResource extends Resource
 
     public static function getNavigationIcon(): ?string
     {
-        return CapellAdmin::getAsset('content')->getIcon();
+        return CapellCore::getAsset('content')->getIcon();
     }
 
     public static function getPluralModelLabel(): string

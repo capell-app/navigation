@@ -9,6 +9,7 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Page;
+use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
@@ -66,7 +67,7 @@ class DemoCreator
      */
     public function createContents(Collection $languages): void
     {
-        $contentType = $this->typeModel::default()->first();
+        $contentType = (new ContentTypeFactory())->create();
 
         $this->contentModel::factory()->type($contentType)->withTranslations($languages)->count(10)->create();
 

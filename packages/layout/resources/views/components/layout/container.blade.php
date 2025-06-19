@@ -7,6 +7,7 @@ declare(strict_types=1);
 @php
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader\LayoutLoader;
+    use Capell\Layout\Facades\Layout;
 @endphp
 
 @props([
@@ -100,11 +101,15 @@ declare(strict_types=1);
 >
     @foreach ($container['widgets'] as $widgetIndex => $widgetData)
         @php
-            $widget = Frontend::getContainerWidget(
+            $widget = Layout::getContainerWidget(
                 $containerKey,
                 $widgetData['widget_key'],
                 $widgetData['occurrence'] ?? 1
             );
+
+            if (! $widget) {
+                continue;
+            }
 
             $type = $widget->getMetaComponentType();
 

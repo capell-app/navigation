@@ -1,0 +1,165 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Layout\Commands;
+
+use Capell\Core\Enums\ModelEnum;
+use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Services\Creator\ContentCreator;
+use Capell\Layout\Services\Creator\DemoCreator;
+use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+
+use function Laravel\Prompts\multisearch;
+
+class LayoutDemoCommand extends Command
+{
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Inserts demo layout widgets';
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'capell-layout:demo {--site= : The ID of the site to insert demo pages into}';
+
+    protected DemoCreator $demoCreator;
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        $this->demoCreator = app(DemoCreator::class);
+
+        if ($this->option('site')) {
+            $siteIds = explode(',', (string) $this->option('site'));
+        } else {
+            $siteIds = multisearch(
+                'Select a site to insert demo pages',
+                options: fn (string $search) => CapellCore::getModel(ModelEnum::Site)::query()
+                    ->when(
+                        mb_strlen($search) > 0,
+                        fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
+                    )
+                    ->limit(10)
+                    ->select(['id', 'name'])
+                    ->get()
+                    ->mapWithKeys(fn (Site $site) => [$site->id => $site->name])
+                    ->toArray(),
+                validate: [
+                    'required',
+                    'array',
+                    'min:1',
+                ],
+            );
+        }
+
+        $this->demoCreator->createContents(Language::all());
+
+        $sites = Site::whereIn('id', $siteIds)->get();
+
+        foreach ($sites as $site) {
+            $this->info(sprintf('Selected site: %s', $site->name));
+
+            if (! $this->createDemoLayouts($site)) {
+                $this->error('Failed to create demo pages for the selected site.');
+
+                return Command::FAILURE;
+            }
+        }
+
+        $this->info('Demo layouts have been successfully created.');
+
+        return Command::SUCCESS;
+    }
+
+    public function createDemoLayouts(Site $site): bool
+    {
+        $demo_data = config('capell-demo.pages');
+
+        $this->newLine();
+        $this->line('Setting up homepage extras for site: '.$site->name);
+
+        $languages = $site->languages;
+
+        $homePage = $site->pages()->isHomePage()->first();
+
+        $this->setupHomepage($homePage, $languages);
+
+        $this->line('Setting up content');
+
+        /** @var ContentCreator $contentCreator */
+        $contentCreator = app(ContentCreator::class);
+
+        $this->createContent($contentCreator, $demo_data, $site, $languages);
+
+        return true;
+    }
+
+    public function setupHomepage(Page $page, Collection $languages): void
+    {
+        $layout = $page->layout;
+
+        $containers = $layout->containers;
+
+        $containers['main']['widgets'] = [
+            ['widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page)->key, 'occurrence' => 1],
+            ['widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page, occurrence: 2)->key, 'occurrence' => 2],
+            ['widget_key' => $this->demoCreator->createGalleryWidget()->key],
+            ['widget_key' => $this->demoCreator->createMediaCarouselWidget()->key],
+            ['widget_key' => $this->demoCreator->createFaqWidget($languages)->key],
+            ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page)->key],
+            ['widget_key' => $this->demoCreator->createStaticWidget($languages)->key],
+        ];
+
+        $layout->containers = $containers;
+        $layout->update(['containers' => $containers]);
+
+        if ($page->layout_id !== $layout->id) {
+            $page->update(['layout_id' => $layout->id]);
+        }
+    }
+
+    private function createContent(ContentCreator $contentCreator, array $data, Site $site, Collection $languages, ?Content $parent = null): void
+    {
+        $contentData = [
+            'name' => $data['name']['en'],
+        ];
+
+        if ($parent instanceof Content) {
+            $contentData['parent_uuid'] = $parent->uuid;
+        }
+
+        foreach ($languages as $language) {
+            $name = $data['name'][$language->code];
+
+            $contentData['translations'][$language->code] = [
+                'title' => $name,
+                'contents' => $name,
+            ];
+        }
+
+        $content = $contentCreator->createContent($contentData, $site, $languages);
+
+        if (! isset($data['children'])) {
+            return;
+        }
+
+        foreach ($data['children'] as $child) {
+            $this->createContent($contentCreator, $child, $site, $languages, $content);
+        }
+
+    }
+}

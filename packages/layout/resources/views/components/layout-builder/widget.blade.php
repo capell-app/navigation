@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 ?>
 
-@use(Capell\Admin\Facades\CapellAdmin;use Capell\Core\Models\Type;use Capell\Layout\Enums\LayoutResourceEnum;use Capell\Layout\Models\Content;use Filament\Support\Enums\ActionSize;use Filament\Support\Enums\FontWeight;use Filament\Support\Enums\IconSize;use Illuminate\Support\HtmlString;use Illuminate\View\ComponentAttributeBag)
+@use(Capell\Admin\Facades\CapellAdmin;use Capell\Core\Facades\CapellCore;use Capell\Core\Models\Type;use Capell\Layout\Enums\LayoutResourceEnum;use Capell\Layout\Models\Content;use Filament\Support\Enums\ActionSize;use Filament\Support\Enums\FontWeight;use Filament\Support\Enums\IconSize;use Illuminate\Support\HtmlString;use Illuminate\View\ComponentAttributeBag)
 
 @props([
     'containerKey',
@@ -222,9 +222,9 @@ declare(strict_types=1);
                                     <x-filament::dropdown.header
                                         class="cursor-default font-semibold"
                                         color="gray"
-                                        :icon="CapellAdmin::getAsset($assetType)->getIcon()"
+                                        :icon="CapellCore::getAsset($assetType)->getIcon()"
                                     >
-                                        {{ CapellAdmin::getAsset($assetType)->getLabel() }}
+                                        {{ CapellCore::getAsset($assetType)->getLabel() }}
                                     </x-filament::dropdown.header>
                                     {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
                                     {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}

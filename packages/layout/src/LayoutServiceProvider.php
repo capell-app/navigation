@@ -6,12 +6,16 @@ namespace Capell\Layout;
 
 use Capell\Admin\Actions\CreatedModelAction;
 use Capell\Admin\Actions\DeletedModelAction;
-use Capell\Admin\Data\AssetData;
+use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Layout\Actions\InstallLayoutPackageAction;
+use Capell\Layout\Commands\LayoutDemoCommand;
+use Capell\Layout\Filament\Resources\LayoutResource;
 use Capell\Layout\Filament\Schemas;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\ContentAsset;
@@ -24,6 +28,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -38,7 +44,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     public function bootingPackage(): void
     {
         $this->registerModels()
-            ->registerModelEvents()
+            ->registerEvents()
+            ->registerListeners()
             ->registerRelationships()
             ->registerSchemas();
 
@@ -55,6 +62,10 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         foreach (config('capell-layout.livewire_components', []) as $name => $class) {
             Livewire::component($name, $class);
         }
+
+        foreach (config('capell-layout.blade_components') as $name => $component) {
+            Blade::component($name, $component);
+        }
     }
 
     public function configurePackage(Package $package): void
@@ -64,17 +75,28 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->hasViews(self::$name)
             ->hasTranslations()
             ->hasMigrations(CapellLayoutManager::getMigrations())
-            ->hasInstallCommand(function (InstallCommand $command): InstallCommand {
-                return $command->publishMigrations()
-                    ->publishAssets();
-            });
+            ->hasCommands([
+                LayoutDemoCommand::class,
+            ])
+            ->hasInstallCommand(fn (InstallCommand $command): InstallCommand => $command->endWith(function (): void {
+                InstallLayoutPackageAction::run();
+            }));
     }
 
     public function registeringPackage(): void
     {
         parent::registeringPackage();
 
-        CapellCore::registerPackage(self::$name, self::class);
+        // Register the CapellLayoutManager as a singleton
+        App::singleton(CapellLayoutManager::class, fn (): CapellLayoutManager => new CapellLayoutManager());
+
+        CapellCore::registerPackage(
+            self::$name,
+            self::class,
+            permissions: $this->getPackagePermissions(),
+            demoCommand: true,
+            demoParams: ['sites'],
+        );
 
         CapellAdmin::registerResource(
             Enums\LayoutResourceEnum::Content->name,
@@ -86,9 +108,28 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             class: Enums\LayoutResourceEnum::Widget->value,
         );
 
-        CapellAdmin::registerAsset(
+        CapellAdmin::registerResource(
+            ResourceEnum::Layout,
+            class: LayoutResource::class,
+        );
+
+        CapellCore::registerAsset(
             new AssetData(name: 'content', model: Content::class, icon: 'heroicon-o-document-text')
         );
+    }
+
+    private function getPackagePermissions(): array
+    {
+        return [
+            'create_content',
+            'reorder_content',
+            'replicate_content',
+            'restore_any_content',
+            'restore_content',
+            'update_content',
+            'view_any_content',
+            'view_content',
+        ];
     }
 
     private function registerModels(): self
@@ -101,7 +142,17 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
-    private function registerModelEvents(): self
+    private function registerListeners(): self
+    {
+        CapellCore::subscriberManager()->subscribe(new Listeners\AfterRecordSaved());
+        CapellCore::subscriberManager()->subscribe(new Listeners\SiteTreeRebuilt());
+        CapellCore::subscriberManager()->subscribe(new Listeners\TypeValidated());
+        CapellCore::subscriberManager()->subscribe(new Listeners\LayoutLoaded());
+
+        return $this;
+    }
+
+    private function registerEvents(): self
     {
         Filament::serving(function (): void {
             $createDeleteModels = [

@@ -7,7 +7,7 @@ namespace Capell\Blog;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Blog\Actions\InstallBlogAction;
+use Capell\Blog\Actions\InstallBlogPackageAction;
 use Capell\Blog\Commands\BlogDemoCommand;
 use Capell\Blog\Enums\BlogModelEnum;
 use Capell\Blog\Enums\BlogResourceEnum;
@@ -81,11 +81,8 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ])
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command->startWith(function (): void {
-                    InstallBlogAction::run();
-                })
-                    ->endWith(function (InstallCommand $installCommand): void {
-                        $installCommand->askToStarRepoOnGitHub('capell-app/site');
-                    });
+                    InstallBlogPackageAction::run();
+                });
             });
     }
 
@@ -93,7 +90,14 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         parent::registeringPackage();
 
-        CapellCore::registerPackage(self::$name, self::class, sort: 9);
+        CapellCore::registerPackage(
+            self::$name,
+            self::class,
+            sort: 9,
+            permissions: $this->getPackagePermissions(),
+            demoCommand: true,
+            demoParams: ['sites'],
+        );
 
         CapellAdmin::registerResource(
             ResourceEnum::Page,
@@ -104,5 +108,19 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerComponent('Widget', 'Article', 'capell-blog::widget.page.article');
 
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\ArticleDefaultPageSchema::class);
+    }
+
+    private function getPackagePermissions(): array
+    {
+        return [
+            'create_article',
+            'replicate_article',
+            'reorder_article',
+            'restore_any_article',
+            'restore_article',
+            'update_article',
+            'view_any_article',
+            'view_article',
+        ];
     }
 }
