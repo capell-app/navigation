@@ -1,0 +1,92 @@
+name: Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.head_ref }}-phpunit
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: github.event.pull_request.draft == false
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }} - DB${{ matrix.db }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        php: [8.2, 8.3, 8.4]
+        laravel: [11.*, 12.*]
+        stability: [prefer-stable]
+        db: [sqlite, mysql]
+        include:
+          - laravel: 11.*
+            testbench: 9.*
+          - laravel: 12.*
+            testbench: 10.*
+        exclude:
+          - laravel: 11.*
+            php: 8.4
+          - laravel: 12.*
+            php: 8.2
+          - laravel: 12.*
+            php: 8.3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Dependencies PHP
+        id: php-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: dependencies-php-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, dom, fileinfo, intl, json, libxml, mbstring, simplexml, zip
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Setup MySQL
+        if: matrix.db == 'mysql'
+        uses: mirromutth/mysql-action@v1
+        with:
+          mysql version: '8.0'
+          mysql user: root
+          mysql password: root
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install PHP dependencies
+        if: steps.php-cache.outputs.cache-hit != 'true'
+        run: composer install --no-interaction --no-progress --ansi
+
+      - name: Configure environment
+        run: |
+          if [ "${{ matrix.db }}" == "mysql" ]; then
+            echo "DB_CONNECTION=mysql" >> .env
+            echo "DB_DATABASE=test_cms_multi" >> .env
+            echo "DB_USERNAME=root" >> .env
+            echo "DB_PASSWORD=root" >> .env
+          else
+            echo "DB_CONNECTION=sqlite" >> .env
+            echo "DB_DATABASE=:memory:" >> .env
+          fi
+
+      - name: Execute tests
+        run: composer test
+
+      - name: Upload coverage
+        uses: gaelgirodon/ci-badges-action@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          gist-id: 9dd8e508cb2433728d42a258193770eb
+          token: ${{ secrets.GIST_TOKEN }}
