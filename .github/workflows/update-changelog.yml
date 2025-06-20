@@ -7,7 +7,13 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
-
+    env:
+      COMPOSER_AUTH: |
+        {
+          "github-oauth": {
+            "github.com": "${{ secrets.ACCESS_TOKEN }}"
+          }
+        }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

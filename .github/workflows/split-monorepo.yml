@@ -7,6 +7,13 @@ on:
 jobs:
   split-monorepo:
     runs-on: ubuntu-latest
+    env:
+      COMPOSER_AUTH: |
+        {
+          "github-oauth": {
+            "github.com": "${{ secrets.ACCESS_TOKEN }}"
+          }
+        }
     strategy:
       fail-fast: false
       matrix:

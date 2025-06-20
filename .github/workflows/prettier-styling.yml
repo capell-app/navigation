@@ -11,6 +11,13 @@ permissions:
 jobs:
   prettier:
     runs-on: ubuntu-latest
+    env:
+      COMPOSER_AUTH: |
+        {
+          "github-oauth": {
+            "github.com": "${{ secrets.ACCESS_TOKEN }}"
+          }
+        }
     strategy:
       fail-fast: true
 
