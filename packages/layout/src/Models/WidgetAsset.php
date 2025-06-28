@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Capell\Core\Contracts\PageCacheable;
-use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPageCache;
@@ -85,11 +84,6 @@ class WidgetAsset extends Model implements PageCacheable
     ];
 
     protected static string $factory = WidgetAssetFactory::class;
-
-    public static function getTypes(): array
-    {
-        return TypeEnum::getResourceTypes();
-    }
 
     public static function totalWidgetPages(Widget $widget): int
     {

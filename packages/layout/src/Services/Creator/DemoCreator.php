@@ -9,10 +9,16 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
+use Capell\Layout\Actions\AddWidgetToLayoutContainerAction;
+use Capell\Layout\Enums\AssetEnum;
+use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
+use Capell\Layout\Filament\Schemas\Widget\HeroWidgetSchema;
+use Capell\Layout\Filament\Schemas\WidgetAsset\HeroWidgetAssetSchema;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -178,6 +184,11 @@ class DemoCreator
                 'component' => WidgetComponentEnum::ResourcesAccordion,
                 'margin' => ['lg'],
                 'align' => 'center',
+            ],
+            'admin' => [
+                'asset_types' => [
+                    AssetEnum::Content->value,
+                ],
             ],
         ]);
 
@@ -359,7 +370,7 @@ class DemoCreator
         return $widget;
     }
 
-    public function createStaticNavigationWidget(Collection $languages, Page $page): Widget
+    public function createStaticNavigationWidget(Collection $languages, Site $site): Widget
     {
         /** @var class-string<Models\Navigation> $model */
         $model = CapellCore::getModel(ModelEnum::Navigation);
@@ -369,7 +380,7 @@ class DemoCreator
         $handle = Str::slug($name);
 
         $pages = Page::where([
-            'site_id' => $page->site_id,
+            'site_id' => $site->id,
         ])
             ->whereHas(
                 'type',
@@ -388,7 +399,7 @@ class DemoCreator
 
         $model::updateOrCreate([
             'handle' => $handle,
-            'site_id' => $page->site_id,
+            'site_id' => $site->id,
         ], [
             'name' => $name,
             'items' => $this->navigationPageItems($pages, $languages->first()),
@@ -419,6 +430,235 @@ class DemoCreator
         }
 
         return $widget;
+    }
+
+    public function createHeroWidget(): Widget
+    {
+        return $this->widgetModel::firstOrCreate([
+            'key' => 'hero',
+        ], [
+            'name' => __('capell-layout::generic.hero'),
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Contents, 'type' => LayoutTypeEnum::Widget])->id,
+            'meta' => [
+                'component' => 'capell-layout::widget.hero',
+                'heading_size' => 'h1',
+                'carousel_fade' => true,
+                'carousel_arrows' => false,
+                'carousel_pagination' => true,
+                'carousel_loop' => true,
+                'carousel_auto' => true,
+                'carousel_auto_delay' => 50000,
+                'color_scheme' => 'dark',
+            ],
+            'admin' => [
+                'icon' => 'heroicon-o-gift',
+                'schema' => HeroWidgetSchema::getKey(),
+                'asset_types' => [LayoutAssetEnum::Content->value],
+                'widget_asset_schema' => HeroWidgetAssetSchema::getKey(),
+                'notes' => 'Displays a prominent banner section, often used for showcasing key content or messages',
+            ],
+        ]);
+    }
+
+    public function createWidgetAssets(Widget $widget, Page $page): void
+    {
+        if ($widget->assets()->exists()) {
+            return;
+        }
+
+        $features = [
+            [
+                'title' => 'Hero welcome message',
+                'content' => '<p>Welcome to our website! We are glad to have you here.</p>',
+            ],
+            [
+                'title' => 'Hero call to action',
+                'content' => '<p>Take the first step towards your goals. Join us today!</p>',
+            ],
+            [
+                'title' => 'Hero image',
+                'content' => '<p>Check out our latest projects and initiatives.</p>',
+            ],
+            [
+                'title' => 'Hero video',
+                'content' => '<p>Watch our introduction video to learn more about us.</p>',
+            ],
+        ];
+
+        foreach ($features as $feature) {
+            $media = $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->limit(6)->get();
+            $mediaId = $media->shuffle()->shift()?->id;
+            $content = Content::factory()
+                ->site($page->site)
+                ->withTranslations($page->site->languages, ['content' => "<p>{$feature['title']}</p>"])
+                ->state([
+                    'meta' => fn ($attributes): array => array_merge_recursive((array) $attributes['meta'], [
+                        'image_id' => $mediaId,
+                        'media' => $media?->take(2)->pluck('id')->toArray(),
+                        'actions' => [
+                            [
+                                'type' => 'page',
+                                'page_id' => Page::where('site_id', $page->site->id)
+                                    ->whereHas(
+                                        'type',
+                                        /** @param Models\Type $query */
+                                        fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                    )
+                                    ->inRandomOrder()
+                                    ->value('uuid'),
+                                'site_id' => $page->site->id,
+                            ],
+                            [
+                                'type' => 'page',
+                                'page_id' => Page::where('site_id', $page->site->id)
+                                    ->whereHas(
+                                        'type',
+                                        /** @param Models\Type $query */
+                                        fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                    )
+                                    ->inRandomOrder()
+                                    ->value('uuid'),
+                                'site_id' => $page->site->id,
+                                'color' => 'secondary',
+                            ],
+                            [
+                                'type' => 'url',
+                                'url' => 'https://example.com',
+                                'label' => 'External',
+                                'color' => 'default',
+                            ],
+                        ],
+                    ]),
+                ])
+                ->create();
+
+            $widget->assets()->create([
+                'page_id' => $page->id,
+                'container' => 'hero',
+                'occurrence' => 1,
+                'asset_type' => 'content',
+                'asset_id' => $content->uuid,
+            ]);
+        }
+    }
+
+    public function createBusinessFeatures(Site $site, Models\Layout $layout): void
+    {
+        $title = 'Fundamental Capabilities That Set Us Apart';
+        $content = '<p>We combine innovation, efficiency, and deep expertise to deliver exceptional results. Our adaptable, client-focused approach ensures measurable value and lasting impact.</p>';
+        $features = [
+            [
+                'icon' => 'heroicon-o-light-bulb',
+                'title' => 'Innovative Solutions',
+                'content' => '<p>We leverage cutting-edge technology to create innovative solutions that drive success.</p>',
+            ],
+            [
+                'icon' => 'heroicon-o-academic-cap',
+                'title' => 'Expertise',
+                'content' => '<p>Our team of experts brings deep industry knowledge and experience to every project.</p>',
+            ],
+            [
+                'icon' => 'heroicon-o-user-group',
+                'title' => 'Client-Centric Approach',
+                'content' => '<p>We prioritize our clients\' needs and work collaboratively to achieve their goals.</p>',
+            ],
+            [
+                'icon' => 'heroicon-o-chart-bar',
+                'title' => 'Measurable Results',
+                'content' => '<p>We focus on delivering measurable results that drive growth and success.</p>',
+            ],
+            [
+                'icon' => 'heroicon-o-leaf',
+                'title' => 'Sustainable Practices',
+                'content' => '<p>We are committed to sustainable practices that benefit our clients and the environment.</p>',
+            ],
+            [
+                'icon' => 'heroicon-o-globe-alt',
+                'title' => 'Global Reach',
+                'content' => '<p>Our global presence allows us to serve clients across diverse markets and industries.</p>',
+            ],
+        ];
+
+        $widget = Widget::firstOrCreate([
+            'key' => 'business-features',
+        ]);
+
+        AddWidgetToLayoutContainerAction::run($widget, $layout, 'main');
+
+        $site->languages->each(function (Models\Language $language) use ($widget, $title, $content) {
+            $widget->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => Str::apiTranslate($title, $language->locale, 'en'),
+                'content' => Str::apiTranslate($content, $language->locale, 'en'),
+            ]);
+        });
+
+        $parentPage = Page::updateOrCreate([
+            'site_id' => $site->id,
+            'name' => 'Features',
+        ]);
+
+        $site->languages->each(function (Models\Language $language) use ($parentPage): void {
+            $title = Str::apiTranslate($parentPage->name, $language->locale, 'en');
+
+            $parentPage->translations()->firstOrCreate([
+                'language_id' => $language->id,
+            ], [
+                'title' => $title,
+            ]);
+        });
+
+        foreach ($features as $feature) {
+            $page = Page::updateOrCreate([
+                'site_id' => $site->id,
+                'name' => $feature['title'],
+            ], [
+                'parent_id' => $parentPage->id,
+                'meta' => [
+                    'icon' => $feature['icon'],
+                    'image_id' => $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->value('id'),
+                ],
+            ]);
+
+            $content = Content::updateOrCreate([
+                'name' => $feature['title'],
+            ], [
+                'meta' => [
+                    'icon' => $feature['icon'],
+                    'page_id' => $page->uuid,
+                ],
+            ]);
+
+            if ($widget->assets()->where('asset_id', $content->uuid)->exists()) {
+                continue;
+            }
+
+            $widget->assets()->create([
+                'occurrence' => 1,
+                'asset_type' => 'content',
+                'asset_id' => $content->uuid,
+            ]);
+
+            $site->languages->each(function (Models\Language $language) use ($page, $content, $feature): void {
+                $title = Str::apiTranslate($feature['title'], $language->locale, 'en');
+                $contents = Str::apiTranslate($feature['content'], $language->locale, 'en');
+
+                $page->translations()->firstOrCreate([
+                    'language_id' => $language->id,
+                ], [
+                    'title' => $title,
+                    'content' => $contents,
+                ]);
+
+                $content->translations()->firstOrCreate([
+                    'language_id' => $language->id,
+                ], [
+                    'title' => $title,
+                    'content' => $contents,
+                ]);
+            });
+        }
     }
 
     protected function navigationPageItems(\Illuminate\Support\Collection $siteTree, Models\Language $language): array

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('content_id')->index()->constrained()->cascadeOnDelete();
             $table->unsignedInteger('order')->default(0)->index();
-            $table->morphs('asset');
+            $table->uuidMorphs('asset');
             $table->userstamps();
             $table->timestamps();
             $table->unique(['content_id', 'asset_type', 'asset_id'], 'content_resource_index');

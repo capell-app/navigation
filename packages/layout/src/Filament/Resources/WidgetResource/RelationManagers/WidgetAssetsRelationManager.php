@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\WidgetResource\RelationManagers;
 
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Filament\Components\Forms\AssetTypeToggleButtons;
 use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
@@ -38,7 +39,7 @@ class WidgetAssetsRelationManager extends RelationManager
     public function form(Forms\Form $form): Forms\Form
     {
         return $form
-            ->schema(static::getResourceableForm());
+            ->schema(static::getAssetForm());
     }
 
     public function table(Table $table): Table
@@ -89,11 +90,8 @@ class WidgetAssetsRelationManager extends RelationManager
                                     ->toArray()
                             ),
 
-                        Forms\Components\ToggleButtons::make('type')
-                            ->label(__('capell-admin::form.type'))
-                            ->reactive()
-                            ->options(fn (): array => WidgetAsset::getTypes())
-                            ->inline(),
+                        AssetTypeToggleButtons::make('type')
+                            ->reactive(),
 
                         Forms\Components\Select::make('type_id')
                             ->label(__('capell-admin::form.type'))

@@ -11,7 +11,7 @@ use stdClass;
 
 abstract class AbstractWidget extends Component
 {
-    protected string $defaultView = 'capell::components.widget.default';
+    protected string $defaultView = 'capell-layout::components.widget.default';
 
     protected bool $skipRender = false;
 

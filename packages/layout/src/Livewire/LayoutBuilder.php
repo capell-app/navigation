@@ -160,8 +160,6 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
 
         $this->addAssets($containerKey, $widgetIndex, $hasPageAssets, $type, $assets);
 
-        $this->dispatch('refresh-assets', containerKey: $containerKey, widgetIndex: $widgetIndex);
-
         $this->layoutUpdated();
     }
 
@@ -497,7 +495,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                 $totalAssets = $livewire->countWidgetAssets($arguments['containerKey'], $arguments['widgetIndex']);
 
                 if ($totalAssets) {
-                    $hasPageAssets = $livewire->widgetHasPageAssets($arguments['containerKey'], $arguments['widgetIndex']);
+                    $hasPageAssets = $livewire->hasPageAssets($arguments['containerKey'], $arguments['widgetIndex']);
                 } else {
                     $hasPageAssets = (bool) $livewire->page_id;
                 }
@@ -511,7 +509,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     :component="$componentName"
                     :$containerKey
                     :existingRecords="$existingRecords"
-                    :hasPageAssets="$hasPageAssets"
+                    : ="$hasPageAssets"
                     :pageId="$pageId"
                     :siteId="$siteId"
                     :$widgetIndex
@@ -565,7 +563,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     ['type' => $arguments['type']]
                 )
             )
-            ->successNotificationTitle(__('capell-admin::message.resource_added'))
+            ->successNotificationTitle(__('capell-admin::message.asset_added'))
             ->model(WidgetAsset::class)
             ->record(
                 function (self $livewire, array $arguments): WidgetAsset {
@@ -862,7 +860,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
         return Action::make('convertPageAssets')
             ->label(
                 function (self $livewire, array $arguments): string {
-                    $hasPageAssets = $livewire->widgetHasPageAssets(
+                    $hasPageAssets = $livewire->hasPageAssets(
                         containerKey: $arguments['containerKey'],
                         widgetIndex: $arguments['widgetIndex']
                     );
@@ -881,7 +879,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     return false;
                 }
 
-                $hasPageAssets = $livewire->widgetHasPageAssets(
+                $hasPageAssets = $livewire->hasPageAssets(
                     containerKey: $arguments['containerKey'],
                     widgetIndex: $arguments['widgetIndex']
                 );
@@ -897,7 +895,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             ->requiresConfirmation()
             ->modalDescription(
                 function (self $livewire, array $arguments): string {
-                    $hasPageAssets = $livewire->widgetHasPageAssets(
+                    $hasPageAssets = $livewire->hasPageAssets(
                         containerKey: $arguments['containerKey'],
                         widgetIndex: $arguments['widgetIndex']
                     );
@@ -908,7 +906,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                 }
             )
             ->action(function (self $livewire, array $arguments, Action $action): void {
-                $hasPageAssets = $livewire->widgetHasPageAssets(
+                $hasPageAssets = $livewire->hasPageAssets(
                     containerKey: $arguments['containerKey'],
                     widgetIndex: $arguments['widgetIndex']
                 );
@@ -948,15 +946,6 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
         }
 
         return $this->layout->pages_count;
-    }
-
-    public function widgetHasPageAssets(string $containerKey, int $widgetIndex): bool
-    {
-        if (! isset($this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'])) {
-            return false;
-        }
-
-        return $this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'] === $this->page_id;
     }
 
     public function hasPageAssets(string $containerKey, int $widgetIndex): bool
@@ -1053,8 +1042,21 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
         $containerWidgets = array_merge(array_slice($containerWidgets, 0, $widgetIndex), [$widget], array_slice($containerWidgets, $widgetIndex));
         $this->containerWidgets[$containerKey] = $containerWidgets;
 
-        if ($this->hasPageAssets($containerKey, $widgetIndex)) {
-            $this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'] = $this->page_id;
+        $this->updatePageAssets($containerKey, $widgetIndex);
+    }
+
+    protected function updatePageAssets(string $containerKey, int $widgetIndex, ?bool $hasPageAssets = null): void
+    {
+        if (! $this->assets[$containerKey][$widgetIndex]) {
+            return;
+        }
+
+        if ($hasPageAssets === null) {
+            $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
+        }
+
+        foreach ($this->assets[$containerKey][$widgetIndex] as $assetIndex => $asset) {
+            $this->assets[$containerKey][$widgetIndex][$assetIndex]['page_id'] = $hasPageAssets ? $this->page_id : null;
         }
     }
 
@@ -1319,13 +1321,6 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
 
         $this->assets[$containerKey][$widgetIndex] = array_values($this->assets[$containerKey][$widgetIndex]);
 
-        /*if (
-            empty($this->assets[$containerKey][$widgetIndex])
-            && isset($this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'])
-        ) {
-            unset($this->containers[$containerKey]['widgets'][$widgetIndex]['page_id']);
-        }*/
-
         $this->containerWidgets[$containerKey][$widgetIndex]->setRelation('assets', $widgetAssets);
 
         $this->layoutUpdated();
@@ -1471,16 +1466,15 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             $widgetAssets = [];
 
             if ($this->containerWidgets[$containerKey][$widgetIndex]->assets->isNotEmpty()) {
-                $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]->assets
+                $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]
+                    ->assets
                     ->map(fn (WidgetAsset $resource): array => $resource->attributesToArray())
                     ->toArray();
             }
 
             $this->assets[$containerKey][$widgetIndex] = $widgetAssets;
 
-            if ($this->hasPageAssets($containerKey, $widgetIndex)) {
-                $this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'] = $this->page_id;
-            }
+            $this->updatePageAssets($containerKey, $widgetIndex);
         }
     }
 
@@ -1586,7 +1580,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
         $widgets = $this->getWidgetQuery()
             ->whereIn('key', $widgetKeys)
             ->get()
-            ->tap(fn (Collection $widgets): Collection => $this->loadMorphAssetableRelations($widgets))
+            ->tap(fn (Collection $widgets): Collection => $this->loadMorphAssetRelations($widgets))
             ->mapWithKeys(fn (Widget $widget): array => [$widget->key => $widget]);
 
         foreach ($this->containers as $containerKey => $container) {
@@ -1618,8 +1612,11 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                             return false;
                         }
 
-                        return (string) $resource->container === (string) $containerKey
-                            && (int) $resource->occurrence === (int) $occurrence;
+                        if ((string) $resource->container !== (string) $containerKey) {
+                            return false;
+                        }
+
+                        return (int) $resource->occurrence === (int) $occurrence;
                     }
                 )
                     ->sortBy('order')
@@ -1648,7 +1645,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
         };
     }
 
-    private function loadMorphAssetableRelations(Collection $widgets): Collection
+    private function loadMorphAssetRelations(Collection $widgets): Collection
     {
         $widgetAssets = $widgets->pluck('assets')
             ->flatten()
@@ -1822,19 +1819,13 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
 
     private function updateAssets(string $containerKey, int $widgetIndex): void
     {
-        $containerWidget = $this->containers[$containerKey]['widgets'][$widgetIndex];
-
         $widget = $this->getContainerWidget($containerKey, $widgetIndex);
 
         $occurrence = $this->getContainerWidgetOccurrence($containerKey, $widgetIndex);
 
         $assets = $this->assets[$containerKey][$widgetIndex] ?? [];
 
-        if ($assets) {
-            $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
-        } else {
-            $hasPageAssets = isset($containerWidget['page_id']) && $containerWidget['page_id'] === $this->page_id;
-        }
+        $hasPageAssets = $assets ? $this->hasPageAssets($containerKey, $widgetIndex) : (bool) $this->page_id;
 
         $this->syncAssets($widget, $containerKey, $occurrence, $assets, $hasPageAssets);
     }
@@ -1843,7 +1834,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
     {
         $existingAssets = $widget->assets()
             ->when(
-                $hasPageAssets && $this->page_id,
+                $hasPageAssets,
                 fn (Builder $query) => $query
                     ->where('container', $containerKey)
                     ->where('occurrence', $occurrence)
@@ -1872,7 +1863,9 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             function (array $resource) use ($existingAssets, $widget, $containerKey, $occurrence, $hasPageAssets, &$order): void {
                 ++$order;
 
-                $existingAsset = $existingAssets->get(sprintf('%s.%s', $resource['asset_type'], $resource['asset_id']));
+                $key = sprintf('%s.%s', $resource['asset_type'], $resource['asset_id']);
+
+                $existingAsset = $existingAssets->get($key);
 
                 if ($existingAsset) {
                     if ($existingAsset->order !== $order) {
@@ -2062,16 +2055,9 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
 
     private function togglePageAssets(string $containerKey, int $widgetIndex, ?int $pageId): void
     {
-        $this->assets[$containerKey][$widgetIndex] = array_map(
-            fn ($resource): array => array_merge($resource, ['page_id' => $pageId]),
-            $this->assets[$containerKey][$widgetIndex]
-        );
+        $hasPageAssets = $pageId !== null && $pageId !== 0;
 
-        if ($pageId !== null && $pageId !== 0) {
-            $this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'] = $pageId;
-        } elseif (isset($this->containers[$containerKey]['widgets'][$widgetIndex]['page_id'])) {
-            unset($this->containers[$containerKey]['widgets'][$widgetIndex]['page_id']);
-        }
+        $this->updatePageAssets($containerKey, $widgetIndex, $hasPageAssets);
 
         $this->layoutUpdated();
     }
@@ -2099,10 +2085,12 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     continue;
                 }
 
+                $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
+
                 $occurrence = $containerWidget['occurrence'] ?? $this->getContainerWidgetOccurrence($containerKey, $widgetIndex);
 
                 if ($containerWidget['widget_key'] === $currentWidget['widget_key']) {
-                    if (empty($currentWidget['page_id'])) {
+                    if (! $hasPageAssets) {
                         continue;
                     }
 
@@ -2116,7 +2104,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                 WidgetAsset::query()
                     ->where('widget_id', $widget->id)
                     ->when(
-                        ! empty($currentWidget['page_id']),
+                        $hasPageAssets,
                         fn (Builder $query) => $query->where('page_id', $this->page_id)
                             ->where('container', $containerKey)
                             ->where('occurrence', $occurrence)

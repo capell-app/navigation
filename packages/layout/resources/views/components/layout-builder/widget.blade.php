@@ -4,25 +4,42 @@ declare(strict_types=1);
 
 ?>
 
-@use(Capell\Admin\Facades\CapellAdmin;use Capell\Core\Facades\CapellCore;use Capell\Core\Models\Type;use Capell\Layout\Enums\LayoutResourceEnum;use Capell\Layout\Models\Content;use Filament\Support\Enums\ActionSize;use Filament\Support\Enums\FontWeight;use Filament\Support\Enums\IconSize;use Illuminate\Support\HtmlString;use Illuminate\View\ComponentAttributeBag)
-
 @props([
     'containerKey',
     'containerWidget',
     'loop',
     'occurrence',
-    'assetTypes',
     'assets',
     'assetsCount',
     'widget',
     'widgetIndex',
 ])
 @php
+    use Capell\Admin\Facades\CapellAdmin;
+    use Capell\Core\Facades\CapellCore;
+    use Capell\Core\Models\Type;
+    use Capell\Layout\Enums\LayoutResourceEnum;
+    use Capell\Layout\Models\Content;
+    use Filament\Support\Enums\ActionSize;
+    use Filament\Support\Enums\FontWeight;
+    use Filament\Support\Enums\IconSize;
+    use Illuminate\Support\HtmlString;
+    use Illuminate\View\ComponentAttributeBag;
+
     $occurrence = $containerWidget['occurrence'] ?? 1;
+
     $type = $widget->admin['type'] ?? ($widget->type->admin['type'] ?? []);
-    $assetTypes = $widget->type->admin['asset_types'] ?? [];
-    $widgetIcon = $widget->admin['icon'] ?? ($widget->type->admin['icon'] ?? null) ?: 'heroicon-o-document-text';
+
+    $assetTypes = ! empty($widget->admin['asset_types'])
+        ? $widget->admin['asset_types']
+        : ($widget->type->admin['asset_types'] ?? []);
+
+    $widgetIcon = ! empty($widget->admin['icon'])
+        ? $widget->admin['icon']
+        : ($widget->type->admin['icon'] ?? 'heroicon-o-document-text');
+
     $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
+
     $editWidgetAction = ($this->editWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]);
 
     $editContainerWidgetAction = ($this->editContainerWidgetAction)([
@@ -238,7 +255,7 @@ declare(strict_types=1);
     </div>
 
     @if ($assetTypes)
-        <x-capell-layout::layout-builder.widget.assets
+        <x-capell-layout::layout-builder.assets
             :$containerKey
             :$hasPageAssets
             :$occurrence

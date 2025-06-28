@@ -26,6 +26,7 @@ class HeroWidgetAssetSchema extends DefaultWidgetAssetSchema
                 ->statePath('meta')
                 ->schema([
                     Forms\Components\Tabs::make()
+                        ->columnSpanFull()
                         ->tabs([
                             self::getMediaTab(),
                             self::getRelatedTab(),

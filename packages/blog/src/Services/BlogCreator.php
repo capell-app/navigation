@@ -6,6 +6,7 @@ namespace Capell\Blog\Services;
 
 use Capell\Admin\Actions\AddPageToNavigationAction;
 use Capell\Admin\Filament\Schemas\Page\ResultsPageSchema;
+use Capell\Admin\Filament\Schemas\Type\PageTypeSchema;
 use Capell\Admin\Services\Creator\LayoutCreator;
 use Capell\Admin\Services\Creator\PageTypeCreator;
 use Capell\Blog\Enums\BlogResourceEnum;
@@ -115,7 +116,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.blog_archive_page'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => ResultsPageSchema::getKey(),
+                'schema' => PageTypeSchema::getKey(),
+                'default_schema' => ResultsPageSchema::getKey(),
                 'icon' => 'heroicon-o-archive-box',
             ],
             'meta' => [
@@ -302,7 +304,8 @@ class BlogCreator
                 'accessible' => false,
                 'content_editor' => 'ContentEditor',
                 'icon' => 'heroicon-o-newspaper',
-                'schema' => ArticleDefaultPageSchema::getKey(),
+                'schema' => PageTypeSchema::getKey(),
+                'default_schema' => ArticleDefaultPageSchema::getKey(),
                 'resource' => BlogResourceEnum::Article->name,
                 'with_tags' => true,
                 'exclude' => true,
@@ -338,7 +341,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.article'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => ArticleWidgetSchema::getKey(),
+                'schema' => PageTypeSchema::getKey(),
+                'default_schema' => ArticleWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-newspaper',
             ],
             'meta' => [
@@ -409,7 +413,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.blog'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => ResultsPageSchema::getKey(),
+                'schema' => PageTypeSchema::getKey(),
+                'default_schema' => ResultsPageSchema::getKey(),
                 'icon' => 'heroicon-o-newspaper',
                 'exclude_parent',
             ],

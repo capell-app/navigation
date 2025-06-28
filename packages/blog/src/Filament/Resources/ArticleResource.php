@@ -72,9 +72,7 @@ class ArticleResource extends PageResource
     #[Override]
     public static function getFormSchema(Form $form): array
     {
-        return [
-            static::getFormTypeSchema($form),
-        ];
+        return static::getFormTypeSchema($form);
     }
 
     #[Override]

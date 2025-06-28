@@ -23,7 +23,7 @@ declare(strict_types=1);
     'theme' => Frontend::getTheme(),
     'widget',
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-content-grid widget-content-accordion space-y-6"
     :$containerKey
     :$container
@@ -66,7 +66,7 @@ declare(strict_types=1);
                         "
                         class="hover:text-primary focus:text-primary group flex cursor-pointer items-center"
                     >
-                        <div class="ml-2 mr-1 flex w-10 justify-center">
+                        <div class="ml-2 flex w-10 justify-center">
                             @svg('heroicon-o-chevron-right', [
                                 'class' => 'text-link group-hover:text-primary group-focus:text-primary h-6 w-6',
                                 ':class' => "{ 'rotate-90': isActive(".$loop->iteration."), 'rotate-0': !isActive(".$loop->iteration.') }',
@@ -85,7 +85,7 @@ declare(strict_types=1);
                         "
                         class="relative max-h-0 overflow-hidden transition-all duration-700"
                     >
-                        <div class="ml-10 px-1 pr-4 pt-2">
+                        <div class="ml-4 px-1 pr-4 pt-1">
                             <div class="flex gap-6">
                                 @if ($widgetAsset->asset->translation)
                                     <x-capell::content
@@ -145,6 +145,6 @@ declare(strict_types=1);
             @endforeach
         </div>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

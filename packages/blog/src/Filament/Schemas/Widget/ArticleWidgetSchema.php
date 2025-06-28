@@ -42,6 +42,7 @@ class ArticleWidgetSchema extends AbstractSchema
                         Forms\Components\Tabs\Tab::make(__('capell-admin::generic.admin'))
                             ->statePath('admin')
                             ->icon('heroicon-o-cog')
+                            ->columns(['md' => 2])
                             ->schema([
                                 WidgetAdminSchema::make(),
                             ]),

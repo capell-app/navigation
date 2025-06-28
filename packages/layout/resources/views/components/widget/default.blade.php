@@ -19,7 +19,7 @@ declare(strict_types=1);
     $hasImage = $widget->meta['image_id'] ?? false && $widget->image;
 @endphp
 
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-default"
     container-class="flex flex-col gap-x-5 gap-y-3 lg:flex-row lg:items-center"
     :$container
@@ -58,6 +58,6 @@ declare(strict_types=1);
             />
         </div>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 abstract class AbstractPagesWidget extends AbstractWidget
 {
-    protected string $defaultView = 'capell::components.widget.page.pages';
+    protected string $defaultView = 'capell-layout::components.widget.page.pages';
 
     protected Collection $pages;
 

@@ -48,6 +48,7 @@ it('can render assets table', function (string $assetType): void {
         'siteId' => $page->site_id,
         'type' => $assetType,
         'widgetIndex' => $widgetIndex,
+        'hasPageAssets' => false,
     ])
         ->assertSuccessful();
 })->with($types);
@@ -66,6 +67,7 @@ describe('layout', function () use ($types): void {
             'actionId' => 'select-assets',
             'containerKey' => $containerKey,
             'widgetIndex' => $widgetIndex,
+            'hasPageAssets' => false,
         ])
             ->assertSuccessful()
             ->assertCountTableRecords(5)
@@ -86,6 +88,7 @@ describe('layout', function () use ($types): void {
             'actionId' => 'select-assets',
             'containerKey' => $containerKey,
             'widgetIndex' => $widgetIndex,
+            'hasPageAssets' => false,
         ])
             ->assertSuccessful()
             ->assertCountTableRecords(4)
@@ -105,6 +108,7 @@ describe('layout', function () use ($types): void {
             'actionId' => 'select-assets',
             'containerKey' => $containerKey,
             'widgetIndex' => $widgetIndex,
+            'hasPageAssets' => false,
         ])
             ->assertSuccessful()
             ->assertCountTableRecords(5)
@@ -174,6 +178,7 @@ describe('layout', function () use ($types): void {
             'actionId' => 'select-assets',
             'containerKey' => $containerKey,
             'widgetIndex' => $widgetIndex,
+            'hasPageAssets' => false,
         ])
             ->assertSuccessful()
             ->assertCountTableRecords(4)

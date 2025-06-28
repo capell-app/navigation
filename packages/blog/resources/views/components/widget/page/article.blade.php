@@ -20,7 +20,7 @@ declare(strict_types=1);
     'withTags' => $widget->meta['with_tags'] ?? false,
     'withNextPrev' => $widget->meta['with_next_prev'] ?? false,
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     :$container
     :$containerKey
     :index="$loop->index"
@@ -94,6 +94,6 @@ declare(strict_types=1);
             @endif
         </div>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

@@ -51,24 +51,29 @@ class DemoCommand extends Command
                 ? [$this->option('sites')]
                 : $this->option('sites');
         } else {
-            $siteIds = multisearch(
-                'Select a site to insert demo pages',
-                options: fn (string $search) => CapellCore::getModel(ModelEnum::Site)::query()
-                    ->when(
+            $sites = CapellCore::getModel(ModelEnum::Site)::query()
+                ->limit(10)
+                ->select(['id', 'name']);
+
+            if ($sites->count() === 1) {
+                $siteIds = $sites->pluck('id')->toArray();
+            } else {
+                $siteIds = multisearch(
+                    'Select a site to insert demo pages',
+                    options: fn (string $search) => $sites->when(
                         mb_strlen($search) > 0,
                         fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
                     )
-                    ->limit(10)
-                    ->select(['id', 'name'])
-                    ->get()
-                    ->mapWithKeys(fn (Site $site) => [$site->id => $site->name])
-                    ->toArray(),
-                validate: [
-                    'required',
-                    'array',
-                    'min:1',
-                ],
-            );
+                        ->get()
+                        ->mapWithKeys(fn (Site $site) => [$site->id => $site->name])
+                        ->toArray(),
+                    validate: [
+                        'required',
+                        'array',
+                        'min:1',
+                    ],
+                );
+            }
         }
 
         $demo_data = config('capell-demo.pages');
@@ -96,7 +101,7 @@ class DemoCommand extends Command
             /** @var ContentCreator $contentCreator */
             $contentCreator = app(ContentCreator::class);
 
-            $this->createContent($contentCreator, $demo_data[0], $site);
+            $this->createSiteContents($contentCreator, $demo_data[0], $site);
 
             if (! $this->createDemoLayouts($site)) {
                 $this->error('Failed to create demo pages for the selected site.');
@@ -112,7 +117,6 @@ class DemoCommand extends Command
 
     public function createDemoLayouts(Site $site): bool
     {
-
         $this->newLine();
         $this->line('Setting up homepage extras for site: '.$site->name);
 
@@ -137,13 +141,38 @@ class DemoCommand extends Command
 
         $containers = $layout->containers;
 
+        $heroWidget = $this->demoCreator->createHeroWidget();
+
+        $this->demoCreator->createWidgetAssets($heroWidget, $page);
+
+        $this->demoCreator->createBusinessFeatures($page->site, $layout);
+
+        $containers = ['hero' => [
+            'meta' => [
+                'colspan' => 12,
+                'container' => 'full',
+            ],
+            'widgets' => [
+                [
+                    'widget_key' => $heroWidget->key,
+                    'occurrence' => 1,
+                ],
+            ],
+        ]] + $containers;
+
         $containers['main']['widgets'] = [
-            ['widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page)->key, 'occurrence' => 1],
-            ['widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page, occurrence: 2)->key, 'occurrence' => 2],
+            [
+                'widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page)->key,
+                'occurrence' => 1,
+            ],
+            [
+                'widget_key' => $this->demoCreator->createPageCardsWidget($languages, $page, occurrence: 2)->key,
+                'occurrence' => 2,
+            ],
             ['widget_key' => $this->demoCreator->createGalleryWidget()->key],
             ['widget_key' => $this->demoCreator->createMediaCarouselWidget()->key],
             ['widget_key' => $this->demoCreator->createFaqWidget($languages)->key],
-            ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page)->key],
+            ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page->site)->key],
             ['widget_key' => $this->demoCreator->createStaticWidget($languages)->key],
         ];
 
@@ -151,8 +180,12 @@ class DemoCommand extends Command
         $layout->update(['containers' => $containers]);
     }
 
-    private function createContent(ContentCreator $contentCreator, array $data, Site $site, ?Collection $languages = null, ?Content $parent = null): void
+    private function createSiteContents(ContentCreator $contentCreator, array $data, Site $site, ?Collection $languages = null, ?Content $parent = null): void
     {
+        if ($site->contents()->count() > 28) {
+            return;
+        }
+
         if (! $languages instanceof Collection) {
             $languages = $site->languages;
         }
@@ -181,7 +214,7 @@ class DemoCommand extends Command
         }
 
         foreach ($data['children'] as $child) {
-            $this->createContent($contentCreator, $child, $site, $languages, $content);
+            $this->createSiteContents($contentCreator, $child, $site, $languages, $content);
         }
     }
 

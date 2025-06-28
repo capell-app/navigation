@@ -13,7 +13,7 @@ declare(strict_types=1);
     'loop',
     'widget',
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-navigation-bar"
     :$container
     :$containerKey
@@ -67,6 +67,6 @@ declare(strict_types=1);
             @endforeach
         </x-dynamic-component>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

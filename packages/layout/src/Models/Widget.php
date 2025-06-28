@@ -147,7 +147,7 @@ class Widget extends Model implements PageCacheable, Statusable
     public function getComponent(): ?string
     {
         return $this->getMetaComponent()
-            ?? config('capell-layout.default_widget', 'capell::widget.default');
+            ?? config('capell-layout.default_widget', 'capell-layout::widget.default');
     }
 
     public function getMetaComponent(): ?string

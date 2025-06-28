@@ -15,7 +15,7 @@ class Hero extends AbstractWidget
 
     protected ?Collection $contents = null;
 
-    protected string $defaultView = 'capell::components.widget.hero.index';
+    protected string $defaultView = 'capell-layout::components.widget.hero.index';
 
     public function render(array $data = [])
     {

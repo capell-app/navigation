@@ -13,6 +13,7 @@ use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
+use Capell\Layout\Filament\Schemas\Type\WidgetTypeSchema;
 use Capell\Layout\Models\Widget;
 use Illuminate\Support\Collection;
 
@@ -191,7 +192,7 @@ class WidgetCreator
             'name' => __('capell-admin::generic.media_carousel'),
             'type_id' => $mediaWidgetType->id,
             'meta' => [
-                'file_view' => 'capell::components.widget.assets.media.carousel',
+                'file_view' => 'capell-layout::components.widget.assets.media.carousel',
                 'limit' => 20,
                 'container' => 'full',
                 'background_color' => 'light-gray',
@@ -264,7 +265,7 @@ class WidgetCreator
             'name' => __('capell-admin::generic.page_slot'),
             'type_id' => $systemWidgetType->id,
             'meta' => [
-                'component' => 'capell::widget.slot',
+                'component' => 'capell-layout::widget.slot',
                 'type' => 'slot',
             ],
             'admin' => [
@@ -294,7 +295,8 @@ class WidgetCreator
             'admin' => [
                 'icon' => 'heroicon-c-link',
                 'notes' => 'Displays a list of related pages',
-                'schema' => WidgetSchemaEnum::Related->value,
+                'schema' => WidgetTypeSchema::getKey(),
+                'default_schema' => WidgetSchemaEnum::Related->value,
             ],
         ]);
 

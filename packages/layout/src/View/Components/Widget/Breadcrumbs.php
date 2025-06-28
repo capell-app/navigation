@@ -9,7 +9,7 @@ use Capell\Frontend\Services\Loader\PageLoader;
 
 class Breadcrumbs extends AbstractWidget
 {
-    protected string $defaultView = 'capell::components.widget.breadcrumbs';
+    protected string $defaultView = 'capell-layout::components.widget.breadcrumbs';
 
     protected array $pages = [];
 

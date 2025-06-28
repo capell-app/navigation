@@ -24,7 +24,7 @@ declare(strict_types=1);
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
     'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? true),
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-assets widget-assets-grid"
     :$container
     :$containerKey
@@ -47,7 +47,7 @@ declare(strict_types=1);
     @if ($widget->assets->isNotEmpty())
         <div
             @class([
-                'grid gap-x-8 gap-y-6 lg:gap-x-10 lg:gap-y-7',
+                'grid gap-x-8 gap-y-6 lg:gap-x-10 lg:gap-y-10',
                 'md:grid-cols-2' => $total >= 2,
                 'lg:grid-cols-3' => $total >= 3,
                 '2xl:grid-cols-4' => $total > 7,
@@ -71,6 +71,6 @@ declare(strict_types=1);
             @endforeach
         </div>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

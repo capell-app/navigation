@@ -15,7 +15,7 @@ class Tags extends AbstractWidget
 
     public $tags;
 
-    protected string $defaultView = 'capell::components.widget.tag.tags';
+    protected string $defaultView = 'capell-layout::components.widget.tag.tags';
 
     public function render(array $data = [])
     {

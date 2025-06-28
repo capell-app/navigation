@@ -26,7 +26,7 @@ abstract class AbstractAssetsTable extends Component implements Forms\Contracts\
 
     public ?array $existingRecords = [];
 
-    public ?bool $hasPageAssets = null;
+    public bool $hasPageAssets;
 
     public ?int $pageId = null;
 
@@ -76,7 +76,7 @@ abstract class AbstractAssetsTable extends Component implements Forms\Contracts\
             )
             ->columns($this->getTableColumns())
             ->description(
-                fn (self $livewire): string => $livewire->hasPageAssets === true
+                fn (self $livewire): string => $livewire->hasPageAssets
                     ? __('capell-admin::generic.select_page_widget_resource_description', ['type' => $this->type])
                     : __('capell-admin::generic.select_widget_resource_description', ['type' => $this->type])
             )
@@ -121,7 +121,7 @@ abstract class AbstractAssetsTable extends Component implements Forms\Contracts\
             containerKey: $this->containerKey,
             widgetIndex: $this->widgetIndex,
             type: $this->type,
-            hasPageAssets: $this->pageId !== null,
+            hasPageAssets: $this->hasPageAssets,
             assets: $livewire->selectedTableRecords,
         )
             ->to(LayoutBuilder::class);

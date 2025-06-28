@@ -7,6 +7,8 @@ namespace Capell\Layout\Filament\Components\Forms\Widget;
 use Capell\Admin\Filament\Components\Forms\AdminSchemaSelect;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\ImageUpload;
+use Capell\Core\Enums\AssetEnum;
+use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
 use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Schemas\Widget\DefaultWidgetSchema;
 use Filament\Forms;
@@ -46,9 +48,9 @@ class WidgetAdminSchema
                 ->helperText(__('capell-admin::generic.asset_type_info'))
                 ->multiple()
                 ->options([
-                    'content' => __('capell-admin::generic.content'),
-                    'media' => __('capell-admin::generic.media'),
-                    'page' => __('capell-admin::generic.page'),
+                    LayoutAssetEnum::Content->name => LayoutAssetEnum::Content->getLabel(),
+                    AssetEnum::Media->name => __('capell-admin::generic.media'),
+                    AssetEnum::Page->name => __('capell-admin::generic.page'),
                 ]),
         ];
     }

@@ -9,7 +9,9 @@ use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Core\Actions\EditPageUrlAction;
+use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeEnum;
+use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Filament\Concerns\HasAssetsRelationManager;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\ContentAsset;
@@ -31,13 +33,12 @@ class ContentAssetsRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('capell-admin::tab.resources');
+        return __('capell-admin::tab.assets');
     }
 
     public function form(Forms\Form $form): Forms\Form
     {
-        return $form
-            ->schema(static::getResourceableForm());
+        return $form->schema(static::getAssetForm())->columns(1);
     }
 
     public function table(Table $table): Table
@@ -69,13 +70,15 @@ class ContentAssetsRelationManager extends RelationManager
                 }
             )
             ->filters([
-                Tables\Filters\Filter::make('filter')
-                    ->form([
-                        Forms\Components\Select::make('type')
-                            ->label(__('capell-admin::form.type'))
-                            ->reactive()
-                            ->options(fn (): array => ContentAsset::getTypes()),
-                    ]),
+                Tables\Filters\SelectFilter::make('asset_type')
+                    ->label(__('capell-admin::form.asset_type'))
+                    ->options(
+                        fn (): array => CapellCore::getAssets()
+                            ->mapWithKeys(
+                                static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()]
+                            )
+                            ->toArray()
+                    ),
                 Tables\Filters\SelectFilter::make('type_id')
                     ->label(__('capell-admin::form.type'))
                     ->options(fn (): array => Content::getTypes()),

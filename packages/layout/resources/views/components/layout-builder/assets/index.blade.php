@@ -110,7 +110,7 @@ declare(strict_types=1);
                     }
                 @endphp
 
-                <x-capell-layout::layout-builder.widget.asset
+                <x-capell-layout::layout-builder.assets.asset
                     :$containerKey
                     :index="$loop->index"
                     :$occurrence

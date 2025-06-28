@@ -14,7 +14,6 @@ use Capell\Core\Data\TypeData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
-use Capell\Layout\Actions\InstallPackageAction;
 use Capell\Layout\Commands\DemoCommand;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
@@ -104,7 +103,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                     ->endWith(function (InstallCommand $command): void {
                         $command->call('migrate');
 
-                        InstallPackageAction::run();
+                        $command->call('capell-layout:install');
                     })
             );
     }
@@ -338,6 +337,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         CapellAdmin::registerSchemas('WidgetAsset', Enums\WidgetAssetSchemaEnum::cases());
         CapellAdmin::registerSchemas('LayoutContainer', Enums\LayoutContainerSchemaEnum::cases());
         CapellAdmin::registerSchemas('LayoutWidget', Enums\LayoutWidgetSchemaEnum::cases());
+        CapellAdmin::registerSchema(SchemaEnum::Type, Schemas\Type\WidgetTypeSchema::class);
         CapellAdmin::registerSchema(SchemaEnum::Layout, Schemas\Layout\DefaultLayoutSchema::class);
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\DefaultPageSchema::class);
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\LandingPageSchema::class);

@@ -107,9 +107,9 @@ class WidgetResource extends Resource
             TypeSchema::make()
                 ->schema(
                     function (Forms\Get $get, TypeSchema $component, ?Widget $record) use ($form): array {
-                        if ($record?->admin['schema'] ?? null) {
+                        if ($record?->admin['default_schema'] ?? null) {
                             /** @var class-string<AbstractWidgetSchema> $schema */
-                            $schema = CapellAdmin::getSchema(SchemaEnum::Widget->value, $record->admin['schema']);
+                            $schema = CapellAdmin::getSchema(SchemaEnum::Widget->value, $record->admin['default_schema']);
 
                             return app($schema)::make($form);
                         }
@@ -118,7 +118,7 @@ class WidgetResource extends Resource
 
                         $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
 
-                        $adminSchema = $type->admin['schema'] ?? DefaultWidgetSchema::getKey();
+                        $adminSchema = $type->admin['default_schema'] ?? DefaultWidgetSchema::getKey();
 
                         return $component->getSchema($form, SchemaEnum::Widget->name, $adminSchema);
                     }
@@ -208,6 +208,7 @@ class WidgetResource extends Resource
                     'types.meta->component',
                 ]),
             ImageColumn::make('meta.image')
+                ->visibility('public')
                 ->toggleable(isToggledHiddenByDefault: true),
             LanguagesColumn::make('translations.language'),
             Tables\Columns\TextColumn::make('translation.contents')

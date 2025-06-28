@@ -29,7 +29,7 @@ declare(strict_types=1);
     'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
     'widget',
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-media-carousel"
     :$container
     :$containerKey
@@ -137,6 +137,6 @@ declare(strict_types=1);
             </div>
         @endif
     </div>
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

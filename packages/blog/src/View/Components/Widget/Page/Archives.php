@@ -17,7 +17,7 @@ class Archives extends AbstractWidget
 
     protected Collection|LengthAwarePaginator $archives;
 
-    protected string $defaultView = 'capell::components.widget.page.archives';
+    protected string $defaultView = 'capell-layout::components.widget.page.archives';
 
     public function render(array $data = [])
     {

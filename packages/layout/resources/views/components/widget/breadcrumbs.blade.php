@@ -26,7 +26,7 @@ declare(strict_types=1);
     class="widget-breadcrumbs my-4 text-gray-800"
     aria-label="{{ __('capell-frontend::generic.breadcrumbs') }}"
 >
-    <x-capell::widget.wrapper
+    <x-capell-layout::widget.wrapper
         :$container
         :$containerKey
         :index="$loop->index"
@@ -75,7 +75,7 @@ declare(strict_types=1);
                 </div>
             </li>
         </ol>
-    </x-capell::widget.wrapper>
+    </x-capell-layout::widget.wrapper>
 </nav>
 
 <?php

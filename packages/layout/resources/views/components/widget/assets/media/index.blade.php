@@ -22,7 +22,7 @@ declare(strict_types=1);
     'widget',
     'widget_theme' => $widget->meta['widget_theme'] ?? '',
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-media-gallery"
     :$container
     :$containerKey
@@ -128,6 +128,6 @@ declare(strict_types=1);
             @endforeach
         </div>
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

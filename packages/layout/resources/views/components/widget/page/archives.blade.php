@@ -9,16 +9,18 @@ declare(strict_types=1);
 @endphp
 
 @props([
+    'archives' => [],
     'container',
     'containerKey',
     'hideContent' => $widgetData['meta']['hide_content'] ?? false,
-    'language' => Frontend::getLanguage(),
     'loop',
+    'results',
     'site' => Frontend::getSite(),
+    'archiveDate' => Frontend::getPageParams()['archive_date'] ?? null,
     'widget',
 ])
-<x-capell::widget.wrapper
-    class="widget-tags"
+<x-capell-layout::widget.wrapper
+    class="widget-archive"
     :$container
     :$containerKey
     :index="$loop->index"
@@ -31,35 +33,32 @@ declare(strict_types=1);
             :$containerKey
             :content="$widget->translation->content"
             :contents="$widget->translation->content ? null : $widget->translation->contents"
-            :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             :title="$widget->translation->title"
+            :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         />
     @endif
 
-    @if ($tags->isEmpty())
-        <x-capell::no-results>
-            {{ __('No tags found.') }}
-        </x-capell::no-results>
+    @if ($archives?->isEmpty())
+        <x-capell::no-results />
     @else
         <ul class="divide-y divide-gray-100 dark:divide-gray-600">
-            @foreach ($tags as $tag)
-                @php($url = $tagPage->pageUrl->full_url.'/'.$tag->getTranslation('slug', $language->code))
+            @foreach ($archives as $archive)
+                @php
+                    $url = $archivePage->pageUrl->full_url.'/'.$archive->year.'-'.$archive->month;
+                    $active = $archiveDate && $archiveDate->month === $archive->month && $archiveDate->year === $archive->year;
+                @endphp
+
                 <x-capell::list.list-item
                     :$url
-                    :count="$tag->pages_count"
+                    :count="$archive->total"
+                    :active="$active"
                     size="sm"
                 >
-                    {{ $tag->getTranslation('name', $language->code) }}
+                    {{ Carbon\Carbon::create()->day(1)->month($archive->month)->year($archive->year)->format('F Y') }}
                 </x-capell::list.list-item>
             @endforeach
         </ul>
     @endif
-    @if (method_exists($tags, 'total') && $tags->hasPages())
-        <x-capell::pagination
-            :results="$tags"
-            :scrollToElement="$containerKey.'-'.$widget->key.'-'.$index"
-        />
-    @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php

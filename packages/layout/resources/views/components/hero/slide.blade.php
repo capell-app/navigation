@@ -50,11 +50,7 @@ declare(strict_types=1);
     @if ($backgroundImage)
         <x-dynamic-component
             format="webp"
-            :component="
-                $backgroundImage->hasCuration('hero')
-                ? 'capell::media.background'
-                : 'capell::media.background-glider'
-            "
+            component="capell::media.background-glider"
             curation="hero"
             :media="$backgroundImage"
             :srcset="['1680w', '1024w', '640w']"

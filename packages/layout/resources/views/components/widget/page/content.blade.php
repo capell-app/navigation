@@ -33,7 +33,7 @@ declare(strict_types=1);
 @endphp
 
 @if ($hasContent)
-    <x-capell::widget.wrapper
+    <x-capell-layout::widget.wrapper
         :$container
         :$containerKey
         :index="$loop->index"
@@ -58,7 +58,7 @@ declare(strict_types=1);
                 button_color="primary"
             />
         @endif
-    </x-capell::widget.wrapper>
+    </x-capell-layout::widget.wrapper>
 @endif
 
 <?php

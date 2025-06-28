@@ -8,9 +8,9 @@ use Capell\Admin\Filament\Components\Forms\TypeSchema;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\ImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
@@ -82,7 +82,7 @@ class ContentResource extends Resource
 
                         $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
 
-                        $adminSchema = $type->admin['schema'] ?? DefaultContentSchema::getKey();
+                        $adminSchema = $type->admin['default_schema'] ?? DefaultContentSchema::getKey();
 
                         return $component->getSchema($form, SchemaEnum::Content->value, $adminSchema);
                     }
@@ -500,7 +500,9 @@ class ContentResource extends Resource
                     fn (Pages\ListContents $livewire): bool => $livewire->activeTab
                         || ! empty($livewire->getTableFilterState('filter')['site_id'])
                 ),
-            ImageColumn::make('image')
+            CuratorColumn::make('asset.image_id')
+                ->label(__('capell-admin::table.image'))
+                ->relationship('image')
                 ->toggleable(),
             StatusColumn::make('status'),
             DateColumn::make('publish_from')

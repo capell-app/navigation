@@ -29,7 +29,7 @@ abstract class AbstractWidget extends Component
 
     public array $widgetData = [];
 
-    protected string $defaultView = 'capell::components.widget.default';
+    protected string $defaultView = 'capell-layout::components.widget.default';
 
     protected $skipRender = false;
 

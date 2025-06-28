@@ -15,7 +15,7 @@ class Navigation extends AbstractWidget
 
     public ?Models\Navigation $menu = null;
 
-    protected string $defaultView = 'capell::components.widget.navigation.index';
+    protected string $defaultView = 'capell-layout::components.widget.navigation.index';
 
     protected function mountWidget(): void
     {

@@ -19,7 +19,7 @@ class DefaultWidgetAssetSchema extends AbstractSchema
     public static function make(Forms\Form $form): array
     {
         return [
-            self::getResourceableFormSchema($form),
+            self::getAssetFormSchema($form),
         ];
     }
 
@@ -47,7 +47,7 @@ class DefaultWidgetAssetSchema extends AbstractSchema
         return PageResource::getFormSchema($form);
     }
 
-    protected static function getResourceableFormSchema(Forms\Form $form): Forms\Components\Group
+    protected static function getAssetFormSchema(Forms\Form $form): Forms\Components\Group
     {
         return Forms\Components\Group::make()
             ->relationship('asset')

@@ -28,7 +28,7 @@ declare(strict_types=1);
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? false),
     'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? false),
 ])
-<x-capell::widget.wrapper
+<x-capell-layout::widget.wrapper
     class="widget-pages"
     :$containerKey
     :$container
@@ -91,6 +91,6 @@ declare(strict_types=1);
             <x-capell::pagination :$results />
         @endif
     @endif
-</x-capell::widget.wrapper>
+</x-capell-layout::widget.wrapper>
 
 <?php
