@@ -76,6 +76,8 @@ use Wildside\Userstamps\Userstamps;
  * @method static Builder<static>|Widget withWhereHasLanguage(int $language_id)
  * @method static Builder<static>|Widget withoutTrashed()
  *
+ * @property-read Media|null $backgroundImage
+ *
  * @mixin \Eloquent
  */
 #[ObservedBy(WidgetObserver::class)]
@@ -169,6 +171,11 @@ class Widget extends Model implements PageCacheable, Statusable
     public function image(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'meta->image_id');
+    }
+
+    public function backgroundImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'meta->background_image_id');
     }
 
     public function type(): BelongsTo

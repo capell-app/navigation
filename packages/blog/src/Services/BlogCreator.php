@@ -157,6 +157,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-articles'],
@@ -188,9 +189,6 @@ class BlogCreator
                 'with_summary' => true,
                 'with_tags' => true,
                 'margin' => ['b-lg'],
-            ],
-            'admin' => [
-                'notes' => 'Displays a list of archived pages grouped by year and month',
             ],
         ]);
 
@@ -282,6 +280,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
                     ],
                     'widgets' => [
                         ['widget_key' => 'related-pages'],
@@ -326,9 +325,6 @@ class BlogCreator
                 'with_author' => false,
                 'with_tags' => true,
                 'with_next_prev' => true,
-            ],
-            'admin' => [
-                'notes' => 'Article content, including title, author, and tags, with navigation to next and previous articles',
             ],
         ]);
     }
@@ -424,6 +420,7 @@ class BlogCreator
                 'page_group' => 'article',
                 'limit' => 10,
                 'pagination' => true,
+                'accessible' => false,
                 'exclude_parent' => true,
                 'with_image' => true,
                 'with_published' => true,
@@ -442,7 +439,7 @@ class BlogCreator
         $widget = Widget::firstOrCreate([
             'key' => 'latest-articles',
         ], [
-            'name' => __('capell-blog::generic.blog'),
+            'name' => __('capell-blog::generic.latest_articles'),
             'type_id' => Type::firstWhere(['key' => WidgetTypeEnum::PageResults, 'type' => LayoutTypeEnum::Widget])?->id,
             'meta' => [
                 'component' => WidgetComponentEnum::LivewirePages,
@@ -450,13 +447,12 @@ class BlogCreator
                 'page_group' => 'article',
                 'pagination' => false,
                 'with_published' => true,
-                'with_summary' => true,
+                'with_image' => true,
                 'with_link_text' => true,
                 'margin' => ['b-lg'],
             ],
             'admin' => [
                 'icon' => 'heroicon-o-newspaper',
-                'notes' => 'Displays a list of the latest articles',
             ],
         ]);
 

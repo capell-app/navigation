@@ -145,7 +145,6 @@ class WidgetAssetsRepeater
                             ->withUuid()
                             ->required()
                             ->afterStateHydrated(static function (ImageMediaPicker $component, array|int|string|null $state): void {
-
                                 if (blank($state)) {
                                     $component->state([]);
 

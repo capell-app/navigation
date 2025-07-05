@@ -5,6 +5,7 @@ declare(strict_types=1);
 ?>
 
 @php
+    use Capell\Core\Models\Media;
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader\LayoutLoader;
     use Capell\Layout\Facades\Layout;
@@ -12,9 +13,11 @@ declare(strict_types=1);
 
 @props([
     'colspan' => 12,
+    'columnStart' => 0,
     'container',
     'containerKey',
     'containerIndex',
+    'containerWidth' => $container['meta']['container'] ?? null,
     'layout',
     'spacing' => $container['meta']['spacing'] ?? null,
     'padding' => $container['meta']['padding'] ?? [],
@@ -28,8 +31,10 @@ declare(strict_types=1);
         $htmlClass .= ' '.$container['meta']['html_class'];
     }
 
-    if ($containerKey === 'sidebar') {
-        $htmlClass .= ' sidebar sidebar-sticky space-y-10 pt-10 pb-20';
+    if ($container['meta']['background_image_id'] ?? false) {
+        $backgroundImage = Media::find($container['meta']['background_image_id']);
+    } else {
+        $backgroundImage = null;
     }
 @endphp
 
@@ -38,36 +43,43 @@ declare(strict_types=1);
 </div>{{-- format-ignore-end --}}
 @endif
 
-@if ($colspan !== 12)
-    @if (! $previousColspan || $previousColspan === 12)
-        {{-- format-ignore-start --}}
-        <div class="container flex">
-            <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
-                {{-- format-ignore-end --}}
-    @endif
-
-    {{-- format-ignore-start --}}
-                <div @class([
-        'lg:col-span-1' => $colspan === 1,
-        'lg:col-span-2' => $colspan === 2,
-        'lg:col-span-3' => $colspan === 3,
-        'lg:col-span-4' => $colspan === 4,
-        'lg:col-span-5' => $colspan === 5,
-        'lg:col-span-6' => $colspan === 6,
-        'lg:col-span-7' => $colspan === 7,
-        'lg:col-span-8' => $colspan === 8,
-        'lg:col-span-9' => $colspan === 9,
-        'lg:col-span-10' => $colspan === 10,
-        'lg:col-span-11' => $colspan === 11,
-        'lg:col-span-12' => $colspan === 12,
-    ])>
-                    @if (!empty($container['meta']['container_inner']))
-                        <div class="container-inner relative">
-                            @endif
-                            {{-- format-ignore-end --}}
+{{-- format-ignore-start --}}
+@if ($backgroundImage)
+    <div class="relative">
+    <div
+        @if ($backgroundImage)
+            style="{{ $backgroundImage ? 'background-image:url('.$backgroundImage->url.');' : '' }}"
+        @endif
+        @class([
+            "absolute top-0 bottom-0 left-0 w-1/2 -z-1 h-full bg-cover bg-center bg-no-repeat",
+        ])
+    >
+    </div>
 @endif
 
+@if ($colspan !== 12)
+    @if (! $previousColspan || $previousColspan === 12)
+        <div
+            @class([
+                "grow",
+                "container" => $containerWidth !== 'full',
+            ])
+        >
+            <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
+    @endif
+
+    <div
+        style="--colspan: {{ $colspan }}; --column-start: {{ $columnStart }};"
+        @class([
+            "lg:col-span-[var(--colspan)]",
+            "lg:col-start-[var(--column-start)]",
+        ])
+    >
+@endif
+{{-- format-ignore-end --}}
+
 <div
+    id="layout-container-{{ $containerKey }}"
     @class([
         'layout-container',
         $htmlClass => (bool) $htmlClass,
@@ -138,20 +150,18 @@ declare(strict_types=1);
     @endforeach
 </div>
 
-@if ($colspan !== 12)
-    {{-- format-ignore-start --}}
-                                @if (!empty($container['meta']['container_inner']))
-                        </div>
-                    @endif
-                </div>
-                {{-- format-ignore-end --}}
+{{-- format-ignore-start --}}
+@if ($backgroundImage)
+    </div>
 @endif
+@if ($colspan !== 12)
+    </div>
 
-@if ($previousColspan && $previousColspan !== 12)
-    {{-- format-ignore-start --}}
+    @if ($previousColspan && $previousColspan !== 12)
             </div>
         </div>
-        {{-- format-ignore-end --}}
+    @endif
 @endif
+{{-- format-ignore-end --}}
 
 <?php

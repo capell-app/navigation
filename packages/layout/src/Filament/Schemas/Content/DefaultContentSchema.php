@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Schemas\Content;
 
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\CallToActionText;
+use Capell\Admin\Filament\Components\Forms\CustomColorInput;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
@@ -28,6 +30,10 @@ class DefaultContentSchema extends AbstractSchema
                 ->label(__('capell-admin::form.icon')),
             CuratorPicker::make('image_id')
                 ->label(__('capell-admin::form.image')),
+            CustomColorInput::make(
+                name: 'color',
+                label: __('capell-admin::form.color'),
+            ),
             Forms\Components\Group::make()
                 ->schema([
                     PageSelect::make('page_uuid')
@@ -66,6 +72,13 @@ class DefaultContentSchema extends AbstractSchema
             ContentTranslationsRepeater::make($form),
             Forms\Components\Grid::make()
                 ->statePath('meta')
+                ->mutateDehydratedStateUsing(function (array $state): array {
+                    if (isset($state['image_id'])) {
+                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
+                    }
+
+                    return $state;
+                })
                 ->schema(self::getMetaSchema()),
         ];
     }

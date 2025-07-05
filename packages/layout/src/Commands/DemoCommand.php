@@ -117,6 +117,7 @@ class DemoCommand extends Command
 
     public function createDemoLayouts(Site $site): bool
     {
+
         $this->newLine();
         $this->line('Setting up homepage extras for site: '.$site->name);
 
@@ -132,7 +133,6 @@ class DemoCommand extends Command
     public function setupHomepage(Page $page, Collection $languages): void
     {
         $layout = $this->getHomeLayout();
-
         if (! $layout instanceof Layout) {
             throw new Exception('Unable to find homepage layout');
         }
@@ -165,17 +165,57 @@ class DemoCommand extends Command
                 'widget_key' => $this->demoCreator->createPageCardsWidget($page)->key,
                 'occurrence' => 1,
             ],
+            ['widget_key' => $this->demoCreator->createGalleryWidget()->key],
             [
                 'widget_key' => $this->demoCreator->createPageCardsWidget($page, occurrence: 2)->key,
                 'occurrence' => 2,
             ],
-            ['widget_key' => $this->demoCreator->createGalleryWidget()->key],
-            ['widget_key' => $this->demoCreator->createBannerImageWidget($languages)->key],
             ['widget_key' => $this->demoCreator->createMediaCarouselWidget()->key],
-            ['widget_key' => $this->demoCreator->createFaqWidget($languages)->key],
-            ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page->site)->key],
-            ['widget_key' => $this->demoCreator->createStaticWidget($languages)->key],
-            ['widget_key' => $this->demoCreator->createBusinessFeatures($page->site, $layout)->key],
+        ];
+
+        $containers['faq-main'] = [
+            'meta' => [
+                'colspan' => 8,
+            ],
+            'widgets' => [
+                ['widget_key' => $this->demoCreator->createFaqWidget($languages)->key],
+            ],
+        ];
+
+        $containers['faq-sidebar'] = [
+            'meta' => [
+                'colspan' => 4,
+                'container' => 'full',
+            ],
+            'widgets' => [
+                ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page->site)->key],
+            ],
+        ];
+
+        $containers['secondary'] = [
+            'meta' => [
+                'colspan' => 12,
+            ],
+            'widgets' => [
+                ['widget_key' => $this->demoCreator->createBannerImageWidget($languages)->key],
+                ['widget_key' => $this->demoCreator->createContentWidget($languages)->key],
+                ['widget_key' => $this->demoCreator->createStatisticsWidget()->key],
+                ['widget_key' => $this->demoCreator->createBusinessFeatures($page->site, $layout)->key],
+            ],
+        ];
+
+        $containers['split-two'] = [
+            'meta' => [
+                'colspan' => 6,
+                'column_start' => 7,
+                'spacing' => 'none',
+                'html_class' => 'relative',
+                'background_color' => 'light-gray',
+                'background_image_id' => $this->demoCreator->getExampleMedia()?->id,
+            ],
+            'widgets' => [
+                ['widget_key' => $this->demoCreator->createSplitContentWidget($languages)->key],
+            ],
         ];
 
         $layout->containers = $containers;

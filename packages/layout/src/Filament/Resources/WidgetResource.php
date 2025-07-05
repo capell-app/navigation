@@ -191,7 +191,6 @@ class WidgetResource extends Resource
         return [
             IdentifierColumn::make('id'),
             NameColumn::make('name')
-                ->description(fn (Widget $record): ?string => $record->admin['notes'] ?? null)
                 ->suffixBadges([
                     Badge::make('type.name')
                         ->label(fn (Widget $record): ?string => $record->type?->name)

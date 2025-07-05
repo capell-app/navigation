@@ -20,7 +20,7 @@ declare(strict_types=1);
         :component="$pageRecord->image->hasCuration('thumbnail') ? 'curator-curation' : 'curator-glider'"
         curation="thumbnail"
         :media="$pageRecord->image"
-        :class="implode(' ', array_filter([$class, 'rounded' => $theme->meta['rounded'] ?? false]))"
+        :class="implode(' ', array_filter([$class, 'rounded' => $theme->meta['rounded_images'] ?? false]))"
         loading="lazy"
         :alt="strip_tags($pageRecord->image->alt ?: $pageRecord->translation->label)"
     />

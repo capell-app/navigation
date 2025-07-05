@@ -68,11 +68,11 @@ class DemoCreator
         $this->tagModel = CapellCore::getModel(ModelEnum::Tag);
     }
 
-    public function createStaticWidget(Collection $languages): Widget
+    public function createContentWidget(Collection $languages): Widget
     {
         $siteId = Site::default()?->value('id');
         $widget = $this->widgetModel::firstOrCreate(['key' => 'example-content'], [
-            'name' => 'Example Static Contents',
+            'name' => 'Example Content',
             'type_id' => $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)->default()->first()->id,
             'meta' => [
                 'size' => 'md',
@@ -80,7 +80,7 @@ class DemoCreator
                 'padding' => ['md'],
                 'reverse_order' => true,
                 'background_color' => 'light-gray',
-                'image_id' => $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->value('id'),
+                'image_id' => $this->getExampleMedia()?->id,
                 'actions' => [
                     [
                         'type' => 'page',
@@ -115,6 +115,53 @@ class DemoCreator
         return $widget;
     }
 
+    public function createSplitContentWidget(Collection $languages): Widget
+    {
+        $siteId = Site::default()?->value('id');
+
+        $widget = $this->widgetModel::firstOrCreate(['key' => 'example-split-content'], [
+            'name' => 'Example Split Content',
+            'type_id' => $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)->default()->first()->id,
+            'meta' => [
+                'align' => 'center',
+                'size' => 'md',
+                'style' => 'column',
+                'padding' => ['md'],
+                'image_id' => $this->getExampleMedia()?->id,
+                'actions' => [
+                    [
+                        'type' => 'page',
+                        'page_uuid' => Page::where('site_id', $siteId)
+                            ->whereHas(
+                                'type',
+                                /** @param Models\Type $query */
+                                fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                            )
+                            ->inRandomOrder()
+                            ->value('uuid'),
+                        'site_id' => $siteId,
+                    ],
+                ],
+            ],
+        ]);
+
+        foreach ($languages as $language) {
+            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
+                'title' => 'Example Content',
+                'contents' => [
+                    [
+                        'type' => 'content',
+                        'data' => [
+                            'content' => str(config('capell-demo.contents')[$language->code])->limit(200)->toString(),
+                        ],
+                    ],
+                ],
+            ]);
+        }
+
+        return $widget;
+    }
+
     public function createBannerImageWidget(Collection $languages): Widget
     {
         $siteId = Site::default()?->value('id');
@@ -124,7 +171,7 @@ class DemoCreator
             'meta' => [
                 'component' => 'capell-layout::widget.banner-image',
                 'margin' => ['lg'],
-                'image_id' => $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->value('id'),
+                'image_id' => $this->getExampleMedia()?->id,
                 'actions' => [
                     [
                         'type' => 'page',
@@ -157,6 +204,18 @@ class DemoCreator
         }
 
         return $widget;
+    }
+
+    public function createImageWidget(): Widget
+    {
+        return $this->widgetModel::firstOrCreate(['key' => 'example-image'], [
+            'name' => 'Example Image',
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Default, 'type' => LayoutTypeEnum::Widget])->id,
+            'meta' => [
+                'component' => 'capell-layout::widget.banner-image',
+                'background_image_id' => $this->getExampleMedia()?->id,
+            ],
+        ]);
     }
 
     public function createGalleryWidget(): Widget
@@ -199,9 +258,6 @@ class DemoCreator
                     'with_summary' => true,
                     'with_link_text' => true,
                     'margin' => ['lg'],
-                ],
-                'admin' => [
-                    'notes' => 'Displays a list of pages in a tile layout',
                 ],
             ]);
         }
@@ -450,13 +506,13 @@ class DemoCreator
             ->whereHas(
                 'type',
                 /** @param  Models\Type  $query */
-                fn (BuilderContract $query) => $query->whereIn('type', ['page', 'article'])
+                fn (BuilderContract $query) => $query->where('type', 'page')
                     ->enabled()
                     ->visible()
                     ->accessible()
             )
             ->with([
-                'children' => fn (BuilderContract $query) => $query->whereHas('type')->limit(6),
+                'children' => fn (BuilderContract $query) => $query->whereHas('type')->limit(2),
             ])
             ->visible()
             ->limit(4)
@@ -472,7 +528,7 @@ class DemoCreator
 
         // Create widget
         $widget = $this->widgetModel::firstOrCreate(['key' => 'example-navigation'], [
-            'name' => __('capell-admin::generic.navigation'),
+            'name' => __('Example Navigation'),
             'type_id' => $this->typeModel::firstWhere(['key' => 'navigation', 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'navigation' => $handle,
@@ -520,7 +576,6 @@ class DemoCreator
                 'schema' => HeroWidgetSchema::getKey(),
                 'asset_types' => [LayoutAssetEnum::Content->value],
                 'widget_asset_schema' => HeroWidgetAssetSchema::getKey(),
-                'notes' => 'Displays a prominent banner section, often used for showcasing key content or messages',
             ],
         ]);
     }
@@ -652,7 +707,7 @@ class DemoCreator
                 'align' => 'center',
                 'padding' => ['lg'],
                 'view_file' => 'capell-layout::components.widget.assets.features',
-                'image_id' => $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->value('id'),
+                'image_id' => $this->getExampleMedia()?->id,
             ],
         ]);
 
@@ -662,8 +717,8 @@ class DemoCreator
             $widget->translations()->firstOrCreate([
                 'language_id' => $language->id,
             ], [
-                'title' => Str::apiTranslate($title, $language->locale, 'en'),
-                'content' => Str::apiTranslate($content, $language->locale, 'en'),
+                'title' => $title,
+                'content' => $content,
             ]);
         });
 
@@ -673,12 +728,10 @@ class DemoCreator
         ]);
 
         $site->languages->each(function (Models\Language $language) use ($parentPage): void {
-            $title = Str::apiTranslate($parentPage->name, $language->locale, 'en');
-
             $parentPage->translations()->firstOrCreate([
                 'language_id' => $language->id,
             ], [
-                'title' => $title,
+                'title' => $parentPage->name,
             ]);
         });
 
@@ -690,7 +743,7 @@ class DemoCreator
                 'parent_id' => $parentPage->id,
                 'meta' => [
                     'icon' => $feature['icon'],
-                    'image_id' => $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->value('id'),
+                    'image_id' => $this->getExampleMedia()?->id,
                 ],
             ]);
 
@@ -704,21 +757,18 @@ class DemoCreator
             ]);
 
             $site->languages->each(function (Models\Language $language) use ($page, $content, $feature): void {
-                $title = Str::apiTranslate($feature['title'], $language->locale, 'en');
-                $contents = Str::apiTranslate($feature['content'], $language->locale, 'en');
-
                 $page->translations()->firstOrCreate([
                     'language_id' => $language->id,
                 ], [
-                    'title' => $title,
-                    'content' => $contents,
+                    'title' => $feature['title'],
+                    'content' => $feature['content'],
                 ]);
 
                 $content->translations()->firstOrCreate([
                     'language_id' => $language->id,
                 ], [
-                    'title' => $title,
-                    'content' => $contents,
+                    'title' => $feature['title'],
+                    'content' => $feature['content'],
                 ]);
             });
 
@@ -734,6 +784,76 @@ class DemoCreator
         }
 
         return $widget;
+    }
+
+    public function createStatisticsWidget(): Widget
+    {
+        $widget = $this->widgetModel::firstOrCreate(['key' => 'statistics'], [
+            'name' => 'Statistics',
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Assets, 'type' => LayoutTypeEnum::Widget])->id,
+            'meta' => [
+                'component_item' => 'capell-layout::content.block',
+                'spacing' => 'none',
+                'columns' => 'auto',
+            ],
+        ]);
+
+        $statistics = [
+            [
+                'icon' => 'heroicon-o-users',
+                'title' => 'Users',
+                'value' => '<p><b>1,200</b></p>',
+                'color' => 'primary',
+            ],
+            [
+                'icon' => 'heroicon-o-chart-bar',
+                'title' => 'Revenue Increases',
+                'value' => '<p><b>300%</b></p>',
+                'color' => 'gray',
+            ],
+            [
+                'icon' => 'heroicon-o-globe-alt',
+                'title' => 'Countries Reached',
+                'value' => '<p><b>50+</b></p>',
+                'color' => 'light-gray',
+            ],
+            [
+                'icon' => 'heroicon-o-clock',
+                'title' => 'Hours Worked',
+                'value' => '<p><b>10,000+</b></p>',
+                'color' => 'secondary',
+            ],
+        ];
+
+        $site = Site::default()->first();
+
+        foreach ($statistics as $statistic) {
+            $content = Content::factory()
+                ->site($site)
+                ->withTranslations($site->languages, [
+                    'title' => $statistic['title'],
+                    'content' => sprintf('<p>%s</p>', $statistic['value']),
+                ])
+                ->state([
+                    'meta' => [
+                        'icon' => $statistic['icon'],
+                        'color' => $statistic['color'],
+                    ],
+                ])
+                ->create();
+
+            $widget->assets()->firstOrCreate([
+                'asset_id' => $content->uuid,
+                'asset_type' => app($this->contentModel)->getMorphClass(),
+            ]);
+        }
+
+        return $widget;
+    }
+
+    public function getExampleMedia(): Models\Media
+    {
+        return $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->first();
     }
 
     protected function navigationPageItems(\Illuminate\Support\Collection $siteTree, Models\Language $language): array

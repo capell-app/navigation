@@ -51,6 +51,7 @@ class LayoutUpdater
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-pages'],
@@ -94,6 +95,7 @@ class LayoutUpdater
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-pages'],
@@ -123,6 +125,7 @@ class LayoutUpdater
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-pages'],

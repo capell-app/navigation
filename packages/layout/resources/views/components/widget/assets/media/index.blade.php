@@ -18,7 +18,7 @@ declare(strict_types=1);
     'large' => false,
     'loop',
     'size' => $widget->meta['size'] ?? '',
-    'spacing' => $container['meta']['spacing'] ?? null,
+    'spacing' => $widget->meta['spacing'] ?? null,
     'theme' => Frontend::getTheme(),
     'widget',
     'widget_theme' => $widget->meta['widget_theme'] ?? '',
@@ -95,7 +95,7 @@ declare(strict_types=1);
                             group-focus-within:translate-y-0 group-focus-within:opacity-100',
                                 'text-sm' => $size === 'sm',
                                 'text-lg' => $size === 'lg',
-                                'rounded-b' => $theme->meta['rounded'] ?? false,
+                                'rounded-b' => $theme->meta['rounded_images'] ?? false,
                             ])
                         >
                             {{ $media->asset->title }}

@@ -18,11 +18,6 @@ class WidgetAdminSchema
     public static function make(): array
     {
         return [
-            Forms\Components\TextInput::make('notes')
-                ->label(__('capell-admin::form.admin_notes'))
-                ->hint(__('capell-admin::generic.internal'))
-                ->columnSpanFull(),
-
             AdminSchemaSelect::make('schema')
                 ->default(fn (): string => DefaultWidgetSchema::getKey())
                 ->setupOptions(SchemaEnum::Widget->value),

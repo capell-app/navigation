@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\LayoutContainer;
 
+use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\ColumnSpanInput;
 use Capell\Admin\Filament\Components\Forms\ContainerWidthSelect;
 use Capell\Admin\Filament\Components\Forms\HtmlClassInput;
@@ -12,6 +13,7 @@ use Capell\Admin\Filament\Components\Forms\PaddingSelect;
 use Capell\Admin\Filament\Components\Forms\SpacingSelect;
 use Capell\Admin\Filament\Schemas\AbstractSchema;
 use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Filament\Forms;
 
 class DefaultLayoutContainerSchema extends AbstractSchema
@@ -23,23 +25,29 @@ class DefaultLayoutContainerSchema extends AbstractSchema
         return [
             Forms\Components\Group::make()
                 ->statePath('meta')
+                ->mutateDehydratedStateUsing(function (array $state): array {
+                    if (isset($state['background_image_id'])) {
+                        $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
+                    }
+
+                    return $state;
+                })
                 ->columns()
                 ->schema([
                     ColumnSpanInput::make(),
+                    ColumnSpanInput::make('column_start')
+                        ->label(__('capell-admin::form.column_start')),
                     Forms\Components\Grid::make(['md' => 2])
                         ->schema([
                             ContainerWidthSelect::make('container'),
                             HtmlClassInput::make('html_class'),
-                            Forms\Components\Grid::make(['md' => 3])
-                                ->columnSpanFull()
-                                ->schema([
-                                    PaddingSelect::make('padding'),
-                                    MarginSelect::make('margin'),
-                                    SpacingSelect::make('spacing'),
-                                ]),
+                            PaddingSelect::make('padding'),
+                            MarginSelect::make('margin'),
+                            SpacingSelect::make('spacing'),
                             Forms\Components\TextInput::make('override_columns')
                                 ->label(__('capell-admin::form.override_columns'))
                                 ->helperText(__('capell-admin::generic.override_columns_info')),
+                            BackgroundSettingsFieldset::make(),
                         ]),
                 ]),
         ];

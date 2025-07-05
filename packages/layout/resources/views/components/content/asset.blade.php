@@ -19,15 +19,19 @@ declare(strict_types=1);
     'withUrl' => true,
     'loop',
 ])
+
 <x-dynamic-component
     :component="$componentItem"
     :$loop
     :image="$withImage ? $asset->image : null"
+    :icon="$asset->meta['icon'] ?? null"
+    :color="$asset->meta['color'] ?? null"
     :link-text="$withLinkText ? ($asset->translation->meta['link_text'] ?? __('Read more')) : null"
     :summary="$withSummary && $asset->translation ? $asset->translation->summary : null"
     :tags="$withTags ? $asset->tags : null"
     :title="$asset->translation?->label"
-    :url="$withUrl ? $asset->page->pageUrl?->full_url : null"
+    :url="$withUrl && $asset->page ? $asset->page->pageUrl?->full_url : null"
+    :with-summary="$withSummary"
     class="content-asset"
 />
 

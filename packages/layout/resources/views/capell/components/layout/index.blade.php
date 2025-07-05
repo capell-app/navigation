@@ -91,6 +91,8 @@ declare(strict_types=1);
 
                     $colspan = (int) ($container['meta']['colspan'] ?? 12);
 
+                    $column_start = (int) ($container['meta']['column_start'] ?? 0);
+
                     $htmlClass = $container['meta']['html_class'] ?? '';
 
                     if ($containerClass) {
@@ -107,15 +109,23 @@ declare(strict_types=1);
                     :$containerKey
                     :containerIndex="$loop->index"
                     :colspan="$colspan"
+                    :column-start="$column_start"
                     :htmlClass="$htmlClass"
                     :pageSlot="$hasSlotWidget ? $slot : null"
                     :previousColspan="$previousColspan"
                 />
 
                 @php
-                    $previousColspan = $colspan;
+                    $previousColspan += $colspan;
+                    $previousColspan = $previousColspan >= 12 ? 0 : $previousColspan;
                 @endphp
             @endforeach
+
+            {{-- format-ignore-start --}}
+            @if ($previousColspan && $previousColspan !== 12)
+                </div>
+            @endif
+            {{-- format-ignore-end --}}
 
             @if ($slot && ! $slotRendered)
                 {{ $slot }}

@@ -56,6 +56,8 @@ declare(strict_types=1);
         'containerKey' => $containerKey,
         'widgetIndex' => $widgetIndex,
     ]);
+
+    $image = $widget->image ?: $widget->backgroundImage;
 @endphp
 
 <div
@@ -96,7 +98,7 @@ declare(strict_types=1);
                 class="flex grow items-center"
                 @if ($assetTypes) x-on:click="! isReordering ? toggleCollapse() : null" @endif
             >
-                <div class="mr-1 flex w-7 items-center">
+                <div class="mr-1 flex w-7 items-center gap-3">
                     <span
                         class="relative"
                         x-show="! isReordering"
@@ -153,7 +155,6 @@ declare(strict_types=1);
 
                 @if ($type)
                     <x-filament::badge
-                        class="ml-3"
                         size="xs"
                         color="info"
                     >
@@ -161,12 +162,12 @@ declare(strict_types=1);
                     </x-filament::badge>
                 @endif
 
-                @if ($widget->image)
+                @if ($image)
                     <x-curator-glider
-                        class="ml-4 max-h-12 object-contain"
+                        class="ml-auto max-h-12 object-contain"
                         format="webp"
                         view="capell-admin::components.media.glider"
-                        :media="$widget->image"
+                        :media="$image"
                         :width="80"
                         :height="80"
                         fit="fit"

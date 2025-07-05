@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Capell\Frontend\Facades\Frontend;
+
+$theme = Frontend::getTheme();
+
 ?>
 
 @props([
@@ -12,6 +16,7 @@ declare(strict_types=1);
     'title' => $widget->translation?->title,
     'content' => $widget->translation?->content,
     'container',
+    'rounded' => $theme->meta['rounded_images'] ?? false,
     'loop',
     'containerKey',
     'widget',
@@ -25,6 +30,14 @@ declare(strict_types=1);
     }
 
     $hasContent = $content || $title || ! empty($widget->meta['actions']);
+
+    if ($rounded) {
+        $imgRounded = $hasContent
+              ? ($reverseOrder ? ' rounded-r-lg' : ' rounded-l-lg')
+              : ' rounded-lg';
+    } else {
+        $imgRounded = '';
+    }
 @endphp
 
 <x-capell-layout::widget.wrapper
@@ -50,7 +63,8 @@ declare(strict_types=1);
             :$containerKey
             :media="$widget->image"
             size="xxl"
-            class="h-auto w-full object-cover md:h-full"
+            :rounded="false"
+            :class="'h-auto w-full object-cover md:h-full'.$imgRounded"
         />
     </div>
 

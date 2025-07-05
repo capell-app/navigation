@@ -45,7 +45,6 @@ class WidgetsRelationManager extends RelationManager
                 IdentifierColumn::make('id'),
                 NameColumn::make('name')
                     ->icon(fn ($record) => $record->type->admin['icon'] ?? '')
-                    ->description(fn (Widget $record): ?string => $record->admin['notes'] ?? null)
                     ->suffixBadges([
                         Badge::make('type.name')
                             ->label(fn (Widget $record) => $record->type?->name)

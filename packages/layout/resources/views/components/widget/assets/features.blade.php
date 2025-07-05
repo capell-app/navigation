@@ -29,7 +29,7 @@ declare(strict_types=1);
     @php($linked_page_url = $asset->linkedPage ? app('capell-frontend')->pageUrl($asset->linkedPage->pageUrl->url, $site->siteDomain->url) : '')
     <div
         @class([
-            'flex items-start gap-x-4',
+            'flex items-start gap-x-4 pt-1',
             'lg:flex-row-reverse lg:text-right' => $column === 1 && $widget->image,
         ])
     >
@@ -115,7 +115,7 @@ declare(strict_types=1);
                 :heading-tag="$asset->meta['heading_size'] ?? 'h3'"
                 :text-align="'text-left'.($column === 1 && $widget->image ? ' lg:text-right' : '')"
                 size="sm"
-                class="prose-h3:mb-1"
+                class="prose-h3:mb-1 lg:prose-base"
             />
         @endif
     </div>
@@ -150,11 +150,12 @@ declare(strict_types=1);
         >
             @if ($widget->image)
                 <div
-                    class="flex justify-center md:col-span-2 lg:order-2 lg:col-span-1"
+                    class="flex min-h-full justify-center md:col-span-2 lg:order-2 lg:col-span-1"
                 >
-                    <x-curator-glider
+                    <x-capell::media
                         :media="$widget->image"
                         format="webp"
+                        size="xl"
                         fit="fit"
                         loading="lazy"
                     />

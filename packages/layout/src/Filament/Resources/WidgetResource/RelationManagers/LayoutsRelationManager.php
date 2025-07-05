@@ -49,7 +49,6 @@ class LayoutsRelationManager extends RelationManager
             ->description(__('capell-admin::generic.widget_layouts_info'))
             ->columns([
                 NameColumn::make('name')
-                    ->description(fn (Models\Layout $record): ?string => $record->admin['notes'] ?? null)
                     ->weight(fn (Models\Layout $record): FontWeight => $record->default ? FontWeight::SemiBold : FontWeight::Medium),
                 CuratorColumn::make('image')
                     ->relationship('image')

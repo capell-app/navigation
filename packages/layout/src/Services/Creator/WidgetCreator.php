@@ -40,7 +40,7 @@ class WidgetCreator
     {
         $contentsWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Contents, 'type' => LayoutTypeEnum::Widget]);
         $mediaWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Media, 'type' => LayoutTypeEnum::Widget]);
-        $navigationWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Navigation, 'type' => LayoutTypeEnum::Widget]);
+        $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Navigation, 'type' => LayoutTypeEnum::Widget]);
         $pageContentWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::PageContents, 'type' => LayoutTypeEnum::Widget]);
         $pageResultsWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::PageResults, 'type' => LayoutTypeEnum::Widget]);
         $pagesWidgetType = $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Pages, 'type' => LayoutTypeEnum::Widget]);
@@ -52,7 +52,6 @@ class WidgetCreator
         $this->galleryWidget($mediaWidgetType, $languages);
         $this->latestPagesWidget($pageResultsWidgetType, $languages);
         $this->mediaCarouselWidget($mediaWidgetType);
-        $this->navigationWidget($navigationWidgetType);
         $this->pageContentWidget($pageContentWidgetType);
         $this->pageSlotWidget($systemWidgetType);
         $this->pagesCardWidget($pagesWidgetType);
@@ -70,9 +69,6 @@ class WidgetCreator
             'type_id' => $systemWidgetType->id,
             'meta' => [
                 'component' => WidgetComponentEnum::Breadcrumbs,
-            ],
-            'admin' => [
-                'notes' => 'Hierarchy navigation trail of parent pages',
             ],
         ]);
     }
@@ -93,7 +89,6 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-c-users',
-                'notes' => 'Displays a list of child pages of the current page',
             ],
         ]);
 
@@ -123,7 +118,6 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-o-rectangle-stack',
-                'notes' => 'Displays a list of content resources',
             ],
         ]);
     }
@@ -137,12 +131,9 @@ class WidgetCreator
             'type_id' => $mediaWidgetType->id,
             'meta' => [
                 'widget_theme' => 'masonry',
-                'spacing' => 'lg',
+                'spacing' => 'md',
                 'margin' => ['lg'],
                 'container' => 'full',
-            ],
-            'admin' => [
-                'notes' => 'Displays a breadcrumb navigation trail',
             ],
         ]);
 
@@ -173,7 +164,6 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-o-rectangle-stack',
-                'notes' => 'Displays a list of latest pages',
             ],
         ]);
 
@@ -201,25 +191,7 @@ class WidgetCreator
                 'padding' => ['lg'],
             ],
             'admin' => [
-                'notes' => 'Displays a carousel of media items',
                 'schema' => CarouselWidgetSchema::getKey(),
-            ],
-        ]);
-    }
-
-    private function navigationWidget(Type $navigationWidgetType): void
-    {
-        $this->widgetModel::firstOrCreate([
-            'key' => 'navigation',
-        ], [
-            'name' => __('capell-admin::generic.navigation'),
-            'type_id' => $navigationWidgetType->id,
-            'meta' => [
-                'component' => WidgetComponentEnum::Navigation,
-                'margin' => ['b-lg'],
-            ],
-            'admin' => [
-                'notes' => 'Displays a navigation menu',
             ],
         ]);
     }
@@ -235,9 +207,6 @@ class WidgetCreator
                 'component' => WidgetComponentEnum::PageContent,
                 'margin' => ['t-lg'],
                 'page_content' => ['title', 'content', 'contents'],
-            ],
-            'admin' => [
-                'notes' => 'Content for the current page',
             ],
         ]);
     }
@@ -255,7 +224,7 @@ class WidgetCreator
                 'with_summary' => true,
                 'with_link_text' => true,
                 'spacing' => 'lg',
-                'margin' => ['t-lg'],
+                'margin' => ['lg'],
             ],
         ]);
     }
@@ -270,9 +239,6 @@ class WidgetCreator
             'meta' => [
                 'component' => 'capell-layout::widget.slot',
                 'type' => 'slot',
-            ],
-            'admin' => [
-                'notes' => 'Displays the dynamic content of the current page',
             ],
         ]);
     }
@@ -297,7 +263,6 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-c-link',
-                'notes' => 'Displays a list of related pages',
                 'schema' => WidgetTypeSchema::getKey(),
                 'default_schema' => WidgetSchemaEnum::Related->value,
             ],
@@ -327,7 +292,6 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-c-user-group',
-                'notes' => 'Displays a list of sibling pages with the same parent as the current page',
             ],
         ]);
 
@@ -351,9 +315,6 @@ class WidgetCreator
                 'component' => WidgetComponentEnum::Tags,
                 'size' => 'sm',
                 'margin' => ['lg'],
-            ],
-            'admin' => [
-                'notes' => 'List of tags',
             ],
         ]);
 

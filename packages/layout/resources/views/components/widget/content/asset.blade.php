@@ -13,6 +13,8 @@ declare(strict_types=1);
     'componentItem',
     'language' => Frontend::getLanguage(),
     'loop',
+    'widget',
+    'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
 ])
 
 <x-dynamic-component
@@ -25,6 +27,7 @@ declare(strict_types=1);
     :title="$asset->translation->label"
     :summary="$asset->translation->summary"
     :url="$asset->page ? $asset->page->pageUrl->full_url : null"
+    :with-summary="$withSummary"
     class="content-resource"
 />
 

@@ -26,22 +26,18 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
             'create', 'createOption', 'replicate' => [
                 WidgetTranslationsRepeater::make($form)
                     ->section(fn (string $operation): bool => $operation === 'create'),
-                Forms\Components\Group::make()
-                    ->schema(self::getExtraSchema($form)),
+                ...self::getExtraSchema($form),
             ],
             'editOption' => [
                 WidgetTranslationsRepeater::make($form),
-                Forms\Components\Group::make()
-                    ->schema(self::getExtraSchema($form)),
+                ...self::getExtraSchema($form),
             ],
             default => [
                 FixedWidthSidebar::make()
                     ->mainSchema([
                         WidgetTranslationsRepeater::make($form)
                             ->section(true),
-                        Forms\Components\Group::make()
-                            ->columns()
-                            ->schema(self::getExtraSchema($form)),
+                        ...self::getExtraSchema($form),
                     ])
                     ->sidebarSchema([
                         Forms\Components\Section::make()

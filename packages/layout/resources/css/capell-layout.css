@@ -24,6 +24,8 @@
     --color-light-gray: rgb(var(--light-gray-color));
     --font-sans: var(--font-fmaily);
     --font-heading: var(--font-family-heading);
+    --text-xs: 0.8rem;
+    --text-sm: 0.95rem;
     --text-md: 1.2rem;
     --text-lg: 1.35rem;
     --text-xl: 1.455rem;

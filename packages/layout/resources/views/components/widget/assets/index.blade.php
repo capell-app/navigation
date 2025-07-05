@@ -23,6 +23,8 @@ declare(strict_types=1);
     'withPublished' => $widget->meta['with_published'] ?? ($widget->type->meta['with_published'] ?? true),
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
     'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? true),
+    'spacing' => $widget->meta['spacing'] ?? ($widget->type->meta['spacing'] ?? true),
+    'columns' => $widget->meta['columns'] ?? ($widget->type->meta['columns'] ?? null),
 ])
 <x-capell-layout::widget.wrapper
     class="widget-assets widget-assets-grid"
@@ -46,11 +48,15 @@ declare(strict_types=1);
 
     @if ($widget->assets->isNotEmpty())
         <div
+            @if ($columns === 'auto') style="--columns: {{ $widget->assets->count() }};" @endif
             @class([
-                'grid gap-x-8 gap-y-6 lg:gap-x-10 lg:gap-y-10',
-                'md:grid-cols-2' => $total >= 2,
-                'lg:grid-cols-3' => $total >= 3,
-                '2xl:grid-cols-4' => $total > 7,
+                'grid',
+                'gap-x-8 gap-y-6 lg:gap-x-10 lg:gap-y-10' => $spacing && $spacing !== 'none',
+                'md:grid-cols-[repeat(var(--columns),minmax(0,1fr))]' => $columns === 'auto',
+                'md:grid-cols-[repeat($columns,minmax(0,1fr))]' => $columns && $columns !== 'auto',
+                'md:grid-cols-2' => $total >= 2 && ! $columns,
+                'lg:grid-cols-3' => $total >= 3 && ! $columns,
+                '2xl:grid-cols-4' => $total > 7 && ! $columns,
             ])
         >
             @foreach ($widget->assets as $asset)

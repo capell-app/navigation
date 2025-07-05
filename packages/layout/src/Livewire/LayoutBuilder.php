@@ -1540,6 +1540,11 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                 ->alphaDash()
                 ->required()
                 ->maxLength(128)
+                ->afterStateHydrated(
+                    fn (Forms\Components\TextInput $component, $state): Forms\Components\TextInput => $component->state(
+                        str($state)->slug()->lower()->toString()
+                    )
+                )
                 ->dehydrateStateUsing(fn ($state): string => str($state)->slug()->lower()->toString())
                 ->rules([
                     fn (LayoutBuilder $livewire): Closure => function (string $attribute, $value, Closure $fail) use ($livewire, $containerKey): void {
