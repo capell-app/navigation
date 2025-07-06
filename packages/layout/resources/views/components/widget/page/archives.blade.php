@@ -12,6 +12,7 @@ declare(strict_types=1);
     'archives' => [],
     'container',
     'containerKey',
+    'containerWidth' => null,
     'hideContent' => $widgetData['meta']['hide_content'] ?? false,
     'loop',
     'results',
@@ -23,6 +24,7 @@ declare(strict_types=1);
     class="widget-archive"
     :$container
     :$containerKey
+    :$containerWidth
     :index="$loop->index"
     :$widget
 >
@@ -30,7 +32,6 @@ declare(strict_types=1);
         <x-capell::content
             class="mb-4"
             :compact="true"
-            :$containerKey
             :content="$widget->translation->content"
             :contents="$widget->translation->content ? null : $widget->translation->contents"
             :title="$widget->translation->title"

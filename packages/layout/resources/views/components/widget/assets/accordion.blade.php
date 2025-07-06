@@ -14,6 +14,7 @@ declare(strict_types=1);
     'componentItem' => ($widget->meta['component_item'] ?? AssetComponentEnum::Card->value),
     'container',
     'containerKey',
+    'containerWidth' => null,
     'hideContent' => $widgetData['meta']['hide_content'] ?? false,
     'index',
     'loop',
@@ -25,8 +26,9 @@ declare(strict_types=1);
 ])
 <x-capell-layout::widget.wrapper
     class="widget-content-grid widget-content-accordion space-y-6"
-    :$containerKey
     :$container
+    :$containerKey
+    :$containerWidth
     :index="$loop->index"
     :$widget
 >
@@ -34,7 +36,6 @@ declare(strict_types=1);
         <x-capell::content
             class="mb-4"
             :compact="true"
-            :$containerKey
             :content="$widget->translation->content"
             :contents="$widget->translation->content ? null : $widget->translation->contents"
             :title="$widget->translation->title"

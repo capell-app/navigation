@@ -76,7 +76,7 @@ class DemoCreator
             'type_id' => $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)->default()->first()->id,
             'meta' => [
                 'size' => 'md',
-                'margin' => ['lg'],
+                'margin' => '',
                 'padding' => ['md'],
                 'reverse_order' => true,
                 'background_color' => 'light-gray',
@@ -793,8 +793,13 @@ class DemoCreator
             'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::Assets, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'component_item' => 'capell-layout::content.block',
+                'view_file' => 'capell-layout::components.widget.assets.blocks',
                 'spacing' => 'none',
                 'columns' => 'auto',
+                'margin' => '',
+            ],
+            'admin' => [
+                'icon' => 'heroicon-o-chart-bar',
             ],
         ]);
 
@@ -809,13 +814,13 @@ class DemoCreator
                 'icon' => 'heroicon-o-chart-bar',
                 'title' => 'Revenue Increases',
                 'value' => '<p><b>300%</b></p>',
-                'color' => 'gray',
+                'color' => 'success',
             ],
             [
                 'icon' => 'heroicon-o-globe-alt',
                 'title' => 'Countries Reached',
                 'value' => '<p><b>50+</b></p>',
-                'color' => 'light-gray',
+                'color' => 'info',
             ],
             [
                 'icon' => 'heroicon-o-clock',
@@ -835,6 +840,7 @@ class DemoCreator
                     'content' => sprintf('<p>%s</p>', $statistic['value']),
                 ])
                 ->state([
+                    'name' => $statistic['title'],
                     'meta' => [
                         'icon' => $statistic['icon'],
                         'color' => $statistic['color'],

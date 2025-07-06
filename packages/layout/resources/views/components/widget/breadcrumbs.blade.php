@@ -12,6 +12,7 @@ declare(strict_types=1);
 @props([
     'container',
     'containerKey',
+    'containerWidth' => null,
     'loop',
     'pageRecord' => Frontend::getPage(),
     'pageRecordParams' => Frontend::getPageParams(),
@@ -29,6 +30,7 @@ declare(strict_types=1);
     <x-capell-layout::widget.wrapper
         :$container
         :$containerKey
+        :$containerWidth
         :index="$loop->index"
         :margin="[]"
         :$widget

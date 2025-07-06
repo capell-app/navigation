@@ -13,6 +13,7 @@ declare(strict_types=1);
     'colorScheme' => $widget->meta['color_scheme'] ?? 'dark',
     'container',
     'containerKey',
+    'containerWidth' => null,
     'loop',
     'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
     'widget',
@@ -20,7 +21,7 @@ declare(strict_types=1);
     'withChildCount' => $widget->meta['with_child_count'] ?? ($widget->type->meta['with_child_count'] ?? false),
     'withImage' => $widget->meta['with_image'] ?? ($widget->type->meta['with_image'] ?? true),
     'withParent' => $widget->meta['with_parent'] ?? ($widget->type->meta['with_parent'] ?? false),
-    'withPublished' => $widget->meta['with_published'] ?? ($widget->type->meta['with_published'] ?? true),
+    'withDate' => $widget->meta['with_date'] ?? ($widget->type->meta['with_date'] ?? true),
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
     'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? true),
     'spacing' => $widget->meta['spacing'] ?? ($widget->type->meta['spacing'] ?? true),
@@ -30,6 +31,7 @@ declare(strict_types=1);
     class="widget-assets widget-assets-grid"
     :$container
     :$containerKey
+    :$containerWidth
     :index="$loop->index"
     :$widget
     container-class="space-y-6 md:space-y-10"
@@ -37,7 +39,6 @@ declare(strict_types=1);
     @if ($widget->translation)
         <x-capell::content
             :compact="true"
-            :$containerKey
             :content="$widget->translation->content"
             :contents="$widget->translation->content ? null : $widget->translation->contents"
             :color-scheme="$colorScheme"
@@ -69,7 +70,7 @@ declare(strict_types=1);
                     :with-child-count="$withChildCount"
                     :with-image="$withImage"
                     :with-parent="$withParent"
-                    :with-published="$withPublished"
+                    :with-date="$withDate"
                     :with-summary="$withSummary"
                     :with-tags="$withTags"
                     :$loop

@@ -12,6 +12,7 @@ declare(strict_types=1);
 @props([
     'container',
     'containerKey',
+    'containerWidth' => null,
     'headingTag' => $widget->meta['heading_tag'] ?? null,
     'headingSize' => $widget->meta['heading_size'] ?? 'h1',
     'loop',
@@ -36,19 +37,18 @@ declare(strict_types=1);
     <x-capell-layout::widget.wrapper
         :$container
         :$containerKey
+        :$containerWidth
         :index="$loop->index"
         :$widget
         :class="'widget-page-contents'.($loop->last ? ' mb-20' : ' mb-10')"
     >
         <x-capell::content
-            :$containerKey
             :content="in_array('content', $pageContents, true) ? $pageRecord->translation->content : null"
             :contents="in_array('contents', $pageContents, true) ? $pageRecord->translation->contents : null"
             :heading-size="$headingSize"
             :heading-tag="$headingTag"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             :title="in_array('title', $pageContents, true) && ! (empty($widgetData['meta']['hide_title']) && $hasHero) ? $pageRecord->translation->title : null"
-            :title-component="$widgetData['title_component'] ?? 'capell::heading'"
         />
 
         @if (! empty($widget->translation?->actions))
