@@ -192,7 +192,7 @@ class WidgetCreator
                 'margin' => 0,
             ],
             'admin' => [
-                'schema' => CarouselWidgetSchema::getKey(),
+                'type_schema' => CarouselWidgetSchema::getKey(),
             ],
         ]);
     }
@@ -264,8 +264,8 @@ class WidgetCreator
             ],
             'admin' => [
                 'icon' => 'heroicon-c-link',
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => WidgetSchemaEnum::Related->value,
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => WidgetSchemaEnum::Related->value,
             ],
         ]);
 

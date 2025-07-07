@@ -81,7 +81,7 @@ class ContentResource extends Resource
 
                         $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
 
-                        $adminSchema = $type->admin['default_schema'] ?? DefaultContentSchema::getKey();
+                        $adminSchema = $type->admin['schema'] ?? DefaultContentSchema::getKey();
 
                         return $component->getSchema($form, SchemaEnum::Content->value, $adminSchema);
                     }

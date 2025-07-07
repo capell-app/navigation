@@ -117,8 +117,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.blog_archive_page'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => PageTypeSchema::getKey(),
-                'default_schema' => ResultsPageSchema::getKey(),
+                'type_schema' => PageTypeSchema::getKey(),
+                'schema' => ResultsPageSchema::getKey(),
                 'icon' => 'heroicon-o-archive-box',
             ],
             'meta' => [
@@ -304,8 +304,8 @@ class BlogCreator
                 'accessible' => false,
                 'content_editor' => ContentEditorEnum::RichEditor->value,
                 'icon' => 'heroicon-o-newspaper',
-                'schema' => PageTypeSchema::getKey(),
-                'default_schema' => ArticlePageSchema::getKey(),
+                'type_schema' => PageTypeSchema::getKey(),
+                'schema' => ArticlePageSchema::getKey(),
                 'resource' => BlogResourceEnum::Article->name,
                 'with_tags' => true,
                 'exclude' => true,
@@ -338,8 +338,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.article'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => PageTypeSchema::getKey(),
-                'default_schema' => ArticleWidgetSchema::getKey(),
+                'type_schema' => PageTypeSchema::getKey(),
+                'schema' => ArticleWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-newspaper',
             ],
             'meta' => [
@@ -410,8 +410,8 @@ class BlogCreator
             'name' => __('capell-blog::generic.blog'),
             'group' => TypeGroupEnum::System->value,
             'admin' => [
-                'schema' => PageTypeSchema::getKey(),
-                'default_schema' => ResultsPageSchema::getKey(),
+                'type_schema' => PageTypeSchema::getKey(),
+                'schema' => ResultsPageSchema::getKey(),
                 'icon' => 'heroicon-o-newspaper',
                 'exclude_parent',
             ],

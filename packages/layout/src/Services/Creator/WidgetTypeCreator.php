@@ -53,7 +53,7 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.default'),
             'default' => true,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
                 'icon' => 'heroicon-o-puzzle-piece',
                 'content_editor' => ContentEditorEnum::ContentBuilder->value,
             ],
@@ -73,8 +73,7 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.media'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\MediaWidgetSchema::getKey(),
+                'type_schema' => Schemas\Widget\MediaWidgetSchema::getKey(),
                 'icon' => CapellCore::getAsset(AssetEnum::Media->name)->getIcon(),
                 'asset_types' => [AssetEnum::Media->value],
             ],
@@ -95,8 +94,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.navigation'),
             'group' => WidgetTypeGroupEnum::Page->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\NavigationWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\NavigationWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-clipboard-document-list',
             ],
             'meta' => [
@@ -114,8 +113,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.page_content'),
             'group' => WidgetTypeGroupEnum::Page->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\PageContentWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\PageContentWidgetSchema::getKey(),
                 'layout_container_widget_schema' => Schemas\LayoutWidget\PageLayoutWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-document-text',
             ],
@@ -135,8 +134,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.page_results'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\ResultsWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\ResultsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-list-bullet',
             ],
             'meta' => [
@@ -154,8 +153,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.pages'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-document-text',
                 'asset_types' => [AssetEnum::Page->value],
             ],
@@ -174,8 +173,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.assets'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-rectangle-stack',
                 'asset_types' => [
                     AssetEnum::Page->value,
@@ -198,8 +197,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.system'),
             'group' => WidgetTypeGroupEnum::System->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\SystemWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\SystemWidgetSchema::getKey(),
                 'layout_container_widget_schema' => Schemas\LayoutWidget\DefaultLayoutWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-wrench',
             ],
@@ -218,8 +217,8 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.contents'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'schema' => WidgetTypeSchema::getKey(),
-                'default_schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => Schemas\Widget\AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-rectangle-stack',
                 'asset_types' => [LayoutAssetEnum::Content->value],
             ],

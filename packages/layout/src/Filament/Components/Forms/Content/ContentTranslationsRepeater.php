@@ -50,7 +50,7 @@ final class ContentTranslationsRepeater
         ];
     }
 
-    private static function getTitleSchema(bool $titleRequired, $totalLanguages): array
+    private static function getTitleSchema(bool $titleRequired, int $totalLanguages): array
     {
         return [
             Forms\Components\Hidden::make('is_title_changed_manually')

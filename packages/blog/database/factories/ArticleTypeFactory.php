@@ -24,8 +24,8 @@ class ArticleTypeFactory extends TypeFactory
             ->set(
                 'admin',
                 [
-                    'schema' => PageTypeSchema::getKey(),
-                    'default_schema' => ArticlePageSchema::getKey(),
+                    'type_schema' => PageTypeSchema::getKey(),
+                    'schema' => ArticlePageSchema::getKey(),
                     'resource' => BlogResourceEnum::Article->name,
                 ]
             );

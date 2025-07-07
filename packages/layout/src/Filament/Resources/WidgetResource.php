@@ -107,9 +107,9 @@ class WidgetResource extends Resource
             TypeSchema::make()
                 ->schema(
                     function (Forms\Get $get, TypeSchema $component, ?Widget $record) use ($form): array {
-                        if ($record?->admin['default_schema'] ?? null) {
+                        if ($record?->admin['schema'] ?? null) {
                             /** @var class-string<AbstractWidgetSchema> $schema */
-                            $schema = CapellAdmin::getSchema(SchemaEnum::Widget->value, $record->admin['default_schema']);
+                            $schema = CapellAdmin::getSchema(SchemaEnum::Widget->value, $record->admin['schema']);
 
                             return app($schema)::make($form);
                         }
@@ -118,7 +118,7 @@ class WidgetResource extends Resource
 
                         $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
 
-                        $adminSchema = $type->admin['default_schema'] ?? DefaultWidgetSchema::getKey();
+                        $adminSchema = $type->admin['schema'] ?? DefaultWidgetSchema::getKey();
 
                         return $component->getSchema($form, SchemaEnum::Widget->name, $adminSchema);
                     }

@@ -1118,13 +1118,11 @@ class DemoCreator
             ]);
 
             $content->translations()->createMany(
-                $languages->map(function (Models\Language $language) use ($testimonial) {
-                    return [
-                        'language_id' => $language->id,
-                        'title' => $testimonial['name'],
-                        'content' => sprintf('<p>%s</p>', $testimonial['content']),
-                    ];
-                })->toArray()
+                $languages->map(fn (Models\Language $language): array => [
+                    'language_id' => $language->id,
+                    'title' => $testimonial['name'],
+                    'content' => sprintf('<p>%s</p>', $testimonial['content']),
+                ])->toArray()
             );
 
             $testimonialsCollection->push($content);
@@ -1151,7 +1149,7 @@ class DemoCreator
             [
                 'name' => 'Fiona Green',
                 'position' => 'Head of HR',
-                'bio' => '<p>Fiona is dedicated to building a strong team culture and supporting our employees\' growth.</p>',
+                'bio' => "<p>Fiona is dedicated to building a strong team culture and supporting our employees' growth.</p>",
                 'image_id' => $this->getExampleMedia()?->id,
             ],
             [
@@ -1255,14 +1253,12 @@ class DemoCreator
 
             $content->translations()->createMany(
                 $languages
-                    ->filter(fn (Models\Language $language) => ! $content->translations->contains('language_id', $language->id))
-                    ->map(function (Models\Language $language) use ($member) {
-                        return [
-                            'language_id' => $language->id,
-                            'title' => $member['name'],
-                            'content' => $member['bio'],
-                        ];
-                    })->toArray()
+                    ->filter(fn (Models\Language $language): bool => ! $content->translations->contains('language_id', $language->id))
+                    ->map(fn (Models\Language $language): array => [
+                        'language_id' => $language->id,
+                        'title' => $member['name'],
+                        'content' => $member['bio'],
+                    ])->toArray()
             );
 
             $teamMembersCollection->push($content);

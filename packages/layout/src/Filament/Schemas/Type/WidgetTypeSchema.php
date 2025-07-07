@@ -8,7 +8,6 @@ use Capell\Admin\Filament\Components\Forms\AdminSchemaSelect;
 use Capell\Admin\Filament\Components\Forms\ContentEditorSelect;
 use Capell\Admin\Filament\Components\Forms\CustomSelectGroup;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
-use Capell\Admin\Filament\Components\Forms\Type\TypeSettingsSchema;
 use Capell\Admin\Filament\Schemas\Type\DefaultTypeSchema;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
@@ -24,8 +23,8 @@ class WidgetTypeSchema extends DefaultTypeSchema
     public static function make(Forms\Form $form): array
     {
         return [
-            ...TypeSettingsSchema::make($form),
-
+            ...self::getSettingsSchema($form),
+            ...static::getStatusSchema(),
             Forms\Components\Tabs::make()
                 ->columnSpanFull()
                 ->tabs([
@@ -54,7 +53,7 @@ class WidgetTypeSchema extends DefaultTypeSchema
             ->columns()
             ->statePath('admin')
             ->schema([
-                AdminSchemaSelect::make('default_schema')
+                AdminSchemaSelect::make('schema')
                     ->default(fn (): string => DefaultWidgetSchema::getKey())
                     ->setupOptions(SchemaEnum::Widget->value),
 
