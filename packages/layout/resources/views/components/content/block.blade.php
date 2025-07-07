@@ -33,6 +33,7 @@ declare(strict_types=1);
         },
     ])
 >
+    {{ $color }}
     @if ($icon)
         <div>
             <x-capell::icon
