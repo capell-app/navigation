@@ -10,7 +10,6 @@ use Capell\Admin\Enums\ModalWidthEnum;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
-use Capell\Admin\Filament\Schemas\Type\DefaultTypeSchema;
 use Capell\Core\Actions\GetPageResourceAction;
 use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\ModelEnum;
@@ -22,6 +21,7 @@ use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Components\Forms\LayoutBuilder\LayoutBuilderAddWidgetSchema;
 use Capell\Layout\Filament\Resources\WidgetResource;
 use Capell\Layout\Filament\Schemas\LayoutContainer\DefaultLayoutContainerSchema;
+use Capell\Layout\Filament\Schemas\Type\WidgetTypeSchema;
 use Capell\Layout\Filament\Schemas\WidgetAsset\DefaultWidgetAssetSchema;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -333,6 +333,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             ->groupedIcon('heroicon-o-pencil')
             ->color('gray')
             ->grouped()
+            ->slideOver()
             ->record(
                 fn (array $arguments, self $livewire): Models\Type => $livewire->getWidgetType(
                     $arguments['containerKey'],
@@ -591,16 +592,16 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
             ->closeModalByClickingAway(false)
             ->modalHeading(
                 fn (array $arguments, self $livewire): string => __(
-                    'capell-admin::generic.add_widget_resource',
+                    'capell-admin::generic.add_widget_asset',
                     [
                         'widget' => $livewire->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex'])?->name,
-                        'resource' => $arguments['type'],
+                        'asset' => $arguments['type'],
                     ]
                 )
             )
             ->modalSubmitActionLabel(
                 fn (array $arguments, Action $action): string => __(
-                    'capell-admin::button.create_widget_resource',
+                    'capell-admin::button.create_widget_asset',
                     ['type' => $arguments['type']]
                 )
             )
@@ -766,13 +767,13 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
 
                     if ($livewire->page_id !== null && $livewire->page_id !== 0) {
                         return __(
-                            'capell-admin::heading.edit_page_widget_resource',
+                            'capell-admin::heading.edit_page_widget_asset',
                             ['name' => $name]
                         );
                     }
 
                     return __(
-                        'capell-admin::heading.edit_widget_resource',
+                        'capell-admin::heading.edit_widget_asset',
                         ['name' => $name]
                     );
                 }
@@ -789,7 +790,7 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                         return null;
                     }
 
-                    return __('capell-admin::heading.page_widget_resource', ['name' => $livewire->getLayoutPage()->name]);
+                    return __('capell-admin::heading.page_widget_asset', ['name' => $livewire->getLayoutPage()->name]);
                 }
             )
             ->modalSubmitActionLabel(__('capell-admin::button.save_changes'))
@@ -927,8 +928,8 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     );
 
                     return $hasPageAssets
-                        ? __('capell-admin::button.convert_widget_resources')
-                        : __('capell-admin::button.convert_page_resources');
+                        ? __('capell-admin::button.convert_widget_assets')
+                        : __('capell-admin::button.convert_page_assets');
                 }
             )
             ->grouped()
@@ -962,8 +963,8 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
                     );
 
                     return $hasPageAssets
-                        ? __('capell-admin::generic.convert_widget_resources')
-                        : __('capell-admin::generic.convert_page_resources');
+                        ? __('capell-admin::generic.convert_widget_assets')
+                        : __('capell-admin::generic.convert_page_assets');
                 }
             )
             ->action(function (self $livewire, array $arguments, Action $action): void {
@@ -2213,8 +2214,8 @@ class LayoutBuilder extends Component implements Forms\Contracts\HasForms, HasAc
     {
         $name = $this->getContainerWidget($containerKey, $widgetIndex)
             ?->type
-            ?->admin['schema']
-            ?? DefaultTypeSchema::getKey();
+            ?->admin['type_schema']
+            ?? WidgetTypeSchema::getKey();
 
         $schema = CapellAdmin::getSchema(\Capell\Admin\Enums\SchemaEnum::Type->value, $name);
 

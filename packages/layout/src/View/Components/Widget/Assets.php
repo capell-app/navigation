@@ -6,7 +6,7 @@ namespace Capell\Layout\View\Components\Widget;
 
 class Assets extends AbstractWidget
 {
-    protected string $defaultView = 'capell-layout::components.widget.assets.index';
+    protected static string $defaultView = 'capell-layout::components.widget.assets.index';
 
     protected function mountWidget(): void
     {

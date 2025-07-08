@@ -23,7 +23,7 @@ class Article extends AbstractWidget
 
     public $tags = [];
 
-    protected string $defaultView = 'capell-blog::components.widget.page.article';
+    protected static string $defaultView = 'capell-blog::components.widget.page.article';
 
     public function render(array $data = [])
     {

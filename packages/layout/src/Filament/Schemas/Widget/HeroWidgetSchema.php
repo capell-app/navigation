@@ -45,8 +45,8 @@ class HeroWidgetSchema extends AbstractWidgetSchema
         return [
             FixedWidthSidebar::make()
                 ->mainSchema([
-                    Forms\Components\Section::make(__('capell-admin::generic.widget_resources'))
-                        ->description(__('capell-admin::generic.widget_resources_info'))
+                    Forms\Components\Section::make(__('capell-admin::generic.widget_assets'))
+                        ->description(__('capell-admin::generic.widget_assets_info'))
                         ->compact()
                         ->schema([
                             WidgetAssetsRepeater::make($form)

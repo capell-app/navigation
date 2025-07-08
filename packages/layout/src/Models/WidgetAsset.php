@@ -72,17 +72,6 @@ class WidgetAsset extends Model implements PageCacheable
         'widget_id',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'meta' => 'json',
-        'order' => 'integer',
-        'occurrence' => 'integer',
-    ];
-
     protected static string $factory = WidgetAssetFactory::class;
 
     public static function totalWidgetPages(Widget $widget): int
@@ -129,8 +118,22 @@ class WidgetAsset extends Model implements PageCacheable
         $query->orderBy($this->qualifyColumn('order'), $dir);
     }
 
-    public function getAssetKeyAttribute(): string
+    protected function assetKey(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->asset_type.'.'.$this->asset_id;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): string => $this->asset_type.'.'.$this->asset_id);
+    }
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'meta' => 'json',
+            'order' => 'integer',
+            'occurrence' => 'integer',
+        ];
     }
 }

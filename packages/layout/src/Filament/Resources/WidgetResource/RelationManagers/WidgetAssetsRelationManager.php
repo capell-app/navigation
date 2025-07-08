@@ -46,8 +46,8 @@ class WidgetAssetsRelationManager extends RelationManager
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets())
-            ->heading(__('capell-admin::heading.widget_page_resources'))
-            ->description(__('capell-admin::generic.widget_page_resources_description'))
+            ->heading(__('capell-admin::heading.widget_page_assets'))
+            ->description(__('capell-admin::generic.widget_page_assets_description'))
             ->columns([
                 NameColumn::make('asset.name'),
                 Tables\Columns\TextColumn::make('asset_type')

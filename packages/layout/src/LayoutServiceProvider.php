@@ -9,10 +9,13 @@ use Capell\Admin\Actions\DeletedModelAction;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Filament\Components\Forms\Editor\RichEditor;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Data\TypeData;
+use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
+use Capell\Core\Models\PageTranslation;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Layout\Actions\InstallPackageAction;
 use Capell\Layout\Commands\DemoCommand;
@@ -26,6 +29,7 @@ use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Exception;
 use Filament\Facades\Filament;
+use Filament\Forms;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,6 +60,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerListeners()
             ->registerRelationships()
             ->registerSchemas()
+            ->registerSchemaHooks()
             ->registerPublishCommands();
 
         CapellCore::addCloneableRelations('page', 'widgetAssets');
@@ -133,7 +138,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         CapellCore::registerPackage(
             self::$name,
-            self::class,
+            class: self::class,
+            path: __DIR__,
             permissions: $this->getPackagePermissions(),
             demoCommand: true,
             demoParams: ['author', 'sites'],
@@ -162,6 +168,10 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                     table: $layoutType->getTable()
                 )
             );
+        }
+
+        foreach (Enums\ComponentTypeEnum::cases() as $componentType) {
+            CapellCore::registerComponents($componentType->name, $componentType->value::cases());
         }
 
         CapellCore::registerAsset(
@@ -367,6 +377,49 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\DefaultPageSchema::class);
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\LandingPageSchema::class);
         CapellAdmin::registerSchema(SchemaEnum::Page, Schemas\Page\ResultsPageSchema::class);
+
+        return $this;
+    }
+
+    private function registerSchemaHooks(): static
+    {
+        CapellAdmin::registerSchemaHook(
+            SchemaEnum::Page->value,
+            'translations.contents.before',
+            fn (Forms\Form $form, array $context = []): array => [
+                Forms\Components\Group::make()
+                    ->statePath('meta')
+                    ->visible(
+                        function (?PageTranslation $record, Forms\Get $get, string $operation) use ($form): bool {
+                            if (in_array($operation, ['create', 'createOption'], true)) {
+                                return false;
+                            }
+
+                            $layoutId = $get('../../../layout_id')
+                                ?: ($form?->getRawState()['layout_id'] ?? null)
+                                    ?: $record?->page->layout_id
+                                        ?: null;
+
+                            if (! $layoutId) {
+                                return false;
+                            }
+
+                            $layout = CapellCore::getModel(ModelEnum::Layout)::find($layoutId);
+
+                            if (! in_array('hero', $layout->widgets, true)) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    )
+                    ->schema([
+                        RichEditor::make('hero')
+                            ->label(__('capell-layout::generic.hero'))
+                            ->helperText(__('capell-layout::generic.hero_info')),
+                    ]),
+            ]
+        );
 
         return $this;
     }

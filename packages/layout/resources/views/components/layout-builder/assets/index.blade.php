@@ -26,7 +26,7 @@ declare(strict_types=1);
             <span
                 class="text-sm font-light tracking-tight text-gray-500 dark:text-gray-400"
             >
-                {{ $hasPageAssets ? __('capell-admin::generic.page_widget_resources') : __('capell-admin::generic.widget_resources') }}
+                {{ $hasPageAssets ? __('capell-admin::generic.page_widget_assets') : __('capell-admin::generic.widget_assets') }}
             </span>
             <div>
                 @if ($assetsCount > 1)
@@ -127,7 +127,7 @@ declare(strict_types=1);
             class="py-3 text-center font-light tracking-tight text-gray-600 dark:text-gray-100"
         >
             @php($pagesWithAssets = WidgetAsset::totalWidgetPages($widget))
-            {{ $pagesWithAssets ? __('capell-layout::message.widget_has_page_assets', ['total' => $pagesWithAssets]) : __('capell-admin::message.widget_resources_empty') }}
+            {{ $pagesWithAssets ? __('capell-layout::message.widget_has_page_assets', ['total' => $pagesWithAssets]) : __('capell-admin::message.widget_assets_empty') }}
         </div>
     @endif
 </div>

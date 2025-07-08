@@ -71,7 +71,7 @@ class RelatedWidgetSchema extends AbstractWidgetSchema
                                                 ->default(true),
                                             CacheFrequencySelect::make('cache_frequency'),
                                         ]),
-                                    Forms\Components\Fieldset::make(__('capell-admin::generic.display'))
+                                    Forms\Components\Fieldset::make(__('capell-admin::generic.display_settings'))
                                         ->columns(['default' => 1, 'md' => 2, 'lg' => 3, 'xl' => 4])
                                         ->columnSpanFull()
                                         ->schema(WidgetResultsSettingsSchema::make()),

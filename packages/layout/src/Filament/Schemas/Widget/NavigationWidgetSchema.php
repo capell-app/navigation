@@ -26,7 +26,7 @@ class NavigationWidgetSchema extends AbstractWidgetSchema
                 Forms\Components\Section::make()
                     ->schema([self::navigationSelect()]),
                 WidgetTranslationsRepeater::make($form)
-                    ->section(true),
+                    ->section(),
             ],
             'createOption', 'replicate' => [
                 self::navigationSelect(),
@@ -40,7 +40,7 @@ class NavigationWidgetSchema extends AbstractWidgetSchema
                 FixedWidthSidebar::make()
                     ->mainSchema([
                         WidgetTranslationsRepeater::make($form)
-                            ->section(true),
+                            ->section(),
                     ])
                     ->sidebarSchema([
                         Forms\Components\Section::make()

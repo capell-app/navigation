@@ -9,6 +9,5 @@ use Capell\Layout\Filament\Schemas;
 enum ContentSchemaEnum: string
 {
     case Default = Schemas\Content\DefaultContentSchema::class;
-
     case Testimonial = Schemas\Content\TestimonialContentSchema::class;
 }

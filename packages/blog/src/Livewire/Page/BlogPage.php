@@ -10,7 +10,7 @@ use Capell\Frontend\Services\Loader\PageLoader;
 
 class BlogPage extends AbstractPage
 {
-    protected string $defaultView = 'capell::livewire.page.results';
+    protected static string $defaultView = 'capell::livewire.page.results';
 
     protected function loadPage(): void
     {

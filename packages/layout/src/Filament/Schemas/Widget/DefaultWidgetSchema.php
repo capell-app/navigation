@@ -31,13 +31,13 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
             ],
             'editOption' => [
                 WidgetTranslationsRepeater::make($form),
-                ...self::getExtraSchema($form),
+                ...self::getExtraSchema($form, withSettingsTab: true),
             ],
             default => [
                 FixedWidthSidebar::make()
                     ->mainSchema([
                         WidgetTranslationsRepeater::make($form)
-                            ->section(true),
+                            ->section(),
                         ...self::getExtraSchema($form),
                     ])
                     ->sidebarSchema([
@@ -49,20 +49,21 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
         };
     }
 
-    protected static function getExtraSchema(Forms\Form $form): array
+    protected static function getExtraSchema(Forms\Form $form, bool $withSettingsTab = false): array
     {
         return [
-            self::getTabs($form),
+            self::getTabs($form, $withSettingsTab),
         ];
     }
 
-    protected static function getTabs(Forms\Form $form): Forms\Components\Tabs
+    protected static function getTabs(Forms\Form $form, bool $withSettingsTab = false): Forms\Components\Tabs
     {
         return Forms\Components\Tabs::make('tabs')
             ->columnSpanFull()
             ->tabs([
                 static::getDetailsTab(),
                 static::getDisplayTab($form),
+                ...$withSettingsTab ? static::getSettingsTab($form) : [],
             ]);
     }
 
@@ -113,5 +114,14 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
                     ]),
                 ActionsRepeater::make('actions'),
             ]);
+    }
+
+    private static function getSettingsTab(Forms\Form $form): Forms\Components\Tabs\Tab
+    {
+        return Forms\Components\Tabs\Tab::make('settings')
+            ->label(__('capell-admin::tab.settings'))
+            ->icon('heroicon-o-cog')
+            ->statePath('settings')
+            ->schema(WidgetSettingsSchema::make($form));
     }
 }

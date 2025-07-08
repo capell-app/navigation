@@ -68,8 +68,8 @@ class ContentAsset extends Model implements PageCacheable
         return $this->morphTo('asset', 'asset_type', 'asset_id', 'uuid');
     }
 
-    public function getAssetKeyAttribute(): string
+    protected function assetKey(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->asset_type.'.'.$this->asset_id;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): string => $this->asset_type.'.'.$this->asset_id);
     }
 }

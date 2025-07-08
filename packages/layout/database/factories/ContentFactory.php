@@ -29,22 +29,22 @@ class ContentFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->sentence,
+            'name' => fake()->sentence,
             'parent_id' => null,
             'parent_uuid' => null,
             'type_id' => (new ContentTypeFactory()),
             'site_id' => null,
-            'uuid' => $this->faker->uuid,
+            'uuid' => fake()->uuid,
             'meta' => fn (array $attributes): array => [
-                'label' => $this->faker->optional()->sentence,
-                'image_id' => $this->faker->optional() ? Media::inRandomOrder()->first()?->getKey() : null,
-                'page_id' => $this->faker->optional() && $attributes['site_id'] ? Page::where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
+                'label' => fake()->optional()->sentence,
+                'image_id' => fake()->optional() ? Media::inRandomOrder()->first()?->getKey() : null,
+                'page_id' => fake()->optional() && $attributes['site_id'] ? Page::where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
             ],
-            'order' => $this->faker->numberBetween(1, 100),
-            'publish_from' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'publish_to' => $this->faker->dateTimeBetween('-5 month'),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month'),
+            'order' => fake()->numberBetween(1, 100),
+            'publish_from' => fake()->dateTimeBetween('-1 year', '-6 month'),
+            'publish_to' => fake()->dateTimeBetween('-5 month'),
+            'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
+            'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];
     }
 
@@ -56,8 +56,8 @@ class ContentFactory extends Factory
     public function published(): self
     {
         return $this->state(fn (array $attributes): array => [
-            'publish_from' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'publish_to' => $this->faker->dateTimeBetween('-5 month'),
+            'publish_from' => fake()->dateTimeBetween('-1 year', '-6 month'),
+            'publish_to' => fake()->dateTimeBetween('-5 month'),
         ]);
     }
 

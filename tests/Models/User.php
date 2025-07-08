@@ -35,15 +35,6 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
     use \OwenIt\Auditing\Auditable;
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -81,5 +72,15 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
     public function profileImage(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'profile_image_id');
+    }
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+        ];
     }
 }

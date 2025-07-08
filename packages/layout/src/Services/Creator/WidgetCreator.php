@@ -185,14 +185,14 @@ class WidgetCreator
             'name' => __('capell-admin::generic.media_carousel'),
             'type_id' => $mediaWidgetType->id,
             'meta' => [
-                // 'view_file' => 'capell-layout::components.widget.assets.carousel',
+                'component' => WidgetComponentEnum::AssetCarousel->value,
                 'limit' => 20,
                 'container' => 'full',
                 'background_color' => 'light-gray',
                 'margin' => 0,
             ],
             'admin' => [
-                'type_schema' => CarouselWidgetSchema::getKey(),
+                'schema' => CarouselWidgetSchema::getKey(),
             ],
         ]);
     }

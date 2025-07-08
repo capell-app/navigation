@@ -73,7 +73,7 @@ class WidgetTypeCreator
             'name' => __('capell-admin::generic.media'),
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
-                'type_schema' => Schemas\Widget\MediaWidgetSchema::getKey(),
+                'schema' => Schemas\Widget\MediaWidgetSchema::getKey(),
                 'icon' => CapellCore::getAsset(AssetEnum::Media->name)->getIcon(),
                 'asset_types' => [AssetEnum::Media->value],
             ],

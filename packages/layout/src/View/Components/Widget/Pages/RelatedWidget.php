@@ -48,7 +48,7 @@ class RelatedWidget extends AbstractPagesWidget
                      * @param  Type  $query
                      */
                     fn (BuilderContract $query) => $query->enabled()
-                        ->visible()
+                        ->listable()
                         ->accessible()
                         ->when(
                             $this->widget->meta['exclude_types'] ?? false,
@@ -59,7 +59,7 @@ class RelatedWidget extends AbstractPagesWidget
                         )
                 )
                 ->when(
-                    $tags && $tags->isNotEmpty(),
+                    $tags instanceof \Illuminate\Database\Eloquent\Collection && $tags->isNotEmpty(),
                     fn (Builder $query) => $query->whereHas(
                         'tags',
                         fn (BuilderContract $query) => $query->whereIn('taggables.tag_id', $tagIds)

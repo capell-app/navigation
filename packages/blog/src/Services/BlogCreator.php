@@ -122,8 +122,9 @@ class BlogCreator
                 'icon' => 'heroicon-o-archive-box',
             ],
             'meta' => [
-                'hidden' => true,
                 'accessible' => false,
+                'listable' => false,
+                'hidden_from_selection' => true,
                 'component' => 'capell-blog::livewire.page.archive',
                 'limit' => 10,
                 'pagination' => true,
@@ -301,14 +302,12 @@ class BlogCreator
             'name' => __('capell-blog::generic.article'),
             'group' => BlogTypeGroupEnum::Article->value,
             'admin' => [
-                'accessible' => false,
                 'content_editor' => ContentEditorEnum::RichEditor->value,
                 'icon' => 'heroicon-o-newspaper',
                 'type_schema' => PageTypeSchema::getKey(),
                 'schema' => ArticlePageSchema::getKey(),
                 'resource' => BlogResourceEnum::Article->name,
                 'with_tags' => true,
-                'exclude' => true,
             ],
         ]);
     }
@@ -421,6 +420,7 @@ class BlogCreator
                 'limit' => 10,
                 'pagination' => true,
                 'accessible' => false,
+                'listable' => false,
                 'exclude_parent' => true,
                 'with_image' => true,
                 'with_date' => true,

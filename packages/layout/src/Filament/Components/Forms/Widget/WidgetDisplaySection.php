@@ -16,7 +16,7 @@ class WidgetDisplaySection
 {
     public static function make(array $schema = []): Forms\Components\Section
     {
-        return Forms\Components\Section::make(__('capell-admin::generic.display'))
+        return Forms\Components\Section::make(__('capell-admin::generic.display_settings'))
             ->icon('heroicon-o-adjustments-horizontal')
             ->collapsed()
             ->compact()

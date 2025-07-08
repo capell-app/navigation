@@ -34,7 +34,7 @@ class WidgetAssetFactory extends Factory
      */
     public function definition(): array
     {
-        $assetType = $this->faker->randomElement([
+        $assetType = fake()->randomElement([
             AssetEnum::Page,
             AssetEnum::Media,
             LayoutAssetEnum::Content,
@@ -50,9 +50,9 @@ class WidgetAssetFactory extends Factory
                 AssetEnum::Page => (string) Page::factory()->create()->uuid,
             },
             'occurrence' => null,
-            'order' => $this->faker->randomNumber(1),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month'),
+            'order' => fake()->randomNumber(1),
+            'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
+            'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];
     }
 

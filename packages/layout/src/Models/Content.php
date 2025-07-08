@@ -202,17 +202,6 @@ class Content extends Model implements Auditable, PageCacheable
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'publish_from' => 'datetime',
-        'publish_to' => 'datetime',
-        'meta' => 'json',
-    ];
-
-    /**
      * Relations on this model that should be cloned
      *
      * @var array|string[]
@@ -347,8 +336,22 @@ class Content extends Model implements Auditable, PageCacheable
         // Handled in boot
     }
 
-    protected function getActionsAttribute(): array
+    protected function actions(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->meta['actions'] ?? [];
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn () => $this->meta['actions'] ?? []);
+    }
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'publish_from' => 'datetime',
+            'publish_to' => 'datetime',
+            'meta' => 'json',
+        ];
     }
 }

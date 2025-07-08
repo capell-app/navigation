@@ -9,4 +9,5 @@ return [
     'select_add_asset_type' => 'Select asset type',
     'position' => 'Position',
     'company' => 'Company',
+    'Hero' => 'Hero',
 ];

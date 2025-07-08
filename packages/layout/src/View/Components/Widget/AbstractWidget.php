@@ -11,7 +11,7 @@ use stdClass;
 
 abstract class AbstractWidget extends Component
 {
-    protected string $defaultView = 'capell-layout::components.widget.default';
+    protected static string $defaultView = 'capell-layout::components.widget.default';
 
     protected bool $skipRender = false;
 
@@ -42,7 +42,7 @@ abstract class AbstractWidget extends Component
         } elseif (! empty($this->widget->type->meta['view_file'])) {
             $component = $this->widget->type->meta['view_file'];
         } else {
-            $component = $this->defaultView;
+            $component = static::$defaultView;
         }
 
         $data['component_item'] = $this->getComponentItem();

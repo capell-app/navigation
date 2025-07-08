@@ -35,7 +35,7 @@ return new class extends Migration
             $table->index(['container', 'occurrence'], 'container_occurrence_index');
             $table->index(['page_id', 'occurrence'], 'page_occurrence_index');
             $table->index(['asset_type', 'asset_id'], 'resource_index');
-            $table->unique(['page_id', 'widget_id', 'container', 'occurrence', 'asset_type', 'asset_id'], 'page_asset_index');
+            $table->unique(['page_id', 'widget_id', 'container', 'occurrence', 'asset_type', 'asset_id'], 'page_widget_asset_index');
         });
     }
 };

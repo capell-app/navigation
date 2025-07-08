@@ -7,7 +7,12 @@ use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
 use Capell\Frontend\Livewire\Page\SitemapPage;
 
-arch()->preset()->php();
+arch()
+    ->preset()
+    ->php()
+    ->ignoring([
+        'var_export',
+    ]);
 
 arch()
     ->preset()

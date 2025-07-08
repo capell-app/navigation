@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Type;
 
-use Capell\Admin\Filament\Components\Forms\AdminSchemaSelect;
+use Capell\Admin\Filament\Components\Forms\AssetTypeSelect;
 use Capell\Admin\Filament\Components\Forms\ContentEditorSelect;
 use Capell\Admin\Filament\Components\Forms\CustomSelectGroup;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
+use Capell\Admin\Filament\Components\Forms\SchemaSelect;
 use Capell\Admin\Filament\Schemas\Type\DefaultTypeSchema;
-use Capell\Core\Data\AssetData;
-use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Enums\WidgetTypeGroupEnum;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
@@ -48,28 +47,20 @@ class WidgetTypeSchema extends DefaultTypeSchema
     protected static function getAdminTab(): Forms\Components\Tabs\Tab
     {
         return Forms\Components\Tabs\Tab::make(__('capell-admin::generic.admin'))
-            ->icon('heroicon-m-cog-6-tooth')
+            ->statePath('admin')
+            ->icon('heroicon-o-cog-6-tooth')
             ->columnSpanFull()
             ->columns()
-            ->statePath('admin')
             ->schema([
-                AdminSchemaSelect::make('schema')
+                SchemaSelect::make('schema')
                     ->default(fn (): string => DefaultWidgetSchema::getKey())
                     ->setupOptions(SchemaEnum::Widget->value),
 
                 IconPicker::make('icon')
                     ->label(__('capell-admin::form.admin_icon')),
 
-                Forms\Components\Select::make('asset_types')
-                    ->label(__('capell-admin::form.asset_type'))
-                    ->helperText(__('capell-admin::generic.asset_type_info'))
-                    ->multiple()
-                    ->options(
-                        fn (): array => CapellCore::getAssets()->mapWithKeys(
-                            fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()]
-                        )
-                            ->toArray()
-                    ),
+                AssetTypeSelect::make('asset_types')
+                    ->multiple(),
 
                 ContentEditorSelect::make('content_editor'),
 

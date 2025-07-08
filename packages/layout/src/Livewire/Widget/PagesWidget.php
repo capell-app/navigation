@@ -15,7 +15,7 @@ class PagesWidget extends AbstractWidget
 {
     use WithPagination;
 
-    protected string $defaultView = 'capell-layout::components.widget.page.pages';
+    protected static string $defaultView = 'capell-layout::components.widget.page.pages';
 
     protected Collection|LengthAwarePaginator $pages;
 

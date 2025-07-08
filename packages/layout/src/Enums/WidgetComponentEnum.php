@@ -8,17 +8,25 @@ enum WidgetComponentEnum: string
 {
     case Default = 'capell-layout::widget.default';
 
+    case BannerImage = 'capell-layout::widget.banner-image';
+
     case LivewirePages = 'capell-layout::livewire.widget.pages';
 
     case Navigation = 'capell-layout::widget.navigation';
 
-    case Breadcrumbs = 'capell-layout::widget.breadcrumbs';
+    case NavigationTabs = 'capell-layout::widget.navigation.tabs';
+
+    case Hero = 'capell-layout::widget.hero';
+
     case PageChildren = 'capell-layout::widget.pages.children';
-    case PageContent = 'capell-layout::widget.page.content';
     case PageLatest = 'capell-layout::widget.pages.latest';
     case PageRelated = 'capell-layout::widget.pages.related';
     case PageSiblings = 'capell-layout::widget.pages.siblings';
-    case PageSitemap = 'capell-layout::widget.page.sitemap';
+
+    case Archives = 'capell-layout::widget.page.archives';
+    case Breadcrumbs = 'capell-layout::widget.page.breadcrumbs';
+    case PageContent = 'capell-layout::widget.page.content';
+    case Pages = 'capell-layout::widget.page.pages';
 
     case Assets = 'capell-layout::widget.assets';
     case AssetAccordion = 'capell-layout::widget.assets.accordion';

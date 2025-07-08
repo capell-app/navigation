@@ -23,11 +23,11 @@ class WidgetFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->realTextBetween(2, 60);
+        $name = fake()->realTextBetween(2, 60);
 
         return [
             'name' => $name,
-            'key' => $this->faker->unique()->slug,
+            'key' => fake()->unique()->slug,
             'type_id' => fn () => Type::factory()
                 ->type(LayoutTypeEnum::Widget->value)
                 ->state(
@@ -35,8 +35,8 @@ class WidgetFactory extends Factory
                         'default' => ! Type::query()->where('type', LayoutTypeEnum::Widget)->default()->exists(),
                     ]
                 ),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', '-6 month'),
-            'updated_at' => $this->faker->dateTimeBetween('-5 month'),
+            'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
+            'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];
     }
 }

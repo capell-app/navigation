@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Enums;
 
-class WidgetComponentEnum
+enum WidgetComponentEnum
 {
     public const BlogPage = 'capell-blog::livewire.page.blog';
 }

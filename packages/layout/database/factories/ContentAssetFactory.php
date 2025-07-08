@@ -21,7 +21,7 @@ class ContentAssetFactory extends Factory
 
     public function definition(): array
     {
-        $type = $this->faker->randomElement([
+        $type = fake()->randomElement([
             AssetEnum::Page,
             AssetEnum::Media,
             LayoutAssetEnum::Content,
@@ -29,7 +29,7 @@ class ContentAssetFactory extends Factory
 
         return [
             'content_id' => Content::factory(),
-            'order' => $this->faker->numberBetween(1, 10),
+            'order' => fake()->numberBetween(1, 10),
             'asset_type' => $type->value,
             'asset_id' => fn ($state): string => (match ($type) {
                 LayoutAssetEnum::Content => (string) Content::factory()->create()->uuid,

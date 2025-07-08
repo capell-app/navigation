@@ -30,7 +30,7 @@ class SystemWidgetSchema extends AbstractWidgetSchema
                 FixedWidthSidebar::make()
                     ->mainSchema([
                         WidgetTranslationsRepeater::make($form)
-                            ->section(true),
+                            ->section(),
                     ])
                     ->sidebarSchema([
                         Forms\Components\Section::make()

@@ -18,7 +18,7 @@ class ArchivePage extends AbstractPage
 
     public ?int $year = null;
 
-    protected string $defaultView = 'capell::livewire.page.results';
+    protected static string $defaultView = 'capell::livewire.page.results';
 
     public function getPaginationPage($pageName = 'page')
     {

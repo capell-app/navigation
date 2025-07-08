@@ -29,11 +29,16 @@ abstract class AbstractWidget extends Component
 
     public array $widgetData = [];
 
-    protected string $defaultView = 'capell-layout::components.widget.default';
+    protected static string $defaultView = 'capell-layout::components.widget.default';
 
     protected $skipRender = false;
 
     abstract protected function mountWidget(): void;
+
+    public static function getViewName(): string
+    {
+        return static::$defaultView;
+    }
 
     public function hydrate(): void
     {
@@ -51,6 +56,12 @@ abstract class AbstractWidget extends Component
         $this->loop = $loop;
 
         $this->initializeWidget();
+    }
+
+    #[Computed]
+    public function widget(): Widget
+    {
+        return once(fn () => Widget::firstWhere('key', $this->widgetData['widget_key']));
     }
 
     /**
@@ -82,15 +93,9 @@ abstract class AbstractWidget extends Component
         return view($this->getComponent(), $data);
     }
 
-    #[Computed]
-    public function widget(): Widget
-    {
-        return once(fn () => Widget::firstWhere('key', $this->widgetData['widget_key']));
-    }
-
     protected function getComponent(): string
     {
-        return $this->widget->meta['view_file'] ?? $this->widget->type->meta['view_file'] ?? $this->defaultView;
+        return $this->widget->meta['view_file'] ?? $this->widget->type->meta['view_file'] ?? static::$defaultView;
     }
 
     protected function getComponentItem(): string

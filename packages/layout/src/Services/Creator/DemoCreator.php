@@ -89,7 +89,7 @@ class DemoCreator
                             ->whereHas(
                                 'type',
                                 /** @param Models\Type $query */
-                                fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
                             )
                             ->inRandomOrder()
                             ->value('uuid'),
@@ -135,7 +135,7 @@ class DemoCreator
                             ->whereHas(
                                 'type',
                                 /** @param Models\Type $query */
-                                fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
                             )
                             ->inRandomOrder()
                             ->value('uuid'),
@@ -178,7 +178,7 @@ class DemoCreator
                             ->whereHas(
                                 'type',
                                 /** @param Models\Type $query */
-                                fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
                             )
                             ->inRandomOrder()
                             ->value('uuid'),
@@ -496,13 +496,12 @@ class DemoCreator
                 /** @param  Models\Type  $query */
                 fn (BuilderContract $query) => $query->where('type', 'page')
                     ->enabled()
-                    ->visible()
+                    ->listable()
                     ->accessible()
             )
             ->with([
                 'children' => fn (BuilderContract $query) => $query->whereHas('type')->limit(2),
             ])
-            ->visible()
             ->limit(4)
             ->get();
 
@@ -610,7 +609,7 @@ class DemoCreator
                                     ->whereHas(
                                         'type',
                                         /** @param Models\Type $query */
-                                        fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                        fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
                                     )
                                     ->inRandomOrder()
                                     ->value('uuid'),
@@ -622,7 +621,7 @@ class DemoCreator
                                     ->whereHas(
                                         'type',
                                         /** @param Models\Type $query */
-                                        fn (BuilderContract $query) => $query->visible()->enabled()->accessible()
+                                        fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
                                     )
                                     ->inRandomOrder()
                                     ->value('uuid'),

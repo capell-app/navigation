@@ -52,8 +52,8 @@ class AssetsWidgetSchema extends AbstractWidgetSchema
     protected static function getMainSchema(Forms\Form $form): array
     {
         return [
-            Forms\Components\Section::make(__('capell-admin::generic.widget_resources'))
-                ->description(__('capell-admin::generic.widget_resources_info'))
+            Forms\Components\Section::make(__('capell-admin::generic.widget_assets'))
+                ->description(__('capell-admin::generic.widget_assets_info'))
                 ->compact()
                 ->schema([
                     WidgetAssetsRepeater::make($form)

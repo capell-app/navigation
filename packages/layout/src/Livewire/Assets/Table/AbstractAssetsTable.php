@@ -77,8 +77,8 @@ abstract class AbstractAssetsTable extends Component implements Forms\Contracts\
             ->columns($this->getTableColumns())
             ->description(
                 fn (self $livewire): string => $livewire->hasPageAssets
-                    ? __('capell-admin::generic.select_page_widget_resource_description', ['type' => $this->type])
-                    : __('capell-admin::generic.select_widget_resource_description', ['type' => $this->type])
+                    ? __('capell-admin::generic.select_page_widget_asset_description', ['type' => $this->type])
+                    : __('capell-admin::generic.select_widget_asset_description', ['type' => $this->type])
             )
             ->filters($this->getTableFilters())
             ->filtersFormWidth('4xl')
@@ -93,7 +93,7 @@ abstract class AbstractAssetsTable extends Component implements Forms\Contracts\
     {
         return [
             BulkSelectAction::make('selectRecords')
-                ->label(__('capell-admin::button.add_widget_resource'))
+                ->label(__('capell-admin::button.add_widget_asset'))
                 ->color('primary')
                 ->action($this->syncAssets(...)),
         ];

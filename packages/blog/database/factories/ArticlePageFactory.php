@@ -28,7 +28,6 @@ class ArticlePageFactory extends PageFactory
                 ->state([
                     'group' => BlogTypeGroupEnum::Article->value,
                     'admin' => [
-                        'accessible' => false,
                         'content_editor' => ContentEditorEnum::RichEditor->value,
                         'icon' => 'heroicon-o-newspaper',
                         'type_schema' => PageTypeSchema::getKey(),
