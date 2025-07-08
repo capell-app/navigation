@@ -26,7 +26,7 @@ use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages;
 use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers;
-use Capell\Layout\Filament\Schemas\Widget\AbstractWidgetSchema;
+use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
 use Capell\Layout\Filament\Schemas\Widget\DefaultWidgetSchema;
 use Capell\Layout\Models\Widget;
 use Filament\Forms;

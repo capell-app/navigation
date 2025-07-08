@@ -7,7 +7,7 @@ namespace Capell\Blog\Filament\Schemas\Widget;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetAdminSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
-use Capell\Layout\Filament\Schemas\Widget\AbstractWidgetSchema;
+use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
 use Filament\Forms;
 
 class ArticleWidgetSchema extends AbstractWidgetSchema

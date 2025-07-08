@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Filament\Schemas\Widget;
+namespace Capell\Layout\Filament\Schemas;
 
 use Capell\Admin\Filament\Schemas\AbstractSchema;
 use Capell\Layout\Enums\SchemaEnum;

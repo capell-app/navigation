@@ -11,15 +11,12 @@ use Capell\Admin\Filament\Components\Forms\HtmlClassInput;
 use Capell\Admin\Filament\Components\Forms\MarginSelect;
 use Capell\Admin\Filament\Components\Forms\PaddingSelect;
 use Capell\Admin\Filament\Components\Forms\SpacingSelect;
-use Capell\Admin\Filament\Schemas\AbstractSchema;
-use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
+use Capell\Layout\Filament\Schemas\AbstractLayoutContainerSchema;
 use Filament\Forms;
 
-class DefaultLayoutContainerSchema extends AbstractSchema
+class DefaultLayoutContainerSchema extends AbstractLayoutContainerSchema
 {
-    protected static string $schemaType = SchemaEnum::LayoutContainer->value;
-
     public static function make(Forms\Form $form): array
     {
         return [

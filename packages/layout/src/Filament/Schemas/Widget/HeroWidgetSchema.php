@@ -15,6 +15,7 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetAssetsRepeater;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
+use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
 use Filament\Forms;
 
 class HeroWidgetSchema extends AbstractWidgetSchema

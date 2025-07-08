@@ -11,18 +11,15 @@ use Capell\Admin\Filament\Components\Forms\CustomColorInput;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
-use Capell\Admin\Filament\Schemas\AbstractSchema;
-use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
+use Capell\Layout\Filament\Schemas\AbstractContentSchema;
 use Filament\Forms;
 
-class DefaultContentSchema extends AbstractSchema
+class DefaultContentSchema extends AbstractContentSchema
 {
-    protected static string $schemaType = SchemaEnum::Content->value;
-
     public static function getMetaSchema(): array
     {
         return [

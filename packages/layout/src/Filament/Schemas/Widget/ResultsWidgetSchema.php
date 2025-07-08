@@ -13,6 +13,7 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetResultsSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
+use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
 use Filament\Forms;
 
 class ResultsWidgetSchema extends AbstractWidgetSchema
