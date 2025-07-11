@@ -47,11 +47,8 @@ declare(strict_types=1);
     @endif
 
     @if ($widget->assets->isNotEmpty())
-        <div class="embla embla__fade relative grid h-full w-full">
-            <div class="embla__viewport h-full w-full overflow-hidden">
-                <div
-                    class="embla__container flex h-full w-full touch-pan-y touch-pinch-zoom"
-                >
+        <div class="swiper swiper-fade relative grid h-full w-full">
+            <div class="swiper-wrapper h-full w-full">
                     @foreach ($widget->assets as $widgetAsset)
                         @php
                             $title = '';
@@ -66,7 +63,7 @@ declare(strict_types=1);
 
                         <div
                             @class([
-                                'embla__slide relative flex w-full shrink-0 basis-full flex-col space-y-4',
+                                'swiper-slide relative flex w-full shrink-0 basis-full flex-col space-y-4',
                                 'items-center justify-center text-center' => $align === 'center',
                                 'items-start justify-start text-left' => $align === 'left',
                                 'items-end justify-end text-right' => $align === 'right',
@@ -115,8 +112,8 @@ declare(strict_types=1);
                 </div>
             </div>
             @if ($total > 1)
-                <div class="embla__controls mt-4">
-                    <div class="embla__dots flex justify-center gap-x-3"></div>
+                <div class="swiper-controls mt-4">
+                    <div class="swiper-pagination flex justify-center gap-x-3"></div>
                 </div>
             @endif
         </div>

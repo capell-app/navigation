@@ -26,11 +26,8 @@ declare(strict_types=1);
 <section
     class="widget-banner relative flex w-full items-center justify-center overflow-hidden"
 >
-    <div class="embla relative grid h-full w-full">
-        <div class="embla__viewport h-full w-full overflow-hidden">
-            <div
-                class="embla__container flex h-full w-full touch-pan-y touch-pinch-zoom"
-            >
+    <div class="swiper relative grid h-full w-full">
+        <div class="swiper-wrapper h-full w-full">
                 @foreach ($widget->assets as $widgetAsset)
                     @php
                         $backgroundImage = $widgetAsset->asset instanceof Media ? $widgetAsset->asset : $widgetAsset->asset->image;
@@ -48,7 +45,7 @@ declare(strict_types=1);
                     @endphp
 
                     <div
-                        class="embla__slide relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center"
+                        class="swiper-slide relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center"
                     >
                         @if ($backgroundImage)
                             <x-dynamic-component
@@ -117,9 +114,9 @@ declare(strict_types=1);
             </div>
         </div>
         @if ($total > 1)
-            <div class="embla__controls">
+            <div class="swiper-controls">
                 <div
-                    class="embla__dots absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-x-3"
+                    class="swiper-pagination absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-x-3"
                 ></div>
             </div>
         @endif
