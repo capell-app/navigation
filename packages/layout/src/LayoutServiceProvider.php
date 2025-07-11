@@ -81,9 +81,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             Blade::component($name, $component);
         }
 
-        $viewPath = base_path('vendor/capell-app/layout/resources/views/capell');
+        $viewPath = realpath(__DIR__.'/../resources/views/capell');
 
-        if (! is_dir($viewPath)) {
+        if (! $viewPath || ! is_dir($viewPath)) {
             throw new Exception('Theme view path not found: '.$viewPath);
         }
 
