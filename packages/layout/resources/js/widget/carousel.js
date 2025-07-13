@@ -23,18 +23,21 @@ document.addEventListener('livewire:navigated', () => {
 })
 
 function initCarousel(swiperNode) {
-    const controls = swiperNode.querySelector('.swiper-controls')
+    let controls = swiperNode.querySelector('.swiper-controls')
+    if (!controls) {
+        controls = swiperNode.parentNode.querySelector('.swiper-controls')
+    }
     const dotsNode = controls?.querySelector('.swiper-pagination')
     const prevBtn = controls?.querySelector('.swiper-button-prev')
     const nextBtn = controls?.querySelector('.swiper-button-next')
 
-    const fade = swiperNode.dataset.fade === 'true'
-    const loop = swiperNode.dataset.loop === 'true'
-    const autoEnabled = swiperNode.dataset.auto === 'true'
+    const fade = swiperNode.dataset.fade === '1'
+    const loop = swiperNode.dataset.loop === '1'
+    const autoEnabled = swiperNode.dataset.auto === '1'
     const autoDelay = parseInt(swiperNode.dataset.delay, 10) || 5000
     const dragEnabled =
         swiperNode.dataset.drag !== undefined
-            ? swiperNode.dataset.drag === 'true'
+            ? swiperNode.dataset.drag === '1'
             : true
     const align = swiperNode.dataset.align || 'center'
     const perView = parseInt(swiperNode.dataset.perview, 10) || 1

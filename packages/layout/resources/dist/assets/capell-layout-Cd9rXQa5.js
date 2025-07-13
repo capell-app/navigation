@@ -4531,15 +4531,16 @@ document.addEventListener('livewire:navigated', () => {
     Le()
 })
 function ii(i) {
-    const e = i.querySelector('.swiper-controls'),
-        t = e == null ? void 0 : e.querySelector('.swiper-pagination'),
+    let e = i.querySelector('.swiper-controls')
+    e || (e = i.parentNode.querySelector('.swiper-controls'))
+    const t = e == null ? void 0 : e.querySelector('.swiper-pagination'),
         s = e == null ? void 0 : e.querySelector('.swiper-button-prev'),
         n = e == null ? void 0 : e.querySelector('.swiper-button-next'),
-        r = i.dataset.fade === 'true',
-        l = i.dataset.loop === 'true',
-        a = i.dataset.auto === 'true',
+        r = i.dataset.fade === '1',
+        l = i.dataset.loop === '1',
+        a = i.dataset.auto === '1',
         d = parseInt(i.dataset.delay, 10) || 5e3,
-        o = i.dataset.drag !== void 0 ? i.dataset.drag === 'true' : !0,
+        o = i.dataset.drag !== void 0 ? i.dataset.drag === '1' : !0,
         u = i.dataset.align || 'center',
         p = parseInt(i.dataset.perview, 10) || 1
     let h = [],

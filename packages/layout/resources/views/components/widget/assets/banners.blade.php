@@ -25,6 +25,10 @@ declare(strict_types=1);
 
 <section
     class="widget-banner relative flex w-full items-center justify-center overflow-hidden"
+    style="
+        --swiper-pagination-bottom: 2rem;
+        --swiper-pagination-bullet-inactive-color: #fff;
+    "
 >
     <div class="swiper relative grid h-full w-full">
         <div class="swiper-wrapper h-full w-full">
@@ -45,7 +49,10 @@ declare(strict_types=1);
                 @endphp
 
                 <div
-                    class="swiper-slide relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center"
+                    @class([
+                        'swiper-slide relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center',
+                        'swiper-slide-active' => $loop->first,
+                    ])
                 >
                     @if ($backgroundImage)
                         <x-dynamic-component
@@ -115,7 +122,8 @@ declare(strict_types=1);
         @if ($total > 1)
             <div class="swiper-controls">
                 <div
-                    class="swiper-pagination absolute bottom-8 left-0 right-0 z-30 flex justify-center gap-x-3"
+                    class="swiper-pagination flex justify-center"
+                    wire:ignore
                 ></div>
             </div>
         @endif

@@ -21,6 +21,10 @@ declare(strict_types=1);
     data-loop="{{ (int) $carouselLoop }}"
     data-delay="{{ $carouselAutoDelay }}"
     data-fade="{{ $carouselType === 'fade' }}"
+    style="
+        --swiper-pagination-bottom: 1.5rem;
+        --swiper-pagination-bullet-inactive-color: #fff;
+    "
     @class([
         'grid min-h-full w-full',
         'swiper relative' => $total > 1,
@@ -48,7 +52,7 @@ declare(strict_types=1);
 
             @if ($carouselPagination)
                 <div
-                    class="swiper-pagination absolute bottom-8 left-0 right-0 z-10 flex select-none justify-center gap-x-3"
+                    class="swiper-pagination absolute bottom-8 left-0 right-0 z-10 flex select-none justify-center"
                     wire:ignore
                 ></div>
             @endif

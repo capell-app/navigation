@@ -16,7 +16,7 @@ declare(strict_types=1);
     'carouselArrows' => true,
     'carouselAuto' => true,
     'carouselAutoDelay' => 3000,
-    'carouselButtonClass' => 'text-primary hover:enabled:bg-primary active:enabled:bg-primary absolute top-0 z-10 flex h-full w-10 max-w-[8vw] cursor-pointer items-center justify-center bg-gray-400/75 hover:enabled:text-white active:enabled:text-white dark:bg-gray-900/60',
+    'carouselButtonClass' => 'hover:bg-primary focus:bg-primary pointer-events-auto bg-white/80 shadow-md transition hover:text-white focus:text-white disabled:pointer-events-none disabled:opacity-50',
     'carouselDrag' => true,
     'carouselLoop' => true,
     'carouselPagination' => false,
@@ -27,6 +27,7 @@ declare(strict_types=1);
     'containerWidth' => null,
     'hideContent' => $widgetData['meta']['hide_content'] ?? false,
     'loop',
+    'rounded' => $theme->meta['rounded_images'] ?? false,
     'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
     'widget',
 ])
@@ -59,9 +60,24 @@ declare(strict_types=1);
         data-align="{{ $carouselAlign }}"
         data-drag="{{ (int) $carouselDrag }}"
         data-wheel="{{ (int) $carouselWheel }}"
+        data-breakpoint='{
+            "992": {
+                "slidesPerView": "auto",
+                "spaceBetween": 36
+            },
+            "768": {
+                "slidesPerView": "auto",
+                "spaceBetween": 24
+            },
+            "320": {
+                "slidesPerView": 1,
+                "spaceBetween": 0
+            }
+        }'
         @class(['relative py-10', 'swiper' => $total > 1])
+        style="--swiper-navigation-sides-offset: 0"
     >
-        <div class="swiper-wrapper w-full overflow-hidden px-8">
+        <div class="swiper-wrapper w-full">
             @foreach ($widget->assets as $widgetAsset)
                 @php
                     $resource = $widgetAsset->asset;
@@ -77,12 +93,13 @@ declare(strict_types=1);
 
                 <div
                     @class([
-                        'swiper-slide group relative h-64 text-white',
+                        'swiper-slide group relative h-64 !w-auto overflow-hidden text-white',
+                        'rounded-lg' => $rounded,
                     ])
                     tabindex="0"
                 >
                     <x-capell::media
-                        :class="'swiper-slide-img h-64 bg-gray-50 shadow transition-transform duration-300 group-hover:scale-105 group-focus:scale-105'.($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
+                        :class="'swiper-slide-img h-64 bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105'.($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
                         :$loop
                         :media="$media"
                         :srcset="['400w', '200w']"
@@ -90,6 +107,7 @@ declare(strict_types=1);
                         :height="$height"
                         sizes="(max-width: 640px) 80vw, 20w"
                         lightbox="true"
+                        rounded="true"
                     />
                     @if ($media->name)
                         <div
@@ -104,32 +122,31 @@ declare(strict_types=1);
 
         @if ($total > 1)
             <div
-                class="swiper-controls pointer-events-none absolute inset-0 z-50"
+                class="swiper-controls pointer-events-none absolute inset-0 z-50 flex items-center justify-between"
             >
                 @if ($carouselArrows)
                     <button
                         aria-label="{{ __('capell-frontend::generic.previous') }}"
                         @class([
-                            'swiper-button-prev [:is(.swiper-button-disabled)]:hidden hover:text-primary focus:text-primary pointer-events-auto absolute bottom-0 left-0 top-0',
+                            'swiper-button-prev rounded-r-md',
                             $carouselButtonClass,
                         ])
-                    >
-                        @svg('heroicon-o-chevron-left', 'swiper-button-svg h-12 w-10')
-                    </button>
+                        style="width: 50px; height: 60px; margin-top: -30px"
+                    ></button>
                     <button
                         aria-label="{{ __('capell-frontend::generic.next') }}"
                         @class([
-                            'swiper-button-next [:is(.swiper-button-disabled)]:hidden hover:text-primary focus:text-primary pointer-events-auto absolute bottom-0 right-0 top-0',
+                            'swiper-button-next rounded-l-md',
                             $carouselButtonClass,
                         ])
-                    >
-                        @svg('heroicon-o-chevron-right', 'swiper-button-svg h-12 w-10')
-                    </button>
+                        style="width: 50px; height: 60px; margin-top: -30px"
+                    ></button>
                 @endif
 
                 @if ($carouselPagination)
                     <div
-                        class="swiper-pagination pointer-events-auto hidden select-none justify-center gap-x-3 pt-4 md:flex"
+                        class="swiper-pagination pointer-events-auto absolute bottom-2 left-1/2 flex -translate-x-1/2 select-none justify-center pt-4"
+                        wire:ignore
                     ></div>
                 @endif
             </div>
