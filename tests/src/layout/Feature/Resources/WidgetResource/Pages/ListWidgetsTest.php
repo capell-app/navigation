@@ -88,7 +88,7 @@ test('can delete widget', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(1)
         ->callTableAction(DeleteAction::class, $widget)
-        ->assertHasNoTableActionErrors()
+        ->assertHasNoFormErrors()
         ->assertCountTableRecords(0);
 
     assertSoftDeleted($widget, ['id' => $widget->id]);
@@ -100,7 +100,7 @@ test('can group delete widgets', function (): void {
     livewire(ListWidgets::class)
         ->assertSuccessful()
         ->callTableBulkAction(DeleteBulkAction::class, $widgets)
-        ->assertHasNoTableActionErrors();
+        ->assertHasNoFormErrors();
 
     foreach ($widgets as $widget) {
         assertSoftDeleted($widget, ['id' => $widget->id]);

@@ -15,13 +15,13 @@ class AssetTypeToggleButtons extends ToggleButtons
         parent::setUp();
 
         $this->label(__('capell-admin::form.asset_types'))
-            ->hiddenLabel()
             ->options(
                 fn (): array => CapellCore::getAssets()
                     ->mapWithKeys(static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()])
                     ->toArray()
             )
             ->inline()
+            ->grouped()
             ->autoDefault();
     }
 }

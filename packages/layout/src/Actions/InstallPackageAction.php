@@ -7,7 +7,6 @@ namespace Capell\Layout\Actions;
 use Capell\Admin\Services\Creator\LayoutCreator;
 use Capell\Core\Models\Language;
 use Capell\Layout\Enums\LayoutEnum;
-use Capell\Layout\Services\Creator\ContentCreator;
 use Capell\Layout\Services\Creator\LayoutCreator as LayoutCreatorService;
 use Capell\Layout\Services\Creator\LayoutUpdater;
 use Capell\Layout\Services\Creator\TypeCreator;
@@ -23,11 +22,10 @@ class InstallPackageAction
 
     public function handle(): void
     {
-        $widgetTypeCreator = app(TypeCreator::class);
-        $widgetTypeCreator->createWidgetTypes();
+        $typeCreator = app(TypeCreator::class);
+        $typeCreator->createWidgetTypes();
 
-        $contentCreator = app(ContentCreator::class);
-        $contentCreator->createDefaultContentType();
+        $typeCreator->createDefaultContentType();
 
         $widgetCreator = app(WidgetCreator::class);
         $widgetCreator->createWidgets(Language::all());

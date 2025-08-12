@@ -7,7 +7,6 @@ use Capell\Layout\Filament\Resources\WidgetResource;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Filament\Tables\Actions\CreateAction;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -39,18 +38,18 @@ test('can create a asset for a widget', function (string $assetType): void {
     ])
         ->assertSuccessful()
         ->assertCountTableRecords(0)
-        ->assertSchemaStateSet(CreateAction::class)
+        ->mountAction(Filament\Actions\CreateAction::class)
         ->fillForm(
             match ($assetType) {
                 'content' => [
                     'asset_type' => app(Content::class)->getMorphClass(),
-                    'assets' => [
+                    'asset_id' => [
                         (string) Content::factory()->create()->id,
                     ],
                 ],
                 'media' => [
                     'asset_type' => app(Models\Media::class)->getMorphClass(),
-                    'assets' => [
+                    'asset_id' => [
                         (string) Models\Media::factory()->create()->id,
                     ],
                 ],
@@ -61,10 +60,10 @@ test('can create a asset for a widget', function (string $assetType): void {
                     ],
                 ],
             },
-            formName: 'mountedTableActionForm'
+            form: 'mountedTableActionForm'
         )
-        ->callMountedTableAction()
-        ->assertHasNoTableActionErrors()
+        ->callMountedAction()
+        ->assertHasNoFormErrors()
         ->assertCountTableRecords(1);
 
     assertDatabaseHas(WidgetAsset::class, [

@@ -9,7 +9,7 @@ use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Override;
 
-class CreateWidgetAction extends CreateModalAction
+class CreateWidgetModalAction extends CreateModalAction
 {
     #[Override]
     protected function mutateFormData(array $data): array

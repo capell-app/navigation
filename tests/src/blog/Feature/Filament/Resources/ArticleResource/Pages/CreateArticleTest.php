@@ -12,6 +12,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
+use Illuminate\Support\Str;
 use src\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -38,12 +39,12 @@ describe('from edit article', function (): void {
         livewire(EditArticle::class, ['record' => $page->getRouteKey()])
             ->assertSuccessful()
             ->mountAction(CreatePageAction::class)
-            ->setActionData([
+            ->fillForm([
                 'type_id' => $newData->type_id,
                 'site_id' => $newData->site_id,
             ])
-            ->set('mountedActionsData.0.translations', [
-                0 => [
+            ->set('mountedActions.0.data.translations', [
+                (string) Str::uuid() => [
                     'title' => $newData->name,
                     'language_id' => $page->site->language_id,
                     'slug' => $slug,
@@ -105,21 +106,23 @@ describe('from list article', function (): void {
         livewire(ListArticles::class)
             ->assertSuccessful()
             ->mountAction('create')
-            ->set('mountedActionsData.0.translations', [])
-            ->setActionData([
+            ->set('mountedActions.0.data.translations', [])
+            ->fillForm([
                 'site_id' => $site->id,
                 'name' => $newData->name,
             ])
             ->set(
-                'mountedActionsData.0.translations',
-                $site->languages->map(fn ($language): array => [
-                    'language_id' => $language->getKey(),
-                    'title' => $newData->name,
-                    'slug' => str($newData->name)->slug()->toString(),
+                'mountedActions.0.data.translations',
+                $site->languages->mapWithKeys(fn ($language): array => [
+                    (string) Str::uuid() => [
+                        'language_id' => $language->getKey(),
+                        'title' => $newData->name,
+                        'slug' => str($newData->name)->slug()->toString(),
+                    ],
                 ])
                     ->toArray()
             )
-            ->assertActionDataSet([
+            ->assertSchemaStateSet([
                 'name' => $newData->name,
                 'type_id' => $type->id,
                 'site_id' => $site->id,
@@ -145,20 +148,22 @@ describe('from list article', function (): void {
         livewire(ListArticles::class)
             ->assertSuccessful()
             ->mountAction('create')
-            ->set('mountedActionsData.0.translations', [])
-            ->setActionData([
+            ->set('mountedActions.0.data.translations', [])
+            ->fillForm([
                 'name' => $newData->name,
             ])
             ->set(
-                'mountedActionsData.0.translations',
-                $site->languages->map(fn ($language): array => [
-                    'language_id' => $language->getKey(),
-                    'title' => $newData->name,
-                    'slug' => str($newData->name)->slug()->toString(),
+                'mountedActions.0.data.translations',
+                $site->languages->mapWithKeys(fn ($language): array => [
+                    (string) Str::uuid() => [
+                        'language_id' => $language->getKey(),
+                        'title' => $newData->name,
+                        'slug' => str($newData->name)->slug()->toString(),
+                    ],
                 ])
                     ->toArray()
             )
-            ->assertActionDataSet([
+            ->assertSchemaStateSet([
                 'name' => $newData->name,
                 'layout_id' => $layout->id,
                 'type_id' => $type->id,

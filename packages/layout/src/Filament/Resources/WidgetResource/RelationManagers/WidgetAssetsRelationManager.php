@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\WidgetResource\RelationManagers;
 
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
@@ -52,8 +53,8 @@ class WidgetAssetsRelationManager extends RelationManager
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withAssets())
-            ->heading(__('capell-admin::heading.widget_page_assets'))
-            ->description(__('capell-admin::generic.widget_page_assets_description'))
+            ->heading(__('capell-admin::heading.widget_assets'))
+            ->description(__('capell-admin::generic.widget_assets_description'))
             ->columns([
                 NameColumn::make('asset.name'),
                 TextColumn::make('asset_type')
@@ -68,6 +69,9 @@ class WidgetAssetsRelationManager extends RelationManager
                     ->withParents()
                     ->sortable(),
             ])
+            ->recordActions([
+                EditAction::make(),
+            ])
             ->recordUrl(
                 fn (WidgetAsset $record): ?string => match ($record->asset_type) {
                     TypeEnum::Page->value => EditPageUrlAction::run($record->asset),
@@ -81,6 +85,18 @@ class WidgetAssetsRelationManager extends RelationManager
                 Filter::make('filter')
                     ->columnSpanFull()
                     ->schema([
+                        AssetTypeToggleButtons::make('type')
+                            ->reactive(),
+
+                        Select::make('type_id')
+                            ->label(__('capell-admin::form.type'))
+                            ->visible(fn (Get $get): bool => ! empty($get('type')))
+                            ->options(fn (Get $get): array => match ($get('type')) {
+                                LayoutTypeEnum::Content->value => Content::getTypes(),
+                                TypeEnum::Page->value => Page::getTypes(),
+                                default => []
+                            }),
+
                         Select::make('page_id')
                             ->label(__('capell-admin::form.page'))
                             ->options(
@@ -95,18 +111,6 @@ class WidgetAssetsRelationManager extends RelationManager
                                     )
                                     ->toArray()
                             ),
-
-                        AssetTypeToggleButtons::make('type')
-                            ->reactive(),
-
-                        Select::make('type_id')
-                            ->label(__('capell-admin::form.type'))
-                            ->visible(fn (Get $get): bool => ! empty($get('type')))
-                            ->options(fn (Get $get): array => match ($get('type')) {
-                                LayoutTypeEnum::Content->value => Content::getTypes(),
-                                TypeEnum::Page->value => Page::getTypes(),
-                                default => []
-                            }),
                     ])
                     ->query(
                         fn (Builder $query, array $data) => $query

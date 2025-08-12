@@ -7,6 +7,7 @@ namespace Capell\Layout\Models;
 use Bkwld\Cloner\Cloneable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\PublishStatusEnum;
+use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPageCache;
 use Capell\Core\Models\Concerns\HasPublishDates;
@@ -88,6 +89,7 @@ use Wildside\Userstamps\Userstamps;
 class Widget extends Model implements PageCacheable, Statusable
 {
     use Cloneable;
+    use CloneableExcept;
 
     /** @use HasFactory<WidgetFactory> */
     use HasFactory;

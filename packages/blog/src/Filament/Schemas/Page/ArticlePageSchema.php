@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Filament\Schemas\Page;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
@@ -12,14 +11,13 @@ use Capell\Admin\Filament\Components\Forms\Page\LayoutSelect;
 use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
 use Capell\Admin\Filament\Components\Forms\Page\PageTagsInput;
+use Capell\Admin\Filament\Components\Forms\PublishDates;
 use Capell\Admin\Filament\Components\Forms\PublishToggle;
 use Capell\Admin\Filament\Resources\PageResource\RelationManagers\AuditsRelationManager;
 use Capell\Admin\Filament\Schemas\Page\DefaultPageSchema;
 use Capell\Core\Enums\LayoutGroupEnum;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -42,12 +40,15 @@ class ArticlePageSchema extends DefaultPageSchema
     {
         return [
             static::getTranslationFormSchema($schema),
-            Section::make()
-                ->contained(in_array($schema->getOperation(), ['create', 'edit']))
-                ->columns()
+            Group::make()
                 ->columnSpanFull()
                 ->schema([
-                    PublishToggle::make('is_published'),
+                    PublishToggle::make('is_published')
+                        ->reactive(),
+                    PublishDates::make()
+                        ->columnSpanFull()
+                        ->columns()
+                        ->whenFalsy('is_published'),
                 ]),
         ];
     }
@@ -150,24 +151,18 @@ class ArticlePageSchema extends DefaultPageSchema
                         $set('is_layout_changed_manually', (bool) $state);
                     })
                     ->modifyQueryUsing(
-                        fn (Builder $query, Get $get): Builder => $query->when(
-                            ! $get('is_system'),
-                            fn (Builder $query): Builder => $query->where(
-                                fn (Builder $query) => $query->where('group', '!=', LayoutGroupEnum::System)
-                                    ->orWhereNull('group')
-                            )
+                        fn (Builder $query, Get $get): Builder => $query->where(
+                            fn (Builder $query) => $query->where('group', '!=', LayoutGroupEnum::System)
+                                ->orWhereNull('group')
                         )
                     ),
             ]),
-            Group::make([
-                PublishToggle::make('is_published'),
-                Toggle::make('is_system')
-                    ->label(__('capell-admin::form.system_page'))
-                    ->dehydrated(false)
-                    ->default(false)
-                    ->hidden(fn (): bool => Filament::auth()->user()->hasRole(Utils::getSuperAdminName()))
-                    ->reactive(),
-            ]),
+            PublishToggle::make('is_published')
+                ->reactive(),
+            PublishDates::make()
+                ->columnSpanFull()
+                ->columns()
+                ->whenFalsy('is_published'),
         ];
     }
 }

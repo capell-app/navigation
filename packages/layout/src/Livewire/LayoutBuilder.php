@@ -2224,8 +2224,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ?->admin['type_schema']
             ?? WidgetTypeSchema::getKey();
 
-        $schema = CapellAdmin::getSchema(\Capell\Admin\Enums\SchemaEnum::Type->value, $name);
+        $adminSchema = CapellAdmin::getSchema(\Capell\Admin\Enums\SchemaEnum::Type->value, $name);
 
-        return $schema::make($schema);
+        return $schema::make($adminSchema);
     }
 }

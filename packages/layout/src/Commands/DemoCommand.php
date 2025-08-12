@@ -14,6 +14,7 @@ use Capell\Layout\Enums\LayoutEnum;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Services\Creator\ContentCreator;
 use Capell\Layout\Services\Creator\DemoCreator;
+use Capell\Layout\Services\Creator\TypeCreator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
@@ -80,8 +81,8 @@ class DemoCommand extends Command
 
         $demo_data = config('capell-demo.pages');
 
-        $contentCreator = app(ContentCreator::class);
-        $contentCreator->createDefaultContentType();
+        $typeCreator = app(TypeCreator::class);
+        $typeCreator->createDefaultContentType();
 
         $sites = Site::whereIn('id', $siteIds)->get();
 

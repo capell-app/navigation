@@ -72,7 +72,7 @@ test('can replicate contents', function (): void {
                 'name' => $content->name.' (copy)',
             ]
         )
-        ->assertHasNoTableActionErrors()
+        ->assertHasNoFormErrors()
         ->assertCountTableRecords(2);
 
     assertDatabaseHas('contents', [
@@ -87,7 +87,7 @@ test('can delete content', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(1)
         ->callTableAction(DeleteAction::class, $content)
-        ->assertHasNoTableActionErrors()
+        ->assertHasNoFormErrors()
         ->assertCountTableRecords(0);
 
     assertSoftDeleted($content, ['id' => $content->id]);
@@ -99,7 +99,7 @@ test('can group delete contents', function (): void {
     livewire(ListContents::class)
         ->assertSuccessful()
         ->callTableBulkAction(DeleteBulkAction::class, $contents)
-        ->assertHasNoTableActionErrors();
+        ->assertHasNoFormErrors();
 
     foreach ($contents as $content) {
         assertSoftDeleted($content, ['id' => $content->id]);

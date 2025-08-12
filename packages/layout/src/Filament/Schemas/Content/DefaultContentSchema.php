@@ -10,9 +10,12 @@ use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
+use Capell\Admin\Filament\Components\Forms\PublishDates;
+use Capell\Admin\Filament\Components\Forms\PublishToggle;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
+use Capell\Layout\Filament\Components\Forms\Content\ContentTagsInput;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\CustomColorInput;
 use Capell\Layout\Filament\Schemas\AbstractContentSchema;
@@ -71,17 +74,31 @@ class DefaultContentSchema extends AbstractContentSchema
         return [
             ...ContentSettingsSchema::make($schema),
             ContentTranslationsRepeater::make($schema),
-            Grid::make()
-                ->statePath('meta')
+            Section::make(__('capell-admin::generic.settings'))
+                ->icon('heroicon-o-cog-6-tooth')
                 ->columnSpanFull()
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (isset($state['image_id'])) {
-                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                    }
+                ->compact()
+                ->collapsed()
+                ->schema([
+                    ContentTagsInput::make('tags'),
+                    Grid::make()
+                        ->statePath('meta')
+                        ->columnSpanFull()
+                        ->mutateDehydratedStateUsing(function (array $state): array {
+                            if (isset($state['image_id'])) {
+                                $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
+                            }
 
-                    return $state;
-                })
-                ->schema(self::getMetaSchema()),
+                            return $state;
+                        })
+                        ->schema(self::getMetaSchema()),
+                ]),
+            PublishToggle::make('is_published')
+                ->reactive(),
+            PublishDates::make()
+                ->columnSpanFull()
+                ->columns()
+                ->whenFalsy('is_published'),
         ];
     }
 

@@ -353,7 +353,7 @@ test('can add media asset', function (): void {
                 'type' => 'media',
             ]
         )
-        ->setActionData([
+        ->fillForm([
             'asset' => [
                 'file' => UploadedFile::fake()->image('test.jpg'),
                 'alt' => $media->name,
@@ -401,14 +401,14 @@ test('can add page asset', function (): void {
                 'type' => 'page',
             ]
         )
-        ->setActionData([
+        ->fillForm([
             'asset' => [
                 'layout_id' => $newData->layout_id,
                 'site_id' => $newData->site_id,
                 'name' => $newData->name,
             ],
         ])
-        ->set('mountedActionsData.0.asset.translations', [
+        ->set('mountedActions.0.data.asset.translations', [
             0 => [
                 'title' => $newData->name,
                 'slug' => Str::slug($newData->name),
@@ -576,14 +576,14 @@ test('can add page asset to existing widget with page layout', function (): void
                 'type' => 'page',
             ]
         )
-        ->setActionData([
+        ->fillForm([
             'asset' => [
                 'layout_id' => $newData->layout_id,
                 'site_id' => $newData->site_id,
                 'name' => $newData->name,
             ],
         ])
-        ->set('mountedActionsData.0.asset.translations', [
+        ->set('mountedActions.0.data.asset.translations', [
             0 => [
                 'title' => $newData->name,
                 'slug' => Str::slug($newData->name),
@@ -635,8 +635,8 @@ test('can add page asset to widget with page layout', function (): void {
                 'type' => 'page',
             ]
         )
-        ->set('mountedActionsData.0.translations', [])
-        ->setActionData([
+        ->set('mountedActions.0.data.translations', [])
+        ->fillForm([
             'asset' => [
                 'layout_id' => $newData->layout_id,
                 'site_id' => $newData->site_id,
@@ -644,9 +644,9 @@ test('can add page asset to widget with page layout', function (): void {
             ],
         ])
         ->set(
-            'mountedActionsData.0.translations',
+            'mountedActions.0.data.translations',
             [
-                0 => [
+                (string) Str::uuid() => [
                     'title' => $newData->name,
                     'slug' => Str::slug($newData->name),
                     'language_id' => $newData->site->language_id,

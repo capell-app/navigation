@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Actions;
 
-use Capell\Admin\Services\Creator\ThemeCreator;
+use Capell\Admin\Services\Creator\TypeCreator;
 use Capell\Core\Enums\DefaultColorEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
@@ -22,9 +22,8 @@ class CreateThemeAction
 
     public function handle(): Theme
     {
-        $themeCreator = app(ThemeCreator::class);
-
-        $type = $themeCreator->createDefaultThemeType();
+        $typeCreator = app(TypeCreator::class);
+        $type = $typeCreator->createDefaultThemeType();
 
         $theme = DB::transaction(function () use ($type): Theme {
             Theme::default()->update(['default' => false]);

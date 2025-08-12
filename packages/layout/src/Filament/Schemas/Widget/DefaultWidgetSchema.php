@@ -16,6 +16,7 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
 use Filament\Forms\Components\Checkbox;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -118,7 +119,11 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
                             ->label(__('capell-admin::form.reverse_order'))
                             ->visible(fn (Get $get): bool => (bool) $get('image_id')),
                     ]),
-                ActionsRepeater::make('actions'),
+                Fieldset::make(__('capell-admin::form.actions'))
+                    ->schema([
+                        ActionsRepeater::make('actions')
+                            ->hiddenLabel(),
+                    ]),
             ]);
     }
 

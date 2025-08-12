@@ -7,7 +7,7 @@ use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
-use Capell\Layout\Filament\Actions\Page\CreateWidgetAction;
+use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
@@ -34,7 +34,7 @@ describe('from edit page', function (): void {
 
         livewire(EditWidget::class, ['record' => $widget->getRouteKey()])
             ->assertSuccessful()
-            ->callAction(CreateWidgetAction::class, [
+            ->callAction(CreateWidgetModalAction::class, [
                 'name' => $newData->name,
                 'key' => $newData->key,
             ])
@@ -51,7 +51,7 @@ describe('from edit page', function (): void {
 
         livewire(EditWidget::class, ['record' => $widget->getRouteKey()])
             ->assertSuccessful()
-            ->callAction(CreateWidgetAction::class, [
+            ->callAction(CreateWidgetModalAction::class, [
                 'name' => '',
                 'key' => '',
             ])
@@ -69,7 +69,7 @@ describe('from list page', function (): void {
 
         livewire(ListWidgets::class)
             ->assertSuccessful()
-            ->callAction(CreateWidgetAction::class, [
+            ->callAction(CreateWidgetModalAction::class, [
                 'name' => $newData->name,
                 'key' => $newData->key,
             ])
@@ -101,7 +101,7 @@ describe('from list page', function (): void {
 
         livewire(ListWidgets::class)
             ->assertSuccessful()
-            ->callAction(CreateWidgetAction::class, [
+            ->callAction(CreateWidgetModalAction::class, [
                 'name' => $newData->name,
                 'key' => $newData->key,
                 'type_id' => $type->id,
@@ -125,7 +125,7 @@ describe('from list page', function (): void {
 
         livewire(ListWidgets::class)
             ->assertSuccessful()
-            ->callAction(CreateWidgetAction::class, [
+            ->callAction(CreateWidgetModalAction::class, [
                 'name' => '',
                 'key' => '',
             ])

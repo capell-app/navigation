@@ -6,7 +6,7 @@ use Capell\Core\Models;
 use Capell\Layout\Filament\Resources\ContentResource;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\ContentAsset;
-use Filament\Tables\Actions\CreateAction;
+use Filament\Actions\CreateAction;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -25,7 +25,7 @@ it('can list content assets', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(5)
         ->assertCanSeeTableRecords($content->assets)
-        ->assertTableColumnStateSet('asset.name', value: [$resource->asset->name], record: $resource);
+        ->assertTableColumnStateSet('asset.name', state: [$resource->asset->name], record: $resource);
 });
 
 it('can search content assets', function (): void {
@@ -59,7 +59,7 @@ test('can create a asset for a widget', function (string $assetType): void {
     ])
         ->assertSuccessful()
         ->assertCountTableRecords(0)
-        ->mountTableAction(CreateAction::class)
+        ->mountAction(CreateAction::class)
         ->fillForm(
             match ($assetType) {
                 'content' => [
@@ -81,10 +81,10 @@ test('can create a asset for a widget', function (string $assetType): void {
                     ],
                 ],
             },
-            formName: 'mountedTableActionForm'
+            form: 'mountedTableActionForm'
         )
-        ->callMountedTableAction()
-        ->assertHasNoTableActionErrors()
+        ->callMountedAction()
+        ->assertHasNoFormErrors()
         ->assertCountTableRecords(1);
 
     assertDatabaseHas(ContentAsset::class, [

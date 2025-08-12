@@ -31,9 +31,9 @@ trait HasAssetsRelationManager
         return CreateAction::make()
             ->label(__('capell-admin::button.add_asset'))
             ->color('primary')
-            ->successNotificationTitle(__('capell-admin::messsage.asset_added'))
+            ->successNotificationTitle(__('capell-admin::message.asset_added'))
             ->using(function (array $data, self $livewire): Model {
-                foreach ($data['assets'] as $uuid) {
+                foreach ($data['asset_id'] as $uuid) {
                     $livewire->ownerRecord->assets()->create([
                         'asset_id' => $uuid,
                         'asset_type' => $data['asset_type'],
@@ -50,15 +50,17 @@ trait HasAssetsRelationManager
             AssetTypeToggleButtons::make('asset_type')
                 ->required()
                 ->reactive(),
-            Select::make('assets')
+            Select::make('asset_id')
                 ->label(
-                    fn (Get $get): string => $get('asset_type')
-                        ? __('capell-layout::form.select_add_type', ['type' => $get('asset_type')])
-                        : __('capell-layout::form.select_add_asset_type')
+                    fn (Get $get, string $operation): string => in_array($operation, ['create', 'createOption'])
+                        ? __('capell-layout::form.edit_type_record', ['type' => $get('asset_type')])
+                        : ($get('asset_type')
+                            ? __('capell-layout::form.select_add_type', ['type' => $get('asset_type')])
+                            : __('capell-layout::form.select_add_asset_type'))
                 )
                 ->required()
                 ->searchable()
-                ->multiple()
+                ->multiple(fn (string $operation): bool => in_array($operation, ['create', 'createOption'], true))
                 ->disabled(fn (Get $get): bool => ! $get('asset_type'))
                 ->getSearchResultsUsing(
                     static fn (Select $component, Get $get, self $livewire, string $search): array => self::getAssetOptions(
@@ -130,7 +132,10 @@ trait HasAssetsRelationManager
                 'id',
                 'name',
             ])
-            ->whereKeyNot($record->id)
+            ->when(
+                $record instanceof $model,
+                fn (Builder $query) => $query->whereKeyNot($record->id)
+            )
             ->whereNotExists(
                 fn (BuilderContract $query) => $query
                     ->from('content_assets')

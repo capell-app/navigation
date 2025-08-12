@@ -122,7 +122,11 @@ it('can create with translations', function (string $mode): void {
 test('can search parent results', function (): void {
     $parent = Content::factory()->withTranslations()->create();
 
-    livewire(CreateContent::class)
-        ->call('getFormSelectSearchResults', 'data.parent_id', $parent->name)
+    $livewire = livewire(CreateContent::class);
+    $instance = $livewire->instance();
+    $schema = $instance->getSchema($instance->getDefaultTestingSchemaName());
+    $component = $schema->getComponent('dynamicTypeSchema.parent_id');
+
+    $livewire->call('callSchemaComponentMethod', $component->getKey(), $parent->name)
         ->assertSuccessful();
 });

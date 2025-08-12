@@ -14,7 +14,7 @@ use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Admin\Filament\Concerns\HasTypeRelationManagers;
 use Capell\Layout\Actions\ReplicateContentAction;
 use Capell\Layout\Enums\LayoutResourceEnum;
-use Capell\Layout\Filament\Actions\Page\CreateContentAction;
+use Capell\Layout\Filament\Actions\Page\CreateContentModalAction;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTypeSelect;
 use Capell\Layout\Filament\Resources\ContentResource;
 use Capell\Layout\Models\Content;
@@ -79,7 +79,8 @@ class EditContent extends EditRecord
             DeleteAction::make(),
             ForceDeleteAction::make(),
             ActionGroup::make([
-                CreateContentAction::make(),
+                CreateContentModalAction::make()
+                    ->redirectAfterCreate(),
                 ReplicateAction::make()
                     ->replicaModelAction(ReplicateContentAction::class)
                     ->hidden($this->record->trashed()),

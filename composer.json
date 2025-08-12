@@ -43,6 +43,18 @@
             "url": "https://github.com/capell-app/frontend"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/broqit/filament-title-with-slug"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/lara-zeus/translatable"
+        },
+        {
+            "type": "git",
+            "url": "git@github.com:backstagephp/filament-adjacency-list.git"
+        },
+        {
             "type": "path",
             "url": "./packages/*",
             "options": {

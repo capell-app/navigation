@@ -8,6 +8,7 @@ use ArrayAccess;
 use Bkwld\Cloner\Cloneable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\PublishStatusEnum;
+use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasDraftsAndNestedSet;
 use Capell\Core\Models\Concerns\HasMetaData;
@@ -162,6 +163,7 @@ use Wildside\Userstamps\Userstamps;
 class Content extends Model implements Auditable, PageCacheable
 {
     use Cloneable;
+    use CloneableExcept;
     use HasAssets;
     use HasDrafts {
         bootHasDrafts as protected;

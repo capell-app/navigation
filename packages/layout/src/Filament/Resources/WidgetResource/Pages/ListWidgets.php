@@ -9,7 +9,7 @@ use Capell\Admin\Filament\Concerns\ApplySearchRelationsTable;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutResourceEnum;
-use Capell\Layout\Filament\Actions\Page\CreateWidgetAction;
+use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
 use Capell\Layout\Filament\Resources\WidgetResource;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -45,7 +45,8 @@ class ListWidgets extends ListRecords
     protected function getActions(): array
     {
         return [
-            CreateWidgetAction::make(),
+            CreateWidgetModalAction::make()
+                ->redirectAfterCreate(),
         ];
     }
 

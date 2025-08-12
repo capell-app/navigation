@@ -27,8 +27,6 @@ class ContentSettingsSchema
             SiteSelect::make('site_id')
                 ->default(null)
                 ->reactive(),
-
-            ContentTagsInput::make('tags'),
         ];
     }
 }
