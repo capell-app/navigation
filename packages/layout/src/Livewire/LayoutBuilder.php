@@ -2099,7 +2099,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
 
         return array_column(
-            array_filter($this->assets[$containerKey][$widgetIndex], fn ($resource): bool => $resource['asset_type'] === $type),
+            array_filter($this->assets[$containerKey][$widgetIndex], fn (array $resource): bool => $resource['asset_type'] === $type),
             'asset_id'
         );
     }

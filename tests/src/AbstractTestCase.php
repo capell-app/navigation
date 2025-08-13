@@ -16,6 +16,8 @@ use Capell\Core\CapellCoreManager;
 use Capell\Core\CapellServiceProvider;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
+use Capell\Tests\Fixtures\Models\User;
+use Capell\Tests\Fixtures\Policies\RolePolicy;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
@@ -46,8 +48,6 @@ use Spatie\LaravelRay\RayServiceProvider;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionServiceProvider;
 use Spatie\Tags\TagsServiceProvider;
-use src\Fixtures\Models\User;
-use src\Fixtures\Policies\RolePolicy;
 use StijnVanouplines\BladeCountryFlags\BladeCountryFlagsServiceProvider;
 use Tapp\FilamentAuthenticationLog\FilamentAuthenticationLogServiceProvider;
 

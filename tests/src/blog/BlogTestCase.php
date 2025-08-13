@@ -8,7 +8,7 @@ use Capell\Admin\AdminServiceProvider;
 use Capell\Blog\BlogServiceProvider;
 use Capell\Frontend\FrontendServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use src\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
 
 class BlogTestCase extends AbstractTestCase
 {

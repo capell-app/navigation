@@ -8,8 +8,8 @@ use Capell\Blog\Database\Factories\ArticlePageFactory;
 use Capell\Blog\Filament\Resources\ArticleResource;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\get;

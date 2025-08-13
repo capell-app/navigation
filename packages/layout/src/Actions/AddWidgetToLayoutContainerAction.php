@@ -26,7 +26,7 @@ class AddWidgetToLayoutContainerAction
 
         $occurrence = count(array_filter(
             $containers[$container]['widgets'],
-            fn ($existingWidget): bool => $existingWidget['widget_key'] === $widget->key
+            fn (array $existingWidget): bool => $existingWidget['widget_key'] === $widget->key
         )) + 1;
 
         $containers[$container]['widgets'][] = [

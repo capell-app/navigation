@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace src\Fixtures\Models;
+namespace Capell\Tests\Fixtures\Models;
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Capell\Core\Database\Factories\UserFactory;

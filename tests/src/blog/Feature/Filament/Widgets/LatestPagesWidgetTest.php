@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Widgets\LatestPagesWidget;
 use Capell\Blog\Database\Factories\ArticlePageFactory;
 use Capell\Core\Models\Page;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 

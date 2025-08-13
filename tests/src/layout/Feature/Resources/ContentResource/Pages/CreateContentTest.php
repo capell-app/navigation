@@ -8,7 +8,7 @@ use Capell\Core\Models\Translation;
 use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Filament\Resources\ContentResource\Pages\CreateContent;
 use Capell\Layout\Models\Content;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

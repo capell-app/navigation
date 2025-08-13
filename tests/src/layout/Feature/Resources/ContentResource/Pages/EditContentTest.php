@@ -8,7 +8,7 @@ use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Filament\Resources\ContentResource\Pages\EditContent;
 use Capell\Layout\Models\Content;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;

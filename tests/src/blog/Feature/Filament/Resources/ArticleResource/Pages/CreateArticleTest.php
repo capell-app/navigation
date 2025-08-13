@@ -12,8 +12,8 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Illuminate\Support\Str;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

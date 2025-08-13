@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace src\Fixtures\Policies;
+namespace Capell\Tests\Fixtures\Policies;
 
+use Capell\Tests\Fixtures\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use src\Fixtures\Models\User;
 
 class UserPolicy
 {

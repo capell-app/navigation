@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Layout\Filament\Resources\WidgetResource;
 use Capell\Layout\Models\Widget;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 

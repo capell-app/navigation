@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use src\Fixtures\Models\User;
+use Capell\Tests\Fixtures\Models\User;
 
 use function Pest\Laravel\artisan;
 

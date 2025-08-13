@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace src\Fixtures\Support\Concerns;
+namespace Capell\Tests\Fixtures\Support\Concerns;
 
 use Capell\Tests\AbstractTestCase;
+use Capell\Tests\Fixtures\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
-use src\Fixtures\Models\User;
 
 /**
  * @property-read \Illuminate\Foundation\Application $app

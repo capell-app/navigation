@@ -5,10 +5,10 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Database\Eloquent\Factories\Sequence;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;

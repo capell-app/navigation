@@ -41,16 +41,11 @@ class TypeCreator
 
     public function create(string $key): void
     {
-        switch ($key) {
-            case LayoutTypeEnum::Content->value:
-                $this->createDefaultContentType();
-                break;
-            case LayoutTypeEnum::Widget->value:
-                $this->defaultWidgetType();
-                break;
-            default:
-                throw new Exception('Invalid page type key: '.$key);
-        }
+        match ($key) {
+            LayoutTypeEnum::Content->value => $this->createDefaultContentType(),
+            LayoutTypeEnum::Widget->value => $this->defaultWidgetType(),
+            default => throw new Exception('Invalid page type key: '.$key),
+        };
     }
 
     public function createDefaultContentType(): void

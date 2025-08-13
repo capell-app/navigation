@@ -9,7 +9,7 @@ use Capell\Frontend\FrontendServiceProvider;
 use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use src\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
 
 class LayoutTestCase extends AbstractTestCase
 {

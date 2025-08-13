@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace src\Fixtures\Support\Filament;
+namespace Capell\Tests\Fixtures\Support\Filament;
 
 use Capell\Admin\CapellAdminPlugin;
 use Capell\Admin\Enums\FilamentColorEnum;

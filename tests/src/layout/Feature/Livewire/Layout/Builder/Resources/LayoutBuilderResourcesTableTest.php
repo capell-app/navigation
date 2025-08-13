@@ -14,8 +14,8 @@ use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
+use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Illuminate\Database\Eloquent\Model;
-use src\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 
