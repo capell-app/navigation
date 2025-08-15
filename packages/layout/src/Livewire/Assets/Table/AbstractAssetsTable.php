@@ -82,11 +82,6 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
                     )
             )
             ->columns($this->getTableColumns())
-            ->description(
-                fn (self $livewire): string => $livewire->hasPageAssets
-                    ? __('capell-admin::generic.select_page_widget_asset_description', ['type' => $this->type])
-                    : __('capell-admin::generic.select_widget_asset_description', ['type' => $this->type])
-            )
             ->filters($this->getTableFilters())
             ->filtersFormWidth('4xl')
             ->filtersFormColumns([

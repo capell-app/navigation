@@ -221,11 +221,6 @@ class Content extends Model implements Auditable, PageCacheable
 
     protected static string $factory = ContentFactory::class;
 
-    public static function findByUuid(string $value, $select = '*'): ?static
-    {
-        return static::where('id', $value)->select($select)->first();
-    }
-
     public static function getMorphRelations(): array
     {
         return ['image', 'type', 'translation'];
@@ -239,7 +234,7 @@ class Content extends Model implements Auditable, PageCacheable
 
         $builder->withDrafts();
 
-        $builder->where($table ? $table.'.'.$this->getIsPublishedColumn() : $this->getIsPublishedColumn(), true);
+        $builder->where($table ? $table . '.' . $this->getIsPublishedColumn() : $this->getIsPublishedColumn(), true);
 
         return $this->applyNestedSetScopeParent($query, $table);
     }
@@ -257,7 +252,7 @@ class Content extends Model implements Auditable, PageCacheable
 
     public function getQualifiedIsPublishedColumn(?string $table = null): string
     {
-        return $table ? $table.'.'.$this->getIsPublishedColumn() : $this->getIsPublishedColumn();
+        return $table ? $table . '.' . $this->getIsPublishedColumn() : $this->getIsPublishedColumn();
     }
 
     public function loadParent(Language $language): void

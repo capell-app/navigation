@@ -38,10 +38,10 @@ declare(strict_types=1);
                         x-show="selectedRecords['{{ $containerKey }}'][{{ $widgetIndex }}].length === 0"
                     >
                         @svg('heroicon-o-arrows-up-down', 'inline-block h-5 w-5 text-gray-400 transition duration-75 dark:text-gray-500', [
-                            'x-show' => "! isWidgetReorderingResources('{$containerKey}', $widgetIndex)",
+                            'x-show' => "! isWidgetReorderingResources('{$containerKey}', {$widgetIndex})",
                         ])
                         @svg('heroicon-o-x-mark', 'inline-block h-5 w-5 text-gray-400 transition duration-75 dark:text-gray-500', [
-                            'x-show' => "isWidgetReorderingResources('{$containerKey}', $widgetIndex)",
+                            'x-show' => "isWidgetReorderingResources('{$containerKey}', {$widgetIndex})",
                             'x-cloak' => '',
                         ])
                         <span
@@ -63,20 +63,17 @@ declare(strict_types=1);
 
         <div
             class="flex w-full flex-grow flex-wrap items-center justify-between gap-4 px-4 py-3 lg:order-1 lg:w-auto"
-            x-show="{{ "selectedRecords['$containerKey'][$widgetIndex].length" }}"
+            x-show="{{ "selectedRecords['{$containerKey}'][{$widgetIndex}].length" }}"
             x-transition
         >
             <x-capell-admin::tables.selection-indicator
                 class="flex-grow !bg-transparent !p-0"
                 :all-selectable-records-count="$assetsCount"
-                :selectedRecordsPropertyName="'selectedRecords[\''.$containerKey.'\']['.$widgetIndex.']'"
-                :x-bind:hidden="
-                    '! selectedRecords[\''.$containerKey.
-                    '\']['.$widgetIndex.
-                    '].length'
-                "
-                :selectAllRecordsAction="'selectAllRecords(\''.$containerKey.'\', '.$widgetIndex.')'"
-                :deselectAllRecordsAction="'deselectAllRecords(\''.$containerKey.'\', '.$widgetIndex.')'"
+                :page="1"
+                :selected-records-property-name="'selectedRecords[\'' . $containerKey . '\'][' . $widgetIndex . ']'"
+                :get-selected-records-count-action="'selectedRecords[\'' . $containerKey . '\'][' . $widgetIndex . '].length'"
+                :select-all-records-action="'selectAllRecords(\'' . $containerKey . '\', ' . $widgetIndex . ')'"
+                :deselect-all-records-action="'deselectAllRecords(\'' . $containerKey . '\', ' . $widgetIndex . ')'"
             />
 
             @if ($removeAssetsAction && $removeAssetsAction->isVisible())
@@ -105,7 +102,7 @@ declare(strict_types=1);
 
                     if (! $widgetAsset) {
                         throw new Exception(
-                            "Resource not found for {$asset['asset_type']} {$asset['asset_id']} for widget $widget->key ($occurrence).",
+                            "Resource not found for {$asset['asset_type']} {$asset['asset_id']} for widget {$widget->key} ({$occurrence}).",
                         );
                     }
                 @endphp
@@ -115,7 +112,7 @@ declare(strict_types=1);
                     :index="$loop->index"
                     :$occurrence
                     :asset="$widgetAsset->asset"
-                    :asset-key="$widgetAsset->asset_type.'.'.$widgetAsset->asset_id"
+                    :asset-key="$widgetAsset->asset_type . '.' . $widgetAsset->asset_id"
                     :asset-type="$widgetAsset->asset_type"
                     :$widget
                     :$widgetIndex

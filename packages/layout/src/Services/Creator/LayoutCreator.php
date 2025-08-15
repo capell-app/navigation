@@ -27,7 +27,7 @@ class LayoutCreator
     {
         return match ($key) {
             'home' => $this->createHomeLayout(),
-            default => throw new InvalidArgumentException('Invalid layout key: '.$key),
+            default => throw new InvalidArgumentException('Invalid layout key: ' . $key),
         };
     }
 

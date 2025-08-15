@@ -33,7 +33,7 @@ class RelatedWidget extends AbstractPagesWidget
             withImage: $this->widget->meta['with_image'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
-            cacheKeyPrepend: 'tags-'.implode('-', $tagIds),
+            cacheKeyPrepend: 'tags-' . implode('-', $tagIds),
             /**
              * @param  Page  $query
              */

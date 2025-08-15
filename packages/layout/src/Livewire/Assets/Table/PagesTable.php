@@ -212,7 +212,7 @@ class PagesTable extends AbstractAssetsTable
                             $pages->each(function (Page $page) use (&$options, $site_id): void {
                                 $label = '';
                                 if (! $site_id && $page->site) {
-                                    $label .= $page->site->name.' » ';
+                                    $label .= $page->site->name . ' » ';
                                 }
 
                                 $ancestors = $page->ancestors()->get();
@@ -221,7 +221,7 @@ class PagesTable extends AbstractAssetsTable
                                     $label .= $ancestors->pluck('name')
                                         ->map(fn ($item) => Str::limit($item, 30))
                                         ->implode(' » ')
-                                        .' » ';
+                                        . ' » ';
                                 }
 
                                 $label .= Str::limit($page->name, 40);
@@ -243,7 +243,7 @@ class PagesTable extends AbstractAssetsTable
 
                             $code = CapellCore::getModel(ModelEnum::Language)::find($languageId, 'code')->code;
 
-                            return $query->whereRaw('JSON_EXTRACT(`tags`.`name`, '.DB::getPdo()->quote('$.'.$code).') IS NOT NULL');
+                            return $query->whereRaw('JSON_EXTRACT(`tags`.`name`, ' . DB::getPdo()->quote('$.' . $code) . ') IS NOT NULL');
                         })
                         ->searchable()
                         ->preload()

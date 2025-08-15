@@ -10,7 +10,7 @@ use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Models;
 
 it('has many contents', function (): void {
-    $type = (new ContentTypeFactory())->create();
+    $type = (new ContentTypeFactory)->create();
 
     Models\Content::factory()->create(['type_id' => $type->id]);
 
@@ -19,7 +19,7 @@ it('has many contents', function (): void {
 });
 
 it('has many widgets', function (): void {
-    $type = (new WidgetTypeFactory())->create();
+    $type = (new WidgetTypeFactory)->create();
 
     Models\Widget::factory()->create(['type_id' => $type->id]);
 

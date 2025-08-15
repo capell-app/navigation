@@ -68,15 +68,15 @@ abstract class AbstractTestCase extends TestCase
     protected function setUp(): void
     {
         if (getenv('TEST_TOKEN')) {
-            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-'.getenv('TEST_TOKEN'));
+            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-' . getenv('TEST_TOKEN'));
         }
 
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         $migrations = CapellCoreManager::getMigrations();
-        $path = realpath(__DIR__.'/../../vendor/capell-app/core/database/migrations');
+        $path = realpath(__DIR__ . '/../../vendor/capell-app/core/database/migrations');
         array_walk($migrations, fn (&$migration): string => $migration = sprintf('%s/%s.php', $path, $migration));
 
         $this->loadMigrationsFrom($migrations);
@@ -162,7 +162,7 @@ abstract class AbstractTestCase extends TestCase
         $this->registerPublishConfig('admin', vendorPackage: true);
 
         foreach ($packages as $package_key => $package) {
-            $config = require __DIR__.'/..'.$this->getPackageFile($package);
+            $config = require __DIR__ . '/..' . $this->getPackageFile($package);
 
             $this->registerPackageConfig($package_key, $config);
         }
@@ -213,16 +213,16 @@ abstract class AbstractTestCase extends TestCase
     protected function getPublishConfigs(string $package, bool $vendorPackage): array
     {
         if ($vendorPackage) {
-            $path = realpath(__DIR__.'/../../vendor/capell-app/'.$package.'/publishes/config');
+            $path = realpath(__DIR__ . '/../../vendor/capell-app/' . $package . '/publishes/config');
         } else {
-            $path = realpath(__DIR__.'/../../packages/'.$package.'/publishes/config');
+            $path = realpath(__DIR__ . '/../../packages/' . $package . '/publishes/config');
         }
 
         if (! $path) {
             return [];
         }
 
-        return glob($path.'/*.php');
+        return glob($path . '/*.php');
     }
 
     protected function setupPage(Page $page, Collection $languages): void
@@ -230,8 +230,8 @@ abstract class AbstractTestCase extends TestCase
         $languages->each(function (int $languageId) use ($page): void {
             $page->translations()->save(PageTranslation::factory()->make([
                 'language_id' => $languageId,
-                'title' => Str::title($page->name.' '.$languageId),
-                'slug' => Str::slug($page->name.' '.$languageId),
+                'title' => Str::title($page->name . ' ' . $languageId),
+                'slug' => Str::slug($page->name . ' ' . $languageId),
             ]));
         });
 
@@ -240,8 +240,8 @@ abstract class AbstractTestCase extends TestCase
 
     private function getPackageFile(array $package): string
     {
-        $path = '/../vendor/'.basename((string) $package['user']).'/'.basename((string) $package['name']).'/config';
-        $file = basename((string) $package['file']).'.php';
+        $path = '/../vendor/' . basename((string) $package['user']) . '/' . basename((string) $package['name']) . '/config';
+        $file = basename((string) $package['file']) . '.php';
 
         return sprintf('%s/%s', $path, $file);
     }

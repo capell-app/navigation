@@ -44,7 +44,7 @@ class TypeCreator
         match ($key) {
             LayoutTypeEnum::Content->value => $this->createDefaultContentType(),
             LayoutTypeEnum::Widget->value => $this->defaultWidgetType(),
-            default => throw new Exception('Invalid page type key: '.$key),
+            default => throw new Exception('Invalid page type key: ' . $key),
         };
     }
 

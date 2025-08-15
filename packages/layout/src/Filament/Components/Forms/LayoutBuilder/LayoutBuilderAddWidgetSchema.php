@@ -78,7 +78,7 @@ class LayoutBuilderAddWidgetSchema
         $model = CapellCore::getModel(LayoutModelEnum::Widget->name);
 
         return $model::getTypeGroups()
-            ->mapWithKeys(fn ($group): array => [$group => __('capell-admin::generic.'.$group)])
+            ->mapWithKeys(fn ($group): array => [$group => __('capell-admin::generic.' . $group)])
             ->toArray();
     }
 
@@ -106,23 +106,24 @@ class LayoutBuilderAddWidgetSchema
                 $groups,
                 fn (Builder $query) => $query->whereHas(
                     'type',
-                    fn (BuilderContract $query) => $query->where(fn ($query) => $query
-                        ->when(
-                            in_array('default', $groups),
-                            fn (Builder $query): Builder => $query->whereNull('group')
-                        )
-                        ->when(
-                            count($groups) > 1 || ! in_array('default', $groups, true),
-                            function (Builder $query) use ($groups): Builder {
-                                if (in_array('default', $groups, true)) {
-                                    $groups = array_diff($groups, ['default']);
+                    fn (BuilderContract $query) => $query->where(
+                        fn ($query) => $query
+                            ->when(
+                                in_array('default', $groups),
+                                fn (Builder $query): Builder => $query->whereNull('group')
+                            )
+                            ->when(
+                                count($groups) > 1 || ! in_array('default', $groups, true),
+                                function (Builder $query) use ($groups): Builder {
+                                    if (in_array('default', $groups, true)) {
+                                        $groups = array_diff($groups, ['default']);
 
-                                    return $query->orWhereIn('group', $groups);
+                                        return $query->orWhereIn('group', $groups);
+                                    }
+
+                                    return $query->whereIn('group', $groups);
                                 }
-
-                                return $query->whereIn('group', $groups);
-                            }
-                        )
+                            )
                     )
                 )
             );

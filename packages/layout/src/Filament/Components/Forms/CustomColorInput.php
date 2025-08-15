@@ -38,10 +38,10 @@ class CustomColorInput
                     ->searchable()
                     ->reactive()
                     ->preload()
-                    ->mutateDehydratedStateUsing(fn ($state, Get $get) => $state === 'custom' ? $get($name.'_custom') : $state)
+                    ->mutateDehydratedStateUsing(fn ($state, Get $get) => $state === 'custom' ? $get($name . '_custom') : $state)
                     ->afterStateUpdated(function (Set $set, $state) use ($name): void {
                         if (! filled($state)) {
-                            $set($name.'_custom', '');
+                            $set($name . '_custom', '');
                         }
                     })
                     ->options(function (Set $set, $state, $livewire) use ($name, $options): array {
@@ -55,7 +55,7 @@ class CustomColorInput
 
                         if ($state && ! isset($options[$state])) {
                             $set($name, 'custom');
-                            $set($name.'_custom', $state);
+                            $set($name . '_custom', $state);
                         }
 
                         $options['custom'] = __('capell-admin::form.option_custom');
@@ -63,7 +63,7 @@ class CustomColorInput
                         return $options;
                     }),
 
-                ColorPicker::make($name.'_custom')
+                ColorPicker::make($name . '_custom')
                     ->label(__('capell-admin::form.custom'))
                     ->hiddenLabel()
                     ->placeholder(__('capell-admin::generic.custom'))

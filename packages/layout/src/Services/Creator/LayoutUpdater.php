@@ -26,7 +26,7 @@ class LayoutUpdater
             LayoutEnum::Results->value => $this->resultsLayout(Layout::firstWhere('key', LayoutEnum::Results)),
             LayoutEnum::Tags->value => $this->tagsLayout(Layout::firstWhere('key', LayoutEnum::Tags)),
             LayoutEnum::Default->value => $this->defaultLayout(Layout::firstWhere('default', true)),
-            default => throw new InvalidArgumentException('Invalid layout key: '.$key)
+            default => throw new InvalidArgumentException('Invalid layout key: ' . $key)
         };
     }
 

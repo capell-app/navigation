@@ -96,7 +96,7 @@ trait HasAssetsRelationManager
         $options = collect();
 
         $results->each(function (Page $page) use (&$options): void {
-            $label = $page->site->name.' » ';
+            $label = $page->site->name . ' » ';
 
             $ancestors = $page->ancestors()->get();
 
@@ -104,7 +104,7 @@ trait HasAssetsRelationManager
                 $label .= $ancestors->pluck('name')
                     ->map(fn ($item) => Str::limit($item, 30))
                     ->implode(' » ')
-                    .' » ';
+                    . ' » ';
             }
 
             $label .= Str::limit($page->name, 40);

@@ -93,7 +93,7 @@ class DemoCommand extends Command
         foreach ($sites as $site) {
             $this->info(sprintf('Selected site: %s', $site->name));
 
-            $this->line('Associating theme with site: '.$site->name);
+            $this->line('Associating theme with site: ' . $site->name);
 
             $theme = CreateThemeAction::run();
 
@@ -122,7 +122,7 @@ class DemoCommand extends Command
     {
 
         $this->newLine();
-        $this->line('Setting up homepage extras for site: '.$site->name);
+        $this->line('Setting up homepage extras for site: ' . $site->name);
 
         $languages = $site->languages;
 

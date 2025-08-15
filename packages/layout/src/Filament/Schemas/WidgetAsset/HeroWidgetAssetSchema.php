@@ -10,18 +10,17 @@ use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\Content\RelatedRepeater;
 use Capell\Layout\Filament\Components\Forms\MediaRepeater;
+use Capell\Layout\Filament\Schemas\AbstractWidgetAssetSchema;
 use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Override;
 
-class HeroWidgetAssetSchema extends DefaultWidgetAssetSchema
+class HeroWidgetAssetSchema extends AbstractWidgetAssetSchema
 {
-    #[Override]
-    protected static function getContentFormSchema(Schema $schema): array
+    public static function make(Schema $schema): array
     {
         return [
             ContentTranslationsRepeater::make($schema, titleRequired: false)

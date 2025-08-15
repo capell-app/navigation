@@ -31,7 +31,7 @@ declare(strict_types=1);
         'containerKey' => $containerKey,
         'widgetIndex' => $widgetIndex,
         'index' => $index,
-        'assetType' => $assetType,
+        'type' => $assetType,
     ]);
 
     if (! $asset) {
@@ -99,9 +99,9 @@ declare(strict_types=1);
                 class="group-hover/asset:border-primary-500 group/asset-focus:border-primary-500 h-4 w-4 cursor-pointer border-gray-600"
                 :label="__('tables::table.fields.bulk_select_asset.label', ['key' => $name])"
                 :value="$assetKey"
-                :wire:key="'selectedRecords'.$containerKey.'-'.$widgetIndex.'-'.$assetKey"
+                :wire:key="'selectedRecords' . $containerKey . '-' . $widgetIndex . '-' . $assetKey"
                 x-model="selectedRecords['{{ $containerKey }}'][{{ $widgetIndex }}]"
-                :x-show="'! isWidgetReorderingResources(\''.$containerKey.'\', '.$widgetIndex.')'"
+                :x-show="'! isWidgetReorderingResources(\'' . $containerKey . '\', ' . $widgetIndex . ')'"
                 wire:loading.remove
                 wire:target="{{ $editWidgetAssetAction->getLivewireClickHandler() }}"
             />

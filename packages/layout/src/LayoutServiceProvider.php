@@ -54,6 +54,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Assets\AlpineComponent;
+use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -101,10 +102,10 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             Blade::component($name, $component);
         }
 
-        $viewPath = realpath(__DIR__.'/../resources/views/capell');
+        $viewPath = realpath(__DIR__ . '/../resources/views/capell');
 
         if (! $viewPath || ! is_dir($viewPath)) {
-            throw new Exception('Theme view path not found: '.$viewPath);
+            throw new Exception('Theme view path not found: ' . $viewPath);
         }
 
         app('view')->prependNamespace('capell', $viewPath);
@@ -114,10 +115,12 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         $publishDir = self::getPublishedDirectory();
 
-        FilamentAsset::register([
-            AlpineComponent::make('layout-builder', $publishDir.'/build/layout-builder.js')
-                ->loadedOnRequest(),
-        ],
+        FilamentAsset::register(
+            [
+                Css::make('capell-layout-filament', $publishDir . '/build/admin/capell-layout-filament.css'),
+                AlpineComponent::make('layout-builder', $publishDir . '/build/admin/layout-builder.js')
+                    ->loadedOnRequest(),
+            ],
             package: 'capell-layout'
         );
     }
@@ -140,7 +143,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                     ->endWith(function (InstallCommand $command): void {
                         $command->call(
                             'capell:publish-migrations',
-                            ['--migrations' => CapellLayoutManager::getMigrations(), '--path' => __DIR__.'/../database/migrations']
+                            ['--migrations' => CapellLayoutManager::getMigrations(), '--path' => __DIR__ . '/../database/migrations']
                         );
 
                         $command->call('migrate');
@@ -159,7 +162,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerSchemas()
             ->registerSchemaHooks();
 
-        App::singleton(CapellLayoutManager::class, fn (): CapellLayoutManager => new CapellLayoutManager());
+        App::singleton(CapellLayoutManager::class, fn (): CapellLayoutManager => new CapellLayoutManager);
 
         CapellCore::registerPackage(
             self::$name,
@@ -215,7 +218,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     protected function getPublishedDirectory(): string
     {
-        $dir = realpath(__DIR__.'/../publishes');
+        $dir = realpath(__DIR__ . '/../publishes');
 
         if (! $dir) {
             throw new RuntimeException('Publish directory not found.');
@@ -343,7 +346,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             fn (Page $model): MorphToMany => $model->morphToMany(
                 Widget::class,
                 'asset',
-                'widget_assets')
+                'widget_assets'
+            )
         );
 
         Page::resolveRelationUsing(
@@ -385,10 +389,10 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerPublishCommands(): self
     {
-        $vendorAssets = $this->package->basePath('/../resources/dist');
-        $appAssets = public_path('vendor/'.$this->package->shortName());
+        $vendorAssets = $this->package->basePath('/../publishes/dist');
+        $appAssets = public_path('vendor/' . $this->package->shortName());
 
-        $this->publishes([$vendorAssets => $appAssets], $this->package->shortName().'-assets');
+        $this->publishes([$vendorAssets => $appAssets], $this->package->shortName() . '-assets');
 
         return $this;
     }

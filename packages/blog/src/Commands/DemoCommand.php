@@ -110,7 +110,7 @@ class DemoCommand extends Command
         $name = Str::title($data['name'][$defaultLanguage->code]);
 
         if ($type !== '' && $type !== '0') {
-            $name .= ' '.Str::title($type);
+            $name .= ' ' . Str::title($type);
         }
 
         $full_name = $parent_name ? sprintf('%s » %s', $parent_name, $name) : $name;

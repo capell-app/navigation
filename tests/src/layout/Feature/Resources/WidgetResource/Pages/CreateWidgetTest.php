@@ -96,7 +96,7 @@ describe('from list page', function (): void {
             WidgetTypeEnum::PageResults => $typeCreator->pageResultsWidgetType(),
             WidgetTypeEnum::Assets => $typeCreator->assetsWidgetType(),
             WidgetTypeEnum::System => $typeCreator->systemWidgetType(),
-            default => throw new Exception('Invalid widget type: '.$typeEum->name),
+            default => throw new Exception('Invalid widget type: ' . $typeEum->name),
         };
 
         livewire(ListWidgets::class)
@@ -121,7 +121,7 @@ describe('from list page', function (): void {
         ->with(WidgetTypeEnum::cases());
 
     test('required fields are required', function (): void {
-        (new WidgetTypeFactory())->default()->create();
+        (new WidgetTypeFactory)->default()->create();
 
         livewire(ListWidgets::class)
             ->assertSuccessful()

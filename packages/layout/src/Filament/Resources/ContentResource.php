@@ -256,7 +256,7 @@ class ContentResource extends Resource
                                 $label = '';
 
                                 if (! $siteId && $content->site) {
-                                    $label .= $content->site->name.' » ';
+                                    $label .= $content->site->name . ' » ';
                                 }
 
                                 $ancestors = $content->ancestors()->get();
@@ -265,7 +265,7 @@ class ContentResource extends Resource
                                     $label .= $ancestors->pluck('name')
                                         ->map(fn ($item) => Str::limit($item, 30))
                                         ->implode(' » ')
-                                        .' » ';
+                                        . ' » ';
                                 }
 
                                 $label .= Str::limit($content->name, 40);
@@ -291,7 +291,7 @@ class ContentResource extends Resource
 
                             if ($language_id = $get('language_id')) {
                                 $code = CapellCore::getModel(ModelEnum::Language)::find($language_id, 'code')->code;
-                                $query->whereRaw('JSON_EXTRACT(`tags`.`name`, '.DB::getPdo()->quote('$.'.$code).') IS NOT NULL');
+                                $query->whereRaw('JSON_EXTRACT(`tags`.`name`, ' . DB::getPdo()->quote('$.' . $code) . ') IS NOT NULL');
                             }
                         })
                         ->getOptionLabelFromRecordUsing(function (Tag $record, HasTable $livewire, Get $get): string {
@@ -300,7 +300,7 @@ class ContentResource extends Resource
                             $siteId = self::getSiteId($livewire);
 
                             if (! $siteId && $record->site) {
-                                $label .= $record->site->name.' » ';
+                                $label .= $record->site->name . ' » ';
                             }
 
                             if ($language_id = $get('language_id')) {

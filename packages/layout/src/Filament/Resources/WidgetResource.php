@@ -225,7 +225,6 @@ class WidgetResource extends Resource
                 ->limit(200)
                 ->wrap()
                 ->color('gray')
-                ->weight(FontWeight::Medium)
                 ->html()
                 ->listWithLineBreaks()
                 ->formatStateUsing(

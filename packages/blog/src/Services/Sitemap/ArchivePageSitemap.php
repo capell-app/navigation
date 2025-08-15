@@ -46,8 +46,8 @@ class ArchivePageSitemap extends AbstractSitemapPages
     public function format(ArchiveMonthData $monthData, Page $archivePage): SitemapPageData
     {
         return SitemapPageData::from([
-            'label' => $monthData->getDate()->format('F Y').' ('.$monthData->total.')',
-            'url' => $archivePage->pageUrl->full_url.sprintf('/%d-%d', $monthData->year, $monthData->month),
+            'label' => $monthData->getDate()->format('F Y') . ' (' . $monthData->total . ')',
+            'url' => $archivePage->pageUrl->full_url . sprintf('/%d-%d', $monthData->year, $monthData->month),
             'editUrl' => $this->withEditUrl ? EditPageUrlAction::run($archivePage) : null,
         ]);
     }

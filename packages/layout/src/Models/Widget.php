@@ -272,7 +272,7 @@ class Widget extends Model implements PageCacheable, Statusable
                 default => <<<'SQL'
                     (SELECT COUNT(*) FROM layouts WHERE JSON_CONTAINS(layouts.widgets, JSON_QUOTE(widgets.key)))
                 SQL,
-            }.' AS layouts_count'
+            } . ' AS layouts_count'
         );
     }
 

@@ -29,7 +29,7 @@ test('user cannot see contents', function (): void {
 test('admin can see create content', function (): void {
     test()->actingAsAdmin();
 
-    (new ContentTypeFactory())->default()->create();
+    (new ContentTypeFactory)->default()->create();
 
     get(ContentResource::getUrl('create'))->assertOk();
 });

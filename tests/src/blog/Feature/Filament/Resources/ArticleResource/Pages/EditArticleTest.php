@@ -24,7 +24,7 @@ beforeEach(function (): void {
 
 test('can render article', function (): void {
     get(ArticleResource::getUrl('edit', [
-        'record' => (new ArticlePageFactory())->create(),
+        'record' => (new ArticlePageFactory)->create(),
     ]))->assertSuccessful();
 });
 
@@ -32,7 +32,7 @@ test('can not render article', function (): void {
     test()->withoutExceptionHandling();
 
     get(PageResource::getUrl('edit', [
-        'record' => (new ArticlePageFactory())->create(),
+        'record' => (new ArticlePageFactory)->create(),
     ]));
 })->throws(InvalidPageTypeException::class);
 
@@ -48,11 +48,11 @@ it('can save', function (): void {
     $site = Site::factory()->hasSiteDomains()->create();
     $languages = $site->siteDomains->map->language_id;
 
-    $page = (new ArticlePageFactory())->recycle($site)->create();
+    $page = (new ArticlePageFactory)->recycle($site)->create();
 
     test()->setupPage($page, $languages);
 
-    $newData = (new ArticlePageFactory())->site($site)->make();
+    $newData = (new ArticlePageFactory)->site($site)->make();
 
     livewire(ArticleResource\Pages\EditArticle::class, [
         'record' => $page->getRouteKey(),
@@ -76,7 +76,7 @@ it('can save', function (): void {
 });
 
 it('can delete', function (): void {
-    $content = (new ArticlePageFactory())->create();
+    $content = (new ArticlePageFactory)->create();
 
     livewire(ArticleResource\Pages\EditArticle::class, [
         'record' => $content->getRouteKey(),

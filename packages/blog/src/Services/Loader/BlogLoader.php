@@ -34,7 +34,7 @@ class BlogLoader
         }) ?: null;
 
         if ($fromCache && $page) {
-            event('eloquent.retrieved: '.Page::class, $page);
+            event('eloquent.retrieved: ' . Page::class, $page);
         }
 
         return $page;

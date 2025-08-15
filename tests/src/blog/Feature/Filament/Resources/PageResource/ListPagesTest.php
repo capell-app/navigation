@@ -17,7 +17,7 @@ beforeEach(function (): void {
 });
 
 test('can list pages', function (): void {
-    (new ArticlePageFactory())->create();
+    (new ArticlePageFactory)->create();
 
     $pages = Page::factory()->count(5)->create();
 

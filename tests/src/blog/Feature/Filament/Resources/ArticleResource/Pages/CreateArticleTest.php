@@ -27,9 +27,9 @@ beforeEach(function (): void {
 
 describe('from edit article', function (): void {
     test('can create new article', function (): void {
-        $page = (new ArticlePageFactory())->create();
+        $page = (new ArticlePageFactory)->create();
 
-        $newData = (new ArticlePageFactory())->recycle($page->site)->make();
+        $newData = (new ArticlePageFactory)->recycle($page->site)->make();
 
         $slug = str($newData->name)->slug()->toString();
 
@@ -61,12 +61,12 @@ describe('from edit article', function (): void {
         ]);
 
         assertDatabaseHas(PageUrl::class, [
-            'url' => '/'.$slug,
+            'url' => '/' . $slug,
         ]);
     });
 
     test('required fields are required', function (): void {
-        $page = (new ArticlePageFactory())->create();
+        $page = (new ArticlePageFactory)->create();
 
         livewire(EditArticle::class, ['record' => $page->getRouteKey()])
             ->assertSuccessful()
@@ -141,7 +141,7 @@ describe('from list article', function (): void {
         $language = Language::factory()->create();
         $site = Site::factory()->recycle($language)->hasSiteDomains()->create();
 
-        $newData = (new ArticlePageFactory())->make();
+        $newData = (new ArticlePageFactory)->make();
 
         livewire(ListArticles::class)
             ->assertSuccessful()

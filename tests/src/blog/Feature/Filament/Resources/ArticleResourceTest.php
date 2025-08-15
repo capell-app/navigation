@@ -45,7 +45,7 @@ test('admin can see create article', function (): void {
 test('admin can see edit article', function (): void {
     test()->actingAsAdmin();
 
-    $page = (new ArticlePageFactory())->create();
+    $page = (new ArticlePageFactory)->create();
 
     get(ArticleResource::getUrl('edit', ['record' => $page]))
         ->assertOk();

@@ -21,7 +21,7 @@ beforeEach(function (): void {
 });
 
 test('required fields are required', function (): void {
-    (new ContentTypeFactory())->create();
+    (new ContentTypeFactory)->create();
 
     livewire(CreateContent::class)
         ->assertSuccessful()
@@ -64,7 +64,7 @@ it('can create', function (string $type): void {
 it('can create with translations', function (string $mode): void {
     Site::factory()->create();
 
-    $type = (new ContentTypeFactory())->default()->create();
+    $type = (new ContentTypeFactory)->default()->create();
 
     $newData = Content::factory()
         ->type($type)
@@ -89,7 +89,7 @@ it('can create with translations', function (string $mode): void {
             $languages->map(
                 fn (Language $language): array => [
                     'language_id' => $language->getKey(),
-                    'title' => $newData->name.' - '.$language->name,
+                    'title' => $newData->name . ' - ' . $language->name,
                     'content' => 'Test content',
                 ]
             )->toArray()
@@ -111,7 +111,7 @@ it('can create with translations', function (string $mode): void {
     $languages->each(
         fn (Language $language) => assertDatabaseHas(Translation::class, [
             'language_id' => $language->getKey(),
-            'title' => $newData->name.' - '.$language->name,
+            'title' => $newData->name . ' - ' . $language->name,
             'content' => 'Test content',
             'translatable_type' => 'content',
         ])
@@ -125,7 +125,7 @@ test('can search parent results', function (): void {
     $livewire = livewire(CreateContent::class);
     $instance = $livewire->instance();
     $schema = $instance->getSchema($instance->getDefaultTestingSchemaName());
-    $component = $schema->getComponent('dynamicTypeSchema.parent_id');
+    $component = $schema->getComponent('parent_id');
 
     $livewire->call('callSchemaComponentMethod', $component->getKey(), $parent->name)
         ->assertSuccessful();

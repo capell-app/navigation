@@ -69,14 +69,14 @@ test('can replicate contents', function (): void {
         ->callAction(
             TestAction::make(ReplicateAction::class)->table($content),
             data: [
-                'name' => $content->name.' (copy)',
+                'name' => $content->name . ' (copy)',
             ]
         )
         ->assertHasNoFormErrors()
         ->assertCountTableRecords(2);
 
     assertDatabaseHas('contents', [
-        'name' => $content->name.' (copy)',
+        'name' => $content->name . ' (copy)',
     ]);
 });
 

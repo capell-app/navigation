@@ -70,6 +70,6 @@ class ContentAsset extends Model implements PageCacheable
 
     protected function assetKey(): Attribute
     {
-        return Attribute::make(get: fn (): string => $this->asset_type.'.'.$this->asset_id);
+        return Attribute::make(get: fn (): string => $this->asset_type . '.' . $this->asset_id);
     }
 }

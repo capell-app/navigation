@@ -38,7 +38,7 @@ it('can save', function (): void {
             'parent_id' => $content->parent?->id,
             'site_id' => $content->site?->getKey(),
         ])
-        ->assertFormFieldExists('dynamicTypeSchema.meta.image_id')
+        ->assertFormFieldExists('meta.image_id')
         ->fillForm([
             'type_id' => $contentType->getKey(),
             'name' => $newData->name,

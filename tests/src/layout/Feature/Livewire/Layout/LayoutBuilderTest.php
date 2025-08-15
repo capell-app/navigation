@@ -30,13 +30,13 @@ beforeEach(function (): void {
 });
 
 test('Render layout builder', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name.' Layout');
+        ->assertSeeText($layout->name . ' Layout');
 });
 
 test('can edit layouts', function (AdminLayoutEnum|LayoutEnum $layoutEnum): void {
@@ -61,11 +61,11 @@ test('can edit layouts', function (AdminLayoutEnum|LayoutEnum $layoutEnum): void
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name.' Layout');
+        ->assertSeeText($layout->name . ' Layout');
 })->with([...AdminLayoutEnum::cases(), ...LayoutEnum::cases()]);
 
 test('Render layout builder with page', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 
     livewire(LayoutBuilder::class, [
@@ -74,11 +74,11 @@ test('Render layout builder with page', function (): void {
         'site_id' => $page->site_id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name.' Layout');
+        ->assertSeeText($layout->name . ' Layout');
 });
 
 test('Render layout without containers', function (): void {
-    $layout = (new LayoutFactory())->state(['containers' => []])->create();
+    $layout = (new LayoutFactory)->state(['containers' => []])->create();
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -89,14 +89,14 @@ test('Render layout without containers', function (): void {
 
 test('Render layout with widget and assets', function (AssetEnum|Capell\Core\Enums\AssetEnum $assetType): void {
     $widget = Widget::factory()
-        ->for((new WidgetTypeFactory())->state([
+        ->for((new WidgetTypeFactory)->state([
             'admin' => [
                 'asset_types' => [$assetType],
             ],
         ]))
         ->has(WidgetAsset::factory()->asset($assetType), 'assets')
         ->create();
-    $layout = (new LayoutFactory())->state(['containers' => ['main' => ['widgets' => [['widget_key' => $widget->key]]]]])
+    $layout = (new LayoutFactory)->state(['containers' => ['main' => ['widgets' => [['widget_key' => $widget->key]]]]])
         ->create();
 
     livewire(LayoutBuilder::class, [
@@ -106,7 +106,7 @@ test('Render layout with widget and assets', function (AssetEnum|Capell\Core\Enu
 })->with([AssetEnum::Content, ...Capell\Core\Enums\AssetEnum::cases()]);
 
 test('Save layout builder', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -121,7 +121,7 @@ test('Save layout builder', function (): void {
 
 test('Can reorder containers', function (): void {
     $widget = Widget::factory()->create(['key' => 'test']);
-    $layout = (new LayoutFactory())->state([
+    $layout = (new LayoutFactory)->state([
         'containers' => [
             'first' => ['widgets' => [['widget_key' => $widget->key]]],
             'second' => ['widgets' => [['widget_key' => $widget->key]]],
@@ -149,7 +149,7 @@ test('Can reorder widgets', function (): void {
     Widget::factory()->state(['key' => 'first'])->create();
     Widget::factory()->state(['key' => 'second'])->create();
 
-    $layout = (new LayoutFactory())->state([
+    $layout = (new LayoutFactory)->state([
         'containers' => [
             'test' => [
                 'widgets' => [
@@ -181,9 +181,9 @@ test('Can reorder widgets', function (): void {
 todo('Can reorder widgets into different container');
 
 test('Can add container', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
-    $containerKey = array_key_first($layout->containers).'-2';
+    $containerKey = array_key_first($layout->containers) . '-2';
     $htmlClass = 'test-class';
 
     livewire(LayoutBuilder::class, [
@@ -214,7 +214,7 @@ test('Can add container', function (): void {
 });
 
 test('Can clone layout', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 
     livewire(LayoutBuilder::class, [
@@ -226,8 +226,8 @@ test('Can clone layout', function (): void {
         ->assertHasNoFormErrors()
         ->call('saveLayout');
 
-    $clonedLayout = Layout::where('name', $layout->name.' 1')
-        ->where('key', $layout->key.'-1')
+    $clonedLayout = Layout::where('name', $layout->name . ' 1')
+        ->where('key', $layout->key . '-1')
         ->first();
 
     expect($clonedLayout)
@@ -237,7 +237,7 @@ test('Can clone layout', function (): void {
 });
 
 test('removeContainer action', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
 
@@ -257,10 +257,10 @@ test('removeContainer action', function (): void {
 });
 
 test('Can edit container', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
-    $newContainerKey = $containerKey.'-new';
+    $newContainerKey = $containerKey . '-new';
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][0];
 
@@ -302,7 +302,7 @@ test('Can edit container', function (): void {
 });
 
 test('Can add new widget', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
     $widget = Widget::factory()->state(['key' => 'test'])->create();
 
     $containerKey = array_key_first($layout->containers);
@@ -338,7 +338,7 @@ test('Can add new widget', function (): void {
 });
 
 test('Can add existing widget', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
     $lastWidgetKey = array_key_last($layout->containers[$containerKey]['widgets']);
@@ -376,20 +376,20 @@ test('Can add existing widget', function (): void {
 });
 
 test('Can edit container widget', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
 
     $widget = Widget::factory()
-        ->for((new WidgetTypeFactory())->state([
+        ->for((new WidgetTypeFactory)->state([
             'admin' => [
                 'layout_container_widget_schema' => DefaultLayoutWidgetSchema::getKey(),
             ],
         ]), 'type')
         ->create();
 
-    ++$widgetIndex;
+    $widgetIndex++;
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -423,7 +423,7 @@ test('Can edit container widget', function (): void {
 });
 
 test('Can duplicate widget', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
@@ -458,7 +458,7 @@ test('Can duplicate widget', function (): void {
 });
 
 test('Can remove widget', function (): void {
-    $layout = (new LayoutFactory())->containers()->create();
+    $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);

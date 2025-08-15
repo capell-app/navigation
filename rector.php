@@ -7,11 +7,11 @@ use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__.'/packages',
-        __DIR__.'/tests',
+        __DIR__ . '/packages',
+        __DIR__ . '/tests',
     ])
     ->withSkip([
-        __DIR__.'/packages/layout/src/LayoutServiceProvider.php', // Renaming blade component to aliasComponent https://github.com/driftingly/rector-laravel/issues/356
+        __DIR__ . '/packages/layout/src/LayoutServiceProvider.php', // Renaming blade component to aliasComponent https://github.com/driftingly/rector-laravel/issues/356
     ])
     ->withPreparedSets(
         deadCode: true,

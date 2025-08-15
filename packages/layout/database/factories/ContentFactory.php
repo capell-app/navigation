@@ -31,7 +31,7 @@ class ContentFactory extends Factory
         return [
             'name' => fake()->sentence,
             'parent_id' => null,
-            'type_id' => (new ContentTypeFactory()),
+            'type_id' => (new ContentTypeFactory),
             'site_id' => null,
             'meta' => fn (array $attributes): array => [
                 'label' => fake()->optional()->sentence,
@@ -77,7 +77,7 @@ class ContentFactory extends Factory
             $languages ??= $content->site?->languages ?? Language::all();
 
             $languages->each(function (Language $language) use ($content, $data): void {
-                $title = $content->name.' '.$language->locale;
+                $title = $content->name . ' ' . $language->locale;
 
                 $translation = Translation::factory()
                     ->make([

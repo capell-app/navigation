@@ -101,19 +101,21 @@ class ArchivePage extends AbstractPage
                 if (DB::getDriverName() === 'sqlite') {
                     return $query->when(
                         $this->year,
-                        fn (Builder $query) => $query->whereRaw("strftime('%Y', COALESCE(`publish_from`, `created_at`)) = ".(int) $this->year)
+                        fn (Builder $query) => $query->whereRaw("strftime('%Y', COALESCE(`publish_from`, `created_at`)) = " . (int) $this->year)
                     )
                         ->when(
-                            $this->month, fn (Builder $query) => $query->whereRaw("strftime('%m', COALESCE(`publish_from`, `created_at`)) = ".(int) $this->month)
+                            $this->month,
+                            fn (Builder $query) => $query->whereRaw("strftime('%m', COALESCE(`publish_from`, `created_at`)) = " . (int) $this->month)
                         );
                 }
 
                 return $query->when(
                     $this->year,
-                    fn (Builder $query) => $query->whereRaw('YEAR(COALESCE(`publish_from`, `created_at`)) = '.(int) $this->year)
+                    fn (Builder $query) => $query->whereRaw('YEAR(COALESCE(`publish_from`, `created_at`)) = ' . (int) $this->year)
                 )
                     ->when(
-                        $this->month, fn (Builder $query) => $query->whereRaw('MONTH(COALESCE(`publish_from`, `created_at`)) = '.(int) $this->month)
+                        $this->month,
+                        fn (Builder $query) => $query->whereRaw('MONTH(COALESCE(`publish_from`, `created_at`)) = ' . (int) $this->month)
                     );
             }
         );

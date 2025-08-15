@@ -105,7 +105,7 @@ class ContentPublishSection extends Section
                     ]);
                 }
 
-                return new HtmlString('<p class="leading-tight">'.implode('</p><p class="leading-tight mt-4">', $contents).'</p>');
+                return new HtmlString('<p class="leading-tight">' . implode('</p><p class="leading-tight mt-4">', $contents) . '</p>');
             });
     }
 
@@ -141,8 +141,8 @@ class ContentPublishSection extends Section
                                     ->weight(FontWeight::SemiBold)
                                     ->suffix(
                                         fn (Content $record): ?string => match (true) {
-                                            $record->isCurrent() => ' ('.__('capell-admin::generic.latest').')',
-                                            $record->isPublished() => ' ('.__('capell-admin::generic.published').')',
+                                            $record->isCurrent() => ' (' . __('capell-admin::generic.latest') . ')',
+                                            $record->isPublished() => ' (' . __('capell-admin::generic.published') . ')',
                                             default => null,
                                         }
                                     ),

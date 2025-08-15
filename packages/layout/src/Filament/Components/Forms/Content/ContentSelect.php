@@ -161,24 +161,25 @@ class ContentSelect extends Select
             return $schema->operation('editOption')
                 ->schema(ContentResource::getFormSchema($schema));
         })
-            ->editOptionAction(fn (Action $action): Action => $action
-                ->modalHeading(
-                    fn (self $component): string => __(
-                        'capell-admin::heading.edit_content_record',
-                        ['name' => $component->getSelectedRecord()->name]
+            ->editOptionAction(
+                fn (Action $action): Action => $action
+                    ->modalHeading(
+                        fn (self $component): string => __(
+                            'capell-admin::heading.edit_content_record',
+                            ['name' => $component->getSelectedRecord()->name]
+                        )
                     )
-                )
-                ->modalWidth(Width::ScreenExtraLarge)
-                ->visible(fn (mixed $state): bool => (bool) $state)
-                ->successNotificationTitle(
-                    fn (Action $action): string => __(
-                        'capell-admin::notification.updated_successfully',
-                        ['name' => $action->getModalHeading()]
+                    ->modalWidth(Width::ScreenExtraLarge)
+                    ->visible(fn (mixed $state): bool => (bool) $state)
+                    ->successNotificationTitle(
+                        fn (Action $action): string => __(
+                            'capell-admin::notification.updated_successfully',
+                            ['name' => $action->getModalHeading()]
+                        )
                     )
-                )
-                ->after(function (Action $action): void {
-                    $action->success();
-                })
+                    ->after(function (Action $action): void {
+                        $action->success();
+                    })
             )
             ->fillEditOptionActionFormUsing(static function (self $component): array {
                 /** @var Content $record */
@@ -212,7 +213,7 @@ class ContentSelect extends Select
         $label = '';
 
         if (($siteId === null || $siteId === 0) && $record->site) {
-            $label .= $record->site->name.' » ';
+            $label .= $record->site->name . ' » ';
         }
 
         $ancestors = $record->ancestors()->get();
@@ -221,10 +222,10 @@ class ContentSelect extends Select
             $label .= $ancestors->pluck('name')
                 ->map(fn ($item) => Str::limit($item, 30))
                 ->implode(' » ')
-                .' » ';
+                . ' » ';
         }
 
-        return $label.Str::limit($record->name, 40);
+        return $label . Str::limit($record->name, 40);
     }
 
     private function getContentOptions(?int $site_id = null, ?string $search = null): array

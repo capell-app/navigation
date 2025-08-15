@@ -14,7 +14,7 @@ class LayoutTestCase extends AbstractTestCase
 {
     protected function setUp(): void
     {
-        $this->packageMigrations = glob(__DIR__.'/../../../packages/layout/database/migrations/*.php');
+        $this->packageMigrations = glob(__DIR__ . '/../../../packages/layout/database/migrations/*.php');
 
         parent::setUp();
     }

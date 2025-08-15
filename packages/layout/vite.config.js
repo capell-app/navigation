@@ -19,7 +19,7 @@ export default defineConfig(async () => {
             open: false,
         },
         build: {
-            outDir: './resources/dist',
+            outDir: './publishes/build/frontend',
         },
     }
 })

@@ -369,7 +369,7 @@ class DemoCreator
         $languages->skip(1)
             ->each(fn (Language $language) => $this->tagModel::findOrCreate('faq', 'content', $language->code));
 
-        for ($i = 0; $i < 6; ++$i) {
+        for ($i = 0; $i < 6; $i++) {
             $content = $this->contentModel::firstOrCreate([
                 'name' => $questions['en'][$i],
                 'parent_id' => $parentContent->id,
@@ -1014,7 +1014,7 @@ class DemoCreator
             ]);
         });
 
-        $contentFeatures = new Collection();
+        $contentFeatures = new Collection;
 
         foreach ($features as $feature) {
             $featureImage = $this->getExampleMedia();
@@ -1094,7 +1094,7 @@ class DemoCreator
             ],
         ];
 
-        $testimonialsCollection = new Collection();
+        $testimonialsCollection = new Collection;
 
         $testimonialType = Type::updateOrCreate([
             'key' => 'testimonial',
@@ -1240,7 +1240,7 @@ class DemoCreator
             'icon' => 'heroicon-o-user-circle',
         ]);
 
-        $teamMembersCollection = new Collection();
+        $teamMembersCollection = new Collection;
 
         foreach ($teamMembers as $member) {
             $content = Content::firstOrCreate([

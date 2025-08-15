@@ -19,7 +19,7 @@ class LayoutLoader
 {
     public static function getLayout(int $id): ?Layout
     {
-        $key = 'layout-'.$id;
+        $key = 'layout-' . $id;
 
         $fromCache = true;
 
@@ -31,10 +31,10 @@ class LayoutLoader
         }) ?: null;
 
         if ($fromCache && $layout) {
-            event('eloquent.retrieved: '.Layout::class, $layout);
+            event('eloquent.retrieved: ' . Layout::class, $layout);
 
             $layout->layoutWidgets->each(function (Widget $widget): void {
-                event('eloquent.retrieved: '.$widget::class, $widget);
+                event('eloquent.retrieved: ' . $widget::class, $widget);
             });
         }
 
@@ -57,7 +57,7 @@ class LayoutLoader
             $containerKey,
             $occurrence
         )
-            .($page instanceof Page ? '-page-'.$page->id : '');
+            . ($page instanceof Page ? '-page-' . $page->id : '');
 
         $fromCache = true;
 
@@ -148,15 +148,15 @@ class LayoutLoader
         ) ?: null;
 
         if ($fromCache && $widget) {
-            event('eloquent.retrieved: '.Widget::class, $widget);
+            event('eloquent.retrieved: ' . Widget::class, $widget);
 
             $widget->assets->each(function (WidgetAsset $resource): void {
-                event('eloquent.retrieved: '.$resource::class, $resource);
+                event('eloquent.retrieved: ' . $resource::class, $resource);
             });
 
             if ($widget->translation) {
-                event('eloquent.retrieved: '.Translation::class, $widget->translation);
-                event('eloquent.retrieved: '.Language::class, $widget->translation->language);
+                event('eloquent.retrieved: ' . Translation::class, $widget->translation);
+                event('eloquent.retrieved: ' . Language::class, $widget->translation->language);
             }
         }
 

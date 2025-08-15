@@ -59,13 +59,13 @@ class CreateBlogPagesAction
         $site = Site::find($siteId);
 
         if (! $site) {
-            $command->error('Site not found with ID: '.$siteId);
+            $command->error('Site not found with ID: ' . $siteId);
 
             return;
         }
 
         $this->handle($site);
 
-        $command->info('Blog pages created successfully for site: '.$site->name);
+        $command->info('Blog pages created successfully for site: ' . $site->name);
     }
 }

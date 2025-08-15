@@ -17,7 +17,7 @@ it('renders the pages widget', function (): void {
 
     Page::factory(5)->create();
 
-    (new ArticlePageFactory())->count(5)->create();
+    (new ArticlePageFactory)->count(5)->create();
 
     livewire(LatestPagesWidget::class)
         ->assertOk()

@@ -23,7 +23,7 @@ it('belongs to a site', function (): void {
 });
 
 it('belongs to a type', function (): void {
-    $type = (new ContentTypeFactory())->create();
+    $type = (new ContentTypeFactory)->create();
     $content = Content::factory()->create(['type_id' => $type->id]);
 
     expect($content->type)->toBeInstanceOf(Type::class)

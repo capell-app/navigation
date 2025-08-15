@@ -388,7 +388,7 @@ class BlogCreator
                 'slug' => 'blog',
                 'meta' => [
                     'label' => __('capell-blog::generic.blog'),
-                    'title' => '<h1>'.__('capell-blog::generic.latest_articles').'</h1>',
+                    'title' => '<h1>' . __('capell-blog::generic.latest_articles') . '</h1>',
                 ],
             ]);
 

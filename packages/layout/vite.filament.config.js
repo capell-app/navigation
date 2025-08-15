@@ -5,7 +5,10 @@ export default defineConfig(async () => {
     return {
         plugins: [
             laravel({
-                input: ['resources/js/admin/layout-builder.js'],
+                input: [
+                    'resources/css/admin/capell-layout-filament.css',
+                    'resources/js/admin/layout-builder.js',
+                ],
                 publicDirectory: 'publishes',
                 refresh: false,
             }),
@@ -15,7 +18,7 @@ export default defineConfig(async () => {
         },
         build: {
             manifest: false,
-            outDir: './publishes/build',
+            outDir: './publishes/build/admin',
             assetsInlineLimit: 0,
             rollupOptions: {
                 preserveEntrySignatures: 'strict',

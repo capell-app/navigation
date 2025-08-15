@@ -149,6 +149,6 @@ class Article extends Page
 
     public function getForeignKey()
     {
-        return 'page_'.$this->getKeyName();
+        return 'page_' . $this->getKeyName();
     }
 }

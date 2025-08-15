@@ -40,13 +40,13 @@ class WidgetAssetsRepeater
                     ->keys()
                     ->search($uuid) + 1;
 
-                $label = $order.'. ';
+                $label = $order . '. ';
 
                 if (empty($state['asset_id'])) {
-                    return $label.__('capell-admin::generic.select_resource');
+                    return $label . __('capell-admin::generic.select_resource');
                 }
 
-                return $label.self::getAssetName($state).' ('.str($state['asset_type'])->title().')';
+                return $label . self::getAssetName($state) . ' (' . str($state['asset_type'])->title() . ')';
             })
             ->extraItemActions([
                 Action::make('editRecord')
@@ -73,9 +73,9 @@ class WidgetAssetsRepeater
                             }
 
                             $resource = match ($itemState['asset_type']) {
-                                'media' => is_array($assetId) ? reset($assetId)['id'] : Media::findByUuid($assetId),
-                                'page' => Page::findByUuid($assetId),
-                                'content' => Content::findByUuid($assetId),
+                                'media' => is_array($assetId) ? reset($assetId)['id'] : Media::find($assetId),
+                                'page' => Page::find($assetId),
+                                'content' => Content::find($assetId),
                             };
 
                             if (! $resource) {
@@ -188,9 +188,9 @@ class WidgetAssetsRepeater
     private static function getAssetName(array $itemState): ?string
     {
         return match ($itemState['asset_type']) {
-            'media' => is_array($itemState['asset_id']) ? reset($itemState['asset_id'])['title'] : Media::findByUuid($itemState['asset_id']),
-            'page' => Page::findByUuid($itemState['asset_id'])?->name,
-            'content' => Content::findByUuid($itemState['asset_id'])?->name
+            'media' => is_array($itemState['asset_id']) ? reset($itemState['asset_id'])['title'] : Media::find($itemState['asset_id']),
+            'page' => Page::find($itemState['asset_id'])?->name,
+            'content' => Content::find($itemState['asset_id'])?->name
         };
     }
 }

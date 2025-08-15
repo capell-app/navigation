@@ -109,6 +109,6 @@ class MediaRepeater
             $imageId = Arr::first($imageId)['id'] ?? null;
         }
 
-        return $order.'. '.once(fn (): ?string => Media::find($imageId, 'title')?->title).($order === 1 ? ' ('.__('capell-admin::generic.primary').')' : '');
+        return $order . '. ' . once(fn (): ?string => Media::find($imageId, 'title')?->title) . ($order === 1 ? ' (' . __('capell-admin::generic.primary') . ')' : '');
     }
 }
