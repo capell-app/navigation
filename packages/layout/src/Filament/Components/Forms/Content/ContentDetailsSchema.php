@@ -15,6 +15,7 @@ class ContentDetailsSchema
                 ->withTitleUpdater(),
             ContentTypeSelect::make('type_id')
                 ->live()
+                ->changeConfirmation()
                 ->withRelation()
                 ->withCreateForm()
                 ->withEditForm(),

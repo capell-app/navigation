@@ -15,7 +15,6 @@ use Capell\Admin\Filament\Components\Forms\PublishToggle;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
-use Capell\Layout\Filament\Components\Forms\Content\ContentTagsInput;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\CustomColorInput;
 use Capell\Layout\Filament\Schemas\AbstractContentSchema;
@@ -53,46 +52,19 @@ class DefaultContentSchema extends AbstractContentSchema
     {
         return match ($schema->getOperation()) {
             'createOption', 'replicate' => self::getCreateOptionFormSchema($schema),
-            'create' => self::getCreateFormSchema($schema),
             'editOption' => self::getEditOptionFormSchema($schema),
-            default => self::getEditFormSchema($schema),
+            default => self::getFormSchema($schema),
         };
-    }
-
-    protected static function getCreateFormSchema(Schema $schema): array
-    {
-        return [
-            Section::make()
-                ->columns()
-                ->schema(ContentSettingsSchema::make($schema)),
-            ContentTranslationsRepeater::make($schema),
-        ];
     }
 
     protected static function getCreateOptionFormSchema(Schema $schema): array
     {
         return [
+            Grid::make()
+                ->hiddenOn(['edit', 'editOption'])
+                ->schema(ContentDetailsSchema::make()),
             ...ContentSettingsSchema::make($schema),
             ContentTranslationsRepeater::make($schema),
-            Section::make(__('capell-admin::generic.settings'))
-                ->icon('heroicon-o-cog-6-tooth')
-                ->columnSpanFull()
-                ->compact()
-                ->collapsed()
-                ->schema([
-                    ContentTagsInput::make('tags'),
-                    Grid::make()
-                        ->statePath('meta')
-                        ->columnSpanFull()
-                        ->mutateDehydratedStateUsing(function (array $state): array {
-                            if (isset($state['image_id'])) {
-                                $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                            }
-
-                            return $state;
-                        })
-                        ->schema(self::getMetaSchema()),
-                ]),
             PublishToggle::make('is_published')
                 ->reactive(),
             PublishDates::make()
@@ -102,9 +74,12 @@ class DefaultContentSchema extends AbstractContentSchema
         ];
     }
 
-    protected static function getEditFormSchema(Schema $schema): array
+    protected static function getFormSchema(Schema $schema): array
     {
         return [
+            Grid::make()
+                ->hiddenOn(['edit', 'editOption'])
+                ->schema(ContentDetailsSchema::make()),
             FixedWidthSidebar::make()
                 ->mainSchema([
                     ContentTranslationsRepeater::make($schema),

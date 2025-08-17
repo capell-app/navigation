@@ -27,7 +27,6 @@ use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\SchemaEnum;
-use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Tables\Columns\Content\ContentNameColumn;
 use Capell\Layout\Filament\Resources\ContentResource\Pages\CreateContent;
 use Capell\Layout\Filament\Resources\ContentResource\Pages\EditContent;
@@ -44,7 +43,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\SpatieTagsColumn;
@@ -88,9 +86,6 @@ class ContentResource extends Resource
     public static function getFormSchema(Schema $schema): array
     {
         return [
-            Grid::make()
-                ->hiddenOn(['edit', 'editOption'])
-                ->schema(ContentDetailsSchema::make()),
             TypeSchema::make()
                 ->schema(
                     function (Get $get, TypeSchema $component) use ($schema): array {

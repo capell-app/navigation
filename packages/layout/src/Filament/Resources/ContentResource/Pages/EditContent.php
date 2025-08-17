@@ -7,7 +7,6 @@ namespace Capell\Layout\Filament\Resources\ContentResource\Pages;
 use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\DeleteAction;
-use Capell\Admin\Filament\Actions\Page\ChangeTypeAction;
 use Capell\Admin\Filament\Actions\ReplicateAction;
 use Capell\Admin\Filament\Concerns\HasAncestorBreadcrumbs;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
@@ -15,7 +14,6 @@ use Capell\Admin\Filament\Concerns\HasTypeRelationManagers;
 use Capell\Layout\Actions\ReplicateContentAction;
 use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateContentModalAction;
-use Capell\Layout\Filament\Components\Forms\Content\ContentTypeSelect;
 use Capell\Layout\Filament\Resources\ContentResource;
 use Capell\Layout\Models\Content;
 use Filament\Actions\ActionGroup;
@@ -84,8 +82,6 @@ class EditContent extends EditRecord
                 ReplicateAction::make()
                     ->replicaModelAction(ReplicateContentAction::class)
                     ->hidden($this->record->trashed()),
-                ChangeTypeAction::make('editType')
-                    ->typeComponent(ContentTypeSelect::class),
             ]),
         ];
     }

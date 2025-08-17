@@ -13,7 +13,7 @@ class WidgetAdminTab
     {
         return Tab::make(__('capell-admin::generic.admin'))
             ->statePath('admin')
-            ->icon('heroicon-o-cog-6-tooth')
+            ->icon(config('capell-admin.icon.admin'))
             ->columns(['md' => 2])
             ->schema([
                 ...WidgetAdminSchema::make(),

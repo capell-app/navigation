@@ -59,6 +59,7 @@ class CreateWidgetDetailsSchema
 
             WidgetTypeSelect::make('type_id')
                 ->live()
+                ->changeConfirmation()
                 ->withRelation()
                 ->withCreateForm(),
         ];

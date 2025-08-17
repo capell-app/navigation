@@ -44,15 +44,14 @@ class WidgetTypeSchema extends DefaultTypeSchema
             options: fn (): array => collect(WidgetTypeGroupEnum::cases())
                 ->mapWithKeys(fn ($case) => [$case->value => $case->name])
                 ->toArray()
-        )
-            ->label(__('capell-admin::form.group'));
+        );
     }
 
     protected static function getAdminTab(): Tab
     {
         return Tab::make(__('capell-admin::generic.admin'))
             ->statePath('admin')
-            ->icon('heroicon-o-cog-6-tooth')
+            ->icon(config('capell-admin.icon.admin'))
             ->columnSpanFull()
             ->columns()
             ->schema([
@@ -77,7 +76,7 @@ class WidgetTypeSchema extends DefaultTypeSchema
     {
         return Tab::make(__('capell-admin::generic.frontend'))
             ->statePath('meta')
-            ->icon('heroicon-m-building-storefront')
+            ->icon('heroicon-m-cog-6-tooth')
             ->columns()
             ->schema([
                 WidgetDisplaySection::make(),

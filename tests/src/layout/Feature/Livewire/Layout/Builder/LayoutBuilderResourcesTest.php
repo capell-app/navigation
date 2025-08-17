@@ -357,11 +357,9 @@ test('can add media asset', function (): void {
             ]
         )
         ->fillForm([
-            'asset' => [
-                'file' => UploadedFile::fake()->image('test.jpg'),
-                'alt' => $media->name,
-                'originalFilename' => 'test.jpg',
-            ],
+            'file' => UploadedFile::fake()->image('test.jpg'),
+            'alt' => $media->name,
+            'originalFilename' => 'test.jpg',
         ])
         ->callMountedAction()
         ->assertHasNoFormErrors()
@@ -405,13 +403,11 @@ test('can add page asset', function (): void {
                 ])
         )
         ->fillForm([
-            'asset' => [
-                'layout_id' => $newData->layout_id,
-                'site_id' => $newData->site_id,
-                'name' => $newData->name,
-            ],
+            'layout_id' => $newData->layout_id,
+            'site_id' => $newData->site_id,
+            'name' => $newData->name,
         ])
-        ->set('mountedActions.0.data.asset.translations', [
+        ->set('mountedActions.0.data.translations', [
             (string) Str::uuid() => [
                 'title' => $newData->name,
                 'slug' => Str::slug($newData->name),
@@ -462,11 +458,9 @@ test('can add media asset to existing widget with page layout', function (): voi
         ->callAction(
             'addAsset',
             data: [
-                'asset' => [
-                    'file' => UploadedFile::fake()->image('test.jpg'),
-                    'alt' => $media->name,
-                    'originalFilename' => 'test.jpg',
-                ],
+                'file' => UploadedFile::fake()->image('test.jpg'),
+                'alt' => $media->name,
+                'originalFilename' => 'test.jpg',
             ],
             arguments: [
                 'containerKey' => $containerKey,
@@ -574,21 +568,20 @@ test('can add page asset to existing widget with page layout', function (): void
         ->assertSuccessful()
         ->assertActionExists('addAsset')
         ->mountAction(
-            'addAsset',
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-                'type' => 'page',
-            ]
+            TestAction::make('addAsset')->arguments(
+                [
+                    'containerKey' => $containerKey,
+                    'widgetIndex' => $widgetIndex,
+                    'type' => 'page',
+                ]
+            )
         )
         ->fillForm([
-            'asset' => [
-                'layout_id' => $newData->layout_id,
-                'site_id' => $newData->site_id,
-                'name' => $newData->name,
-            ],
+            'layout_id' => $newData->layout_id,
+            'site_id' => $newData->site_id,
+            'name' => $newData->name,
         ])
-        ->set('mountedActions.0.data.asset.translations', [
+        ->set('mountedActions.0.data.translations', [
             (string) Str::uuid() => [
                 'title' => $newData->name,
                 'slug' => Str::slug($newData->name),
@@ -644,14 +637,12 @@ test('can add page asset to widget with page layout', function (): void {
             ]
         )
         ->fillForm([
-            'asset' => [
-                'layout_id' => $newData->layout_id,
-                'site_id' => $newData->site_id,
-                'name' => $newData->name,
-            ],
+            'layout_id' => $newData->layout_id,
+            'site_id' => $newData->site_id,
+            'name' => $newData->name,
         ])
         ->set(
-            'mountedActions.0.data.asset.translations',
+            'mountedActions.0.data.translations',
             [
                 (string) Str::uuid() => [
                     'title' => $newData->name,
@@ -722,7 +713,7 @@ test('can edit asset', function (): void {
                 'containerKey' => $containerKey,
                 'widgetIndex' => $widgetIndex,
                 'index' => 0,
-                'assetType' => $layoutAsset['asset_type'],
+                'type' => $layoutAsset['asset_type'],
             ],
             data: [
                 'asset' => [

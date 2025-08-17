@@ -7,13 +7,11 @@ namespace Capell\Layout\Filament\Resources\WidgetResource\Pages;
 use Capell\Admin\Contracts\PageCacheNotifiable;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\DeleteAction;
-use Capell\Admin\Filament\Actions\Page\ChangeTypeAction;
 use Capell\Admin\Filament\Actions\ReplicateAction;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Admin\Filament\Concerns\HasTypeRelationManagers;
 use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetTypeSelect;
 use Capell\Layout\Filament\Resources\WidgetResource;
 use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\LayoutsRelationManager;
 use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\WidgetAssetsRelationManager;
@@ -110,8 +108,6 @@ class EditWidget extends EditRecord implements PageCacheNotifiable
                     ->redirectAfterCreate(),
                 ReplicateAction::make()
                     ->hidden($this->record->trashed()),
-                ChangeTypeAction::make('editType')
-                    ->typeComponent(WidgetTypeSelect::class),
             ]),
         ];
     }

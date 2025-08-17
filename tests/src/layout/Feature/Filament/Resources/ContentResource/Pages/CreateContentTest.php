@@ -9,6 +9,7 @@ use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Filament\Resources\ContentResource\Pages\CreateContent;
 use Capell\Layout\Models\Content;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Illuminate\Support\Str;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -86,11 +87,13 @@ it('can create with translations', function (string $mode): void {
         ])
         ->set(
             'data.translations',
-            $languages->map(
+            $languages->mapWithKeys(
                 fn (Language $language): array => [
-                    'language_id' => $language->getKey(),
-                    'title' => $newData->name . ' - ' . $language->name,
-                    'content' => 'Test content',
+                    (string) Str::uuid() => [
+                        'language_id' => $language->getKey(),
+                        'title' => $newData->name . ' - ' . $language->name,
+                        'content' => 'Test content',
+                    ],
                 ]
             )->toArray()
         )

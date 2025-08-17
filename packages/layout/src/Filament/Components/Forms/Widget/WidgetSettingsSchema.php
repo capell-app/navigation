@@ -51,6 +51,7 @@ class WidgetSettingsSchema
                 ),
 
             WidgetTypeSelect::make('type_id')
+                ->changeConfirmation()
                 ->withRelation()
                 ->withCreateForm()
                 ->withEditForm(),

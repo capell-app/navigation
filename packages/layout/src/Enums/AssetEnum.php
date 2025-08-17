@@ -24,7 +24,7 @@ enum AssetEnum: string implements HasColor, HasIcon, HasLabel
     public function getIcon(): string
     {
         return match ($this) {
-            self::Content => config('capell-layout.assets.content.icon', 'heroicon-o-rectangle-stack'),
+            self::Content => config('capell-layout.assets.content.icon', 'heroicon-o-rectangle-group'),
         };
     }
 
