@@ -5,9 +5,9 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Core\Models\Media;
     use Capell\Frontend\Facades\Frontend;
     use Illuminate\Support\Facades\DB;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     $theme = Frontend::getTheme();
 @endphp
@@ -26,7 +26,7 @@ declare(strict_types=1);
     'widget_theme' => $widget->meta['widget_theme'] ?? '',
 ])
 <x-capell-layout::widget.wrapper
-    :class="'widget-media-gallery'.($widget->meta['container'] === 'full' ? ' px-4' : '')"
+    :class="'widget-media-gallery' . ($widget->meta['container'] === 'full' ? ' px-4' : '')"
     :$container
     :$containerKey
     :$containerWidth
@@ -35,7 +35,7 @@ declare(strict_types=1);
 >
     @if ($widget->translation)
         <x-capell::content
-            :class="'mb-5'.($widget->meta['container'] === 'full' ? ' container' : '')"
+            :class="'mb-5' . ($widget->meta['container'] === 'full' ? ' container' : '')"
             :compact="true"
             align="center"
             :content="$widget->translation->content"
@@ -65,7 +65,7 @@ declare(strict_types=1);
                 >
                     @if (($media->meta['media_type'] ?? null) === 'video')
                         <x-capell::media
-                            :class="'h-full w-full bg-gray-50 shadow transition-transform duration-300 group-hover:scale-105 group-focus-within:scale-105'.($theme->withDarkMode ? ' dark:bg-gray-800' : '')"
+                            :class="'h-full w-full bg-gray-50 shadow transition-transform duration-300 group-hover:scale-105 group-focus-within:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-800' : '')"
                             :height="$large ? 600 : 300"
                             :$loop
                             :media="$media->asset"
@@ -77,7 +77,7 @@ declare(strict_types=1);
                         />
                     @else
                         <x-capell::media
-                            :class="'h-full w-full bg-gray-50 shadow transition-transform duration-300 group-hover:scale-105 group-focus-within:scale-105'.($theme->withDarkMode ? ' dark:bg-gray-800' : '')"
+                            :class="'h-full w-full bg-gray-50 shadow transition-transform duration-300 group-hover:scale-105 group-focus-within:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-800' : '')"
                             :height="$large ? 600 : 300"
                             :$loop
                             :media="$media->asset"

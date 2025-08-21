@@ -6,21 +6,22 @@ namespace Capell\Tests\Fixtures\Models;
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Capell\Core\Database\Factories\UserFactory;
-use Capell\Core\Models\Media;
+use Capell\Core\Models\Concerns\InteractsWithMedia;
+use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Model implements Auditable, AuthenticatableContract, AuthorizableContract, FilamentUser
+class User extends Model implements Auditable, AuthenticatableContract, AuthorizableContract, FilamentUser, HasMedia
 {
     use Authenticatable;
     use AuthenticationLoggable;
@@ -31,6 +32,7 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
 
     use HasPanelShield;
     use HasRoles;
+    use InteractsWithMedia;
     use Notifiable;
     use \OwenIt\Auditing\Auditable;
 
@@ -68,11 +70,6 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
     ];
 
     protected static string $factory = UserFactory::class;
-
-    public function profileImage(): BelongsTo
-    {
-        return $this->belongsTo(Media::class, 'profile_image_id');
-    }
 
     /**
      * The attributes that should be cast.

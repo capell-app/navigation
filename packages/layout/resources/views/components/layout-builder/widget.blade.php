@@ -75,8 +75,8 @@ declare(strict_types=1);
             ]),
         )
     }}
-    wire:key="{{ "$containerKey.$widgetIndex" }}"
-    x-sort:item="'{{ $containerKey.'.'.$widgetIndex }}'"
+    wire:key="{{ "{$containerKey}.{$widgetIndex}" }}"
+    x-sort:item="'{{ $containerKey . '.' . $widgetIndex }}'"
     x-on:collapse-widget.window="isCollapsed = $event.detail.isCollapsed"
     x-on:refresh-assets.window="
         $event.detail.containerKey === '{{ $containerKey }}' &&
@@ -98,13 +98,13 @@ declare(strict_types=1);
                 class="flex grow items-center"
                 @if ($assetTypes) x-on:click="! isReordering ? toggleCollapse() : null" @endif
             >
-                <div class="mr-1 flex w-7 items-center gap-3">
+                <div class="mr-1 flex w-7 shrink-0 items-center gap-3">
                     <span
                         class="relative"
                         x-show="! isReordering"
                     >
                         <x-filament::icon
-                            :class="'h-5 w-5'.($assetTypes ? ' text-primary-600' : ' text-gray-400')"
+                            :class="'h-5 w-5' . ($assetTypes ? ' text-primary-600' : ' text-gray-400')"
                             :x-tooltip.raw="$widget->type?->name"
                             :icon="
                                 $assetTypes
@@ -163,16 +163,7 @@ declare(strict_types=1);
                 @endif
 
                 @if ($image)
-                    <x-curator-glider
-                        class="ml-auto max-h-12 object-contain"
-                        format="webp"
-                        view="capell-admin::components.media.glider"
-                        :media="$image"
-                        :width="80"
-                        :height="80"
-                        fit="fit"
-                        loading="lazy"
-                    />
+                    {{ $image->img('thumb')->lazy()->attributes(['class' => 'ml-auto max-h-12 object-contain']) }}
                 @endif
             </div>
 

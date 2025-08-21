@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Widget;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Layout\Filament\Components\Forms\CarouselSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
@@ -24,13 +23,6 @@ class CarouselWidgetSchema extends AssetsWidgetSchema
         return WidgetDisplayTab::make([
             Grid::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (isset($state['background_image_id'])) {
-                        $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
-                    }
-
-                    return $state;
-                })
                 ->schema([
                     Fieldset::make(
                         __('capell-admin::generic.carousel_options')

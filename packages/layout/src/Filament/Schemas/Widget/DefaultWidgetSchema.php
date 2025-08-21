@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Widget;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
+use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
 use Capell\Layout\Filament\Components\Forms\ActionsRepeater;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
@@ -97,13 +96,6 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
         return WidgetDisplayTab::make([
             Grid::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (! empty($state['background_image_id'])) {
-                        $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
-                    }
-
-                    return $state;
-                })
                 ->schema([
                     WidgetDisplaySection::make([
                         ColorSchemeComponent::make('color_scheme'),
@@ -119,19 +111,11 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
             ->label(__('capell-admin::tab.details'))
             ->icon('heroicon-o-information-circle')
             ->statePath('meta')
-            ->mutateDehydratedStateUsing(function (array $state): array {
-                if (! empty($state['image_id'])) {
-                    $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                }
-
-                return $state;
-            })
             ->schema([
                 Grid::make()
                     ->schema([
-                        ImageMediaPicker::make('image_id')
+                        ImageFileUpload::make('image')
                             ->label(__('capell-admin::form.image'))
-                            ->relationship(relationshipName: 'image', titleColumnName: 'name')
                             ->reactive(),
                         Checkbox::make('reverse_order')
                             ->label(__('capell-admin::form.reverse_order'))

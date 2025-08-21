@@ -5,8 +5,8 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Core\Models\Media;
     use Capell\Frontend\Facades\Frontend;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     $theme = Frontend::getTheme();
 @endphp
@@ -99,7 +99,7 @@ declare(strict_types=1);
                     tabindex="0"
                 >
                     <x-capell::media
-                        :class="'swiper-slide-img h-64 bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105'.($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
+                        :class="'swiper-slide-img h-64 bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
                         :$loop
                         :media="$media"
                         :srcset="['400w', '200w']"

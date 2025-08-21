@@ -6,7 +6,6 @@ namespace Capell\Layout\Filament\Resources\PageResource\RelationManagers;
 
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeNameColumn;
@@ -22,6 +21,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -78,8 +78,9 @@ class ContentsRelationManager extends RelationManager
                     ->label(__('capell-admin::table.tags'))
                     ->type(TagTypeEnum::CONTENT->value)
                     ->toggleable(isToggledHiddenByDefault: true),
-                CuratorColumn::make('meta.image')
-                    ->relationship('image')
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->label(__('capell-admin::table.image'))
+                    ->collection('image')
                     ->toggleable(),
             ])
             ->filters(ContentResource::getTableFilters())

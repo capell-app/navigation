@@ -10,7 +10,6 @@ use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Core\Actions\GetPageResourceAction;
-use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
@@ -640,7 +639,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->model(fn (array $arguments): string => match ($arguments['type']) {
                 'content' => CapellCore::getModel(LayoutModelEnum::Content->name),
                 'page' => CapellCore::getModel(ModelEnum::Page),
-                'media' => CapellCore::getModel(ModelEnum::Media),
             })
             ->schema(
                 fn (array $arguments, Schema $schema): Schema => $schema->operation('createOption')
@@ -658,28 +656,26 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 $data = [];
 
-                if (in_array($arguments['type'], ['content', 'page'], true)) {
-                    /** @var class-string<Type> $model */
-                    $model = CapellCore::getModel(ModelEnum::Type);
+                /** @var class-string<Type> $model */
+                $model = CapellCore::getModel(ModelEnum::Type);
 
-                    $data['type_id'] = match ($arguments['type']) {
-                        'content' => $model::query()
-                            ->where('type', LayoutTypeEnum::Content)
-                            ->default()
-                            ->value('id'),
-                        'page' => $model::query()
-                            ->pageType()
-                            ->default()
-                            ->value('id'),
-                    };
+                $data['type_id'] = match ($arguments['type']) {
+                    'content' => $model::query()
+                        ->where('type', LayoutTypeEnum::Content)
+                        ->default()
+                        ->value('id'),
+                    'page' => $model::query()
+                        ->pageType()
+                        ->default()
+                        ->value('id'),
+                };
 
-                    if ($site) {
-                        $data['translations'] = [
-                            (string) Str::uuid() => [
-                                'language_id' => $site->language_id,
-                            ],
-                        ];
-                    }
+                if ($site) {
+                    $data['translations'] = [
+                        (string) Str::uuid() => [
+                            'language_id' => $site->language_id,
+                        ],
+                    ];
                 }
 
                 if ($arguments['type'] === 'page') {
@@ -1847,12 +1843,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             $resource = $this->getWidgetAssetRecord(ucfirst($type), $resourceUuid);
 
             $meta = $assetsMeta[$resourceUuid] ?? [];
-
-            if ($type === AssetEnum::Media->name) {
-                $meta['type'] = $resource->getType();
-                $meta['alt'] = $resource->alt;
-                $meta['caption'] = $resource->caption;
-            }
 
             $order = $this->countWidgetAssets($containerKey, $widgetIndex) + 1;
 

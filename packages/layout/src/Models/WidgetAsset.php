@@ -8,7 +8,7 @@ use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPageCache;
-use Capell\Core\Models\Media;
+use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\WidgetAssetFactory;
 use Eloquent;
@@ -18,8 +18,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
+use Spatie\MediaLibrary\HasMedia;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 use Wildside\Userstamps\Userstamps;
@@ -46,7 +48,7 @@ use Wildside\Userstamps\Userstamps;
  *
  * @mixin Eloquent
  */
-class WidgetAsset extends Model implements PageCacheable
+class WidgetAsset extends Model implements HasMedia, PageCacheable
 {
     use HasAssets;
 
@@ -56,7 +58,10 @@ class WidgetAsset extends Model implements PageCacheable
     use HasJsonRelationships;
     use HasMetaData;
     use HasPageCache;
+    use InteractsWithMedia;
     use Userstamps;
+
+    public const MEDIA_IMAGE = 'image';
 
     /**
      * The attributes that are mass assignable.
@@ -85,6 +90,11 @@ class WidgetAsset extends Model implements PageCacheable
             ->count('page_id');
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
+    }
+
     public function widget(): BelongsTo
     {
         return $this->belongsTo(Widget::class);
@@ -105,9 +115,9 @@ class WidgetAsset extends Model implements PageCacheable
         return $this->belongsToJson(Content::class, 'meta->related');
     }
 
-    public function image(): BelongsTo
+    public function image(): MorphOne
     {
-        return $this->belongsTo(Media::class, 'meta->image_id');
+        return $this->morphOneMedia(static::MEDIA_IMAGE);
     }
 
     public function relatedPage(): BelongsTo

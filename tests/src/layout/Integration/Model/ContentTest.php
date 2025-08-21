@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Tag;
@@ -13,6 +12,7 @@ use Capell\Layout\Models\Content;
 use Capell\Layout\Models\ContentAsset;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 it('belongs to a site', function (): void {
     $site = Site::factory()->create();

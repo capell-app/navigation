@@ -10,7 +10,6 @@ use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\ImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\StatusColumn;
@@ -39,6 +38,7 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -202,8 +202,7 @@ class WidgetResource extends Resource
                 ->searchable()
                 ->sortable()
                 ->alignCenter(),
-            ImageColumn::make('meta.image')
-                ->visibility('public')
+            SpatieMediaLibraryImageColumn::make('meta.image')
                 ->toggleable(isToggledHiddenByDefault: true),
             LanguagesColumn::make('translations.language'),
             TextColumn::make('translation.contents')
@@ -289,7 +288,7 @@ class WidgetResource extends Resource
                 })
                 ->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('widget_assets_count')
-                ->label(__('capell-admin::table.total_resources'))
+                ->label(__('capell-admin::table.total_assets'))
                 ->counts('widgetAssets')
                 ->sortable()
                 ->alignRight()

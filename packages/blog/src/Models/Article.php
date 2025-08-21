@@ -9,7 +9,6 @@ use Capell\Core\Database\Factories\PageFactory;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\PageUrl;
@@ -23,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\QueryBuilder;
 use OwenIt\Auditing\Models\Audit;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property-read Collection<int, Audit> $audits
@@ -140,6 +140,9 @@ use OwenIt\Auditing\Models\Audit;
  * @method static QueryBuilder<static>|Article withoutSelf()
  * @method static QueryBuilder<static>|Article withoutTags((ArrayAccess|\Spatie\Tags\Tag|array|string) $tags, ?string $type = null)
  * @method static Builder<static>|Article withoutTrashed()
+ *
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
  *
  * @mixin Eloquent
  */

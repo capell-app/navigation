@@ -6,14 +6,11 @@ namespace Capell\Layout\Filament\Resources\WidgetResource\RelationManagers;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Core\Actions\EditPageUrlAction;
-use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\TypeEnum;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
@@ -27,6 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -62,13 +60,9 @@ class WidgetAssetsRelationManager extends RelationManager
                 TextColumn::make('asset_type')
                     ->badge()
                     ->sortable(),
-                CuratorColumn::make('asset_image')
+                SpatieMediaLibraryImageColumn::make('asset.image')
                     ->label(__('capell-admin::table.image'))
-                    ->getStateUsing(
-                        fn (WidgetAsset $record): ?Media => $record->asset_type === AssetEnum::Media->value
-                            ? $record->asset
-                            : $record->asset?->image
-                    )
+                    ->collection('asset_image')
                     ->width(0),
                 PageNameColumn::make('page.name')
                     ->label(__('capell-admin::table.page'))

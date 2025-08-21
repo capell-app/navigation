@@ -14,7 +14,7 @@ declare(strict_types=1);
 @props([
     'backgroundAttachment' => $widget->meta['background_attachment'] ?? '',
     'backgroundColor' => $widget->meta['background_color'] ?? '',
-    'backgroundImage' => ! empty($widget->meta['background_image_id']) ? Capell\Core\Models\Media::find($widget->meta['background_image_id']) : null,
+    'backgroundImage' => ! empty($widget->meta['background_image_id']) ? Spatie\MediaLibrary\MediaCollections\Models\Media::find($widget->meta['background_image_id']) : null,
     'backgroundRepeat' => $widget->meta['background_repeat'] ?? 'no-repeat',
     'backgroundOverlay' => $widget->meta['background_overlay'] ?? false,
     'backgroundPosition' => $widget->meta['background_position'] ?? 'center',
@@ -39,11 +39,11 @@ declare(strict_types=1);
     'containerColspan' => null,
 ])
 <{{ $tag }}
-    id="{{ $containerKey.'-'.$widget->key."-$index" }}"
+    id="{{ $containerKey . '-' . $widget->key . "-{$index}" }}"
     {{
         $attributes->class([
-            '@container/wrap widget widget-'.$widget->key,
-            $class => $class !== 'widget-'.$widget->key,
+            '@container/wrap widget widget-' . $widget->key,
+            $class => $class !== 'widget-' . $widget->key,
             $containerClass => $containerWidth === 'full',
             'w-full' => $containerColspan === 12,
             'py-4' => in_array('sm', $padding, true),
@@ -98,7 +98,7 @@ declare(strict_types=1);
         ])
     }}
     @if ($backgroundColor && ! $isDefaultColor || $backgroundImage)
-        style="{{ $backgroundColor && ! $isDefaultColor ? 'background-color:'.$backgroundColor.';' : '' }}{{ $backgroundImage ? 'background-image:url('.$backgroundImage->url.');' : '' }}"
+        style="{{ $backgroundColor && ! $isDefaultColor ? 'background-color:' . $backgroundColor . ';' : '' }}{{ $backgroundImage ? 'background-image:url(' . $backgroundImage->url . ');' : '' }}"
     @endif
 >
     @if ($backgroundOverlay)

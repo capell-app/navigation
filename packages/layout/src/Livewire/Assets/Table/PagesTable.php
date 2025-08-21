@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Livewire\Assets\Table;
 
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
@@ -24,6 +23,7 @@ use Capell\Core\Models\Type;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -60,8 +60,9 @@ class PagesTable extends AbstractAssetsTable
         return [
             IdentifierColumn::make('id'),
             PageNameColumn::make('name'),
-            CuratorColumn::make('image')
-                ->relationship('image')
+            SpatieMediaLibraryImageColumn::make('image')
+                ->label(__('capell-admin::table.image'))
+                ->collection('image')
                 ->toggleable(),
             TextColumn::make('translation.contents')
                 ->label(__('capell-admin::table.content'))

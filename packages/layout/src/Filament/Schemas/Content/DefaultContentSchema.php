@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Content;
 
-use Awcodes\Curator\Components\Forms\CuratorPicker;
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
+use Capell\Admin\Filament\Components\Forms\SpatieMediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
@@ -31,7 +30,7 @@ class DefaultContentSchema extends AbstractContentSchema
         return [
             IconPicker::make('icon')
                 ->label(__('capell-admin::form.icon')),
-            CuratorPicker::make('image_id')
+            SpatieMediaLibraryFileUpload::make('image')
                 ->label(__('capell-admin::form.image')),
             CustomColorInput::make(
                 name: 'color',
@@ -85,15 +84,8 @@ class DefaultContentSchema extends AbstractContentSchema
                 ->mainSchema([
                     ContentTranslationsRepeater::make($schema),
                     Section::make()
-                        ->columns()
                         ->statePath('meta')
-                        ->mutateDehydratedStateUsing(function (array $state): array {
-                            if (isset($state['image_id'])) {
-                                $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                            }
-
-                            return $state;
-                        })
+                        ->columns()
                         ->schema(self::getMetaSchema()),
                 ])
                 ->sidebarSchema([

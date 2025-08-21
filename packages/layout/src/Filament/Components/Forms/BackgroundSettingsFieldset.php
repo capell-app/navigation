@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms;
 
-use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
 use Capell\Layout\Models\WidgetAsset;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Field;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Group;
@@ -81,20 +81,9 @@ class BackgroundSettingsFieldset
                                     ->helperText(__('capell-admin::generic.background_overlay_helper_text')),
                             ]),
                     ]),
-                ImageMediaPicker::make('background_image_id')
-                    ->reactive()
-                    ->dehydrateStateUsing(function (ImageMediaPicker $component, $state): ?string {
-                        if (! $state) {
-                            return null;
-                        }
-
-                        $imageId = is_array($state) ? collect($state)->first()['id'] : $state;
-
-                        $component->state($imageId);
-
-                        return $imageId;
-                    })
-                    ->label(__('capell-admin::form.background_image')),
+                FileUpload::make('background_image')
+                    ->label(__('capell-admin::form.background_image'))
+                    ->reactive(),
             ]);
     }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Tests;
 
 use Awcodes\BadgeableColumn\BadgeableColumnServiceProvider;
-use Awcodes\Curator\CuratorServiceProvider;
 use BezhanSalleh\FilamentShield\FilamentShieldServiceProvider;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Bkwld\Cloner\ServiceProvider as ClonerServiceProvider;
@@ -43,12 +42,12 @@ use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
-use Override;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
+use Spatie\MediaLibrary\MediaLibraryServiceProvider;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionServiceProvider;
 use Spatie\Tags\TagsServiceProvider;
@@ -64,7 +63,6 @@ abstract class AbstractTestCase extends TestCase
 
     protected array $packageMigrations = [];
 
-    #[Override]
     protected function setUp(): void
     {
         if (getenv('TEST_TOKEN')) {
@@ -128,7 +126,6 @@ abstract class AbstractTestCase extends TestCase
             BladeHeroiconsServiceProvider::class,
             BladeIconsServiceProvider::class,
             ClonerServiceProvider::class,
-            CuratorServiceProvider::class,
             SpatieTranslatableServiceProvider::class,
             FilamentAuthenticationLogServiceProvider::class,
             FilamentServiceProvider::class,
@@ -146,6 +143,7 @@ abstract class AbstractTestCase extends TestCase
             CapellServiceProvider::class,
             TablesServiceProvider::class,
             TagsServiceProvider::class,
+            MediaLibraryServiceProvider::class,
             WidgetsServiceProvider::class,
             LivewireServiceProvider::class,
             NotificationsServiceProvider::class,

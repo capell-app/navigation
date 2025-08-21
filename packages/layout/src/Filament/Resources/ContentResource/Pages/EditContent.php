@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\ContentResource\Pages;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\DeleteAction;
 use Capell\Admin\Filament\Actions\ReplicateAction;
@@ -84,17 +83,6 @@ class EditContent extends EditRecord
                     ->hidden($this->record->trashed()),
             ]),
         ];
-    }
-
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data = parent::mutateFormDataBeforeSave($data);
-
-        if (isset($data['meta']['image_id'])) {
-            $data['meta']['image_id'] = FixCuratorMetaDataAction::run($data['meta']['image_id']);
-        }
-
-        return $data;
     }
 
     protected function afterSave(): void

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\LayoutContainer;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\ColumnInput;
 use Capell\Layout\Filament\Components\Forms\ContainerWidthSelect;
@@ -26,13 +25,6 @@ class DefaultLayoutContainerSchema extends AbstractLayoutContainerSchema
         return [
             Group::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (isset($state['background_image_id'])) {
-                        $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
-                    }
-
-                    return $state;
-                })
                 ->columns()
                 ->columnSpanFull()
                 ->schema([

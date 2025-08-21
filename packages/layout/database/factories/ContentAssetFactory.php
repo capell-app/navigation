@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Database\Factories;
 
 use Capell\Core\Enums\AssetEnum;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
 use Capell\Layout\Models\Content;
@@ -23,7 +22,6 @@ class ContentAssetFactory extends Factory
     {
         $type = fake()->randomElement([
             AssetEnum::Page,
-            AssetEnum::Media,
             LayoutAssetEnum::Content,
         ]);
 
@@ -33,18 +31,9 @@ class ContentAssetFactory extends Factory
             'asset_type' => $type->value,
             'asset_id' => fn ($state): string => (match ($type) {
                 LayoutAssetEnum::Content => (string) Content::factory()->create()->id,
-                AssetEnum::Media => (string) Media::factory()->create()->id,
                 AssetEnum::Page => (string) Page::factory()->create()->id,
             }),
         ];
-    }
-
-    public function media(array $state = []): static
-    {
-        return $this->state([
-            'asset_type' => 'media',
-            'asset_id' => Media::factory($state)->create()->id,
-        ]);
     }
 
     public function page(array $state = []): static

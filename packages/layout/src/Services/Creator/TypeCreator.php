@@ -101,8 +101,8 @@ class TypeCreator
             'group' => WidgetTypeGroupEnum::Asset->value,
             'admin' => [
                 'schema' => AssetsWidgetSchema::getKey(),
-                'icon' => CapellCore::getAsset(AssetEnum::Media->name)->getIcon(),
-                'asset_types' => [AssetEnum::Media->value],
+                'icon' => config('capell-admin.assets.media.icon'),
+                'asset_types' => [\Capell\Layout\Enums\AssetEnum::Content->value],
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,
@@ -205,7 +205,6 @@ class TypeCreator
                 'icon' => 'heroicon-o-rectangle-stack',
                 'asset_types' => [
                     AssetEnum::Page->value,
-                    AssetEnum::Media->value,
                     LayoutAssetEnum::Content->value,
                 ],
             ],

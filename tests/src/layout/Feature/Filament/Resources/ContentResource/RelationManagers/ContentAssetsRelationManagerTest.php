@@ -33,9 +33,8 @@ it('can search content assets', function (): void {
     $content = Content::factory()
         ->has(ContentAsset::factory()->page(['name' => 'First']), 'assets')
         ->has(ContentAsset::factory()->content(['name' => 'Second']), 'assets')
-        ->has(ContentAsset::factory()->media(['name' => 'Third']), 'assets')
-        ->has(ContentAsset::factory()->page(['name' => 'Fourth']), 'assets')
-        ->has(ContentAsset::factory()->content(['name' => 'Fifth']), 'assets')
+        ->has(ContentAsset::factory()->page(['name' => 'Third']), 'assets')
+        ->has(ContentAsset::factory()->content(['name' => 'Fourth']), 'assets')
         ->create();
 
     $resource = $content->assets->first()->load('asset');
@@ -72,12 +71,6 @@ test('can create a asset for a widget', function (string $assetType): void {
                         (string) Content::factory()->create()->id,
                     ],
                 ],
-                'media' => [
-                    'asset_type' => app(Models\Media::class)->getMorphClass(),
-                    'asset_id' => [
-                        (string) Models\Media::factory()->create()->id,
-                    ],
-                ],
                 'page' => [
                     'asset_type' => app(Models\Page::class)->getMorphClass(),
                     'asset_id' => [
@@ -94,4 +87,4 @@ test('can create a asset for a widget', function (string $assetType): void {
         'content_id' => $content->id,
         'asset_type' => $assetType,
     ]);
-})->with(['page', 'media', 'content']);
+})->with(['page', 'content']);

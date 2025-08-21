@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Content;
 
-use Awcodes\Curator\Components\Forms\CuratorPicker;
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
+use Capell\Admin\Filament\Components\Forms\SpatieMediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
@@ -22,7 +21,7 @@ class TestimonialContentSchema extends DefaultContentSchema
     public static function getMetaSchema(): array
     {
         return [
-            CuratorPicker::make('image_id')
+            SpatieMediaLibraryFileUpload::make('image')
                 ->label(__('capell-admin::form.image')),
             Group::make()
                 ->schema([
@@ -61,13 +60,6 @@ class TestimonialContentSchema extends DefaultContentSchema
             ContentTranslationsRepeater::make($schema),
             Grid::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (isset($state['image_id'])) {
-                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                    }
-
-                    return $state;
-                })
                 ->schema(self::getMetaSchema()),
         ];
     }
@@ -79,15 +71,8 @@ class TestimonialContentSchema extends DefaultContentSchema
                 ->mainSchema([
                     ContentTranslationsRepeater::make($schema),
                     Section::make()
-                        ->columns()
                         ->statePath('meta')
-                        ->mutateDehydratedStateUsing(function (array $state): array {
-                            if (isset($state['image_id'])) {
-                                $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                            }
-
-                            return $state;
-                        })
+                        ->columns()
                         ->schema(self::getMetaSchema()),
                 ])
                 ->sidebarSchema([
@@ -109,13 +94,6 @@ class TestimonialContentSchema extends DefaultContentSchema
             ContentTranslationsRepeater::make($schema, hasTitle: false),
             Grid::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (isset($state['image_id'])) {
-                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                    }
-
-                    return $state;
-                })
                 ->schema(self::getMetaSchema()),
             Section::make(__('capell-admin::generic.settings'))
                 ->collapsed()

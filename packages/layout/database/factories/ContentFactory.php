@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Database\Factories;
 
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
@@ -35,7 +34,6 @@ class ContentFactory extends Factory
             'site_id' => null,
             'meta' => fn (array $attributes): array => [
                 'label' => fake()->optional()->sentence,
-                'image_id' => fake()->optional() ? Media::inRandomOrder()->first()?->getKey() : null,
                 'page_id' => fake()->optional() && $attributes['site_id'] ? Page::where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
             ],
             'order' => fake()->numberBetween(1, 100),

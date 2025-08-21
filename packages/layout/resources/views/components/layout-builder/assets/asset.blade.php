@@ -21,10 +21,10 @@ declare(strict_types=1);
 ])
 @php
     use Capell\Admin\Facades\CapellAdmin;
-    use Capell\Core\Models\Media;
     use Capell\Core\Models\Page;
     use Capell\Layout\Models\Content;
     use Filament\Actions\Action;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     /** @var Action $editWidgetAssetAction */
     $editWidgetAssetAction = ($this->editWidgetAssetAction)([

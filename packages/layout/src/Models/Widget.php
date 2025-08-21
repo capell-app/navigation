@@ -13,10 +13,10 @@ use Capell\Core\Models\Concerns\HasPageCache;
 use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasStatus;
 use Capell\Core\Models\Concerns\HasTranslations;
+use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Capell\Core\Models\Contracts\Statusable;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
@@ -29,11 +29,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\HasManyJson;
@@ -86,7 +89,7 @@ use Wildside\Userstamps\Userstamps;
  * @mixin \Eloquent
  */
 #[ObservedBy(WidgetObserver::class)]
-class Widget extends Model implements PageCacheable, Statusable
+class Widget extends Model implements HasMedia, PageCacheable, Statusable
 {
     use Cloneable;
     use CloneableExcept;
@@ -101,10 +104,15 @@ class Widget extends Model implements PageCacheable, Statusable
     use HasRelationships;
     use HasStatus;
     use HasTranslations;
+    use InteractsWithMedia;
     use SoftDeletes;
     use Userstamps;
 
     public const COMPONENT_SLOT = 'slot';
+
+    public const MEDIA_IMAGE = 'image';
+
+    public const MEDIA_BACKGROUND_IMAGE = 'background_image';
 
     /**
      * The attributes that are mass assignable.
@@ -162,6 +170,12 @@ class Widget extends Model implements PageCacheable, Statusable
             ->pluck('group');
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
+        $this->addMediaCollection(static::MEDIA_BACKGROUND_IMAGE)->singleFile();
+    }
+
     public function getComponent(): ?string
     {
         return $this->getMetaComponent()
@@ -184,14 +198,14 @@ class Widget extends Model implements PageCacheable, Statusable
         return 'blade';
     }
 
-    public function image(): BelongsTo
+    public function image(): MorphOne
     {
-        return $this->belongsTo(Media::class, 'meta->image_id');
+        return $this->morphOneMedia(static::MEDIA_IMAGE);
     }
 
-    public function backgroundImage(): BelongsTo
+    public function backgroundImage(): MorphOne
     {
-        return $this->belongsTo(Media::class, 'meta->background_image_id');
+        return $this->morphOneMedia(static::MEDIA_BACKGROUND_IMAGE);
     }
 
     public function type(): BelongsTo
@@ -222,17 +236,6 @@ class Widget extends Model implements PageCacheable, Statusable
     {
         return $this->morphedByMany(
             Page::class,
-            'asset',
-            'widget_assets',
-            'widget_id',
-            'asset_id',
-        );
-    }
-
-    public function media(): MorphToMany
-    {
-        return $this->morphedByMany(
-            Media::class,
             'asset',
             'widget_assets',
             'widget_id',

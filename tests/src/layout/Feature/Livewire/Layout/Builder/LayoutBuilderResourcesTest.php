@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Models\Layout;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Livewire\LayoutBuilder;
+use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -40,7 +39,7 @@ test('Can save without affecting widget assets', function (bool $withPage): void
 
     $widget = Widget::firstWhere('key', $widgetKey);
     WidgetAsset::factory()->count(2)->create();
-    Media::factory()->count(2)->create();
+    Content::factory()->count(2)->create();
     Page::factory()->count(3)->create();
 
     WidgetAsset::factory()->count(5)->widget($widget)->create();
@@ -81,7 +80,7 @@ test('Can sync new widget assets to page layout', function (): void {
         ->create();
 
     // 5 to add
-    $media = Media::factory()->count(2)->create();
+    $contents = Content::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     // Excluded
@@ -103,9 +102,9 @@ test('Can sync new widget assets to page layout', function (): void {
             'syncSelectedAssets',
             containerKey: $containerKey,
             widgetIndex: $widgetIndex,
-            type: AssetEnum::Media->name,
+            type: \Capell\Layout\Enums\AssetEnum::Content->name,
             hasPageAssets: true,
-            assets: $media->map(fn (Media $record): string => (string) $record->id)->toArray()
+            assets: $contents->map(fn (Content $record): string => (string) $record->id)->toArray()
         )
         ->call(
             'syncSelectedAssets',
@@ -131,7 +130,7 @@ test('Can sync new widget assets to layout', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
 
     // 5 to add
-    $media = Media::factory()->count(2)->create();
+    $contents = Content::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     $containerKey = array_key_first($layout->containers);
@@ -162,7 +161,7 @@ test('Can sync new widget assets to layout', function (): void {
             widgetIndex: $widgetIndex,
             type: 'media',
             hasPageAssets: false,
-            assets: $media->map(fn (Media $record): string => (string) $record->id)->toArray()
+            assets: $contents->map(fn (Content $record): string => (string) $record->id)->toArray()
         )
         ->call(
             'syncSelectedAssets',
@@ -189,7 +188,7 @@ test('Can sync new page assets', function (): void {
 
     $widget = Widget::firstWhere('key', $widgetKey);
 
-    $media = Media::factory()->count(2)->create();
+    $contents = Content::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     WidgetAsset::factory()
@@ -212,7 +211,7 @@ test('Can sync new page assets', function (): void {
             widgetIndex: $widgetIndex,
             type: 'media',
             hasPageAssets: true,
-            assets: $media->map(fn (Media $record): string => (string) $record->id)->toArray()
+            assets: $contents->map(fn (Content $record): string => (string) $record->id)->toArray()
         )
         ->call(
             'syncSelectedAssets',
@@ -247,7 +246,7 @@ test('Can reorder assets', function (): void {
 
     $secondAsset = WidgetAsset::factory()
         ->widget($widget)
-        ->asset(AssetEnum::Media)
+        ->asset(\Capell\Layout\Enums\AssetEnum::Content)
         ->state([
             'container' => 'test',
             'order' => 2,
@@ -293,7 +292,7 @@ test('Can select all widget assets', function (): void {
 
     $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
 
-    foreach ([AssetEnum::Media, AssetEnum::Page, Capell\Layout\Enums\AssetEnum::Content] as $assetType) {
+    foreach ([AssetEnum::Page, Capell\Layout\Enums\AssetEnum::Content] as $assetType) {
         WidgetAsset::factory()
             ->count(2)
             ->widget($widget)
@@ -330,52 +329,6 @@ test('Can select all widget assets', function (): void {
         ->assertSet('selectedRecords', $selectedRecords)
         ->call('deSelectAllAssets', containerKey: $containerKey, widgetIndex: 0)
         ->assertSet('selectedRecords', $emptySelectedRecords);
-});
-
-test('can add media asset', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-    $media = Media::factory()->make();
-
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-
-    $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
-
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
-
-    livewire(LayoutBuilder::class, [
-        'layout_id' => $layout->id,
-    ])
-        ->assertSuccessful()
-        ->assertActionExists('addAsset')
-        ->mountAction(
-            'addAsset',
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-                'type' => 'media',
-            ]
-        )
-        ->fillForm([
-            'file' => UploadedFile::fake()->image('test.jpg'),
-            'alt' => $media->name,
-            'originalFilename' => 'test.jpg',
-        ])
-        ->callMountedAction()
-        ->assertHasNoFormErrors()
-        ->call('saveLayout');
-
-    assertDatabaseHas('media', [
-        'title' => 'test',
-    ]);
-
-    assertDatabaseHas('widget_assets', [
-        'page_id' => null,
-        'widget_id' => $widget->id,
-        'container' => null,
-        'occurrence' => null,
-        'asset_type' => 'media',
-    ]);
 });
 
 test('can add page asset', function (): void {
@@ -428,116 +381,6 @@ test('can add page asset', function (): void {
         'container' => null,
         'occurrence' => null,
         'asset_type' => 'page',
-    ]);
-});
-
-test('can add media asset to existing widget with page layout', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-    $pageLayout = Page::factory()->layout($layout)->create();
-
-    $media = Media::factory()->make();
-
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-
-    $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
-
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
-
-    WidgetAsset::factory()
-        ->widget($widget)
-        ->page($pageLayout, $containerKey, $containerWidget['occurrence'])
-        ->asset(AssetEnum::Media)
-        ->create();
-
-    livewire(LayoutBuilder::class, [
-        'layout_id' => $layout->id,
-        'page_id' => $pageLayout->id,
-    ])
-        ->assertSuccessful()
-        ->callAction(
-            'addAsset',
-            data: [
-                'file' => UploadedFile::fake()->image('test.jpg'),
-                'alt' => $media->name,
-                'originalFilename' => 'test.jpg',
-            ],
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-                'type' => 'media',
-            ]
-        )
-        ->assertHasNoFormErrors()
-        ->call('saveLayout');
-
-    assertDatabaseHas('media', [
-        'alt' => $media->name,
-    ]);
-
-    $media = Media::firstWhere('alt', $media->name);
-
-    assertDatabaseHas('widget_assets', [
-        'page_id' => $pageLayout->id,
-        'widget_id' => $widget->id,
-        'container' => $containerKey,
-        'occurrence' => $containerWidget['occurrence'],
-        'asset_type' => 'media',
-        'asset_id' => $media->id,
-    ]);
-});
-
-test('can add media asset to widget with page layout', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-    $pageLayout = Page::factory()->layout($layout)->create();
-
-    $media = Media::factory()->make();
-
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-
-    $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
-
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
-
-    livewire(LayoutBuilder::class, [
-        'layout_id' => $layout->id,
-        'page_id' => $pageLayout->id,
-    ])
-        ->assertSuccessful()
-        ->mountAction(
-            TestAction::make('addAsset')
-                ->arguments([
-                    'containerKey' => $containerKey,
-                    'widgetIndex' => $widgetIndex,
-                    'type' => AssetEnum::Media->value,
-                ])
-        )
-        ->fillForm([
-            'asset' => [
-                'file' => UploadedFile::fake()->image('test.jpg'),
-                'alt' => $media->name,
-            ],
-        ])
-        ->callMountedAction()
-        ->assertHasNoFormErrors()
-        ->call('saveLayout');
-
-    $tableName = app(config('curator.model'))->getTable();
-
-    assertDatabaseHas($tableName, [
-        'alt' => $media->name,
-    ]);
-
-    $media = Media::firstWhere('alt', $media->name);
-
-    assertDatabaseHas('widget_assets', [
-        'page_id' => $pageLayout->id,
-        'widget_id' => $widget->id,
-        'container' => $containerKey,
-        'occurrence' => $containerWidget['occurrence'],
-        'asset_type' => 'media',
-        'asset_id' => $media->id,
     ]);
 });
 
@@ -685,7 +528,7 @@ test('can select assets', function (string $assetType): void {
         )
         ->callMountedAction()
         ->assertHasNoFormErrors();
-})->with(['page', 'media', 'content']);
+})->with(['page', 'content']);
 
 test('can edit asset', function (): void {
     $layout = (new LayoutFactory)->containers()->create();

@@ -9,7 +9,6 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
@@ -29,6 +28,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
 
 class DemoCreator
 {
@@ -48,11 +48,6 @@ class DemoCreator
     private readonly string $typeModel;
 
     /**
-     * @var class-string<Media>
-     */
-    private readonly string $mediaModel;
-
-    /**
      * @var class-string<Page>
      */
     private readonly string $pageModel;
@@ -68,7 +63,6 @@ class DemoCreator
         $this->contentModel = CapellCore::getModel(LayoutModelEnum::Content->name);
         $this->widgetModel = CapellCore::getModel(LayoutModelEnum::Widget->name);
         $this->typeModel = CapellCore::getModel(ModelEnum::Type);
-        $this->mediaModel = CapellCore::getModel(ModelEnum::Media);
         $this->pageModel = CapellCore::getModel(ModelEnum::Page);
         $this->tagModel = CapellCore::getModel(ModelEnum::Tag);
     }
@@ -84,7 +78,6 @@ class DemoCreator
                 'padding' => ['md'],
                 'reverse_order' => true,
                 'background_color' => 'light-gray',
-                'image_id' => $this->getExampleMedia()?->id,
                 'actions' => [
                     [
                         'type' => 'page',
@@ -101,6 +94,8 @@ class DemoCreator
                 ],
             ],
         ]);
+
+        $this->createMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -130,7 +125,6 @@ class DemoCreator
                 'size' => 'md',
                 'style' => 'column',
                 'padding' => ['md'],
-                'image_id' => $this->getExampleMedia()?->id,
                 'actions' => [
                     [
                         'type' => 'page',
@@ -147,6 +141,8 @@ class DemoCreator
                 ],
             ],
         ]);
+
+        $this->createMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -173,7 +169,6 @@ class DemoCreator
             'meta' => [
                 'component' => 'capell-layout::widget.banner-image',
                 'margin' => ['lg'],
-                'image_id' => $this->getExampleMedia()?->id,
                 'actions' => [
                     [
                         'type' => 'page',
@@ -190,6 +185,8 @@ class DemoCreator
                 ],
             ],
         ]);
+
+        $this->createMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -216,17 +213,8 @@ class DemoCreator
             return $widget;
         }
 
-        $media = $this->mediaModel::query()
-            ->where('type', 'LIKE', 'image/%')
-            ->inRandomOrder()
-            ->limit(5)
-            ->pluck('id');
-
-        foreach ($media as $mediaUuid) {
-            $widget->assets()->firstOrcreate([
-                'asset_id' => $mediaUuid,
-                'asset_type' => app($this->mediaModel)->getMorphClass(),
-            ]);
+        for ($i = 0; $i < 6; $i++) {
+            $this->createMedia($widget);
         }
 
         return $widget;
@@ -411,44 +399,11 @@ class DemoCreator
             return $widget;
         }
 
-        $video = $this->mediaModel::query()
-            ->where('type', 'LIKE', 'video/%')
-            ->inRandomOrder()
-            ->limit(1)
-            ->first();
-
-        if ($video) {
-            $image = $this->mediaModel::query()
-                ->where('type', 'LIKE', 'image/%')
-                ->inRandomOrder()
-                ->first();
-
-            $widget->assets()->firstOrcreate(
-                [
-                    'asset_id' => $video->id,
-                    'asset_type' => app($this->mediaModel)->getMorphClass(),
-                ],
-                [
-                    'meta' => [
-                        'media_type' => 'video',
-                        'image_id' => $image?->id,
-                    ],
-                ]
-            );
+        for ($i = 0; $i < 7; $i++) {
+            $this->createMedia($widget);
         }
 
-        $media = $this->mediaModel::query()
-            ->where('type', 'LIKE', 'image/%')
-            ->inRandomOrder()
-            ->limit(8)
-            ->pluck('id');
-
-        foreach ($media as $mediaUuid) {
-            $widget->assets()->firstOrcreate([
-                'asset_id' => $mediaUuid,
-                'asset_type' => app($this->mediaModel)->getMorphClass(),
-            ]);
-        }
+        $this->createMedia($widget, type: 'video');
 
         return $widget;
     }
@@ -596,15 +551,11 @@ class DemoCreator
         ];
 
         foreach ($features as $feature) {
-            $media = $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->limit(6)->get();
-            $mediaId = $media->shuffle()->shift()?->id;
             $content = Content::factory()
                 ->site($page->site)
                 ->withTranslations($page->site->languages, ['content' => sprintf('<p>%s</p>', $feature['title'])])
                 ->state([
                     'meta' => fn ($attributes): array => array_merge_recursive((array) $attributes['meta'], [
-                        'image_id' => $mediaId,
-                        'media' => $media?->take(2)->pluck('id')->toArray(),
                         'actions' => [
                             [
                                 'type' => 'page',
@@ -641,6 +592,8 @@ class DemoCreator
                     ]),
                 ])
                 ->create();
+
+            $this->createMedia($content);
 
             $widget->assets()->create([
                 'page_id' => $page->id,
@@ -684,18 +637,9 @@ class DemoCreator
             ]);
         });
 
-        $clientLogos = $this->mediaModel::query()
-            ->where('type', 'LIKE', 'image/%')
-            ->inRandomOrder()
-            ->limit(12)
-            ->get();
-
-        $clientLogos->each(function (Media $logo) use ($widget): void {
-            $widget->assets()->firstOrCreate([
-                'asset_id' => $logo->id,
-                'asset_type' => app($this->mediaModel)->getMorphClass(),
-            ]);
-        });
+        for ($i = 0; $i < 12; $i++) {
+            $this->createMedia($widget);
+        }
 
         return $widget;
     }
@@ -711,9 +655,10 @@ class DemoCreator
                 'align' => 'center',
                 'margin' => ['lg'],
                 'view_file' => 'capell-layout::components.widget.assets.features',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
         ]);
+
+        $this->createMedia($widget);
 
         if ($widget->assets()->exists()) {
             return $widget;
@@ -790,10 +735,11 @@ class DemoCreator
                 'align' => 'center',
                 'background_overlay' => true,
                 'background_color' => 'dark-gray',
-                'background_image_id' => $this->getExampleMedia()?->id,
                 'view_file' => 'capell-layout::components.widget.assets.testimonials',
             ],
         ]);
+
+        $this->createMedia($widget, collection: 'backgroundImage');
 
         if ($widget->assets()->exists()) {
             return $widget;
@@ -894,11 +840,6 @@ class DemoCreator
         }
 
         return $widget;
-    }
-
-    public function getExampleMedia(): Media
-    {
-        return $this->mediaModel::where('type', 'LIKE', 'image/%')->inRandomOrder()->first();
     }
 
     public function createTeamPortfolioWidget(Collection $languages): Widget
@@ -1017,8 +958,6 @@ class DemoCreator
         $contentFeatures = new Collection;
 
         foreach ($features as $feature) {
-            $featureImage = $this->getExampleMedia();
-
             $page = Page::updateOrCreate([
                 'site_id' => $site->id,
                 'name' => $feature['title'],
@@ -1026,20 +965,22 @@ class DemoCreator
                 'parent_id' => $parentPage->id,
                 'meta' => [
                     'icon' => $feature['icon'],
-                    'image_id' => $featureImage?->id,
                     'author_id' => $this->user?->id,
                 ],
             ]);
+
+            $this->createMedia($page);
 
             $content = Content::updateOrCreate([
                 'name' => $feature['title'],
             ], [
                 'meta' => [
                     'icon' => $feature['icon'],
-                    'image_id' => $featureImage?->id,
                     'page_id' => $page->id,
                 ],
             ]);
+
+            $this->createMedia($content);
 
             $contentFeatures->push($content);
 
@@ -1069,28 +1010,26 @@ class DemoCreator
             'name' => 'Testimonials',
             'meta' => [
                 'icon' => 'heroicon-o-chat-bubble-left-right',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
         ]);
+
+        $this->createMedia($testimonialContent);
 
         $testimonials = [
             [
                 'name' => 'John Doe',
                 'position' => 'CEO of Example Corp',
                 'content' => '<p>Capell has transformed our business with their innovative solutions and exceptional service.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Jane Smith',
                 'position' => 'CTO of Tech Innovations',
                 'content' => '<p>The team at Capell is incredibly knowledgeable and always goes the extra mile for us.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Alice Johnson',
                 'position' => 'Marketing Director at Creative Agency',
                 'content' => '<p>We have seen significant growth since partnering with Capell. Their expertise is unmatched.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
         ];
 
@@ -1114,10 +1053,11 @@ class DemoCreator
                 'type_id' => $testimonialType->id,
             ], [
                 'meta' => [
-                    'image_id' => $testimonial['image_id'],
                     'position' => $testimonial['position'],
                 ],
             ]);
+
+            $this->createMedia($content);
 
             $content->translations()->createMany(
                 $languages->map(fn (Language $language): array => [
@@ -1140,97 +1080,81 @@ class DemoCreator
                 'name' => 'Alice Johnson',
                 'position' => 'CEO',
                 'bio' => '<p>Alice is the visionary behind our success, leading the team with passion and expertise.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Charlie Brown',
                 'position' => 'CFO',
                 'bio' => '<p>Charlie manages our finances with precision, ensuring sustainable growth and stability.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Fiona Green',
                 'position' => 'Head of HR',
                 'bio' => "<p>Fiona is dedicated to building a strong team culture and supporting our employees' growth.</p>",
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'George White',
                 'position' => 'Lead Designer',
                 'bio' => '<p>George brings creativity and innovation to our design projects, making them visually stunning.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Hannah Blue',
                 'position' => 'Senior Developer',
                 'bio' => '<p>Hannah is a coding wizard, turning complex problems into elegant solutions.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Ian Black',
                 'position' => 'Project Manager',
                 'bio' => '<p>Ian keeps our projects on track, ensuring timely delivery and client satisfaction.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Julia Red',
                 'position' => 'Content Strategist',
                 'bio' => '<p>Julia crafts compelling content strategies that engage and inform our audience.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Kevin Yellow',
                 'position' => 'Data Analyst',
                 'bio' => '<p>Kevin turns data into insights, helping us make informed decisions for our clients.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Laura Purple',
                 'position' => 'Customer Success Manager',
                 'bio' => '<p>Laura ensures our clients are happy and successful, building lasting relationships.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Mike Orange',
                 'position' => 'Sales Director',
                 'bio' => '<p>Mike drives our sales strategy, helping us reach new heights in revenue.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Nina Pink',
                 'position' => 'UX Researcher',
                 'bio' => '<p>Nina conducts research to understand user needs, shaping our products for better usability.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Oscar Gray',
                 'position' => 'IT Support Specialist',
                 'bio' => '<p>Oscar keeps our systems running smoothly, providing technical support to our team.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Quentin Silver',
                 'position' => 'Business Analyst',
                 'bio' => '<p>Quentin analyzes market trends, helping us identify new opportunities for growth.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Sam White',
                 'position' => 'Quality Assurance Specialist',
                 'bio' => '<p>Sam ensures our products meet the highest quality standards before they reach our clients.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Victor Blue',
                 'position' => 'Network Administrator',
                 'bio' => '<p>Victor manages our network infrastructure, ensuring reliable connectivity for our team.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
             [
                 'name' => 'Zane Purple',
                 'position' => 'Research Scientist',
                 'bio' => '<p>Zane conducts research to develop innovative solutions that push the boundaries of technology.</p>',
-                'image_id' => $this->getExampleMedia()?->id,
             ],
         ];
 
@@ -1248,10 +1172,11 @@ class DemoCreator
                 'parent_id' => $teamContent->id,
             ], [
                 'meta' => [
-                    'image_id' => $member['image_id'],
                     'position' => $member['position'],
                 ],
             ]);
+
+            $this->createMedia($content);
 
             $content->translations()->createMany(
                 $languages
@@ -1267,5 +1192,10 @@ class DemoCreator
         }
 
         return $teamMembersCollection;
+    }
+
+    private function createMedia(HasMedia $content, string $collection = 'image', string $type = 'image'): void
+    {
+        app(\Capell\Admin\Services\Creator\DemoCreator::class)->createMedia($content, type: $type, collection: $collection);
     }
 }

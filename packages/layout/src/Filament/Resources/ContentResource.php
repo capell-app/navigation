@@ -8,7 +8,6 @@ use Capell\Admin\Filament\Components\Forms\Type\TypeSchema;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
@@ -45,6 +44,7 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -504,9 +504,9 @@ class ContentResource extends Resource
                     fn (HasTable $livewire): bool => $livewire->activeTab
                         || ! empty($livewire->getTableFilterState('filter')['site_id'])
                 ),
-            CuratorColumn::make('meta.image_id')
+            SpatieMediaLibraryImageColumn::make('image')
                 ->label(__('capell-admin::table.image'))
-                ->relationship('image')
+                ->collection('image')
                 ->toggleable(),
             PublishStatusColumn::make('status'),
             DateColumn::make('publish_from')

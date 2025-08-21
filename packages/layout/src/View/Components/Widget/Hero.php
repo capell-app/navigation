@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\View\Components\Widget;
 
-use Capell\Core\Models\Media;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Services\Loader\MediaLoader;
 use Illuminate\Database\Eloquent\Collection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Hero extends AbstractWidget
 {

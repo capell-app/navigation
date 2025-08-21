@@ -5,9 +5,9 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Awcodes\Curator\Models\Media;
     use Capell\Core\Facades\CapellCore;
     use Capell\Frontend\Facades\Frontend;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     $page = Frontend::getPage();
     $theme = Frontend::getTheme();

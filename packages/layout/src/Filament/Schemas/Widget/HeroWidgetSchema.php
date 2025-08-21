@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Widget;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\CarouselSettingsSchema;
@@ -83,13 +82,6 @@ class HeroWidgetSchema extends AbstractWidgetSchema
                 WidgetDisplayTab::make([
                     Grid::make()
                         ->statePath('meta')
-                        ->mutateDehydratedStateUsing(function (array $state): array {
-                            if (isset($state['background_image_id'])) {
-                                $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
-                            }
-
-                            return $state;
-                        })
                         ->schema([
                             ...static::getMetaSchema(),
                             WidgetComponentFilesSection::make(),

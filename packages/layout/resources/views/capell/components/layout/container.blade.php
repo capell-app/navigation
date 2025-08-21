@@ -6,10 +6,10 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Facades\CapellCore;
-    use Capell\Core\Models\Media;
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader\LayoutLoader;
     use Capell\Layout\Facades\Layout;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 @endphp
 
 @props([
@@ -30,7 +30,7 @@ declare(strict_types=1);
 ])
 @php
     if (! empty($container['meta']['html_class'])) {
-        $htmlClass .= ' '.$container['meta']['html_class'];
+        $htmlClass .= ' ' . $container['meta']['html_class'];
     }
 
     if ($container['meta']['background_image_id'] ?? false) {

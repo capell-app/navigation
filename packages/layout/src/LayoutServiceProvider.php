@@ -15,7 +15,6 @@ use Capell\Core\Data\TypeData;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\Site;
@@ -284,36 +283,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerRelationships(): self
     {
-        Media::resolveRelationUsing(
-            'pages',
-            fn (Media $model): HasManyThrough => $model->hasManyThrough(
-                Page::class,
-                WidgetAsset::class
-            )
-        );
-
-        Media::resolveRelationUsing(
-            'widgets',
-            fn (Media $model): MorphToMany => $model->morphToMany(
-                Widget::class,
-                'asset',
-                'widget_assets'
-            )
-        );
-
-        Page::resolveRelationUsing(
-            'media',
-            fn (Page $model): HasManyThrough => $model->hasManyThrough(
-                Media::class,
-                WidgetAsset::class,
-                'page_id',
-                'id',
-                'id',
-                'asset_id'
-            )
-                ->where('widget_assets.asset_type', app(Media::class)->getMorphClass())
-        );
-
         Page::resolveRelationUsing(
             'pages',
             fn (Page $model): HasManyThrough => $model->hasManyThrough(

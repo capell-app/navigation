@@ -17,8 +17,9 @@ use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasTags;
 use Capell\Core\Models\Concerns\HasTranslations;
 use Capell\Core\Models\Concerns\HasTypes;
+use Capell\Core\Models\Concerns\InteractsWithMedia;
+use Capell\Core\Models\Contracts\Draftable;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Tag;
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
@@ -46,6 +48,7 @@ use Kalnoy\Nestedset\QueryBuilder;
 use Oddvalue\LaravelDrafts\Concerns\HasDrafts;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Models\Audit;
+use Spatie\MediaLibrary\HasMedia;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 use Wildside\Userstamps\Userstamps;
@@ -160,7 +163,7 @@ use Wildside\Userstamps\Userstamps;
  * @mixin Eloquent
  */
 #[ObservedBy(ContentObserver::class)]
-class Content extends Model implements Auditable, PageCacheable
+class Content extends Model implements Auditable, Draftable, HasMedia, PageCacheable
 {
     use Cloneable;
     use CloneableExcept;
@@ -182,6 +185,7 @@ class Content extends Model implements Auditable, PageCacheable
     use HasTags;
     use HasTranslations;
     use HasTypes;
+    use InteractsWithMedia;
     use NodeTrait {
         NodeTrait::bootNodeTrait as protected;
         NodeTrait::parent as nodeTraitParent;
@@ -190,6 +194,8 @@ class Content extends Model implements Auditable, PageCacheable
     use \OwenIt\Auditing\Auditable;
     use SoftDeletes;
     use Userstamps;
+
+    public const MEDIA_IMAGE = 'image';
 
     /**
      * The attributes that are mass assignable.
@@ -224,6 +230,11 @@ class Content extends Model implements Auditable, PageCacheable
     public static function getMorphRelations(): array
     {
         return ['image', 'type', 'translation'];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
     }
 
     public function applyNestedSetScope($query, $table = null)
@@ -278,19 +289,14 @@ class Content extends Model implements Auditable, PageCacheable
         return $this->belongsTo(Site::class);
     }
 
-    public function image(): BelongsTo
+    public function image(): MorphOne
     {
-        return $this->belongsTo(Media::class, 'meta->image_id');
+        return $this->morphOneMedia(static::MEDIA_IMAGE);
     }
 
     public function linkedPage(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'meta->page_id', 'id');
-    }
-
-    public function media(): BelongsToJson
-    {
-        return $this->belongsToJson(Media::class, 'meta->media');
     }
 
     public function related(): BelongsToJson

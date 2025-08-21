@@ -51,12 +51,6 @@ test('can create a asset for a widget', function (string $assetType): void {
                         (string) Content::factory()->create()->id,
                     ],
                 ],
-                'media' => [
-                    'asset_type' => app(Models\Media::class)->getMorphClass(),
-                    'asset_id' => [
-                        (string) Models\Media::factory()->create()->id,
-                    ],
-                ],
                 'page' => [
                     'asset_type' => app(Models\Page::class)->getMorphClass(),
                     'asset_id' => [
@@ -73,4 +67,4 @@ test('can create a asset for a widget', function (string $assetType): void {
         'widget_id' => $widget->id,
         'asset_type' => $assetType,
     ]);
-})->with(['page', 'media', 'content']);
+})->with(['page', 'content']);

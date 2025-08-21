@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Filament\Schemas\Page;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
+use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\LayoutSelect;
 use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
@@ -75,15 +74,8 @@ class ArticlePageSchema extends DefaultPageSchema
 
                                     Group::make()
                                         ->statePath('meta')
-                                        ->mutateDehydratedStateUsing(function (array $state): array {
-                                            if (isset($state['image_id'])) {
-                                                $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                                            }
-
-                                            return $state;
-                                        })
                                         ->schema([
-                                            ImageMediaPicker::make('image_id'),
+                                            ImageFileUpload::make('image'),
                                             Select::make('author_id')
                                                 ->label(__('capell-admin::form.author'))
                                                 ->relationship(name: 'author', titleAttribute: 'name')
@@ -114,15 +106,8 @@ class ArticlePageSchema extends DefaultPageSchema
 
                             Group::make()
                                 ->statePath('meta')
-                                ->mutateDehydratedStateUsing(function (array $state): array {
-                                    if (isset($state['image_id'])) {
-                                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                                    }
-
-                                    return $state;
-                                })
                                 ->schema([
-                                    ImageMediaPicker::make('image_id'),
+                                    ImageFileUpload::make('image'),
                                     Select::make('author_id')
                                         ->label(__('capell-admin::form.author'))
                                         ->relationship(name: 'author', titleAttribute: 'name')

@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\ContentResource\RelationManagers;
 
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Core\Actions\EditPageUrlAction;
 use Capell\Core\Data\AssetData;
-use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Media;
 use Capell\Layout\Filament\Concerns\HasAssetsRelationManager;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\ContentAsset;
@@ -21,6 +18,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -58,13 +56,9 @@ class ContentAssetsRelationManager extends RelationManager
                         query: fn (Builder $query, string $search): Builder => $query->where('asset_id', $search),
                     ),
                 NameColumn::make('asset.name'),
-                CuratorColumn::make('asset_image')
+                SpatieMediaLibraryImageColumn::make('asset.image')
                     ->label(__('capell-admin::table.image'))
-                    ->getStateUsing(
-                        fn (ContentAsset $record): ?Media => $record->asset_type === AssetEnum::Media->value
-                            ? $record->asset
-                            : $record->asset?->image
-                    )
+                    ->collection('image')
                     ->width(0),
                 TextColumn::make('asset_type')
                     ->badge(),

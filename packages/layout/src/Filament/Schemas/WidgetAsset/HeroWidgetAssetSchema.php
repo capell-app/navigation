@@ -9,7 +9,6 @@ use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\Content\RelatedRepeater;
-use Capell\Layout\Filament\Components\Forms\MediaRepeater;
 use Capell\Layout\Filament\Schemas\AbstractWidgetAssetSchema;
 use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Group;
@@ -61,7 +60,7 @@ class HeroWidgetAssetSchema extends AbstractWidgetAssetSchema
             ->icon('heroicon-o-photo')
             ->schema([
                 Hidden::make('image_id'),
-                MediaRepeater::make(prependImage: true),
+                // TODO media repeater
             ]);
     }
 

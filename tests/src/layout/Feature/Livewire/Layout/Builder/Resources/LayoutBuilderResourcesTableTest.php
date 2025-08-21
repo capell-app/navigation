@@ -3,12 +3,10 @@
 declare(strict_types=1);
 
 use Capell\Core\Enums\AssetEnum;
-use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Livewire\Assets\Table\ContentsTable;
-use Capell\Layout\Livewire\Assets\Table\MediaTable;
 use Capell\Layout\Livewire\Assets\Table\PagesTable;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Content;
@@ -21,7 +19,7 @@ use function Pest\Livewire\livewire;
 
 uses(CreatesAdminUser::class)->group('pages');
 
-$types = ['content', 'media', 'page'];
+$types = ['content', 'page'];
 
 beforeEach(function (): void {
     test()->actingAsAdmin();
@@ -37,7 +35,6 @@ it('can render assets table', function (string $assetType): void {
 
     $component = match ($assetType) {
         'content' => ContentsTable::class,
-        'media' => MediaTable::class,
         'page' => PagesTable::class,
     };
 
@@ -77,24 +74,6 @@ describe('layout', function () use ($types): void {
             ->assertCanNotSeeTableRecords([$otherSiteContents]);
     });
 
-    test('media assets table can select assets', function (): void {
-        $layout = (new LayoutFactory)->containers()->create();
-        $containerKey = array_key_first($layout->containers);
-        $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-
-        $media = Media::factory()->count(4)->create();
-
-        livewire(MediaTable::class, [
-            'actionId' => 'select-assets',
-            'containerKey' => $containerKey,
-            'widgetIndex' => $widgetIndex,
-            'hasPageAssets' => false,
-        ])
-            ->assertSuccessful()
-            ->assertCountTableRecords(4)
-            ->assertCanSeeTableRecords($media);
-    });
-
     test('page assets table can select assets', function (): void {
         $layout = (new LayoutFactory)->containers()->create();
         $containerKey = array_key_first($layout->containers);
@@ -125,13 +104,11 @@ describe('layout', function () use ($types): void {
         $site = Site::factory()->create();
         $records = match ($assetType) {
             'content' => Content::factory()->recycle($site)->count(4)->create(),
-            'media' => Media::factory()->recycle($site)->count(4)->create(),
             'page' => Page::factory()->recycle($site)->count(4)->create(),
         };
 
         $component = match ($assetType) {
             'content' => ContentsTable::class,
-            'media' => MediaTable::class,
             'page' => PagesTable::class,
         };
 
@@ -166,13 +143,11 @@ describe('layout', function () use ($types): void {
         $site = Site::factory()->create();
         $records = match ($assetType) {
             'content' => Content::factory()->recycle($site)->count(4)->create(),
-            'media' => Media::factory()->recycle($site)->count(4)->create(),
             'page' => Page::factory()->recycle($site)->count(4)->create(),
         };
 
         $component = match ($assetType) {
             'content' => ContentsTable::class,
-            'media' => MediaTable::class,
             'page' => PagesTable::class,
         };
 
@@ -201,28 +176,6 @@ describe('layout', function () use ($types): void {
 });
 
 describe('page layout', function () use ($types): void {
-    test('media assets table can be selected', function (): void {
-        $layout = (new LayoutFactory)->containers()->create();
-        $containerKey = array_key_first($layout->containers);
-        $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-
-        $page = Page::factory()->layout($layout)->create();
-
-        $media = Media::factory()->count(4)->create();
-
-        livewire(MediaTable::class, [
-            'actionId' => 'select-assets',
-            'containerKey' => $containerKey,
-            'pageId' => $page->id,
-            'siteId' => $page->site_id,
-            'widgetIndex' => $widgetIndex,
-            'hasPageAssets' => true,
-        ])
-            ->assertSuccessful()
-            ->assertCountTableRecords(4)
-            ->assertCanSeeTableRecords($media);
-    });
-
     test('page assets table can be selected', function (): void {
         $layout = (new LayoutFactory)->containers()->create();
         $containerKey = array_key_first($layout->containers);
@@ -272,13 +225,11 @@ describe('page layout', function () use ($types): void {
 
         $records = match ($assetType) {
             'content' => Content::factory()->count(4)->create(),
-            'media' => Media::factory()->count(4)->create(),
             'page' => Page::factory()->count(4)->create(),
         };
 
         $component = match ($assetType) {
             'content' => ContentsTable::class,
-            'media' => MediaTable::class,
             'page' => PagesTable::class,
         };
 

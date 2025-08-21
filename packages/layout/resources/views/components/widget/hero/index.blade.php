@@ -5,10 +5,10 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Awcodes\Curator\Models\Media;
     use Capell\Frontend\Actions\ReplacePageDataAction;
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Services\Loader\PageLoader;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     $page = Frontend::getPage();
     $pageParams = Frontend::getPageParams();
@@ -51,7 +51,7 @@ declare(strict_types=1);
     ])
 >
     <x-capell-layout::hero.wrapper
-        :key="$containerKey.'-widget-'.$widgetIndex"
+        :key="$containerKey . '-widget-' . $widgetIndex"
         :total="$total"
         :carousel-arrows="$widget->meta['carousel_arrows'] ?? false"
         :carousel-auto="$widget->meta['carousel_auto'] ?? true"
@@ -201,7 +201,7 @@ declare(strict_types=1);
                                 <x-capell-layout::hero.related
                                     class="w-full"
                                     :features="$asset->related"
-                                    :key="$containerKey.'-widget-'.$widgetIndex.'-features'"
+                                    :key="$containerKey . '-widget-' . $widgetIndex . '-features'"
                                 />
                             @endif
 

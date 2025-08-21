@@ -120,7 +120,6 @@ class DemoCommand extends Command
 
     public function createDemoLayouts(Site $site): bool
     {
-
         $this->newLine();
         $this->line('Setting up homepage extras for site: ' . $site->name);
 
@@ -216,12 +215,13 @@ class DemoCommand extends Command
                 'spacing' => 'none',
                 'html_class' => 'relative',
                 'background_color' => 'light-gray',
-                'background_image_id' => $this->demoCreator->getExampleMedia()?->id,
             ],
             'widgets' => [
                 ['widget_key' => $this->demoCreator->createSplitContentWidget($languages)->key],
             ],
         ];
+
+        app(\Capell\Admin\Services\Creator\DemoCreator::class)->createMedia($layout, collection: 'split-two-background');
 
         $layout->containers = $containers;
         $layout->update(['containers' => $containers]);

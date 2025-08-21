@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Livewire\Assets\Table;
 
-use Capell\Admin\Filament\Components\Tables\Columns\CuratorColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeNameColumn;
@@ -14,6 +13,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Filament\Components\Tables\Columns\Content\ContentNameColumn;
 use Capell\Layout\Filament\Resources\ContentResource;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -63,8 +63,9 @@ class ContentsTable extends AbstractAssetsTable
                 ->label(__('capell-admin::table.tags'))
                 ->type(TagTypeEnum::CONTENT->value)
                 ->toggleable(isToggledHiddenByDefault: true),
-            CuratorColumn::make('meta.image')
-                ->relationship('image')
+            SpatieMediaLibraryImageColumn::make('image')
+                ->label(__('capell-admin::table.image'))
+                ->collection('image')
                 ->toggleable(),
         ];
     }

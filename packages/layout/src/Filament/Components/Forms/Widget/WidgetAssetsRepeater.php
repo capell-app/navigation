@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Components\Forms\Widget;
 
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
+use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
-use Capell\Core\Models\Media;
+use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Models\Page;
 use Capell\Layout\Filament\Components\Forms\AssetTypeToggleButtons;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSelect;
@@ -20,8 +20,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class WidgetAssetsRepeater
 {
@@ -73,7 +72,6 @@ class WidgetAssetsRepeater
                             }
 
                             $resource = match ($itemState['asset_type']) {
-                                'media' => is_array($assetId) ? reset($assetId)['id'] : Media::find($assetId),
                                 'page' => Page::find($assetId),
                                 'content' => Content::find($assetId),
                             };
@@ -112,13 +110,7 @@ class WidgetAssetsRepeater
                     $set('asset_id', null);
                 }),
             Group::make()
-                ->visible(fn (Get $get): bool => $get('asset_type') === 'media')
-                ->schema([
-                    ImageMediaPicker::make('asset_id')
-                        ->required(),
-                ]),
-            Group::make()
-                ->visible(fn (Get $get): bool => $get('asset_type') === 'page')
+                ->visible(fn (Get $get): bool => $get('asset_type') === AssetEnum::Page->value)
                 ->schema([
                     PageSelect::make('asset_id')
                         ->required()
@@ -126,7 +118,7 @@ class WidgetAssetsRepeater
                         ->withEditForm(),
                 ]),
             Group::make()
-                ->visible(fn (Get $get): bool => $get('asset_type') === 'content')
+                ->visible(fn (Get $get): bool => $get('asset_type') === \Capell\Layout\Enums\AssetEnum::Content->value)
                 ->schema([
                     ContentSelect::make('asset_id')
                         ->required()
@@ -142,41 +134,13 @@ class WidgetAssetsRepeater
             Group::make()
                 ->schema([
                     match ($record->asset_type) {
-                        'media' => ImageMediaPicker::make('asset_id')
-                            ->required()
-                            ->afterStateHydrated(static function (ImageMediaPicker $component, array|int|string|null $state): void {
-                                if (blank($state)) {
-                                    $component->state([]);
-
-                                    return;
-                                }
-
-                                $items = [];
-
-                                $state = is_array($state) ? array_values($state) : $state;
-
-                                if (is_array($state) && isset($state[0]['id'])) {
-                                    $media = $state;
-                                } elseif (isset($state['id'])) {
-                                    $media = [$state];
-                                } else {
-                                    $state = Arr::wrap($state);
-
-                                    // @custom
-                                    $media = Media::query()->where('id', $state)->get()->toArray();
-                                }
-
-                                foreach ($media as $itemData) {
-                                    $items[(string) Str::uuid()] = $itemData;
-                                }
-
-                                $component->state($items);
-                            }),
-                        'page' => PageSelect::make('asset_id')
+                        AssetEnum::Media->value => ImageFileUpload::make('asset_id')
+                            ->required(),
+                        AssetEnum::Page->value => PageSelect::make('asset_id')
                             ->required()
                             ->withCreateForm()
                             ->withEditForm(),
-                        'content' => ContentSelect::make('asset_id')
+                        \Capell\Layout\Enums\AssetEnum::Content->value => ContentSelect::make('asset_id')
                             ->required()
                             ->withCreateForm()
                             ->withEditForm(),

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Schemas\Widget;
 
-use Capell\Admin\Actions\FixCuratorMetaDataAction;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageMediaPicker;
+use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
@@ -118,19 +117,8 @@ class AssetsWidgetSchema extends AbstractWidgetSchema
         return WidgetDisplayTab::make([
             Grid::make()
                 ->statePath('meta')
-                ->mutateDehydratedStateUsing(function (array $state): array {
-                    if (! empty($state['background_image_id'])) {
-                        $state['background_image_id'] = FixCuratorMetaDataAction::run($state['background_image_id']);
-                    }
-
-                    if (! empty($state['image_id'])) {
-                        $state['image_id'] = FixCuratorMetaDataAction::run($state['image_id']);
-                    }
-
-                    return $state;
-                })
                 ->schema([
-                    ImageMediaPicker::make('image_id'),
+                    ImageFileUpload::make('image'),
                     WidgetDisplaySection::make([
                         ColorSchemeComponent::make('color_scheme'),
                     ]),
