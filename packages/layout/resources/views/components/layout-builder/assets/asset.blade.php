@@ -159,16 +159,7 @@ declare(strict_types=1);
                 @if ($mediaCount || $image)
                     <span class="relative">
                         @if ($image)
-                            <x-curator-glider
-                                class="max-h-12 object-contain"
-                                format="webp"
-                                view="capell-admin::components.media.glider"
-                                :media="$image"
-                                :width="80"
-                                :height="80"
-                                fit="fit"
-                                loading="lazy"
-                            />
+                            {{ $image->img('thumb')->lazy()->attributes(['class' => 'ml-auto max-h-12 max-w-12 object-contain']) }}
                         @endif
 
                         @if ($mediaCount)

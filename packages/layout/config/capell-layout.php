@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\Layout\Filament\Resources\PageResource\RelationManagers\ContentsRelationManager;
 use Capell\Layout\Livewire\Assets\Table\ContentsTable;
 use Capell\Layout\Livewire\Assets\Table\PagesTable;
+use Capell\Layout\Livewire\Filament\WidgetAssetsTable;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Livewire\Widget\PagesWidget;
 use Capell\Layout\Models\Content;
@@ -16,15 +17,16 @@ use Capell\Layout\View\Components\Widget\Pages\SiblingsWidget;
 return [
     'assets' => [
         'content' => [
-            'icon' => 'heroicon-o-rectangle-stack',
+            'icon' => 'heroicon-o-gift',
             'model' => Content::class,
         ],
     ],
     'livewire_components' => [
         'capell.layout.livewire.layout-builder' => LayoutBuilder::class,
         'capell.layout.filament.resources.page-resource.relation-managers.contents-relation-manager' => ContentsRelationManager::class,
-        'capell-layout::layout-builder-assets-table-page' => PagesTable::class,
-        'capell-layout::layout-builder-assets-table-content' => ContentsTable::class,
+        'capell-layout::livewire.assets.table.page' => PagesTable::class,
+        'capell-layout::livewire.assets.table.content' => ContentsTable::class,
+        'capell-layout::filament.widget-assets-table' => WidgetAssetsTable::class,
         'capell-layout::livewire.widget.pages' => PagesWidget::class,
     ],
     'blade_components' => [

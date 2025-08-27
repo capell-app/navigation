@@ -6,6 +6,7 @@ namespace Capell\Layout\Filament\Actions\Page;
 
 use Capell\Admin\Filament\Actions\CreateModalAction;
 use Capell\Layout\Actions\MutateContentDataBeforeFillAction;
+use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Model;
 use Override;
 
@@ -15,7 +16,8 @@ class CreateContentModalAction extends CreateModalAction
     {
         parent::setUp();
 
-        $this->slideOver();
+        $this->slideOver()
+            ->modalWidth(Width::ExtraLarge);
     }
 
     #[Override]

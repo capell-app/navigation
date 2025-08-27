@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Schemas\Widget;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\ActionsRepeater;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
@@ -114,7 +114,7 @@ class DefaultWidgetSchema extends AbstractWidgetSchema
             ->schema([
                 Grid::make()
                     ->schema([
-                        ImageFileUpload::make('image')
+                        MediaLibraryFileUpload::make('image')
                             ->label(__('capell-admin::form.image'))
                             ->reactive(),
                         Checkbox::make('reverse_order')

@@ -29,15 +29,9 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
 
     public string $actionId;
 
-    public string $containerKey;
+    public array $arguments = [];
 
     public ?array $existingRecords = [];
-
-    public bool $hasPageAssets;
-
-    public ?int $pageId = null;
-
-    public ?int $siteId = null;
 
     public string $type;
 
@@ -120,10 +114,8 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
     {
         $this->dispatch(
             'sync-selected-assets',
-            containerKey: $this->containerKey,
-            widgetIndex: $this->widgetIndex,
+            arguments: $this->arguments,
             type: $this->type,
-            hasPageAssets: $this->hasPageAssets,
             assets: $livewire->selectedTableRecords,
         )
             ->to(LayoutBuilder::class);

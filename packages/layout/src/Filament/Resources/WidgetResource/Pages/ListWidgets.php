@@ -10,9 +10,13 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
+use Capell\Layout\Filament\Resources\LayoutResource;
 use Capell\Layout\Filament\Resources\WidgetResource;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListWidgets extends ListRecords
@@ -23,6 +27,11 @@ class ListWidgets extends ListRecords
     public static function getResource(): string
     {
         return CapellAdmin::getResource(LayoutResourceEnum::Widget->name);
+    }
+
+    public function getSubheading(): string|Htmlable|null
+    {
+        return __('capell-layout::generic.widgets_subheading');
     }
 
     public function getFilteredTableQuery(): Builder
@@ -47,6 +56,12 @@ class ListWidgets extends ListRecords
         return [
             CreateWidgetModalAction::make()
                 ->redirectAfterCreate(),
+            ActionGroup::make([
+                Action::make('layouts')
+                    ->url(LayoutResource::getUrl())
+                    ->label(LayoutResource::getNavigationLabel())
+                    ->groupedIcon(LayoutResource::getNavigationIcon()),
+            ]),
         ];
     }
 

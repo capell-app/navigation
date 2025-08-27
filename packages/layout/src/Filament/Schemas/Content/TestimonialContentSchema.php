@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Schemas\Content;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\SpatieMediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
@@ -21,7 +21,7 @@ class TestimonialContentSchema extends DefaultContentSchema
     public static function getMetaSchema(): array
     {
         return [
-            SpatieMediaLibraryFileUpload::make('image')
+            MediaLibraryFileUpload::make('image')
                 ->label(__('capell-admin::form.image')),
             Group::make()
                 ->schema([

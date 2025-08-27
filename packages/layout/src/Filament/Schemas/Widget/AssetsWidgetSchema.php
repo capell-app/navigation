@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Schemas\Widget;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetAssetsRepeater;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
+use Capell\Layout\Livewire\Filament\WidgetAssetsTable;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -71,13 +72,8 @@ class AssetsWidgetSchema extends AbstractWidgetSchema
     protected static function getMainSchema(Schema $schema): array
     {
         return [
-            Section::make(__('capell-admin::generic.widget_assets'))
-                ->description(__('capell-admin::generic.widget_assets_info'))
-                ->compact()
-                ->schema([
-                    WidgetAssetsRepeater::make($schema)
-                        ->hiddenLabel(),
-                ]),
+            Livewire::make(WidgetAssetsTable::class, ['schema' => $schema])
+                ->key('widget-assets-table'),
         ];
     }
 
@@ -94,8 +90,8 @@ class AssetsWidgetSchema extends AbstractWidgetSchema
     {
         return Tab::make(__('capell-admin::tab.assets'))
             ->schema([
-                WidgetAssetsRepeater::make($schema)
-                    ->hiddenLabel(),
+                Livewire::make(WidgetAssetsTable::class, ['schema' => $schema])
+                    ->key('widget-assets-table'),
             ]);
     }
 
@@ -118,7 +114,7 @@ class AssetsWidgetSchema extends AbstractWidgetSchema
             Grid::make()
                 ->statePath('meta')
                 ->schema([
-                    ImageFileUpload::make('image'),
+                    MediaLibraryFileUpload::make('image'),
                     WidgetDisplaySection::make([
                         ColorSchemeComponent::make('color_scheme'),
                     ]),

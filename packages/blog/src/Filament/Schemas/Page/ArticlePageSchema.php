@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\Filament\Schemas\Page;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\ImageFileUpload;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\LayoutSelect;
 use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
@@ -75,7 +75,7 @@ class ArticlePageSchema extends DefaultPageSchema
                                     Group::make()
                                         ->statePath('meta')
                                         ->schema([
-                                            ImageFileUpload::make('image'),
+                                            MediaLibraryFileUpload::make('image'),
                                             Select::make('author_id')
                                                 ->label(__('capell-admin::form.author'))
                                                 ->relationship(name: 'author', titleAttribute: 'name')
@@ -107,7 +107,7 @@ class ArticlePageSchema extends DefaultPageSchema
                             Group::make()
                                 ->statePath('meta')
                                 ->schema([
-                                    ImageFileUpload::make('image'),
+                                    MediaLibraryFileUpload::make('image'),
                                     Select::make('author_id')
                                         ->label(__('capell-admin::form.author'))
                                         ->relationship(name: 'author', titleAttribute: 'name')

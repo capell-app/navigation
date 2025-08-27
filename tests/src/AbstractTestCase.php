@@ -25,6 +25,7 @@ use Filament\Schemas\SchemasServiceProvider;
 use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
+use Guava\IconPicker\IconPickerServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application;
@@ -137,6 +138,7 @@ abstract class AbstractTestCase extends TestCase
             NestedSetServiceProvider::class,
             LaravelServiceProvider::class,
             PermissionServiceProvider::class,
+            IconPickerServiceProvider::class,
             RayServiceProvider::class,
             SupportServiceProvider::class,
             SchemasServiceProvider::class,

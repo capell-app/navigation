@@ -11,14 +11,15 @@ use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetAssetsRepeater;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Capell\Layout\Filament\Schemas\AbstractWidgetSchema;
+use Capell\Layout\Livewire\Filament\WidgetAssetsTable;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -42,7 +43,8 @@ class HeroWidgetSchema extends AbstractWidgetSchema
     {
         return [
             CreateWidgetDetailsSchema::make($schema),
-            WidgetAssetsRepeater::make($schema),
+            Livewire::make(WidgetAssetsTable::class, ['schema' => $schema])
+                ->key('widget-assets-table'),
             ...static::getMetaSchema(),
         ];
     }
@@ -53,13 +55,8 @@ class HeroWidgetSchema extends AbstractWidgetSchema
             CreateWidgetDetailsSchema::make($schema),
             FixedWidthSidebar::make()
                 ->mainSchema([
-                    Section::make(__('capell-admin::generic.widget_assets'))
-                        ->description(__('capell-admin::generic.widget_assets_info'))
-                        ->compact()
-                        ->schema([
-                            WidgetAssetsRepeater::make($schema)
-                                ->hiddenLabel(),
-                        ]),
+                    Livewire::make(WidgetAssetsTable::class, ['schema' => $schema])
+                        ->key('widget-assets-table'),
                 ])
                 ->sidebarSchema([
                     Section::make()

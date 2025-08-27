@@ -165,11 +165,15 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     }
 
     #[On('sync-selected-assets')]
-    public function syncSelectedAssets(string $containerKey, int $widgetIndex, string $type, ?bool $hasPageAssets, array $assets): void
+    public function syncSelectedAssets(array $arguments, string $type, array $assets): void
     {
         if (! property_exists($this, 'layout')) {
             return;
         }
+
+        $containerKey = $arguments['containerKey'];
+        $widgetIndex = $arguments['widgetIndex'];
+        $hasPageAssets = $arguments['hasPageAssets'] ?? false;
 
         $this->addAssets($containerKey, $widgetIndex, $hasPageAssets, $type, $assets);
 
@@ -559,7 +563,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 /** @var self $livewire */
                 $livewire = $action->getLivewire();
 
-                $componentName = 'capell-layout::layout-builder-assets-table-' . $arguments['type'];
+                $componentName = 'capell-layout::livewire.assets.table.' . $arguments['type'];
 
                 $totalAssets = $livewire->countWidgetAssets($arguments['containerKey'], $arguments['widgetIndex']);
 
@@ -579,22 +583,20 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 <livewire:is
                     :$actionId
                     :component="$componentName"
-                    :$containerKey
+                    :$arguments
                     :$existingRecords
-                    :$hasPageAssets
-                    :$pageId
-                    :$siteId
-                    :$widgetIndex
                  />
             blade, [
                     'actionId' => $livewire->getId() . '-action',
                     'componentName' => $componentName,
-                    'containerKey' => $arguments['containerKey'],
+                    'arguments' => [
+                        'containerKey' => $arguments['containerKey'],
+                        'widgetIndex' => $arguments['widgetIndex'],
+                        'pageId' => $livewire->page_id,
+                        'siteId' => $livewire->site_id,
+                    ],
                     'existingRecords' => $existingRecords,
                     'hasPageAssets' => $hasPageAssets,
-                    'pageId' => $livewire->page_id,
-                    'siteId' => $livewire->site_id,
-                    'widgetIndex' => $arguments['widgetIndex'],
                 ]));
             })
             ->submit(null)

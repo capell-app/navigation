@@ -126,10 +126,12 @@ describe('layout', function () use ($types): void {
             ->assertDispatchedTo(
                 LayoutBuilder::class,
                 'sync-selected-assets',
-                containerKey: $containerKey,
-                widgetIndex: $widgetIndex,
+                arguments: [
+                    'containerKey' => $containerKey,
+                    'widgetIndex' => $widgetIndex,
+                    'hasPageAssets' => false,
+                ],
                 type: $assetType,
-                hasPageAssets: false,
                 assets: $records->pluck('id')->toArray(),
             )
             ->assertDispatched('close-modal', id: 'select-assets');
@@ -165,10 +167,12 @@ describe('layout', function () use ($types): void {
             ->assertDispatchedTo(
                 LayoutBuilder::class,
                 'sync-selected-assets',
-                containerKey: $containerKey,
-                widgetIndex: $widgetIndex,
+                arguments: [
+                    'containerKey' => $containerKey,
+                    'widgetIndex' => $widgetIndex,
+                    'hasPageAssets' => false,
+                ],
                 type: $assetType,
-                hasPageAssets: false,
                 assets: $records->pluck('id')->toArray(),
             )
             ->assertDispatched('close-modal', id: 'select-assets');
@@ -248,10 +252,12 @@ describe('page layout', function () use ($types): void {
             ->assertDispatchedTo(
                 LayoutBuilder::class,
                 'sync-selected-assets',
-                containerKey: $containerKey,
-                widgetIndex: $widgetIndex,
+                arguments: [
+                    'containerKey' => $containerKey,
+                    'widgetIndex' => $widgetIndex,
+                    'hasPageAssets' => true,
+                ],
                 type: $assetType,
-                hasPageAssets: true,
                 assets: $records->pluck('id')->toArray(),
             )
             ->assertDispatched('close-modal', id: 'select-assets');

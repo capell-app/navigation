@@ -11,6 +11,7 @@ use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateContentModalAction;
 use Capell\Layout\Filament\Resources\ContentResource;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ListContents extends ListRecords
 {
@@ -23,6 +24,11 @@ class ListContents extends ListRecords
     public static function getResource(): string
     {
         return CapellAdmin::getResource(LayoutResourceEnum::Content->name);
+    }
+
+    public function getSubheading(): string|Htmlable|null
+    {
+        return __('capell-layout::generic.contents_subheading');
     }
 
     protected function getActions(): array

@@ -10,8 +10,9 @@ use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\Content\RelatedRepeater;
 use Capell\Layout\Filament\Schemas\AbstractWidgetAssetSchema;
-use Filament\Forms\Components\Hidden;
+use Capell\Layout\Livewire\Filament\WidgetAssetsTable;
 use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
@@ -31,7 +32,7 @@ class HeroWidgetAssetSchema extends AbstractWidgetAssetSchema
                     Tabs::make()
                         ->columnSpanFull()
                         ->tabs([
-                            self::getMediaTab(),
+                            self::getMediaTab($schema),
                             self::getRelatedTab(),
                             self::getActionsTab(),
                             self::getSettingsTab(),
@@ -52,15 +53,15 @@ class HeroWidgetAssetSchema extends AbstractWidgetAssetSchema
             ]);
     }
 
-    protected static function getMediaTab(): Tab
+    protected static function getMediaTab(Schema $schema): Tab
     {
         return Tab::make('media')
             ->label(__('capell-admin::generic.media'))
             ->badge(fn (Get $get): ?int => count($get('media') ?: []) ?: null)
             ->icon('heroicon-o-photo')
             ->schema([
-                Hidden::make('image_id'),
-                // TODO media repeater
+                Livewire::make(WidgetAssetsTable::class, ['schema' => $schema, 'withHeading' => false])
+                    ->key('widget-assets-table'),
             ]);
     }
 

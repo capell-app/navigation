@@ -89,8 +89,16 @@ declare(strict_types=1);
     <div class="flex">
         <div
             class="group/widget layout-builder-widget-heading !lg:px-4 flex flex-1 items-center gap-4 px-4 py-3 group-[&:last-child]:rounded-b-lg"
+            :class="{
+                'pb-3' : ! isCollapsed,
+                @if ($assetTypes)
+                    'cursor-pointer
+                    '
+                    : !
+                    isReordering,
+                @endif
+            }"
             @if ($assetTypes)
-                :class="!isReordering ? 'cursor-pointer' : ''"
                 x-on:click.self="! isReordering ? toggleCollapse() : null"
             @endif
         >
@@ -163,7 +171,7 @@ declare(strict_types=1);
                 @endif
 
                 @if ($image)
-                    {{ $image->img('thumb')->lazy()->attributes(['class' => 'ml-auto max-h-12 object-contain']) }}
+                    {{ $image->img('thumb')->lazy()->attributes(['class' => 'ml-auto max-h-12 max-w-12 object-contain']) }}
                 @endif
             </div>
 

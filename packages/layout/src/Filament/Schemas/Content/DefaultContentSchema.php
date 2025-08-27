@@ -7,8 +7,8 @@ namespace Capell\Layout\Filament\Schemas\Content;
 use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
-use Capell\Admin\Filament\Components\Forms\SpatieMediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
@@ -30,7 +30,7 @@ class DefaultContentSchema extends AbstractContentSchema
         return [
             IconPicker::make('icon')
                 ->label(__('capell-admin::form.icon')),
-            SpatieMediaLibraryFileUpload::make('image')
+            MediaLibraryFileUpload::make('image')
                 ->label(__('capell-admin::form.image')),
             CustomColorInput::make(
                 name: 'color',
@@ -106,6 +106,7 @@ class DefaultContentSchema extends AbstractContentSchema
     {
         return Tab::make(__('capell-admin::tab.settings'))
             ->icon('heroicon-m-cog-6-tooth')
+            ->columns()
             ->schema([
                 ...ContentDetailsSchema::make($schema),
                 ...ContentSettingsSchema::make($schema),

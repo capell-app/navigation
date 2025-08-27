@@ -6,7 +6,7 @@ namespace Capell\Layout\Filament\Components\Forms\Widget;
 
 use Capell\Admin\Filament\Components\Forms\AssetTypeSelect;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
-use Capell\Admin\Filament\Components\Forms\ImageUpload;
+use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\SchemaSelect;
 use Capell\Layout\Enums\SchemaEnum;
 use Capell\Layout\Filament\Schemas\Widget\DefaultWidgetSchema;
@@ -29,7 +29,7 @@ class WidgetAdminSchema
             IconPicker::make('icon')
                 ->label(__('capell-admin::form.admin_icon')),
 
-            ImageUpload::make('image')
+            MediaLibraryFileUpload::make('image')
                 ->directory('widgets'),
 
             Fieldset::make(__('capell-admin::generic.assets'))

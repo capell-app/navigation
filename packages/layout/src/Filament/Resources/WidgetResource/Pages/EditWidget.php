@@ -14,7 +14,6 @@ use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
 use Capell\Layout\Filament\Resources\WidgetResource;
 use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\LayoutsRelationManager;
-use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\WidgetAssetsRelationManager;
 use Capell\Layout\Models\Widget;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
@@ -46,11 +45,9 @@ class EditWidget extends EditRecord implements PageCacheNotifiable
     {
         $relationManagers = $this->getTypeRelationManagers();
 
-        if (! in_array(WidgetAssetsRelationManager::class, $relationManagers, true)) {
-            $relationManagers[] = WidgetAssetsRelationManager::class;
+        if (! in_array(LayoutsRelationManager::class, $relationManagers, true)) {
+            $relationManagers[] = LayoutsRelationManager::class;
         }
-
-        $relationManagers[] = LayoutsRelationManager::class;
 
         return $relationManagers;
     }

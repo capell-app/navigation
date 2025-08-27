@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources;
 
-use BackedEnum;
 use Capell\Admin\Filament\Components\Forms\Type\TypeSchema;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
@@ -26,7 +25,6 @@ use Capell\Layout\Filament\Resources\WidgetResource\Pages\CreateWidget;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\WidgetResource\Pages\ListWidgets;
 use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\LayoutsRelationManager;
-use Capell\Layout\Filament\Resources\WidgetResource\RelationManagers\WidgetAssetsRelationManager;
 use Capell\Layout\Filament\Schemas\Widget\DefaultWidgetSchema;
 use Capell\Layout\Models\Widget;
 use Filament\Actions\ActionGroup;
@@ -54,11 +52,9 @@ use Illuminate\Support\Str;
 
 class WidgetResource extends Resource
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-gift';
-
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function getResourceType(): string
     {
@@ -80,7 +76,7 @@ class WidgetResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return (string) (__('capell-admin::navigation.group_resources'));
+        return (string) (__('capell-admin::navigation.group_layouts'));
     }
 
     public static function getNavigationBadge(): ?string
@@ -95,6 +91,11 @@ class WidgetResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('capell-admin::generic.widgets');
+    }
+
+    public static function getNavigationIcon(): string
+    {
+        return config('capell-admin.resources.widgets.navigation_icon', 'heroicon-o-gift');
     }
 
     public static function getGloballySearchableAttributes(): array
@@ -170,7 +171,6 @@ class WidgetResource extends Resource
     public static function getRelations(): array
     {
         return [
-            WidgetAssetsRelationManager::class,
             LayoutsRelationManager::class,
         ];
     }

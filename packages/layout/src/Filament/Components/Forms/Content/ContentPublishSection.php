@@ -4,111 +4,20 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms\Content;
 
-use Capell\Admin\Filament\Components\Forms\PublishDates;
+use Capell\Admin\Filament\Components\Forms\PublishSection;
 use Capell\Layout\Models\Content;
-use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Size;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
-use Illuminate\Support\HtmlString;
 
-class ContentPublishSection extends Section
+class ContentPublishSection extends PublishSection
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->heading(__('capell-admin::generic.publish_settings'))
-            ->icon(fn (Get $get, ?Content $record): string => match (true) {
-                $get('publish_from') && Carbon::parse($get('publish_from'))->isFuture(),
-                $get('publish_to') && Carbon::parse($get('publish_to'))->isPast() => 'heroicon-c-eye-slash',
-                default => 'heroicon-c-eye',
-            })
-            ->iconColor(fn (Get $get, ?Content $record): string => match (true) {
-                $get('publish_from') && Carbon::parse($get('publish_from'))->isFuture(),
-                $get('publish_to') && Carbon::parse($get('publish_to'))->isPast() => 'warning',
-                default => 'success',
-            })
-            ->collapsible()
-            ->collapsed(function (Get $get): bool {
-                $publishFrom = $get('publish_from');
-                if ($publishFrom && Carbon::parse($publishFrom)->isFuture()) {
-                    return false;
-                }
-
-                $publishTo = $get('publish_to');
-
-                return ! $publishTo || Carbon::parse($publishTo)->isPast();
-            })
-            ->schema(function (?Content $record): array {
-                if (! $record instanceof Content) {
-                    return [];
-                }
-
-                return [
-                    $this->modifiedDatePlaceholder(),
-                    PublishDates::make(),
-                ];
-            })
-            ->footerActions([
-                $this->unpublishAction(),
-                $this->revisionsAction(),
-            ]);
-    }
-
-    private function countDrafts(?Content $record): int
-    {
-        if (! $record instanceof Content) {
-            return 0;
-        }
-
-        if ($record->getAttributeValue('revisions_count') === null) {
-            $record->loadCount(['revisions']);
-        }
-
-        return $record->revisions_count;
-    }
-
-    private function modifiedDatePlaceholder(): TextEntry
-    {
-        return TextEntry::make('modified-date')
-            ->label(__('capell-admin::generic.last_updated'))
-            ->hiddenLabel()
-            ->visibleOn('edit')
-            ->state(function (?Content $record): ?HtmlString {
-                $contents = [
-                    __('capell-admin::generic.created_by_at', [
-                        'name' => $record->creator?->name,
-                        'date' => $record->created_at?->diffForHumans(),
-                    ]),
-                ];
-
-                if ($record->created_at->midDay()->notEqualTo($record->updated_at->midDay())) {
-                    $contents[] = __('capell-admin::generic.updated_by_at', [
-                        'name' => $record->editor?->name,
-                        'date' => $record->updated_at?->diffForHumans(),
-                    ]);
-                }
-
-                if ($record->isPublished()) {
-                    $contents[] = __('capell-admin::generic.published_by_at', [
-                        'name' => $record->publisher?->name,
-                        'date' => $record->published_at?->diffForHumans(),
-                    ]);
-                }
-
-                return new HtmlString('<p class="leading-tight">' . implode('</p><p class="leading-tight mt-4">', $contents) . '</p>');
-            });
-    }
-
-    private function revisionsAction(): Action
+    protected function revisionsAction(): Action
     {
         return Action::make('revisions')
             ->label(__('capell-admin::button.draft_revisions'))
@@ -196,7 +105,7 @@ class ContentPublishSection extends Section
             ->modalSubmitAction(false);
     }
 
-    private function unpublishAction(): Action
+    protected function unpublishAction(): Action
     {
         return Action::make('unpublish')
             ->label(__('capell-admin::button.unpublish'))
