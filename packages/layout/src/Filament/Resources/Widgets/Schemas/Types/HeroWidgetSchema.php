@@ -7,7 +7,7 @@ namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types;
 use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
-use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\CarouselSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
@@ -31,7 +31,7 @@ class HeroWidgetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    protected static string $schemaType = SchemaEnum::Widget->value;
+    protected static string $schemaType = SchemaTypeEnum::Widget->value;
 
     public static function make(Schema $schema): array
     {

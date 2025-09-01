@@ -15,6 +15,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\PublishStatusColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeNameColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
+use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Enums\TagTypeEnum;
 use Capell\Core\Facades\CapellCore;
@@ -41,15 +42,16 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class ContentsTable
+class ContentsTable implements TableConfigurator
 {
-    public static function configure($table)
+    public static function configure(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(

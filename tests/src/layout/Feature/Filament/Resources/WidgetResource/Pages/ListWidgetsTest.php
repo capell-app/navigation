@@ -61,7 +61,7 @@ test('can sort widgets', function (): void {
 test('can replicate widget', function (): void {
     $widget = Widget::factory()->create();
 
-    $name = fake()->unique()->name;
+    $name = fake()->unique()->name();
 
     livewire(ListWidgets::class)
         ->assertSuccessful()

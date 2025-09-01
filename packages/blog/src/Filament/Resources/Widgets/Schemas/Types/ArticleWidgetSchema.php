@@ -15,7 +15,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 
-class ArticleDefaultWidgetSchema extends DefaultWidgetSchema
+class ArticleWidgetSchema extends DefaultWidgetSchema
 {
     protected static function getFormSchema(Schema $schema): array
     {

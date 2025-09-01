@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use RectorLaravel\Rector\PropertyFetch\ReplaceFakerPropertyFetchWithMethodCallRector;
 use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
@@ -29,6 +30,9 @@ return RectorConfig::configure()
         symfonyConfigs: true,
     )
     ->withPhpSets(php84: true)
+    ->withRules([
+        ReplaceFakerPropertyFetchWithMethodCallRector::class,
+    ])
     ->withSets([
         LaravelLevelSetList::UP_TO_LARAVEL_120,
     ]);

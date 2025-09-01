@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Widgets\Pages;
 
+use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Concerns\ApplySearchRelationsTable;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutResourceEnum;
 use Capell\Layout\Filament\Actions\Page\CreateWidgetModalAction;
-use Capell\Layout\Filament\Resources\WidgetResource\Pages\LayoutResource;
 use Capell\Layout\Filament\Resources\Widgets\WidgetResource;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -53,14 +53,16 @@ class ListWidgets extends ListRecords
 
     protected function getActions(): array
     {
+        $layoutResource = CapellAdmin::getResource(ResourceEnum::Layout);
+
         return [
             CreateWidgetModalAction::make()
                 ->redirectAfterCreate(),
             ActionGroup::make([
                 Action::make('layouts')
-                    ->url(LayoutResource::getUrl())
-                    ->label(LayoutResource::getNavigationLabel())
-                    ->groupedIcon(LayoutResource::getNavigationIcon()),
+                    ->url($layoutResource::getUrl())
+                    ->label($layoutResource::getNavigationLabel())
+                    ->groupedIcon($layoutResource::getNavigationIcon()),
             ]),
         ];
     }

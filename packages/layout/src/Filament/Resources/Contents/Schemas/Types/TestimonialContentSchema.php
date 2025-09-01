@@ -28,7 +28,7 @@ class TestimonialContentSchema extends DefaultContentSchema
         };
     }
 
-    public static function getMetaSchema(): array
+    protected static function getMetaSchema(): array
     {
         return [
             MediaLibraryFileUpload::make('image')

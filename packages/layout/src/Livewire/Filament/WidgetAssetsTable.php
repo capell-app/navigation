@@ -11,7 +11,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Enums\WidgetAssetSchemaEnum;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
@@ -263,7 +263,7 @@ class WidgetAssetsTable extends Component implements HasActions, HasForms, HasTa
             ?? null;
 
         if ($type) {
-            $typeSchema = CapellAdmin::getSchema(SchemaEnum::WidgetAsset->value, $type);
+            $typeSchema = CapellAdmin::getSchema(SchemaTypeEnum::WidgetAsset->value, $type);
 
             return $typeSchema::make($schema);
         }

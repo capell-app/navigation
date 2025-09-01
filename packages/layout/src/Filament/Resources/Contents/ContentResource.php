@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Contents;
 
+use Capell\Admin\Filament\Concerns\HasFormConfigurator;
+use Capell\Admin\Filament\Concerns\HasTableConfigurator;
+use Capell\Admin\Filament\Contracts\FormConfigurator;
+use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutResourceEnum;
@@ -14,8 +18,8 @@ use Capell\Layout\Filament\Resources\Contents\Pages\ListContents;
 use Capell\Layout\Filament\Resources\Contents\RelationManagers\ContentAssetsRelationManager;
 use Capell\Layout\Filament\Resources\Contents\RelationManagers\PagesRelationManager;
 use Capell\Layout\Filament\Resources\Contents\RelationManagers\WidgetsRelationManager;
-use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetForm;
-use Capell\Layout\Filament\Resources\Widgets\Tables\WidgetsTable;
+use Capell\Layout\Filament\Resources\Contents\Schemas\ContentForm;
+use Capell\Layout\Filament\Resources\Contents\Tables\ContentsTable;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Contracts\HasTable;
@@ -25,18 +29,32 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContentResource extends Resource
 {
+    use HasFormConfigurator;
+    use HasTableConfigurator;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 1;
 
-    public static function getResourceType(): string
-    {
-        return LayoutResourceEnum::Content->name;
-    }
+    /** @var class-string<FormConfigurator> */
+    protected static string $formConfigurator = ContentForm::class;
+
+    /** @var class-string<TableConfigurator> */
+    protected static string $tableConfigurator = ContentsTable::class;
 
     public static function form(Schema $schema): Schema
     {
-        return WidgetForm::configure($schema);
+        return static::getFormConfigurator()::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return static::getTableConfigurator()::configure($table);
+    }
+
+    public static function getResourceType(): string
+    {
+        return LayoutResourceEnum::Content->name;
     }
 
     public static function getEloquentQuery(): Builder
@@ -103,11 +121,6 @@ class ContentResource extends Resource
             WidgetsRelationManager::class,
             PagesRelationManager::class,
         ];
-    }
-
-    public static function table(Table $table): Table
-    {
-        return WidgetsTable::configure($table);
     }
 
     public static function getSiteId(HasTable $livewire)

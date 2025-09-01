@@ -28,12 +28,12 @@ class ContentFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->sentence,
+            'name' => fake()->sentence(),
             'parent_id' => null,
             'type_id' => (new ContentTypeFactory),
             'site_id' => null,
             'meta' => fn (array $attributes): array => [
-                'label' => fake()->optional()->sentence,
+                'label' => fake()->optional()->sentence(),
                 'page_id' => fake()->optional() && $attributes['site_id'] ? Page::where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
             ],
             'order' => fake()->numberBetween(1, 100),

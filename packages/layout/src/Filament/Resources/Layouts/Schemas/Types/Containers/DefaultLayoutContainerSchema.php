@@ -6,7 +6,7 @@ namespace Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Containers;
 
 use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
-use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\ColumnInput;
 use Capell\Layout\Filament\Components\Forms\ContainerWidthSelect;
@@ -24,7 +24,7 @@ class DefaultLayoutContainerSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    protected static string $schemaType = SchemaEnum::LayoutContainer->value;
+    protected static string $schemaType = SchemaTypeEnum::LayoutContainer->value;
 
     public static function make(Schema $schema): array
     {

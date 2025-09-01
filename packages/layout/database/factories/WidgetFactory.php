@@ -27,7 +27,7 @@ class WidgetFactory extends Factory
 
         return [
             'name' => $name,
-            'key' => fake()->unique()->slug,
+            'key' => fake()->unique()->slug(),
             'type_id' => fn () => Type::factory()
                 ->type(LayoutTypeEnum::Widget->value)
                 ->state(

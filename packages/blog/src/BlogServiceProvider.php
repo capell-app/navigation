@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog;
 
 use Capell\Admin\Enums\ResourceEnum;
-use Capell\Admin\Enums\SchemaEnum;
+use Capell\Admin\Enums\SchemaTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Blog\Actions\InstallBlogPackageAction;
 use Capell\Blog\Commands\DemoCommand;
@@ -14,7 +14,7 @@ use Capell\Blog\Enums\BlogResourceEnum;
 use Capell\Blog\Enums\WidgetComponentEnum;
 use Capell\Blog\Filament\Resources\Articles\ArticleResource;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
-use Capell\Blog\Filament\Resources\Widgets\Schemas\Types\ArticleDefaultWidgetSchema;
+use Capell\Blog\Filament\Resources\Widgets\Schemas\Types\ArticleWidgetSchema;
 use Capell\Blog\Listeners\AddBlogPagesToNavigation;
 use Capell\Blog\Models\Article;
 use Capell\Blog\Services\BlogCreator;
@@ -25,6 +25,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Composer\InstalledVersions;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
@@ -51,6 +52,10 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
                 self::$name => fn () => InstalledVersions::getPrettyVersion('capell-app/blog'),
             ]);
         }
+
+        Relation::morphMap([
+            'article' => Article::class,
+        ]);
 
         Event::listen(
             NavigationCreating::class,
@@ -112,9 +117,9 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
         CapellCore::registerComponents(ComponentTypeEnum::Widget->value, WidgetComponentEnum::cases());
 
-        CapellAdmin::registerSchema(SchemaEnum::Page, ArticlePageSchema::class);
+        CapellAdmin::registerSchema(SchemaTypeEnum::Page, ArticlePageSchema::class);
 
-        CapellAdmin::registerSchema(\Capell\Layout\Enums\SchemaEnum::Widget->value, ArticleDefaultWidgetSchema::class);
+        CapellAdmin::registerSchema(\Capell\Layout\Enums\SchemaTypeEnum::Widget->value, ArticleWidgetSchema::class);
 
         CapellCore::registerModel(BlogModelEnum::Article, Article::class);
 

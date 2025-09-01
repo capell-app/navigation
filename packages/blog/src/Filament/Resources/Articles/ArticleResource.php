@@ -109,7 +109,7 @@ class ArticleResource extends PageResource
     }
 
     #[Override]
-    protected static function applyTypeAdminResourceConstraint(BuilderContract $query, bool $showSystem = false): void
+    public static function applyTypeAdminResourceConstraint(BuilderContract $query, bool $showSystem = false): void
     {
         $query->where('group', BlogTypeGroupEnum::Article);
     }

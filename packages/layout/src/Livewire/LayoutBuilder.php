@@ -18,7 +18,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutModelEnum;
-use Capell\Layout\Enums\SchemaEnum;
+use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Enums\WidgetAssetSchemaEnum;
 use Capell\Layout\Filament\Components\Forms\LayoutBuilder\LayoutBuilderAddWidgetSchema;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Containers\DefaultLayoutContainerSchema;
@@ -391,7 +391,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 fn (array $arguments, self $livewire, Schema $schema): Schema => $schema->operation('editOption')
                     ->schema(
                         CapellAdmin::getSchema(
-                            SchemaEnum::LayoutWidget->value,
+                            SchemaTypeEnum::LayoutWidget->value,
                             $livewire->getContainerWidgetSchema($arguments['containerKey'], $arguments['widgetIndex'])
                         )::make($schema)
                     )
@@ -1508,7 +1508,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     },
                 ]),
             ...CapellAdmin::getSchema(
-                SchemaEnum::LayoutContainer->value,
+                SchemaTypeEnum::LayoutContainer->value,
                 $this->layout->admin['container_schema'][$containerKey] ?? DefaultLayoutContainerSchema::getKey()
             )::make($schema),
         ];
@@ -1523,7 +1523,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ?? null;
 
         if ($type) {
-            $typeSchema = CapellAdmin::getSchema(SchemaEnum::WidgetAsset->value, $type);
+            $typeSchema = CapellAdmin::getSchema(SchemaTypeEnum::WidgetAsset->value, $type);
 
             return $typeSchema::make($schema);
         }
@@ -2160,9 +2160,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ?->admin['type_schema']
             ?? WidgetTypeSchema::getKey();
 
-        $adminSchema = CapellAdmin::getSchema(\Capell\Admin\Enums\SchemaEnum::Type->value, $name);
+        $adminSchema = CapellAdmin::getSchema(\Capell\Admin\Enums\SchemaTypeEnum::Type->value, $name);
 
-        return $schema::make($adminSchema);
+        return $adminSchema::make($schema);
     }
 
     private function createActionRecord(Action $action, array $data): Model

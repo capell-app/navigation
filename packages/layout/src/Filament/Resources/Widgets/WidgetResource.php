@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Widgets;
 
+use Capell\Admin\Filament\Concerns\HasFormConfigurator;
+use Capell\Admin\Filament\Concerns\HasTableConfigurator;
+use Capell\Admin\Filament\Contracts\FormConfigurator;
+use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutResourceEnum;
-use Capell\Layout\Filament\Resources\Contents\Schemas\WidgetForm;
 use Capell\Layout\Filament\Resources\Widgets\Pages\CreateWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\ListWidgets;
 use Capell\Layout\Filament\Resources\Widgets\RelationManagers\LayoutsRelationManager;
+use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetForm;
+use Capell\Layout\Filament\Resources\Widgets\Tables\WidgetsTable;
 use Capell\Layout\Models\Widget;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,9 +26,28 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class WidgetResource extends Resource
 {
+    use HasFormConfigurator;
+    use HasTableConfigurator;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 1;
+
+    /** @var class-string<FormConfigurator> */
+    protected static string $formConfigurator = WidgetForm::class;
+
+    /** @var class-string<TableConfigurator> */
+    protected static string $tableConfigurator = WidgetsTable::class;
+
+    public static function form(Schema $schema): Schema
+    {
+        return static::getFormConfigurator()::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return static::getTableConfigurator()::configure($table);
+    }
 
     public static function getResourceType(): string
     {
@@ -78,16 +102,6 @@ class WidgetResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-    public static function form(Schema $schema): Schema
-    {
-        return WidgetForm::configure($schema);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table;
     }
 
     public static function getRelations(): array
