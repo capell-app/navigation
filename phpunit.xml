@@ -23,15 +23,13 @@
 >
     <testsuites>
         <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/packages/blog/Feature</directory>
-            <directory suffix="Test.php">./tests/packages/layout/Feature</directory>
+            <directory suffix="Test.php">./tests/src/*/Feature</directory>
         </testsuite>
         <testsuite name="Arch">
-            <directory suffix="Test.php">./tests/packages/blog/Arch</directory>
-            <directory suffix="Test.php">./tests/packages/layout/Arch</directory>
+            <directory suffix="Test.php">./tests/src/*/Arch</directory>
         </testsuite>
         <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/packages/layout/Integration</directory>
+            <directory suffix="Test.php">./tests/src/*/Integration</directory>
         </testsuite>
     </testsuites>
     <source>

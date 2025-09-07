@@ -15,6 +15,10 @@ enum WidgetAssetSchemaEnum: string
 
     public static function fromName(string $name): self
     {
+        if (! $name) {
+            throw new InvalidArgumentException('WidgetAssetSchemaEnum name cannot be empty');
+        }
+
         return constant(self::class . ('::' . $name))
             ?? throw new InvalidArgumentException('Invalid WidgetAssetSchemaEnum name: ' . $name);
     }

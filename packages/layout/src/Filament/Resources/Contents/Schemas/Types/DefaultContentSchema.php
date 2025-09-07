@@ -17,11 +17,8 @@ use Capell\Layout\Filament\Components\Forms\Content\ContentPublishSection;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
 use Capell\Layout\Filament\Components\Forms\CustomColorInput;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -45,7 +42,7 @@ class DefaultContentSchema implements TypeSchemaInterface
             IconPicker::make('icon')
                 ->label(__('capell-admin::form.icon')),
             MediaLibraryFileUpload::make('image')
-                ->label(__('capell-admin::form.image')),
+                ->imageDefaults(),
             CustomColorInput::make(
                 name: 'color',
                 label: __('capell-admin::form.color'),
@@ -64,16 +61,13 @@ class DefaultContentSchema implements TypeSchemaInterface
     protected static function getOptionFormSchema(Schema $schema): array
     {
         return [
-            Grid::make()
-                ->hiddenOn(['edit', 'editOption'])
-                ->columnSpanFull()
-                ->schema(ContentDetailsSchema::make($schema)),
-            Tabs::make()
-                ->columnSpanFull()
-                ->schema([
-                    self::translationsTab($schema),
-                    self::settingsTab($schema),
-                ]),
+            ...ContentDetailsSchema::make($schema),
+            ContentTranslationsRepeater::make($schema)
+                ->hiddenLabel(),
+            ...ContentSettingsSchema::make($schema),
+            MediaLibraryFileUpload::make('image')
+                ->imageDefaults(),
+            ContentPublishSection::make(),
         ];
     }
 
@@ -105,27 +99,5 @@ class DefaultContentSchema implements TypeSchemaInterface
                     ContentPublishSection::make(),
                 ]),
         ];
-
-    }
-
-    protected static function settingsTab(Schema $schema): Tab
-    {
-        return Tab::make(__('capell-admin::tab.settings'))
-            ->icon('heroicon-m-cog-6-tooth')
-            ->columns()
-            ->schema([
-                ...ContentDetailsSchema::make($schema),
-                ...ContentSettingsSchema::make($schema),
-                ContentPublishSection::make(),
-            ]);
-    }
-
-    private static function translationsTab(Schema $schema): Tab
-    {
-        return Tab::make(__('capell-admin::tab.content'))
-            ->schema([
-                ContentTranslationsRepeater::make($schema)
-                    ->hiddenLabel(),
-            ]);
     }
 }

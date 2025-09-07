@@ -99,6 +99,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
     protected static function getContentTab(Schema $schema): Tab
     {
         return Tab::make(__('capell-admin::tab.content'))
+            ->icon('heroicon-o-language')
             ->schema([
                 WidgetTranslationsRepeater::make($schema),
             ]);
@@ -115,7 +116,8 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
             Grid::make()
                 ->statePath('meta')
                 ->schema([
-                    MediaLibraryFileUpload::make('image'),
+                    MediaLibraryFileUpload::make('image')
+                        ->imageDefaults(),
                     WidgetDisplaySection::make([
                         ColorSchemeComponent::make('color_scheme'),
                     ]),

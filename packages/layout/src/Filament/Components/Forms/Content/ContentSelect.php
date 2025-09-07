@@ -131,7 +131,7 @@ class ContentSelect extends Select
                                 ->where('type', LayoutTypeEnum::Content)
                                 ->default()
                                 ->value('id'),
-                            'translations' => $site->translations->mapWithKeys(fn ($translation) => [
+                            'translations' => $site->translations->mapWithKeys(fn ($translation): array => [
                                 (string) Str::uuid() => [
                                     'language_id' => $translation->language_id,
                                 ],
@@ -154,7 +154,7 @@ class ContentSelect extends Select
 
     public function withEditForm(): self
     {
-        return $this->editOptionForm(function (mixed $state, Schema $schema): ?Schema {
+        return $this->editOptionForm(function (mixed $state, Schema $schema): \Filament\Schemas\Schema {
             if (! $state) {
                 return $schema;
             }

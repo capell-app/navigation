@@ -64,7 +64,7 @@ class DemoCommand extends Command
                         fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
                     )
                         ->get()
-                        ->mapWithKeys(fn (Site $site) => [$site->id => $site->name])
+                        ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
                         ->toArray(),
                     validate: [
                         'required',

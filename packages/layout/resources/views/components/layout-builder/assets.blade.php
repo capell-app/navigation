@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 ?>
 
-@props(['containerKey', 'hasPageAssets', 'occurrence', 'assets', 'assetsCount', 'widget', 'widgetIndex'])
+@props(['containerKey', 'hasPageAssets', 'occurrence', 'assets', 'assetsCount', 'assetTypes', 'widget', 'widgetIndex'])
 @php
+    use Capell\Core\Facades\CapellCore;
     use Capell\Layout\Models\WidgetAsset;
+    use Filament\Support\Enums\FontWeight;
+    use Filament\Support\Enums\IconPosition;
+    use Filament\Support\Enums\IconSize;
+    use Filament\Support\Enums\Size;
 
     $removeAssetsAction = ($this->removeAssetsAction)([
         'containerKey' => $containerKey,
@@ -15,24 +20,24 @@ declare(strict_types=1);
 @endphp
 
 <div
-    class="layout-builder-widget-assets mx-4 mt-0.5 rounded-lg ring-1 ring-gray-950/5 dark:ring-gray-700"
+    class="layout-builder-widget-assets mx-4 mt-0.5 rounded-lg ring-1 ring-gray-950/10 dark:ring-gray-700"
     x-show="! isCollapsed"
     x-cloak
 >
     @if ($assets?->isNotEmpty())
         <div
-            class="flex items-center justify-between border-b border-black/5 bg-gray-50 px-4 py-2 dark:border-white/10 dark:bg-gray-800"
+            class="flex items-center justify-between rounded-t-lg border-b border-black/5 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-gray-800"
         >
             <span
                 class="text-sm font-light tracking-tight text-gray-500 dark:text-gray-400"
             >
                 {{ $hasPageAssets ? __('capell-admin::generic.page_widget_assets') : __('capell-admin::generic.widget_assets') }}
             </span>
-            <div>
+            <div class="flex items-center gap-x-3">
                 @if ($assetsCount > 1)
                     <x-filament::link
                         color="gray"
-                        size="xl"
+                        :size="Size::Small"
                         weight="semibold"
                         x-on:click="toggleReorderingResources('{{ $containerKey }}', {{ $widgetIndex }})"
                         x-show="selectedRecords['{{ $containerKey }}'][{{ $widgetIndex }}].length === 0"
@@ -58,11 +63,43 @@ declare(strict_types=1);
                         ></span>
                     </x-filament::link>
                 @endif
+
+                @if ($assetTypes)
+                    <div class="flex flex-wrap justify-end gap-1">
+                        <x-filament::dropdown placement="bottom-end">
+                            <x-slot name="trigger">
+                                <x-filament::link
+                                    :iconSize="IconSize::Small"
+                                    :weight="FontWeight::Medium"
+                                    :size="Size::Small"
+                                    color="primary"
+                                    icon="heroicon-c-plus-circle"
+                                    :outlined="true"
+                                >
+                                    {{ __('capell-admin::button.assets') }}
+                                </x-filament::link>
+                            </x-slot>
+                            @foreach ($assetTypes as $assetType)
+                                <x-filament::dropdown.list>
+                                    <x-filament::dropdown.header
+                                        class="cursor-default font-semibold"
+                                        color="gray"
+                                        :icon="CapellCore::getAsset($assetType)->getIcon()"
+                                    >
+                                        {{ __('capell-admin::button.add_asset_type', ['type' => CapellCore::getAsset($assetType)->getLabel()]) }}
+                                    </x-filament::dropdown.header>
+                                    {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
+                                    {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
+                                </x-filament::dropdown.list>
+                            @endforeach
+                        </x-filament::dropdown>
+                    </div>
+                @endif
             </div>
         </div>
 
         <div
-            class="flex w-full flex-grow flex-wrap items-center justify-between gap-4 px-4 py-3 lg:order-1 lg:w-auto"
+            class="flex w-full flex-grow flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-4 py-3 lg:order-1 lg:w-auto dark:border-gray-700"
             x-show="{{ "selectedRecords['{$containerKey}'][{$widgetIndex}].length" }}"
             x-transition
         >
@@ -107,7 +144,7 @@ declare(strict_types=1);
                     }
                 @endphp
 
-                <x-capell-layout::layout-builder.assets.asset
+                <x-capell-layout::layout-builder.asset
                     :$containerKey
                     :index="$loop->index"
                     :$occurrence

@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Ramsey\Uuid\UuidInterface;
 
@@ -34,6 +35,9 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
     public string $type;
 
     public int $widgetIndex;
+
+    #[Url(as: 'tab')]
+    public ?string $activeTab = null;
 
     abstract protected function getTableQuery(): Builder;
 

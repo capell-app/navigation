@@ -18,10 +18,10 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Override;
 
-class HeroWidgetAssetForm extends DefaultWidgetAssetSchema
+class HeroWidgetAssetForm extends AbstractWidgetAssetSchema
 {
     #[Override]
-    public static function make(Schema $schema): array
+    protected static function getAssetSchema(Schema $schema): array
     {
         return [
             ContentTranslationsRepeater::make($schema, titleRequired: false)

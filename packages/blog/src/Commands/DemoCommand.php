@@ -60,7 +60,7 @@ class DemoCommand extends Command
                     ->limit(10)
                     ->select(['id', 'name'])
                     ->get()
-                    ->mapWithKeys(fn (Site $site) => [$site->id => $site->name])
+                    ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
                     ->toArray(),
                 validate: [
                     'required',

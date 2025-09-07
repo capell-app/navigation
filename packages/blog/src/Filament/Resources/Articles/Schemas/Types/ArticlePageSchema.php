@@ -75,7 +75,8 @@ class ArticlePageSchema extends DefaultPageSchema
                                     Group::make()
                                         ->statePath('meta')
                                         ->schema([
-                                            MediaLibraryFileUpload::make('image'),
+                                            MediaLibraryFileUpload::make('image')
+                                                ->imageDefaults(),
                                             Select::make('author_id')
                                                 ->label(__('capell-admin::form.author'))
                                                 ->relationship(name: 'author', titleAttribute: 'name')
@@ -107,7 +108,8 @@ class ArticlePageSchema extends DefaultPageSchema
                             Group::make()
                                 ->statePath('meta')
                                 ->schema([
-                                    MediaLibraryFileUpload::make('image'),
+                                    MediaLibraryFileUpload::make('image')
+                                        ->imageDefaults(),
                                     Select::make('author_id')
                                         ->label(__('capell-admin::form.author'))
                                         ->relationship(name: 'author', titleAttribute: 'name')

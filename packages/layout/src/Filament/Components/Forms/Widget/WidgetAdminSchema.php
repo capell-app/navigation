@@ -30,7 +30,7 @@ class WidgetAdminSchema
                 ->label(__('capell-admin::form.admin_icon')),
 
             MediaLibraryFileUpload::make('image')
-                ->directory('widgets'),
+                ->imageDefaults(),
 
             Fieldset::make(__('capell-admin::generic.assets'))
                 ->visible(fn (?Widget $record): bool => ! empty($record->type?->admin['asset_types']))

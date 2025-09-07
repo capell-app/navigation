@@ -24,6 +24,7 @@ declare(strict_types=1);
     use Capell\Core\Models\Page;
     use Capell\Layout\Models\Content;
     use Filament\Actions\Action;
+    use Filament\Support\Enums\Size;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     /** @var Action $editWidgetAssetAction */
@@ -63,13 +64,22 @@ declare(strict_types=1);
         default => null,
     };
 
-    if (! $name) {
-        $name = match (get_class($asset)) {
-            Page::class, Content::class => $asset->name,
-            Media::class => $asset->title,
-            default => null,
-        };
+    $label = '';
+
+    $ancestors = $asset->ancestors()->get();
+
+    if ($ancestors->isNotEmpty()) {
+        $label .= $ancestors->pluck('name')
+            ->map(fn ($item) => Str::limit($item, 30))
+            ->implode(' » ')
+            . ' » ';
     }
+
+    if (! $name) {
+        $name = $asset->name;
+    }
+
+    $label .= $name;
 
     if (! $description) {
         $description = match (get_class($asset)) {
@@ -93,7 +103,7 @@ declare(strict_types=1);
     >
         <label
             x-on:click.stop
-            class="group/asset flex h-full w-12 cursor-pointer items-center justify-center pl-2"
+            class="group/asset flex h-full w-14 cursor-pointer items-center justify-center pl-2"
         >
             <x-capell-admin::forms.checkbox
                 class="group-hover/asset:border-primary-500 group/asset-focus:border-primary-500 h-4 w-4 cursor-pointer border-gray-600"
@@ -121,10 +131,10 @@ declare(strict_types=1);
                 x-cloak
             >
                 <x-filament::button
+                    :size="Size::ExtraSmall"
                     class="widget-asset-handle pointer-events-auto"
                     icon="heroicon-o-arrows-up-down"
                     color="primary"
-                    size="sm"
                     label-sr-only
                     outlined
                 />
@@ -140,8 +150,12 @@ declare(strict_types=1);
             <div @class(['py-3', 'lg:col-span-3' => $image])>
                 <div
                     class="group-hover/asset:text-primary-600 dark:group-hover/asset:text-primary-400 line-clamp-1 text-sm font-medium text-gray-800 dark:text-gray-100"
+                    x-tooltip.raw="{{ $editWidgetAssetAction->getTooltip() }}"
                 >
-                    {{ $name }}
+                    {{ $label }}
+
+                    @svg($editWidgetAssetAction->getIcon(),
+                        'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 inline h-4 w-4 align-text-bottom text-gray-400 dark:text-gray-500', )
                 </div>
 
                 @if (! empty($description) && ! $description !== $name)
@@ -210,10 +224,6 @@ declare(strict_types=1);
                         </span>
                     </span>
                 @endif
-
-                @svg($editWidgetAssetAction->getIcon(),
-                    'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 mr-1.5 inline h-5 w-5 text-gray-400 dark:text-gray-500',
-                    ['x-tooltip.raw' => $editWidgetAssetAction->getTooltip()])
             </div>
         </div>
     </div>

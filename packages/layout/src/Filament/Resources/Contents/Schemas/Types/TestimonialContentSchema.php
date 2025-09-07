@@ -32,7 +32,7 @@ class TestimonialContentSchema extends DefaultContentSchema
     {
         return [
             MediaLibraryFileUpload::make('image')
-                ->label(__('capell-admin::form.image')),
+                ->imageDefaults(),
             Group::make()
                 ->schema([
                     TextInput::make('company')

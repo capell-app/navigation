@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types\Assets;
 
-use Capell\Admin\Filament\Resources\Pages\PageResource;
+use Capell\Admin\Enums\SchemaTypeEnum;
+use Capell\Admin\Facades\CapellAdmin;
+use Capell\Layout\Filament\Resources\Contents\Schemas\Types\DefaultContentSchema;
 use Filament\Schemas\Schema;
 use Override;
 
-class PageWidgetAssetForm extends DefaultWidgetAssetSchema
+class PageWidgetAssetForm extends AbstractWidgetAssetSchema
 {
     #[Override]
-    public static function make(Schema $schema): array
+    protected static function getAssetSchema(Schema $schema): array
     {
-        return [
-            self::getAssetFormSchema($schema, PageResource::getFormSchema($schema)),
-        ];
+        $adminSchema = CapellAdmin::getSchema(SchemaTypeEnum::Page, DefaultContentSchema::getKey());
+
+        return app($adminSchema)::make($schema);
     }
 }

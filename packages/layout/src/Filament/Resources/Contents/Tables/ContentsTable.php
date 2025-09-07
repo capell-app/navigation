@@ -262,7 +262,7 @@ class ContentsTable implements TableConfigurator
                                 ->orderBy('_lft')
                                 ->get();
 
-                            return $contents->mapWithKeys(function (Content $content) use ($siteId) {
+                            return $contents->mapWithKeys(function (Content $content) use ($siteId): array {
                                 $label = '';
 
                                 if (! $siteId && $content->site) {

@@ -121,11 +121,11 @@ class DefaultWidgetSchema implements TypeSchemaInterface
                 Grid::make()
                     ->schema([
                         MediaLibraryFileUpload::make('image')
-                            ->label(__('capell-admin::form.image'))
+                            ->imageDefaults()
                             ->reactive(),
                         Checkbox::make('reverse_order')
                             ->label(__('capell-admin::form.reverse_order'))
-                            ->visible(fn (Get $get): bool => (bool) $get('image_id')),
+                            ->visible(fn (Get $get): bool => (bool) $get('image')),
                     ]),
                 Fieldset::make(__('capell-admin::form.actions'))
                     ->schema([

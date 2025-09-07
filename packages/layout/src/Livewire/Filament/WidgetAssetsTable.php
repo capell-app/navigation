@@ -114,7 +114,7 @@ class WidgetAssetsTable extends Component implements HasActions, HasForms, HasTa
                     ->label(__('capell-admin::table.type'))
                     ->sortable()
                     ->alignCenter()
-                    ->getStateUsing(fn (WidgetAsset $record): ?AssetData => CapellCore::getAsset($record->asset_type))
+                    ->getStateUsing(fn (WidgetAsset $record): \Capell\Core\Data\AssetData => CapellCore::getAsset($record->asset_type))
                     ->icon(fn (?AssetData $state): ?string => $state?->getIcon())
                     ->tooltip(fn (?AssetData $state): ?string => $state?->getLabel()),
             ])
@@ -181,7 +181,7 @@ class WidgetAssetsTable extends Component implements HasActions, HasForms, HasTa
     private function addAssetAction(?Widget $widget, AssetData $asset): Action
     {
         return CreateAction::make()
-            ->label(__('capell-admin::button.add_new'))
+            ->label(__('capell-admin::button.add_new_asset'))
             ->icon('heroicon-o-plus-circle')
             ->slideOver()
             ->modal()
@@ -265,7 +265,7 @@ class WidgetAssetsTable extends Component implements HasActions, HasForms, HasTa
         if ($type) {
             $typeSchema = CapellAdmin::getSchema(SchemaTypeEnum::WidgetAsset->value, $type);
 
-            return $typeSchema::make($schema);
+            return app($typeSchema)::make($schema);
         }
 
         $typeSchema = WidgetAssetSchemaEnum::fromName(ucfirst($assetType))->value;

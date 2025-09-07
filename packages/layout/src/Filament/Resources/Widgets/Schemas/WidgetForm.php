@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Widgets\Schemas;
 
 use Capell\Admin\Filament\Components\Forms\Type\TypeSchema;
+use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\SchemaTypeEnum;
@@ -12,9 +13,9 @@ use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\DefaultWidgetSchema;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
-class WidgetForm
+class WidgetForm implements FormConfigurator
 {
-    public static function configure(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema->components(static::getFormSchema($schema))
             ->columns();

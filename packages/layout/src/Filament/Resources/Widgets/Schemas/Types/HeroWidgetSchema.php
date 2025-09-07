@@ -79,6 +79,7 @@ class HeroWidgetSchema implements TypeSchemaInterface
             ->columnSpanFull()
             ->tabs([
                 Tab::make(__('capell-admin::tab.content'))
+                    ->icon('heroicon-o-language')
                     ->schema([
                         WidgetTranslationsRepeater::make($schema),
                     ]),

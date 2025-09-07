@@ -16,16 +16,15 @@ declare(strict_types=1);
 ])
 @php
     use Capell\Admin\Facades\CapellAdmin;
-    use Capell\Core\Facades\CapellCore;
-    use Capell\Core\Models\Type;
     use Capell\Layout\Enums\LayoutResourceEnum;
-    use Capell\Layout\Models\Content;
-    use Filament\Support\Enums\FontWeight;
+    use Capell\Layout\Livewire\LayoutBuilder;
     use Filament\Support\Enums\IconSize;
     use Filament\Support\Enums\Size;
-    use Illuminate\Support\HtmlString;
     use Illuminate\View\ComponentAttributeBag;
 
+    /**
+     * @var LayoutBuilder $this
+     */
     $occurrence = $containerWidget['occurrence'] ?? 1;
 
     $type = $widget->admin['type'] ?? ($widget->type->admin['type'] ?? []);
@@ -36,7 +35,7 @@ declare(strict_types=1);
 
     $widgetIcon = ! empty($widget->admin['icon'])
         ? $widget->admin['icon']
-        : ($widget->type->admin['icon'] ?? 'heroicon-o-document-text');
+        : ($widget->type->admin['icon'] ?? null);
 
     $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
 
@@ -90,13 +89,8 @@ declare(strict_types=1);
         <div
             class="group/widget layout-builder-widget-heading !lg:px-4 flex flex-1 items-center gap-4 px-4 py-3 group-[&:last-child]:rounded-b-lg"
             :class="{
-                'pb-3' : ! isCollapsed,
-                @if ($assetTypes)
-                    'cursor-pointer
-                    '
-                    : !
-                    isReordering,
-                @endif
+                'pb-1 mb-2 !rounded-b-none' : ! isCollapsed,
+                {{ $assetTypes ? "'cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5' : ! isReordering," : '' }}
             }"
             @if ($assetTypes)
                 x-on:click.self="! isReordering ? toggleCollapse() : null"
@@ -227,38 +221,6 @@ declare(strict_types=1);
                         </x-filament::dropdown>
                     </div>
                 </div>
-
-                @if ($assetTypes)
-                    <div class="flex flex-wrap justify-end gap-1 md:order-1">
-                        <x-filament::dropdown placement="bottom-end">
-                            <x-slot name="trigger">
-                                <x-filament::link
-                                    :iconSize="IconSize::Small"
-                                    :weight="FontWeight::Medium"
-                                    size="xs"
-                                    color="primary"
-                                    icon="heroicon-c-plus-circle"
-                                    :outlined="true"
-                                >
-                                    {{ __('capell-admin::button.assets') }}
-                                </x-filament::link>
-                            </x-slot>
-                            @foreach ($assetTypes as $assetType)
-                                <x-filament::dropdown.list>
-                                    <x-filament::dropdown.header
-                                        class="cursor-default font-semibold"
-                                        color="gray"
-                                        :icon="CapellCore::getAsset($assetType)->getIcon()"
-                                    >
-                                        {{ CapellCore::getAsset($assetType)->getLabel() }}
-                                    </x-filament::dropdown.header>
-                                    {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
-                                    {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
-                                </x-filament::dropdown.list>
-                            @endforeach
-                        </x-filament::dropdown>
-                    </div>
-                @endif
             </div>
         </div>
     </div>
@@ -270,6 +232,7 @@ declare(strict_types=1);
             :$occurrence
             :$assets
             :$assetsCount
+            :$assetTypes
             :$widget
             :$widgetIndex
         />
