@@ -91,7 +91,7 @@ it('can create with translations', function (string $mode): void {
                     (string) Str::uuid() => [
                         'language_id' => $language->getKey(),
                         'title' => $newData->name . ' - ' . $language->name,
-                        'contents' => ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $newData->name . ' - ' . $language->name]]]]],
+                        'contents' => $newData->name . ' - ' . $language->name,
                     ],
                 ]
             )->toArray()

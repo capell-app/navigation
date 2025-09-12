@@ -22,11 +22,29 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 use Wildside\Userstamps\Userstamps;
 
 /**
+ * Capell\Layout\Models\WidgetAsset
+ *
+ * @property int $id
+ * @property string $container
+ * @property int|null $page_id
+ * @property array|null $meta
+ * @property int|null $occurrence
+ * @property int|null $order
+ * @property int|null $asset_id
+ * @property string|null $asset_type
+ * @property int|null $widget_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property int|null $deleted_by
  * @property-read Model|Eloquent $asset
  * @property-read User|null $creator
  * @property-read User|null $destroyer
@@ -38,6 +56,8 @@ use Wildside\Userstamps\Userstamps;
  * @property-read Widget|null $widget
  * @property-read Collection|Content[] $related
  * @property-read int|null $related_count
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
+ * @property-read int|null $media_count
  *
  * @method static WidgetAssetFactory factory($count = null, $state = [])
  * @method static Builder<static>|WidgetAsset newModelQuery()
@@ -45,9 +65,6 @@ use Wildside\Userstamps\Userstamps;
  * @method static Builder<static>|WidgetAsset ordered(string $dir = 'asc')
  * @method static Builder<static>|WidgetAsset query()
  * @method static Builder<static>|WidgetAsset withAssets(bool $withDrafts = true)
- *
- * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
- * @property-read int|null $media_count
  *
  * @mixin Eloquent
  */

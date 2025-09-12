@@ -48,7 +48,6 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
@@ -87,8 +86,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     public bool $layoutModified = false;
 
     protected ?array $containerWidgets = null;
-
-    protected ?array $cachedAssets = null;
 
     protected Layout $layout;
 
@@ -213,9 +210,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     {
         $assets = $this->assets[$containerKey][$widgetIndex];
 
-        $resource = $this->getWidgetAsset($containerKey, $widgetIndex, $index);
+        $widgetAsset = $this->getWidgetAsset($containerKey, $widgetIndex, $index);
 
-        if ($resource === null || $resource === []) {
+        if ($widgetAsset === null || $widgetAsset === []) {
             throw new Exception(sprintf('Asset %d not found for container: %s widget: %d', $index, $containerKey, $widgetIndex));
         }
 
@@ -223,7 +220,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $assets = array_values($assets);
 
-        array_splice($assets, $newIndex, 0, [$resource]);
+        array_splice($assets, $newIndex, 0, [$widgetAsset]);
 
         $this->assets[$containerKey][$widgetIndex] = $assets;
 
@@ -628,28 +625,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->schema(
                 fn (array $arguments, Schema $schema): Schema => self::getWidgetAssetSchema(
                     $schema->operation('createOption')
-                        ->record(function () use ($arguments): WidgetAsset {
-                            $containerKey = $arguments['containerKey'];
-                            $widgetIndex = $arguments['widgetIndex'];
-                            $assetType = $arguments['type'];
-
-                            $widget = $this->getContainerWidget($containerKey, $widgetIndex);
-
-                            /** @var class-string<WidgetAsset> $model */
-                            $model = CapellCore::getModel(LayoutModelEnum::WidgetAsset->name);
-
-                            $record = $model::make([
-                                'widget_id' => $widget->id,
-                                'asset_type' => $arguments['type'],
-                                'meta' => [],
-                            ]);
-
-                            $asset = CapellCore::getAsset($assetType)->getModel()::make();
-
-                            $record->setRelation('asset', $asset);
-
-                            return $record;
-                        }),
+                        ->record(fn (): WidgetAsset => $this->makeWidgetAssetRecordForCreate($arguments)),
                 )
             )
             ->model(fn (): string => CapellCore::getModel(LayoutModelEnum::WidgetAsset->name))
@@ -684,42 +660,16 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->iconSize(IconSize::Small)
             ->tooltip(
                 fn (array $arguments): string => __(
-                    'capell-admin::button.edit_resource',
+                    'capell-admin::button.edit_asset_type',
                     ['type' => $arguments['type']]
                 )
             )
             ->modalWidth(Width::SixExtraLarge)
             ->modalHeading(
-                function (self $livewire, array $arguments): string {
-                    $name = str($arguments['type'])->title();
-
-                    if ($livewire->page_id !== null && $livewire->page_id !== 0) {
-                        return __(
-                            'capell-admin::heading.edit_page_widget_asset',
-                            ['name' => $name]
-                        );
-                    }
-
-                    return __(
-                        'capell-admin::heading.edit_widget_asset',
-                        ['name' => $name]
-                    );
-                }
+                fn (self $livewire, array $arguments): string => $this->getEditWidgetAssetModalHeading($livewire, $arguments)
             )
             ->modalDescription(
-                function (self $livewire, array $arguments): ?string {
-                    if ($livewire->page_id === null || $livewire->page_id === 0) {
-                        return null;
-                    }
-
-                    $resource = $this->getWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
-
-                    if (empty($resource['page_id'])) {
-                        return null;
-                    }
-
-                    return __('capell-admin::heading.page_widget_asset', ['name' => $livewire->getLayoutPage()->name]);
-                }
+                fn (self $livewire, array $arguments): ?string => $this->getEditWidgetAssetModalDescription($livewire, $arguments)
             )
             ->modalSubmitActionLabel(__('capell-admin::button.save_changes'))
             ->successNotificationTitle(__('capell-admin::message.asset_updated'))
@@ -732,49 +682,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 'meta' => $record->meta,
                 'asset' => $record->asset->attributesToArray(),
             ])
-            ->record(function (array $arguments): ?WidgetAsset {
-                $widget = $this->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
-
-                $asset = $this->getWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
-
-                if (! $asset) {
-                    return null;
-                }
-
-                $widgetAsset = $widget->assets
-                    ->where('asset_type', $arguments['type'])
-                    ->where('asset_id', $asset['asset_id'])
-                    ->first();
-
-                if (! $widgetAsset) {
-                    throw new Exception(
-                        'Widget asset not found for container: ' . $arguments['containerKey'] .
-                        ' widget: ' . $arguments['widgetIndex'] .
-                        ' (key: ' . ($widget->key ?? 'unknown') . ')' .
-                        ' index: ' . $arguments['index']
-                    );
-                }
-
-                return $widgetAsset->exists ? $widgetAsset : null;
-            })
+            ->record(fn (array $arguments): ?WidgetAsset => $this->resolveEditableWidgetAsset($arguments))
             ->disabled(fn (WidgetAsset $record): bool => ! $record->exists)
-            ->action(function (WidgetAsset $record, array $data, self $livewire, array $arguments, Action $action, Schema $schema): void {
-                $schema->saveRelationships();
-
-                if ($data !== []) {
-                    $record->update($data);
-                }
-
-                if (! empty($data['meta'])) {
-                    $livewire->updateWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index'], ['meta' => $data['meta']]);
-                }
-
-                $livewire->reloadContainerWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
-
-                $livewire->notifyPageCached($record);
-
-                $action->success();
-            });
+            ->action(fn (WidgetAsset $record, array $data, self $livewire, array $arguments, Action $action, Schema $schema) => $this->applyWidgetAssetUpdate($record, $data, $livewire, $arguments, $action, $schema));
     }
 
     public function removeAssetsAction(): Action
@@ -796,7 +706,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 if ($selectedAssets === []) {
                     Notification::make('no-assets-selected')
-                        ->body(__('capell-admin::message.no_resources_selected'))
+                        ->body(__('capell-admin::message.no_assets_selected'))
                         ->warning()
                         ->send();
 
@@ -988,6 +898,51 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         return view($this->view);
     }
 
+    protected function addAssetFromAction(Action $action, Schema $schema, array $arguments, array $data): void
+    {
+        $shouldAddPageAssets = $this->shouldAddPageAssets($arguments['containerKey'], $arguments['widgetIndex']);
+
+        $widget = $this->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
+
+        $record = $schema->getRecord();
+
+        // Fake exists to ensure assets relations are saved correctly
+        $record->exists = true;
+
+        $data['widget_id'] = $widget->id;
+
+        $assetComponent = $schema->getComponentByStatePath('asset');
+
+        SaveFormComponentRelationshipAction::run($assetComponent, $action->getLivewire());
+
+        $record->exists = false;
+        $record->fill($data)->save();
+
+        $uuid = $record->getKey();
+
+        $this->addAssets(
+            containerKey: $arguments['containerKey'],
+            widgetIndex: $arguments['widgetIndex'],
+            hasPageAssets: $shouldAddPageAssets,
+            type: $arguments['type'],
+            assets: [$uuid],
+            assetsMeta: [$uuid => $data['meta'] ?? []]
+        );
+
+        $this->syncDuplicateWidgets(
+            containerKey: $arguments['containerKey'],
+            widgetIndex: $arguments['widgetIndex']
+        );
+
+        $this->layoutUpdated();
+
+        $this->dispatch(
+            'refresh-assets',
+            containerKey: $arguments['containerKey'],
+            widgetIndex: $arguments['widgetIndex']
+        );
+    }
+
     protected function moveContainerWidget(string $originalContainer, int $originalIndex, string $containerKey, int $widgetIndex): void
     {
         $widget = $this->containers[$originalContainer]['widgets'][$originalIndex];
@@ -1039,51 +994,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
     }
 
-    protected function addAssetFromAction(Action $action, Schema $schema, array $arguments, array $data): void
-    {
-        $shouldAddPageAssets = $this->shouldAddPageAssets($arguments['containerKey'], $arguments['widgetIndex']);
-
-        $widget = $this->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
-
-        $record = $schema->getRecord();
-
-        // Fake exists to ensure assets relations are saved correctly
-        $record->exists = true;
-
-        $data['widget_id'] = $widget->id;
-
-        $assetComponent = $schema->getComponentByStatePath('asset');
-
-        SaveFormComponentRelationshipAction::run($assetComponent, $action->getLivewire());
-
-        $record->exists = false;
-        $record->fill($data)->save();
-
-        $uuid = $record->getKey();
-
-        $this->addAssets(
-            containerKey: $arguments['containerKey'],
-            widgetIndex: $arguments['widgetIndex'],
-            hasPageAssets: $shouldAddPageAssets,
-            type: $arguments['type'],
-            assets: [$uuid],
-            assetsMeta: [$uuid => $data['meta'] ?? []]
-        );
-
-        $this->syncDuplicateWidgets(
-            containerKey: $arguments['containerKey'],
-            widgetIndex: $arguments['widgetIndex']
-        );
-
-        $this->layoutUpdated();
-
-        $this->dispatch(
-            'refresh-assets',
-            containerKey: $arguments['containerKey'],
-            widgetIndex: $arguments['widgetIndex']
-        );
-    }
-
     protected function moveContainerWidgetAssets(string $originalContainer, int $originalIndex, string $containerKey, int $widgetIndex): void
     {
         $widget = $this->assets[$originalContainer][$originalIndex];
@@ -1103,6 +1013,128 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         unset($this->selectedRecords[$originalContainer][$originalIndex]);
         $this->selectedRecords[$originalContainer] = array_values($this->selectedRecords[$originalContainer]);
+    }
+
+    private function duplicateLayout(): void
+    {
+        $newLayout = ReplicateLayoutAction::run($this->layout);
+
+        $this->layout_id = $newLayout->id;
+
+        $this->reload();
+
+        $this->dispatch('page-layout-changed', id: $this->layout_id);
+    }
+
+    /**
+     * Build a new WidgetAsset record for the addAsset action form.
+     */
+    private function makeWidgetAssetRecordForCreate(array $arguments): WidgetAsset
+    {
+        $containerKey = $arguments['containerKey'];
+        $widgetIndex = $arguments['widgetIndex'];
+        $assetType = $arguments['type'];
+
+        $widget = $this->getContainerWidget($containerKey, $widgetIndex);
+
+        /** @var class-string<WidgetAsset> $model */
+        $model = CapellCore::getModel(LayoutModelEnum::WidgetAsset->name);
+
+        $record = $model::make([
+            'widget_id' => $widget->id,
+            'asset_type' => $assetType,
+            'meta' => [],
+        ]);
+
+        $asset = CapellCore::getAsset($assetType)->getModel()::make();
+
+        $record->setRelation('asset', $asset);
+
+        return $record;
+    }
+
+    /**
+     * Resolve the existing WidgetAsset for editing based on action arguments.
+     */
+    private function resolveEditableWidgetAsset(array $arguments): ?WidgetAsset
+    {
+        $widget = $this->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
+
+        $asset = $this->getWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
+
+        if (! $asset) {
+            return null;
+        }
+
+        $widgetAsset = $widget->assets
+            ->where('asset_type', $arguments['type'])
+            ->where('asset_id', $asset['asset_id'])
+            ->first();
+
+        if (! $widgetAsset) {
+            throw new Exception(
+                'Widget asset not found for container: ' . $arguments['containerKey'] .
+                ' widget: ' . $arguments['widgetIndex'] .
+                ' (key: ' . ($widget->key ?? 'unknown') . ')' .
+                ' index: ' . $arguments['index']
+            );
+        }
+
+        return $widgetAsset->exists ? $widgetAsset : null;
+    }
+
+    /**
+     * Build the modal heading for the editWidgetAsset action.
+     */
+    private function getEditWidgetAssetModalHeading(self $livewire, array $arguments): string
+    {
+        $name = str($arguments['type'])->title();
+
+        if ($livewire->page_id !== null && $livewire->page_id !== 0) {
+            return __('capell-admin::heading.edit_page_widget_asset', ['name' => $name]);
+        }
+
+        return __('capell-admin::heading.edit_widget_asset', ['name' => $name]);
+    }
+
+    /**
+     * Build the optional modal description for the editWidgetAsset action.
+     */
+    private function getEditWidgetAssetModalDescription(self $livewire, array $arguments): ?string
+    {
+        if ($livewire->page_id === null || $livewire->page_id === 0) {
+            return null;
+        }
+
+        $widgetAsset = $this->getWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
+
+        if (empty($widgetAsset['page_id'])) {
+            return null;
+        }
+
+        return __('capell-admin::heading.page_widget_asset', ['name' => $livewire->getLayoutPage()->name]);
+    }
+
+    /**
+     * Apply updates for the editWidgetAsset action and trigger UI refresh/notifications.
+     */
+    private function applyWidgetAssetUpdate(WidgetAsset $record, array $data, self $livewire, array $arguments, Action $action, Schema $schema): void
+    {
+        $schema->saveRelationships();
+
+        if ($data !== []) {
+            $record->update($data);
+        }
+
+        if (! empty($data['meta'])) {
+            $livewire->updateWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index'], ['meta' => $data['meta']]);
+        }
+
+        $livewire->reloadContainerWidgetAsset($arguments['containerKey'], $arguments['widgetIndex'], $arguments['index']);
+
+        $livewire->notifyPageCached($record);
+
+        $action->success();
     }
 
     private function getChangeLayoutSchema(): array
@@ -1157,6 +1189,19 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         ];
     }
 
+    private function changePageLayout(int $layoutId): void
+    {
+        if (! $this->getLayoutPage() instanceof Page) {
+            return;
+        }
+
+        $this->layout_id = $layoutId;
+
+        $this->reload();
+
+        $this->layoutUpdated();
+    }
+
     private function loadNew(): void
     {
         $this->loadLayout();
@@ -1176,7 +1221,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     {
         $this->loadLayout();
 
-        $this->loadWidgets();
+        $this->loadWidgets(withAssets: false);
 
         $this->loadWidgetAssetsFromStore();
     }
@@ -1201,7 +1246,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     private function getAllSelectableAssetsKeys(string $containerKey, int $widgetIndex): array
     {
         return collect($this->assets[$containerKey][$widgetIndex])
-            ->map(fn ($resource): string => sprintf('%s.%s', $resource['asset_type'], $resource['asset_id']))
+            ->map(fn (array $widgetAsset): string => sprintf('%s.%s', $widgetAsset['asset_type'], $widgetAsset['asset_id']))
             ->values()
             ->all();
     }
@@ -1328,8 +1373,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     {
         $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]->assets
             ->reject(
-                fn (WidgetAsset $resource): bool => in_array(
-                    sprintf('%s.%s', $resource->asset_type, $resource->asset_id),
+                fn (WidgetAsset $widgetAsset): bool => in_array(
+                    sprintf('%s.%s', $widgetAsset->asset_type, $widgetAsset->asset_id),
                     $this->selectedRecords[$containerKey][$widgetIndex],
                     true
                 )
@@ -1352,12 +1397,12 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     private function removeAsset(string $containerKey, int $widgetIndex, string $uuid, string $type): void
     {
-        foreach ($this->assets[$containerKey][$widgetIndex] as $index => $resource) {
-            if ($resource['asset_id'] !== $uuid) {
+        foreach ($this->assets[$containerKey][$widgetIndex] as $index => $widgetAsset) {
+            if ($widgetAsset['asset_id'] !== $uuid) {
                 continue;
             }
 
-            if ($resource['asset_type'] !== $type) {
+            if ($widgetAsset['asset_type'] !== $type) {
                 continue;
             }
 
@@ -1492,7 +1537,15 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             if ($this->containerWidgets[$containerKey][$widgetIndex]->assets->isNotEmpty()) {
                 $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]
                     ->assets
-                    ->map(fn (WidgetAsset $resource): array => $resource->attributesToArray())
+                    ->map(fn (WidgetAsset $widgetAsset): array => [
+                        'id' => $widgetAsset->id,
+                        'asset_id' => $widgetAsset->asset_id,
+                        'asset_type' => $widgetAsset->asset_type,
+                        'meta' => $widgetAsset->meta,
+                        'occurrence' => $widgetAsset->occurrence,
+                        'order' => $widgetAsset->order,
+                        'page_id' => $widgetAsset->page_id,
+                    ])
                     ->toArray();
             }
 
@@ -1603,26 +1656,29 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ]);
     }
 
-    private function loadWidgets(): void
+    private function loadWidgets(bool $withAssets = true): void
     {
         $widgetKeys = $this->getContainerWidgetKeys();
 
         $widgets = $this->getWidgetQuery()
             ->whereIn('key', $widgetKeys)
-            ->with([
-                'assets' => fn (BuilderContract $query) => $query->when(
-                    $this->page_id,
-                    fn (Builder $query) => $query->where(
-                        fn (Builder $query) => $query->where('page_id', $this->page_id)
-                            ->orWhereNull('page_id')
-                    ),
-                    fn (Builder $query) => $query->whereNull('page_id')
-                )
-                    ->with(
-                        'asset',
-                        fn (BuilderContract $query) => $query->morphWith($this->getAssetRelations())
-                    ),
-            ])
+            ->when(
+                $withAssets,
+                fn (Builder $query) => $query->with([
+                    'assets' => fn (BuilderContract $query) => $query->when(
+                        $this->page_id,
+                        fn (Builder $query) => $query->where(
+                            fn (Builder $query) => $query->where('page_id', $this->page_id)
+                                ->orWhereNull('page_id')
+                        ),
+                        fn (Builder $query) => $query->whereNull('page_id')
+                    )
+                        ->with(
+                            'asset',
+                            fn (BuilderContract $query) => $query->morphWith($this->getAssetRelations())
+                        ),
+                ])
+            )
             ->get()
             ->mapWithKeys(fn (Widget $widget): array => [$widget->key => $widget]);
 
@@ -1646,20 +1702,20 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 $widget = clone $widgets[$widgetKey];
 
                 $assets = $widget->assets->filter(
-                    function (WidgetAsset $resource) use ($containerKey, $occurrence): bool {
-                        if (! $resource->page_id) {
+                    function (WidgetAsset $widgetAsset) use ($containerKey, $occurrence): bool {
+                        if (! $widgetAsset->page_id) {
                             return true;
                         }
 
-                        if ($resource->page_id !== $this->page_id) {
+                        if ($widgetAsset->page_id !== $this->page_id) {
                             return false;
                         }
 
-                        if ((string) $resource->container !== (string) $containerKey) {
+                        if ($widgetAsset->container !== (string) $containerKey) {
                             return false;
                         }
 
-                        return (int) $resource->occurrence === (int) $occurrence;
+                        return (int) $widgetAsset->occurrence === (int) $occurrence;
                     }
                 )
                     ->sortBy('order')
@@ -1706,19 +1762,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             return;
         }
 
-        $allAssets = collect($this->assets)
-            ->flatten(2)
-            ->filter()
-            ->groupBy('asset_type')
-            ->mapWithKeys(
-                fn (\Illuminate\Support\Collection $assets, string $type): array => [
-                    $type => CapellCore::getAsset($type)->model::query()
-                        ->with($this->getAssetRelations($type))
-                        ->whereIn('id', $assets->pluck('asset_id')->unique()->toArray())
-                        ->get()
-                        ->keyBy('id'),
-                ]
-            );
+        $allAssets = $this->loadAllAssetsByType($this->getAssetTypes());
 
         foreach ($this->assets as $containerKey => $widgets) {
             foreach ($widgets as $widgetIndex => $assets) {
@@ -1730,23 +1774,23 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 $widgetAssets = collect();
 
-                foreach ($assets as $order => $resource) {
-                    $type = $resource['asset_type'];
+                foreach ($assets as $order => $widgetAsset) {
+                    $type = $widgetAsset['asset_type'];
 
-                    if (! isset($allAssets[$type][$resource['asset_id']])) {
+                    if (! isset($allAssets[$type][$widgetAsset['asset_id']])) {
                         continue;
                     }
 
-                    $asset = $allAssets[$type][$resource['asset_id']];
+                    $asset = $allAssets[$type][$widgetAsset['asset_id']];
 
                     $widgetAsset = $this->addWidgetAsset(
                         widget: $widget,
                         containerKey: $containerKey,
                         type: $type,
-                        pageId: $resource['page_id'],
-                        resourceUuid: $resource['asset_id'],
-                        meta: $resource['meta'] ?? [],
-                        occurrence: $resource['occurrence'],
+                        pageId: $widgetAsset['page_id'],
+                        widgetAssetUuid: $widgetAsset['asset_id'],
+                        meta: $widgetAsset['meta'] ?? [],
+                        occurrence: $widgetAsset['occurrence'],
                         order: $order,
                     );
 
@@ -1758,6 +1802,24 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 $widget->setRelation('assets', $widgetAssets);
             }
         }
+    }
+
+    private function getAssetTypes(): \Illuminate\Support\Collection
+    {
+        return collect($this->assets)->flatten(2)->filter()->groupBy('asset_type');
+    }
+
+    private function loadAllAssetsByType(\Illuminate\Support\Collection $assetTypes): \Illuminate\Support\Collection
+    {
+        return $assetTypes->mapWithKeys(
+            fn (\Illuminate\Support\Collection $assets, string $type): array => [
+                $type => CapellCore::getAsset($type)->model::query()
+                    ->with($this->getAssetRelations($type))
+                    ->whereIn('id', $assets->pluck('asset_id')->unique()->toArray())
+                    ->get()
+                    ->keyBy('id'),
+            ]
+        );
     }
 
     private function reloadContainerWidgetAsset(string $containerKey, int $widgetIndex, int $index): void
@@ -1800,15 +1862,13 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $occurrence = $this->getLastContainerWidgetOccurrence($containerKey, $widget->key);
 
-        foreach ($assets as $resourceUuid) {
-            $resource = $this->getWidgetAssetRecord(ucfirst($type), $resourceUuid);
-
-            $meta = $assetsMeta[$resourceUuid] ?? [];
+        foreach ($assets as $widgetAssetUuid) {
+            $meta = $assetsMeta[$widgetAssetUuid] ?? [];
 
             $order = $this->countWidgetAssets($containerKey, $widgetIndex) + 1;
 
             $this->assets[$containerKey][$widgetIndex][] = [
-                'asset_id' => $resourceUuid,
+                'asset_id' => $widgetAssetUuid,
                 'asset_type' => $type,
                 'meta' => $meta,
                 'page_id' => $hasPageAssets === true ? $this->page_id : null,
@@ -1821,13 +1881,13 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 containerKey: $containerKey,
                 type: $type,
                 pageId: $hasPageAssets === true ? $this->page_id : null,
-                resourceUuid: $resourceUuid,
+                widgetAssetUuid: $widgetAssetUuid,
                 meta: $meta,
                 occurrence: $occurrence,
                 order: $order,
             );
 
-            $widgetAsset->setRelation('asset', $resource);
+            $widgetAsset->setRelation('asset', $widgetAsset);
 
             $widget->assets->add($widgetAsset);
         }
@@ -1860,12 +1920,12 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 fn (Builder $query) => $query->whereNull('page_id')
             )
             ->get()
-            ->mapWithKeys(fn (WidgetAsset $resource): array => [$resource->asset_key => $resource]);
+            ->mapWithKeys(fn (WidgetAsset $widgetAsset): array => [$widgetAsset->asset_key => $widgetAsset]);
 
         if ($existingAssets->isNotEmpty()) {
             $currentAssets = collect($assets)
-                ->filter(fn ($resource): bool => $existingAssets->has(sprintf('%s.%s', $resource['asset_type'], $resource['asset_id'])))
-                ->mapWithKeys(fn ($resource): array => [sprintf('%s.%s', $resource['asset_type'], $resource['asset_id']) => $resource]);
+                ->filter(fn ($widgetAsset): bool => $existingAssets->has(sprintf('%s.%s', $widgetAsset['asset_type'], $widgetAsset['asset_id'])))
+                ->mapWithKeys(fn ($widgetAsset): array => [sprintf('%s.%s', $widgetAsset['asset_type'], $widgetAsset['asset_id']) => $widgetAsset]);
 
             $assetsToRemove = $currentAssets->isNotEmpty()
                 ? $existingAssets->diffKeys($currentAssets)
@@ -1878,10 +1938,10 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $order = 0;
         collect($assets)->each(
-            function (array $resource) use ($existingAssets, $widget, $containerKey, $occurrence, $hasPageAssets, &$order): void {
+            function (array $widgetAsset) use ($existingAssets, $widget, $containerKey, $occurrence, $hasPageAssets, &$order): void {
                 $order++;
 
-                $key = sprintf('%s.%s', $resource['asset_type'], $resource['asset_id']);
+                $key = sprintf('%s.%s', $widgetAsset['asset_type'], $widgetAsset['asset_id']);
 
                 $existingAsset = $existingAssets->get($key);
 
@@ -1899,13 +1959,13 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     return;
                 }
 
-                $this->addAsset(
+                $this->createWidgetAsset(
                     widget: $widget,
                     containerKey: $containerKey,
                     occurrence: $occurrence,
                     hasPageAssets: $hasPageAssets,
                     order: $order,
-                    resource: $resource
+                    asset: $widgetAsset
                 );
             }
         );
@@ -1916,14 +1976,14 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         string $containerKey,
         string $type,
         ?int $pageId,
-        int|string $resourceUuid,
+        int|string $widgetAssetUuid,
         array $meta,
         ?int $occurrence,
         int $order,
     ): WidgetAsset {
-        $widgetAsset = $widget->assets()
+        $widgetAsset = $widget->assets
             ->where('asset_type', $type)
-            ->where('asset_id', $resourceUuid)
+            ->where('asset_id', $widgetAssetUuid)
             ->when(
                 $pageId,
                 fn (Builder $query) => $query->where('container', $containerKey)
@@ -1939,7 +1999,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 'order' => $order,
                 'widget_id' => $widget->id,
                 'asset_type' => mb_strtolower($type),
-                'asset_id' => $resourceUuid,
+                'asset_id' => $widgetAssetUuid,
             ]);
 
             if ($pageId !== null && $pageId !== 0) {
@@ -1949,28 +2009,24 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             }
         }
 
-        $widgetAsset->load([
-            'asset' => fn (BuilderContract $query) => $query->with($this->getAssetRelations($type)),
-        ]);
-
         return $widgetAsset;
     }
 
-    private function addAsset(
+    private function createWidgetAsset(
         Widget $widget,
         string $containerKey,
         int $occurrence,
         bool $hasPageAssets,
         int $order,
-        array $resource,
+        array $asset,
     ): WidgetAsset {
         /** @var WidgetAsset $widgetAsset */
         $widgetAsset = $widget->assets()->make([
-            'meta' => $resource['meta'] ?? [],
+            'meta' => $asset['meta'] ?? [],
             'order' => $order,
             'widget_id' => $widget->id,
-            'asset_type' => $resource['asset_type'],
-            'asset_id' => $resource['asset_id'],
+            'asset_type' => $asset['asset_type'],
+            'asset_id' => $asset['asset_id'],
         ]);
 
         if ($hasPageAssets) {
@@ -1981,33 +2037,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $widgetAsset->save();
 
-        // $widgetAsset->load('asset');
-
         return $widgetAsset;
-    }
-
-    private function changePageLayout(int $layoutId): void
-    {
-        if (! $this->getLayoutPage() instanceof Page) {
-            return;
-        }
-
-        $this->layout_id = $layoutId;
-
-        $this->reload();
-
-        $this->layoutUpdated();
-    }
-
-    private function duplicateLayout(): void
-    {
-        $newLayout = ReplicateLayoutAction::run($this->layout);
-
-        $this->layout_id = $newLayout->id;
-
-        $this->reload();
-
-        $this->dispatch('page-layout-changed', id: $this->layout_id);
     }
 
     private function getContainerWidget(string $containerKey, int $widgetIndex): Widget
@@ -2042,27 +2072,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
 
         return array_column(
-            array_filter($this->assets[$containerKey][$widgetIndex], fn (array $resource): bool => $resource['asset_type'] === $type),
+            array_filter($this->assets[$containerKey][$widgetIndex], fn (array $widgetAsset): bool => $widgetAsset['asset_type'] === $type),
             'asset_id'
         );
-    }
-
-    private function getWidgetAssetRecord(string $type, int|string $id): ?Model
-    {
-        if (isset($this->cachedAssets[$type][$id])) {
-            return $this->cachedAssets[$type][$id];
-        }
-
-        /** @var Model $model */
-        $model = CapellCore::getAsset($type)->model;
-
-        $this->cachedAssets[$type][$id] = $model::find($id);
-
-        if (! $this->cachedAssets[$type][$id]) {
-            return null;
-        }
-
-        return $this->cachedAssets[$type][$id];
     }
 
     private function shouldAddPageAssets(string $containerKey, int $widgetIndex): bool
@@ -2091,9 +2103,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     private function updateWidgetAsset(string $containerKey, int $widgetIndex, int $index, array $data): void
     {
-        $resource = $this->assets[$containerKey][$widgetIndex][$index];
+        $widgetAsset = $this->assets[$containerKey][$widgetIndex][$index];
 
-        $this->assets[$containerKey][$widgetIndex][$index] = array_merge_recursive($resource, $data);
+        $this->assets[$containerKey][$widgetIndex][$index] = array_merge_recursive($widgetAsset, $data);
     }
 
     private function getContainerWidgetSchema(string $containerKey, int $widgetIndex): ?string

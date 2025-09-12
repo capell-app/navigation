@@ -37,7 +37,7 @@ declare(strict_types=1);
 
     $asset = $widgetAsset->asset;
 
-    $assetKey = "{$widgetAsset->asset_type} . '.' . {$widgetAsset->asset_id}";
+    $assetKey = "{$widgetAsset->asset_type}.{$widgetAsset->asset_id}";
 
     if (! $image) {
         $image = match (get_class($asset)) {
@@ -99,7 +99,7 @@ declare(strict_types=1);
     >
         <label
             x-on:click.stop
-            class="group/asset flex h-full w-14 cursor-pointer items-center justify-center pl-2"
+            class="group/asset flex h-full w-14 cursor-pointer items-center justify-center"
         >
             <x-capell-admin::forms.checkbox
                 class="group-hover/asset:border-primary-500 group/asset-focus:border-primary-500 h-4 w-4 cursor-pointer border-gray-600"
@@ -126,14 +126,7 @@ declare(strict_types=1);
                 x-show="isWidgetReorderingResources('{{ $containerKey }}', {{ $widgetIndex }})"
                 x-cloak
             >
-                <x-filament::button
-                    :size="Size::ExtraSmall"
-                    class="widget-asset-handle pointer-events-auto"
-                    icon="heroicon-o-arrows-up-down"
-                    color="primary"
-                    label-sr-only
-                    outlined
-                />
+                @svg('heroicon-o-arrows-up-down', 'h-5 w-5 text-gray-400 dark:text-gray-500')
             </div>
         </label>
 
@@ -246,7 +239,7 @@ declare(strict_types=1);
                     tag="a"
                     :href="GetResourceFromTypeAction::run(ucfirst($widgetAsset->asset_type), $asset->type)::getUrl('edit', ['record' => $asset->getKey()])"
                 >
-                    {{ __('capell-admin::button.edit_resource', ['type' => $widgetAsset->asset_type]) }}
+                    {{ __('capell-admin::button.edit_asset_type', ['type' => $widgetAsset->asset_type]) }}
                 </x-filament::dropdown.list.item>
             </x-filament::dropdown.list>
         </x-filament::dropdown>

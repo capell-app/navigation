@@ -10,6 +10,10 @@ export default function layoutBuilderComponent() {
 
         isLoading: false,
 
+        isAllCollapsed: null, // true = all collapsed, false = all expanded, null = mixed
+
+        collapsedContainers: new Map(), // id => isCollapsed
+
         selectedRecords: this.$wire.$entangle('selectedRecords'),
 
         init() {
@@ -18,13 +22,27 @@ export default function layoutBuilderComponent() {
                 this.isReorderingResources = []
             })
 
-            // on escape  key press
             window.addEventListener('keydown', (e) => {
                 if (e.key !== 'Escape') {
                     return
                 }
                 this.isReordering = false
                 this.isReorderingResources = []
+            })
+
+            window.addEventListener('container-collapsed-register', (e) => {
+                this.collapsedContainers.set(
+                    e.detail.id,
+                    !!e.detail.isCollapsed,
+                )
+                this.updateIsAllCollapsed()
+            })
+            window.addEventListener('container-collapsed-changed', (e) => {
+                this.collapsedContainers.set(
+                    e.detail.id,
+                    !!e.detail.isCollapsed,
+                )
+                this.updateIsAllCollapsed()
             })
         },
 
@@ -49,24 +67,37 @@ export default function layoutBuilderComponent() {
             this.collapseAllComponents(false)
         },
 
-        collapseWidgets: function (toggle) {
-            this.$dispatch('collapse-widget', { isCollapsed: toggle })
+        collapseAllWidgets: function (collapse) {
+            this.$dispatch('collapse-widget', { isCollapsed: collapse })
         },
 
-        collapseContainers: function (toggle) {
-            this.$dispatch('collapse-container', { isCollapsed: toggle })
+        collapseAllContainers: function (collapse) {
+            this.$dispatch('collapse-container', { isCollapsed: collapse })
         },
 
-        collapseAllComponents: function (toggle) {
-            this.collapseWidgets(toggle)
-            this.collapseContainers(toggle)
+        collapseAllComponents: function (collapse) {
+            this.collapseAllWidgets(collapse)
+            this.collapseAllContainers(collapse)
+        },
+
+        updateIsAllCollapsed: function () {
+            const values = Array.from(this.collapsedContainers.values())
+            if (values.length === 0) {
+                this.isAllCollapsed = null
+            } else if (values.every((v) => v === true)) {
+                this.isAllCollapsed = true
+            } else if (values.every((v) => v === false)) {
+                this.isAllCollapsed = false
+            } else {
+                this.isAllCollapsed = null
+            }
         },
 
         toggleReordering: function () {
             this.isReordering = !this.isReordering
 
             if (this.isReordering) {
-                this.collapseWidgets(true)
+                this.collapseAllWidgets(true)
             }
         },
 

@@ -23,13 +23,32 @@ declare(strict_types=1);
 <div
     x-data="{
         isCollapsed: false,
+        id: '{{ $containerKey }}',
+        notify() {
+            this.$dispatch('container-collapsed-changed', {
+                id: this.id,
+                isCollapsed: this.isCollapsed,
+            })
+        },
         toggleCollapse() {
             this.isCollapsed = ! this.isCollapsed
+            this.notify()
         },
     }"
     wire:key="container-{{ $containerKey }}"
     x-sort:item="'{{ $containerKey }}'"
-    x-on:collapse-container.window="isCollapsed = $event.detail.isCollapsed"
+    x-init="
+        $nextTick(() =>
+            $dispatch('container-collapsed-register', {
+                id: '{{ $containerKey }}',
+                isCollapsed: isCollapsed,
+            }),
+        )
+    "
+    x-on:collapse-container.window="
+        isCollapsed = $event.detail.isCollapsed
+        notify()
+    "
     x-cloak
     @class([
         'layout-container col-span-12',
@@ -37,7 +56,7 @@ declare(strict_types=1);
     ])
 >
     <div
-        class="rounded-lg bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
+        class="rounded-lg bg-white ring-1 ring-gray-950/10 dark:bg-gray-900 dark:ring-white/10"
     >
         <div
             class="layout-container-header group/container flex min-h-11 cursor-pointer items-center gap-x-4 gap-y-2 rounded-lg border-b border-gray-100 px-4 hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5"

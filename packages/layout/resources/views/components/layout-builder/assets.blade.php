@@ -22,14 +22,14 @@ declare(strict_types=1);
 @endphp
 
 <div
-    class="layout-builder-widget-assets mx-4 mt-0.5 rounded-lg ring-1 ring-gray-950/10 dark:ring-white/20"
+    class="layout-builder-widget-assets shadow-xs mx-3 mt-0.5 rounded ring-1 ring-gray-950/5 dark:ring-white/10"
     x-show="! isCollapsed"
     x-cloak
 >
     <div
-        class="flex items-center justify-between rounded-t-lg border-b border-black/5 bg-gray-50 px-4 py-3 dark:border-white/10 dark:bg-gray-800"
+        class="flex items-center justify-between rounded-t border-b border-black/5 bg-gray-50 px-4 py-2.5 dark:border-white/10 dark:bg-gray-800"
     >
-        <span class="text-sm text-gray-500 dark:text-gray-400">
+        <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">
             {{ $hasPageAssets ? __('capell-admin::generic.page_widget_assets') : __('capell-admin::generic.widget_assets') }}
         </span>
         <div class="flex items-center gap-x-3">
@@ -39,12 +39,11 @@ declare(strict_types=1);
                     :size="Size::Small"
                     weight="semibold"
                     x-on:click="toggleReorderingResources('{{ $containerKey }}', {{ $widgetIndex }})"
-                    x-show="selectedRecords['{{ $containerKey }}'][{{ $widgetIndex }}].length === 0"
                 >
                     @svg('heroicon-o-arrows-up-down', 'inline-block h-5 w-5 transition duration-75', [
                         'x-show' => "! isWidgetReorderingResources('{$containerKey}', {$widgetIndex})",
                     ])
-                    @svg('heroicon-o-x-mark', 'inline-block h-5 w-5 transition duration-75', [
+                    @svg('heroicon-o-check', 'inline-block h-5 w-5 transition duration-75', [
                         'x-show' => "isWidgetReorderingResources('{$containerKey}', {$widgetIndex})",
                         'x-cloak' => '',
                     ])

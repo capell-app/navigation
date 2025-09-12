@@ -27,6 +27,8 @@ declare(strict_types=1);
             )
         }}"
         x-data="layoutBuilderComponent"
+        x-on:lb-expand-all.window="expandAll"
+        x-on:lb-collapse-all.window="collapseAll"
     >
         <div
             class="mb-4 flex flex-wrap justify-between gap-4 pl-1 pr-4 sm:flex-nowrap lg:justify-end"
@@ -60,16 +62,6 @@ declare(strict_types=1);
             <div class="ml-auto mt-auto space-y-4 text-right">
                 @if ($this->page_id || $changeLayoutAction->isVisible())
                     <div class="flex flex-wrap items-center justify-end gap-4">
-                        {{--
-                            @if ($this->page_id)
-                            <x-capell-admin::forms.toggle-button
-                            toggleState="isEditing"
-                            toggleMethod="toggleEditMode"
-                            :label="__('capell-admin::button.toggle_edit_mode')"
-                            />
-                            @endif
-                        --}}
-
                         <div class="fi-btn-group flex items-center">
                             {{ $this->changeLayoutAction }}
 
@@ -107,7 +99,11 @@ declare(strict_types=1);
                     </div>
                 @endif
 
-                <div class="flex justify-end gap-2">
+                <div
+                    class="flex justify-end gap-2"
+                    x-show="! isReordering"
+                    x-cloak
+                >
                     <x-filament::link
                         class="whitespace-nowrap"
                         color="gray"
@@ -116,8 +112,8 @@ declare(strict_types=1);
                         size="xs"
                         tag="button"
                         weight="normal"
-                        x-on:click="expandAll"
-                        x-show="! isReordering"
+                        x-on:click="$dispatch('lb-expand-all')"
+                        x-show="isAllCollapsed !== false"
                     >
                         {{ __('capell-admin::button.expand_all') }}
                     </x-filament::link>
@@ -129,8 +125,8 @@ declare(strict_types=1);
                         size="xs"
                         tag="button"
                         weight="normal"
-                        x-on:click="collapseAll"
-                        x-show="! isReordering"
+                        x-on:click="$dispatch('lb-collapse-all')"
+                        x-show="isAllCollapsed !== true"
                     >
                         {{ __('capell-admin::button.collapse_all') }}
                     </x-filament::link>
