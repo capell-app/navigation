@@ -16,7 +16,7 @@ use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Filament\Components\Forms\AssetTypeToggleButtons;
+use Capell\Layout\Filament\Components\Forms\AssetTypeSelect;
 use Capell\Layout\Filament\Concerns\HasAssetsRelationManager;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\WidgetAsset;
@@ -107,7 +107,7 @@ class WidgetAssetsTable implements TableConfigurator
                                 ->toArray()
                         ),
 
-                    AssetTypeToggleButtons::make('type')
+                    AssetTypeSelect::make('type')
                         ->reactive(),
 
                     Select::make('type_id')

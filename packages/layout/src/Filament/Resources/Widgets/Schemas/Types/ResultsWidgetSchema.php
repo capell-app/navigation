@@ -17,7 +17,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Fieldset;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Override;
@@ -53,11 +52,10 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
                     WidgetTranslationsRepeater::make($schema)
                         ->section(),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->columns(1)
-                        ->schema(WidgetSettingsSchema::make($schema)),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
             Tabs::make()
                 ->visibleOn('edit')
                 ->columnSpanFull()

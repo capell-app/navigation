@@ -19,9 +19,11 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Override;
@@ -64,28 +66,32 @@ class ArticlePageSchema extends DefaultPageSchema
                 ->mainSchema([
                     static::getTranslationFormSchema($schema),
                 ])
-                ->sidebarSchema([
-                    Section::make()
+                ->sidebarSchema(
+                    PageSettingsSchema::make(
+                        $schema,
+                        [
+                            Group::make()
+                                ->statePath('meta')
+                                ->schema([
+                                    Select::make('author_id')
+                                        ->label(__('capell-admin::form.author'))
+                                        ->relationship(name: 'author', titleAttribute: 'name')
+                                        ->dehydrated()
+                                        ->saveRelationshipsUsing(fn (): false => false),
+                                ]),
+                        ],
+                        resourceName: 'article',
+                    ),
+                    contained: true
+                ),
+            Tabs::make()
+                ->tabs([
+                    Tabs\Tab::make(__('capell-admin::generic.settings'))
+                        ->icon(Heroicon::Cog)
                         ->schema([
-                            ...PageSettingsSchema::make(
-                                $schema,
-                                [
-                                    PageTagsInput::make('tags'),
-
-                                    Group::make()
-                                        ->statePath('meta')
-                                        ->schema([
-                                            MediaLibraryFileUpload::make('image')
-                                                ->imageDefaults(),
-                                            Select::make('author_id')
-                                                ->label(__('capell-admin::form.author'))
-                                                ->relationship(name: 'author', titleAttribute: 'name')
-                                                ->dehydrated()
-                                                ->saveRelationshipsUsing(fn (): false => false),
-                                        ]),
-                                ],
-                                resourceName: 'article',
-                            ),
+                            PageTagsInput::make('tags'),
+                            MediaLibraryFileUpload::make('image')
+                                ->imageDefaults(),
                         ]),
                 ]),
         ];

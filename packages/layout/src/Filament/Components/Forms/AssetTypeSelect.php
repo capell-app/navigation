@@ -6,9 +6,9 @@ namespace Capell\Layout\Filament\Components\Forms;
 
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
-use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Select;
 
-class AssetTypeToggleButtons extends ToggleButtons
+class AssetTypeSelect extends Select
 {
     protected function setUp(): void
     {
@@ -20,8 +20,6 @@ class AssetTypeToggleButtons extends ToggleButtons
                     ->mapWithKeys(static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()])
                     ->toArray()
             )
-            ->inline()
-            ->grouped()
             ->autoDefault();
     }
 }

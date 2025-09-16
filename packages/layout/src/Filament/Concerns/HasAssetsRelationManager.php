@@ -7,7 +7,7 @@ namespace Capell\Layout\Filament\Concerns;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Layout\Filament\Components\Forms\AssetTypeToggleButtons;
+use Capell\Layout\Filament\Components\Forms\AssetTypeSelect;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
@@ -47,7 +47,7 @@ trait HasAssetsRelationManager
     protected static function getAssetForm(): array
     {
         return [
-            AssetTypeToggleButtons::make('asset_type')
+            AssetTypeSelect::make('asset_type')
                 ->required()
                 ->reactive(),
             Select::make('asset_id')

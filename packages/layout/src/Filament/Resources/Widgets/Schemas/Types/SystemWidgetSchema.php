@@ -13,7 +13,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Override;
@@ -63,11 +62,10 @@ class SystemWidgetSchema extends DefaultWidgetSchema
                     WidgetTranslationsRepeater::make($schema)
                         ->section(),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->columns(1)
-                        ->schema(WidgetSettingsSchema::make($schema)),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
             Tabs::make()
                 ->columnSpanFull()
                 ->tabs([

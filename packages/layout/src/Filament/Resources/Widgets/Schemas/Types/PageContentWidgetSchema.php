@@ -18,7 +18,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -84,10 +83,10 @@ class PageContentWidgetSchema implements TypeSchemaInterface
                 ->mainSchema([
                     static::getTabs(),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->schema(WidgetSettingsSchema::make($schema)),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
         ];
     }
 

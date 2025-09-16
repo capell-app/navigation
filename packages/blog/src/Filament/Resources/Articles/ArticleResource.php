@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Filament\Resources\Articles;
 
+use BackedEnum;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Blog\Actions\GetArticleLayoutAction;
@@ -19,6 +20,7 @@ use Capell\Core\Actions\GetNameFromTranslationsAction;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Support\Htmlable;
 use Override;
 
 class ArticleResource extends PageResource
@@ -47,7 +49,7 @@ class ArticleResource extends PageResource
         return __('capell-blog::generic.article');
     }
 
-    public static function getNavigationIcon(): ?string
+    public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return 'heroicon-o-newspaper';
     }

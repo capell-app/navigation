@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Livewire;
 
+use BackedEnum;
 use Capell\Admin\Actions\BuildWidgetAssetDataAction;
 use Capell\Admin\Actions\NotifyClearCachedPagesAction;
 use Capell\Admin\Actions\ReplicateLayoutAction;
@@ -656,7 +657,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->closeModalByClickingAway(false)
             ->color('primary')
             ->size(Size::ExtraSmall)
-            ->icon(fn (array $arguments): string => CapellCore::getAsset($arguments['type'])->getIcon())
+            ->icon(fn (array $arguments): string|BackedEnum => CapellCore::getAsset($arguments['type'])->getIcon())
             ->iconSize(IconSize::Small)
             ->tooltip(
                 fn (array $arguments): string => __(

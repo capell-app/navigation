@@ -21,7 +21,6 @@ use Capell\Layout\Filament\Concerns\HasWidgetAssets;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
@@ -64,11 +63,10 @@ class HeroWidgetSchema implements TypeSchemaInterface
                 ->mainSchema([
                     self::getAssetsComponent($schema),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->columns(1)
-                        ->schema(WidgetSettingsSchema::make($schema)),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
             static::getTabs($schema),
         ];
     }

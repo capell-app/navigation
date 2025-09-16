@@ -71,11 +71,10 @@ class NavigationWidgetSchema extends DefaultWidgetSchema
                     WidgetTranslationsRepeater::make($schema)
                         ->section(),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->columns(1)
-                        ->schema(WidgetSettingsSchema::make($schema, [static::navigationSelect()])),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema, [static::navigationSelect()]),
+                    contained: true
+                ),
             Tabs::make()
                 ->visibleOn(['edit', 'editOption'])
                 ->columnSpanFull()

@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms;
 
+use BackedEnum;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,26 +33,59 @@ class AssetsRepeater extends Repeater
         $this->relationship()
             ->defaultItems(1)
             ->table([
-                TableColumn::make(__('capell-admin::form.type'))
-                    ->width('10rem'),
                 TableColumn::make(__('capell-admin::form.asset')),
             ])
+            ->addAction(self::modifyAddAction(...))
             ->schema(self::getFormSchema());
+
+        $this->registerActions([
+            fn (self $component): Action => $component->getAddAssetAction(),
+        ]);
+    }
+
+    public function getAddAssetAction(): Action
+    {
+        return Action::make('add_asset')
+            ->action(function (Repeater $component, array $arguments): void {
+                $newUuid = $component->generateUuid();
+
+                $items = $component->getRawState();
+
+                if ($newUuid) {
+                    $items[$newUuid] = $arguments;
+                } else {
+                    $items[] = $arguments;
+                }
+
+                $component->rawState($items);
+
+                $component->getChildSchema($newUuid ?? array_key_last($items))->fill($arguments);
+
+                $component->collapsed(false, shouldMakeComponentCollapsible: false);
+
+                $component->callAfterStateUpdated();
+
+                $component->partiallyRender();
+            });
     }
 
     protected static function getFormSchema(): array
     {
         return [
-            AssetTypeToggleButtons::make('asset_type')
-                ->required()
-                ->maxWidth(Width::Full)
-                ->afterStateUpdatedJs(fn ($state): string => <<<'JS'
-                    if ($state !== $old) { $set('asset_id', null); }
-                JS),
+            Hidden::make('asset_type'),
             Select::make('asset_id')
                 ->label(__('capell-layout::form.select_add_asset_type'))
                 ->required()
                 ->searchable()
+                ->prefixIcon(
+                    fn (Get $get): string|BackedEnum => CapellCore::getAsset($get('asset_type'))->getIcon()
+                )
+                ->placeholder(
+                    fn (Get $get): string|BackedEnum => __(
+                        'capell-admin::generic.select_asset_placeholder',
+                        ['type' => CapellCore::getAsset($get('asset_type'))->getLabel()]
+                    )
+                )
                 ->getSearchResultsUsing(
                     static fn (Select $component, Get $get, string $search): array => self::getAssetOptions(
                         $component,
@@ -98,6 +135,29 @@ class AssetsRepeater extends Repeater
         });
 
         return $options;
+    }
+
+    protected static function modifyAddAction(Action $action, self $component): Action
+    {
+        $actions = ActionGroup::make(
+            CapellCore::getAssets()
+                ->sortBy('name')
+                ->map(
+                    fn (AssetData $asset): Action => $component->getAddAssetAction()
+                        ->schemaComponent($component)
+                        ->label($asset->getLabel())
+                        ->icon($asset->getIcon())
+                        ->arguments(['asset_type' => $asset->getKey()])
+                )
+                ->all()
+        )
+            ->extraDropdownAttributes(['class' => 'contain-layout'])
+            ->dropdownPlacement('bottom')
+            ->label(fn () => $action->getLabel())
+            ->icon(Heroicon::Plus);
+
+        return $action->group($actions)
+            ->view('capell-admin::components.actions.dropdown-group');
     }
 
     private static function getAssetOptions(Select $component, ?string $type, int $limit = 10, ?string $search = null): array

@@ -22,7 +22,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Override;
@@ -57,11 +56,10 @@ class RelatedWidgetSchema extends DefaultWidgetSchema
                 ->mainSchema([
                     WidgetTranslationsRepeater::make($schema),
                 ])
-                ->sidebarSchema([
-                    Section::make()
-                        ->columns(1)
-                        ->schema(WidgetSettingsSchema::make($schema)),
-                ]),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
             Tabs::make()
                 ->visibleOn('edit')
                 ->columnSpanFull()

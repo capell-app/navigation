@@ -144,8 +144,7 @@ declare(strict_types=1);
                     {{ $label }}
 
                     @svg($editWidgetAssetAction->getIcon(),
-                        'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 inline h-4 w-4
-                    align-text-bottom text-gray-400 dark:text-gray-500', )
+                        'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 inline h-4 w-4 align-text-bottom text-gray-400 dark:text-gray-500')
                 </div>
 
                 @if (! empty($description) && ! $description !== $name)

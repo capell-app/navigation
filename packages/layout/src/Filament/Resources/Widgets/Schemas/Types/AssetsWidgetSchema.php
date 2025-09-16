@@ -16,7 +16,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Capell\Layout\Filament\Concerns\HasWidgetAssets;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
@@ -65,16 +64,10 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
                             static::getAdminTab($schema),
                         ]),
                 ])
-                ->sidebarSchema(static::getSidebarSchema($schema)),
-        ];
-    }
-
-    protected static function getSidebarSchema(Schema $schema): array
-    {
-        return [
-            Section::make()
-                ->columns(1)
-                ->schema(WidgetSettingsSchema::make($schema)),
+                ->sidebarSchema(
+                    WidgetSettingsSchema::make($schema),
+                    contained: true
+                ),
         ];
     }
 

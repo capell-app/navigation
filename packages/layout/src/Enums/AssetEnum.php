@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Enums;
 
+use BackedEnum;
 use Capell\Layout\Models\Content;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 enum AssetEnum: string implements HasColor, HasIcon, HasLabel
@@ -21,10 +23,10 @@ enum AssetEnum: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function getIcon(): string
+    public function getIcon(): string|BackedEnum
     {
         return match ($this) {
-            self::Content => config('capell-layout.assets.content.icon', 'heroicon-o-briefcase'),
+            self::Content => config('capell-layout.assets.content.icon', Heroicon::OutlinedRectangleStack),
         };
     }
 

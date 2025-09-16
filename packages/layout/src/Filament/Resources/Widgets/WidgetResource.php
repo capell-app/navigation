@@ -69,7 +69,7 @@ class WidgetResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return (string) (__('capell-admin::navigation.group_layouts'));
+        return (string) (__('capell-admin::navigation.group_resources'));
     }
 
     public static function getNavigationBadge(): ?string
