@@ -144,7 +144,7 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable
         return $this->belongsTo(Page::class, 'meta->related_page_id');
     }
 
-    public function scopeOrdered(Builder $query, string $dir = 'asc'): void
+    protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'), $dir);
     }

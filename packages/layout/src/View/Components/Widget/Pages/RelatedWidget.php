@@ -35,7 +35,7 @@ class RelatedWidget extends AbstractPagesWidget
             withDate: $this->widget->meta['with_date'] ?? false,
             cacheKeyPrepend: 'tags-' . implode('-', $tagIds),
             /**
-             * @param  Page  $query
+             * @param Builder<Page> $query
              */
             modifyQuery: fn (Builder $query) => $query
                 ->where('pages.id', '!=', $pageRecord->id)
@@ -45,19 +45,17 @@ class RelatedWidget extends AbstractPagesWidget
                 )
                 ->whereHas(
                     'type',
-                    /**
-                     * @param  Type  $query
-                     */
-                    fn (BuilderContract $query) => $query->enabled()
-                        ->listable()
-                        ->accessible()
-                        ->when(
-                            $this->widget->meta['exclude_types'] ?? false,
-                            fn (BuilderContract $query) => $query->whereNotIn(
-                                'types.key',
-                                $this->widget->meta['exclude_types'] ?? []
+                    fn (Builder $query): Builder =>
+                        $query->enabled()
+                            ->listable()
+                            ->accessible()
+                            ->when(
+                                $this->widget->meta['exclude_types'] ?? false,
+                                fn (BuilderContract $query) => $query->whereNotIn(
+                                    'types.key',
+                                    $this->widget->meta['exclude_types'] ?? []
+                                )
                             )
-                        )
                 )
                 ->when(
                     $tags instanceof Collection && $tags->isNotEmpty(),

@@ -1162,7 +1162,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                         ->mapWithKeys(
                             fn (Layout $layout): array => [$layout->id => $layout->name . ' (' . $layout->pages_count . ')']
                         )
-                        ->toArray()
+                        ->all()
                 )
                 ->default(fn () => CapellCore::getModel(ModelEnum::Layout)::default()->first(['id'])?->id)
                 ->reactive()

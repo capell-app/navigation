@@ -1064,7 +1064,8 @@ class DemoCreator
                     'language_id' => $language->id,
                     'title' => $testimonial['name'],
                     'content' => sprintf('<p>%s</p>', $testimonial['content']),
-                ])->toArray()
+                ])
+                    ->all()
             );
 
             $testimonialsCollection->push($content);
@@ -1185,7 +1186,8 @@ class DemoCreator
                         'language_id' => $language->id,
                         'title' => $member['name'],
                         'content' => $member['bio'],
-                    ])->toArray()
+                    ])
+                    ->all()
             );
 
             $teamMembersCollection->push($content);

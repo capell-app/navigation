@@ -335,7 +335,7 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         return $this->morphToMany(Tag::class, 'taggable', 'taggables');
     }
 
-    public function scopeOrdered(Builder $query, string $dir = 'asc'): void
+    protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'))
             ->orderBy($this->qualifyColumn('name'));

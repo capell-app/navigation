@@ -267,13 +267,13 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
         return $this->hasManyJson(Layout::class, 'widgets', 'key');
     }
 
-    public function scopeOrdered(Builder $query, string $dir = 'asc'): void
+    protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'), $dir)
             ->orderBy($this->qualifyColumn('name'), $dir);
     }
 
-    public function scopeWithLayoutsCount(Builder $query): void
+    protected function scopeWithLayoutsCount(Builder $query): void
     {
         $query->addRawSelect(
             match (DB::getDriverName()) {

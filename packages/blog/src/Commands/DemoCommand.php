@@ -61,7 +61,7 @@ class DemoCommand extends Command
                     ->select(['id', 'name'])
                     ->get()
                     ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
-                    ->toArray(),
+                    ->all(),
                 validate: [
                     'required',
                     'array',

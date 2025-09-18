@@ -18,7 +18,7 @@ class AssetTypeSelect extends Select
             ->options(
                 fn (): array => CapellCore::getAssets()
                     ->mapWithKeys(static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()])
-                    ->toArray()
+                    ->all()
             )
             ->autoDefault();
     }

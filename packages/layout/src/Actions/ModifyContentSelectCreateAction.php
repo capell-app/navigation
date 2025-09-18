@@ -62,7 +62,8 @@ class ModifyContentSelectCreateAction
                                 (string) Str::uuid() => [
                                     'language_id' => $translation->language_id,
                                 ],
-                            ])->toArray(),
+                            ])
+                                ->all(),
                         ];
                     })
                     ->modalWidth(Width::ScreenLarge)

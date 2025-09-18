@@ -48,7 +48,7 @@ class LayoutBuilderAddWidgetSchema
 
                             return [$widget->getKey() => $component::getSelectOption($widget, $data)];
                         })
-                        ->toArray()
+                        ->all()
                 ),
             ...$containers instanceof Collection ? [
                 Select::make('container')
@@ -66,7 +66,7 @@ class LayoutBuilderAddWidgetSchema
 
         return $model::getTypeGroups()
             ->mapWithKeys(fn ($group): array => [$group => __('capell-admin::generic.' . $group)])
-            ->toArray();
+            ->all();
     }
 
     private static function getWidgetOptions(?array $typeId, ?array $group, ?string $search = null): Collection

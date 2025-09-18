@@ -7,12 +7,24 @@ parameters:
     level: 1
     paths:
         - packages
-    checkOctaneCompatibility: true
-    checkModelProperties: true
+    checkAuthCallsWhenInRequestScope: true
+    checkConfigTypes: true
     checkExplicitMixedMissingReturn: true
     checkFunctionNameCase: true
+    checkMissingTranslations: false
+    checkModelMethodVisibility: true
+    checkModelProperties: true
+    checkOctaneCompatibility: true
+    checkUnusedViews: true
+    noUnnecessaryEnumerableToArrayCalls: true
     databaseMigrationsPath:
         - packages/layout/database/migrations
     configDirectories:
         - packages/blog/config
+    translationDirectories:
+        - packages/blog/resources/lang
+        - packages/layout/resources/lang
+    viewDirectories:
+        - packages/blog/resources/views
+        - packages/layout/resources/views
     tmpDir: /tmp/phpstan

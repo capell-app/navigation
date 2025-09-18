@@ -102,7 +102,7 @@ class WidgetAssetsTable implements TableConfigurator
                                 ->mapWithKeys(
                                     fn (WidgetAsset $widgetAsset): array => [$widgetAsset->page_id => $widgetAsset->page->name]
                                 )
-                                ->toArray()
+                                ->all()
                         ),
 
                     AssetTypeSelect::make('type')

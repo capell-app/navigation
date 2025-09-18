@@ -92,7 +92,7 @@ class ContentAssetsRelationManager extends RelationManager
                             ->mapWithKeys(
                                 static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()]
                             )
-                            ->toArray()
+                            ->all()
                     ),
                 SelectFilter::make('type_id')
                     ->label(__('capell-admin::form.type'))
