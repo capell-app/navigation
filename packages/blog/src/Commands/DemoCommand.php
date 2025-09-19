@@ -103,7 +103,7 @@ class DemoCommand extends Command
         Collection $languages,
         Language $defaultLanguage,
         null|bool|Page $parent = null,
-        ?string $parent_name = '',
+        ?string $parentName = '',
         string $type = '',
         ?Model $author = null
     ): void {
@@ -113,7 +113,7 @@ class DemoCommand extends Command
             $name .= ' ' . Str::title($type);
         }
 
-        $full_name = $parent_name !== null && $parent_name !== '' && $parent_name !== '0' ? sprintf('%s » %s', $parent_name, $name) : $name;
+        $full_name = $parentName !== null && $parentName !== '' && $parentName !== '0' ? sprintf('%s » %s', $parentName, $name) : $name;
 
         $page = $this->demoCreator->createPage($data, $site, $languages, $parent, $type);
 
@@ -128,7 +128,7 @@ class DemoCommand extends Command
                 languages: $languages,
                 defaultLanguage: $defaultLanguage,
                 parent: $parent === false ? false : $page,
-                parent_name: $full_name,
+                parentName: $full_name,
                 type: $type,
                 author: $author
             );

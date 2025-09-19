@@ -20,6 +20,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Override;
 
 class AssetsWidgetSchema extends DefaultWidgetSchema
@@ -81,7 +82,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
     protected static function getContentTab(Schema $schema): Tab
     {
         return Tab::make(__('capell-admin::tab.content'))
-            ->icon('heroicon-o-language')
+            ->icon(Heroicon::Language)
             ->schema([
                 WidgetTranslationsRepeater::make($schema)
                     ->contained(false),

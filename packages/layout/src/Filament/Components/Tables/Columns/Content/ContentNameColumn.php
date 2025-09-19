@@ -7,6 +7,7 @@ namespace Capell\Layout\Filament\Components\Tables\Columns\Content;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
 use Capell\Layout\Models\Content;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\TextSize;
 
 class ContentNameColumn extends BadgeableColumn
@@ -17,7 +18,7 @@ class ContentNameColumn extends BadgeableColumn
 
         $this->searchable()
             ->sortable()
-            ->size(TextSize::Medium)
+            ->weight(FontWeight::Medium)
             ->description(function (Content $record): ?string {
                 $ancestors = $record->ancestors()->get();
 

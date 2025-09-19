@@ -32,9 +32,10 @@ return RectorConfig::configure()
         phpunitCodeQuality: true,
         doctrineCodeQuality: true,
         symfonyCodeQuality: true,
-        symfonyConfigs: true,
+        symfonyConfigs: true
     )
     ->withImportNames()
+    ->withIndent()
     ->withRules([
         ReplaceFakerPropertyFetchWithMethodCallRector::class,
     ])

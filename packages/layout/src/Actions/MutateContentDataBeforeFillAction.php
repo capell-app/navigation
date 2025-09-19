@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Capell\Layout\Actions;
 
 use Capell\Admin\Actions\BuilderDefaultTranslationsAction;
+use Capell\Core\Facades\CapellCore;
+use Capell\Layout\Enums\LayoutModelEnum;
+use Capell\Layout\Models\Content;
+use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**

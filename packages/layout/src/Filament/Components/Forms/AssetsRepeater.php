@@ -154,7 +154,6 @@ class AssetsRepeater extends Repeater
                 )
                 ->all()
         )
-            ->extraDropdownAttributes(['class' => 'contain-layout'])
             ->dropdownPlacement('bottom')
             ->label(fn (): string|Htmlable|null => $action->getLabel())
             ->icon(Heroicon::Plus);

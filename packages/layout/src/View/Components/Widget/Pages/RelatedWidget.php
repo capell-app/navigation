@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\View\Components\Widget\Pages;
 
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Type;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Capell\Frontend\Services\Loader\TagLoader;
@@ -35,7 +34,7 @@ class RelatedWidget extends AbstractPagesWidget
             withDate: $this->widget->meta['with_date'] ?? false,
             cacheKeyPrepend: 'tags-' . implode('-', $tagIds),
             /**
-             * @param Builder<Page> $query
+             * @param  Builder<Page>  $query
              */
             modifyQuery: fn (Builder $query) => $query
                 ->where('pages.id', '!=', $pageRecord->id)
@@ -45,17 +44,16 @@ class RelatedWidget extends AbstractPagesWidget
                 )
                 ->whereHas(
                     'type',
-                    fn (Builder $query): Builder =>
-                        $query->enabled()
-                            ->listable()
-                            ->accessible()
-                            ->when(
-                                $this->widget->meta['exclude_types'] ?? false,
-                                fn (BuilderContract $query) => $query->whereNotIn(
-                                    'types.key',
-                                    $this->widget->meta['exclude_types'] ?? []
-                                )
+                    fn (Builder $query): Builder => $query->enabled()
+                        ->listable()
+                        ->accessible()
+                        ->when(
+                            $this->widget->meta['exclude_types'] ?? false,
+                            fn (BuilderContract $query) => $query->whereNotIn(
+                                'types.key',
+                                $this->widget->meta['exclude_types'] ?? []
                             )
+                        )
                 )
                 ->when(
                     $tags instanceof Collection && $tags->isNotEmpty(),

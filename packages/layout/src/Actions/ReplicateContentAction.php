@@ -34,16 +34,15 @@ class ReplicateContentAction
 
         $model->fill($data);
 
-        $replica = $model->duplicate();
-
-        if ($model->isClean('name')) {
-            $replica->name = $this->getContentName($content);
-        }
+        $replica = $model->duplicate([
+            'draft_id',
+        ]);
 
         $replica->created_at = now();
         $replica->updated_at = now();
 
-        if ($replica->isPublished()) {
+        if ($content->isPublished()) {
+            $replica->is_published = true;
             $replica->published_at = now();
         }
 
@@ -60,19 +59,5 @@ class ReplicateContentAction
         }
 
         return $replica;
-    }
-
-    private function getContentName(Content $content): string
-    {
-        $name = Str::incrementName($content->name);
-
-        /** @var class-string<Content> $model */
-        $model = CapellCore::getModel(LayoutModelEnum::Content->name);
-
-        while ($model::query()->where('name', $name)->exists()) {
-            $name = Str::incrementName($name);
-        }
-
-        return $name;
     }
 }

@@ -11,6 +11,7 @@ use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
 use Capell\Admin\Filament\Components\Forms\Page\PageTagsInput;
 use Capell\Admin\Filament\Components\Forms\PublishDates;
+use Capell\Admin\Filament\Components\Forms\PublishSchema;
 use Capell\Admin\Filament\Components\Forms\PublishToggle;
 use Capell\Admin\Filament\Resources\Pages\RelationManagers\AuditsRelationManager;
 use Capell\Admin\Filament\Resources\Pages\Schemas\Types\DefaultPageSchema;
@@ -42,16 +43,7 @@ class ArticlePageSchema extends DefaultPageSchema
     {
         return [
             static::getTranslationFormSchema($schema),
-            Group::make()
-                ->columnSpanFull()
-                ->schema([
-                    PublishToggle::make('is_published')
-                        ->reactive(),
-                    PublishDates::make()
-                        ->columnSpanFull()
-                        ->columns()
-                        ->whenFalsy('is_published'),
-                ]),
+            PublishSchema::make($schema)
         ];
     }
 
@@ -151,12 +143,7 @@ class ArticlePageSchema extends DefaultPageSchema
                         )
                     ),
             ]),
-            PublishToggle::make('is_published')
-                ->reactive(),
-            PublishDates::make()
-                ->columnSpanFull()
-                ->columns()
-                ->whenFalsy('is_published'),
+            PublishSchema::make($schema),
         ];
     }
 }

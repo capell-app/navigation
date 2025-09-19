@@ -335,12 +335,6 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         return $this->morphToMany(Tag::class, 'taggable', 'taggables');
     }
 
-    protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
-    {
-        $query->orderBy($this->qualifyColumn('order'))
-            ->orderBy($this->qualifyColumn('name'));
-    }
-
     protected static function bootNodeTrait(): void
     {
         // Handled in boot
@@ -349,6 +343,12 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
     protected static function bootHasDrafts(): void
     {
         // Handled in boot
+    }
+
+    protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
+    {
+        $query->orderBy($this->qualifyColumn('order'))
+            ->orderBy($this->qualifyColumn('name'));
     }
 
     protected function actions(): Attribute
