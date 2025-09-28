@@ -6,7 +6,7 @@ namespace Capell\Blog\View\Components\Widget\Page;
 
 use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Core\Models\Page;
-use Capell\Frontend\Facades\Frontend;
+use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -35,8 +35,8 @@ class Archives extends AbstractWidget
         $limit = $this->widget->meta['limit'] ?? config('capell-frontend.pagination_limit', 12);
 
         $this->archives = BlogLoader::getArchives(
-            site: Frontend::getSite(),
-            language: Frontend::getLanguage(),
+            site: FrontendLoader::getSite(),
+            language: FrontendLoader::getLanguage(),
             type: $type,
             limit: $limit
         );
@@ -47,6 +47,6 @@ class Archives extends AbstractWidget
             return;
         }
 
-        $this->archivePage = BlogLoader::getArchivePage(Frontend::getSite(), Frontend::getLanguage());
+        $this->archivePage = BlogLoader::getArchivePage(FrontendLoader::getSite(), FrontendLoader::getLanguage());
     }
 }

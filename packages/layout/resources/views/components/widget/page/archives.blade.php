@@ -5,10 +5,10 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 
-    $site = Frontend::getSite();
-    $pageParams = Frontend::getPageParams();
+    $site = FrontendLoader::getSite();
+    $pageParams = FrontendLoader::getPageParams();
 @endphp
 
 @props([
@@ -35,7 +35,7 @@ declare(strict_types=1);
             class="mb-4"
             :compact="true"
             :content="$widget->translation->content"
-            :contents="$widget->translation->content ? null : $widget->translation->contents"
+            :presenter="$widget->type->meta['content_presenter'] ?? null"
             :title="$widget->translation->title"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         />
@@ -47,7 +47,7 @@ declare(strict_types=1);
         <ul class="divide-y divide-gray-100 dark:divide-gray-600">
             @foreach ($archives as $archive)
                 @php
-                    $url = $archivePage->pageUrl->full_url.'/'.$archive->year.'-'.$archive->month;
+                    $url = $archivePage->pageUrl->full_url . '/' . $archive->year . '-' . $archive->month;
                     $active = $archiveDate && $archiveDate->month === $archive->month && $archiveDate->year === $archive->year;
                 @endphp
 

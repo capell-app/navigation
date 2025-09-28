@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
-use RectorLaravel\Rector\PropertyFetch\ReplaceFakerPropertyFetchWithMethodCallRector;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use RectorLaravel\Set\LaravelSetProvider;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -15,9 +16,7 @@ return RectorConfig::configure()
         cacheDirectory: '/tmp/rector',
         cacheClass: FileCacheStorage::class,
     )
-    ->withSkip([
-        __DIR__ . '/packages/layout/src/LayoutServiceProvider.php', // Renaming blade component to aliasComponent https://github.com/driftingly/rector-laravel/issues/356
-    ])
+    ->withParallel()
     ->withPreparedSets(
         deadCode: true,
         codeQuality: true,
@@ -32,11 +31,12 @@ return RectorConfig::configure()
         phpunitCodeQuality: true,
         doctrineCodeQuality: true,
         symfonyCodeQuality: true,
-        symfonyConfigs: true
+        symfonyConfigs: true,
     )
     ->withImportNames()
-    ->withIndent()
     ->withRules([
-        ReplaceFakerPropertyFetchWithMethodCallRector::class,
+        AddOverrideAttributeToOverriddenMethodsRector::class,
     ])
-    ->withPhpSets();
+    ->withPhpSets()
+    ->withSetProviders(LaravelSetProvider::class)
+    ->withComposerBased(laravel: true, phpunit: true);

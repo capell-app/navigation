@@ -15,12 +15,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
-use OwenIt\Auditing\Contracts\Auditable;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Model implements Auditable, AuthenticatableContract, AuthorizableContract, FilamentUser, HasMedia
+class User extends Model implements AuthenticatableContract, AuthorizableContract, FilamentUser, HasMedia
 {
     use Authenticatable;
     use AuthenticationLoggable;
@@ -32,8 +33,8 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
     use HasPanelShield;
     use HasRoles;
     use InteractsWithMedia;
+    use LogsActivity;
     use Notifiable;
-    use \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -68,16 +69,26 @@ class User extends Model implements Auditable, AuthenticatableContract, Authoriz
         'two_factor_secret',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
     protected static string $factory = UserFactory::class;
 
-    /**
-     * The attributes that should be cast.
-     */
-    protected function casts(): array
+    public function getActivitylogOptions(): LogOptions
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return LogOptions::defaults()
+            ->useLogName('user')
+            ->logAll()
+            ->logExcept([
+                'email_verified_at',
+                'password',
+                'remember_token',
+                'updated_at',
+                'created_at',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

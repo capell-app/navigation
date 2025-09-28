@@ -22,12 +22,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\QueryBuilder;
-use OwenIt\Auditing\Models\Audit;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * @property-read Collection<int, Audit> $audits
  * @property-read int|null $audits_count
  * @property-read User|null $author
  * @property-read Page|null $canonicalPage
@@ -149,6 +148,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $asset_relations_count
  * @property-read Collection<int, AssetRelation> $assets
  * @property-read int|null $assets_count
+ * @property-read Collection<int, Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read Collection|Page[] $related
+ * @property-read int|null $related_count
  *
  * @mixin Eloquent
  */

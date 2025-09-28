@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Actions;
 
 use Capell\Core\Models\Page;
-use Capell\Layout\Facades\Layout;
+use Capell\Layout\Facades\CapellLayout;
 use Capell\Layout\Models\Widget;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -58,7 +58,7 @@ class PageHasHeroWidgetAction
                 continue;
             }
 
-            return Layout::getContainerWidget(
+            return CapellLayout::getContainerWidget(
                 self::HERO_KEY,
                 $layoutWidget['widget_key'],
                 $layoutWidget['occurrence'] ?? 1

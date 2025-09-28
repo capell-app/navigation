@@ -9,12 +9,8 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Filament\Resources\Contents\Schemas\ContentForm;
-use Capell\Layout\Models\Content;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
-use Filament\Notifications\Notification;
-use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsObject;
@@ -28,21 +24,7 @@ class ModifyContentSelectCreateAction
 
     public function handle(Select $select): Select
     {
-        return $select->createOptionForm(
-            fn (mixed $state, Schema $schema): Schema => ContentForm::configure(
-                $schema->operation('createOption')->model(Content::class)
-            )
-        )
-            ->createOptionUsing(function (Select $component, array $data): int|string {
-                $content = CreateContentAction::run($data);
-
-                Notification::make()
-                    ->title(__('capell-admin::message.content_created_successfully'))
-                    ->body($content->name)
-                    ->send();
-
-                return $content->getKey();
-            })
+        return $select
             ->createOptionAction(
                 fn (Action $action): Action => $action
                     ->modal()
@@ -67,6 +49,7 @@ class ModifyContentSelectCreateAction
                         ];
                     })
                     ->modalWidth(Width::ScreenLarge)
+                    ->slideOver()
                     ->visible(fn (mixed $state, $record): bool => ! $state)
                     ->successNotificationTitle(
                         fn (Action $action): string => __(

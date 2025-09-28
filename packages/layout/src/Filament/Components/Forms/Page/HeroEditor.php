@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms\Page;
 
+use Capell\Admin\Enums\TinyEditorProfile;
 use Capell\Admin\Filament\Components\Forms\ContentEditor;
+use Capell\Admin\Filament\Components\Forms\Editor\ContentBuilder;
+use Capell\Admin\Filament\Components\Forms\Editor\RichEditor;
+use Capell\Admin\Filament\Components\Forms\Editor\TinyEditor;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
@@ -41,7 +45,12 @@ class HeroEditor extends Group
             ->schema([
                 ContentEditor::make('hero')
                     ->label(__('capell-layout::form.hero'))
-                    ->hint(__('capell-layout::generic.hero_info')),
+                    ->hint(__('capell-layout::generic.hero_info'))
+                    ->tap(
+                        fn (ContentBuilder|RichEditor|TinyEditor $component): ContentBuilder|RichEditor|TinyEditor => $component instanceof TinyEditor
+                            ? $component->profile(TinyEditorProfile::Simple->value)
+                            : $component
+                    ),
             ]);
     }
 

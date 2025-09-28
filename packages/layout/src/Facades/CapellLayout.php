@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see CapellLayoutManager
  */
-class Layout extends Facade
+class CapellLayout extends Facade
 {
     protected static function getFacadeAccessor(): string
     {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 
-    $language = Frontend::getLanguage();
+    $language = FrontendLoader::getLanguage();
 @endphp
 
 @props([
@@ -27,7 +27,7 @@ declare(strict_types=1);
     @if ($image)
         <img
             class="mx-auto mb-4 h-36 w-64 object-cover"
-            src="{{ $image->url }}"
+            src="{{ $image->getUrl('thumb') }}"
             alt="{{ e(strip_tags($title ?? '')) }}"
         />
     @endif

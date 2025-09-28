@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Livewire;
 
 use BackedEnum;
-use Capell\Admin\Actions\BuildWidgetAssetDataAction;
 use Capell\Admin\Actions\NotifyClearCachedPagesAction;
 use Capell\Admin\Actions\ReplicateLayoutAction;
 use Capell\Admin\Enums\ResourceEnum;
@@ -643,11 +642,13 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 $widget = $this->getContainerWidget($containerKey, $widgetIndex);
 
+                $asset = CapellAdmin::getAsset($assetType);
+
                 return [
                     'widget_id' => $widget->id,
                     'asset_type' => $assetType,
                     'meta' => [],
-                    'asset' => BuildWidgetAssetDataAction::run($arguments['type']),
+                    'asset' => $asset->defaultDataAction !== null && $asset->defaultDataAction !== '' && $asset->defaultDataAction !== '0' ? $asset->defaultDataAction::run($arguments['type']) : [],
                 ];
             })
             ->action(self::addAssetFromAction(...));
@@ -1065,7 +1066,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             'meta' => [],
         ]);
 
-        $asset = CapellCore::getAsset($assetType)->getModel()::make();
+        $asset = CapellCore::getAsset($assetType)->model::make();
 
         $record->setRelation('asset', $asset);
 
@@ -1819,7 +1820,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     $widgetAssets->add($widgetAsset);
                 }
 
-                $widget->setRelation('assets', $widgetAssets);
+                if ($widgetAssets->isNotEmpty()) {
+                    $widget->setRelation('assets', $widgetAssets);
+                }
             }
         }
     }
@@ -2040,20 +2043,43 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         int $order,
         array $asset,
     ): WidgetAsset {
-        /** @var WidgetAsset $widgetAsset */
-        $widgetAsset = $widget->assets()->make([
-            'meta' => $asset['meta'] ?? [],
-            'order' => $order,
+        // Build the unique key attributes based on whether this is a page-scoped asset
+        $attributes = [
             'widget_id' => $widget->id,
             'asset_type' => $asset['asset_type'],
             'asset_id' => $asset['asset_id'],
-        ]);
+        ];
 
         if ($hasPageAssets) {
-            $widgetAsset->page_id = $this->page_id;
-            $widgetAsset->container = $containerKey;
-            $widgetAsset->occurrence = $occurrence;
+            $attributes['page_id'] = $this->page_id;
+            $attributes['container'] = $containerKey;
+            $attributes['occurrence'] = $occurrence;
+        } else {
+            $attributes['page_id'] = null;
+            $attributes['container'] = null;
+            $attributes['occurrence'] = null;
         }
+
+        // Try to find an existing asset first to avoid unique constraint violations
+        /** @var WidgetAsset|null $existing */
+        $existing = WidgetAsset::query()
+            ->where($attributes)
+            ->first();
+
+        if ($existing) {
+            // Update order/meta if needed and return existing record
+            $existing->order = $order;
+            $existing->meta = $asset['meta'] ?? [];
+            $existing->save();
+
+            return $existing;
+        }
+
+        /** @var WidgetAsset $widgetAsset */
+        $widgetAsset = $widget->assets()->make(array_merge([
+            'meta' => $asset['meta'] ?? [],
+            'order' => $order,
+        ], $attributes));
 
         $widgetAsset->save();
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\Filament\Resources\Articles\Schemas\Types;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\LayoutSelect;
 use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
@@ -16,7 +16,6 @@ use Capell\Admin\Filament\Resources\Pages\Schemas\Types\DefaultPageSchema;
 use Capell\Blog\Filament\Components\Forms\Page\PageTagsInput;
 use Capell\Blog\Services\Loader\BlogLoader;
 use Closure;
-use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
@@ -108,7 +107,7 @@ class ArticlePageSchema extends DefaultPageSchema
     }
 
     #[Override]
-    protected function getParentPageSelect(Schema $schema): Select
+    protected function getParentPageSelect(Schema $schema): ParentPageSelect
     {
         return ParentPageSelect::make('parent_id')
             ->label(__('capell-admin::form.parent_page'))

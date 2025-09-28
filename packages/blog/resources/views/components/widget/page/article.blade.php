@@ -5,7 +5,7 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 @endphp
 
 @props([
@@ -36,7 +36,7 @@ declare(strict_types=1);
             :image="$pageRecord->image"
             :heading-size="$headingSize"
             :content="$pageRecord->translation->content"
-            :contents="$pageRecord->translation->content ? null : $pageRecord->translation->contents"
+            :presenter="$widget->type->meta['content_presenter'] ?? null"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         >
             <div>

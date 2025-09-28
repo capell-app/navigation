@@ -39,7 +39,7 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
         return [
             CreateWidgetDetailsSchema::make($schema),
             WidgetTranslationsRepeater::make($schema)
-                ->section(fn (string $operation): bool => $operation === 'create'),
+                ->contained(fn (string $operation): bool => $operation === 'create'),
         ];
     }
 
@@ -50,7 +50,7 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
             FixedWidthSidebar::make()
                 ->mainSchema([
                     WidgetTranslationsRepeater::make($schema)
-                        ->section(),
+                        ->contained(),
                 ])
                 ->sidebarSchema(
                     WidgetSettingsSchema::make($schema),

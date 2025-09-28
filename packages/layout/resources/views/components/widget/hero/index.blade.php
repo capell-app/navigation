@@ -6,13 +6,13 @@ declare(strict_types=1);
 
 @php
     use Capell\Frontend\Actions\ReplacePageDataAction;
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
     use Capell\Frontend\Services\Loader\PageLoader;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-    $page = Frontend::getPage();
-    $pageParams = Frontend::getPageParams();
-    $theme = Frontend::getTheme();
+    $page = FrontendLoader::getPage();
+    $pageParams = FrontendLoader::getPageParams();
+    $theme = FrontendLoader::getTheme();
 @endphp
 
 @props([
@@ -103,10 +103,10 @@ declare(strict_types=1);
                     $slideColorScheme = $asset->meta['color_scheme'] ?? $colorScheme;
 
                     $url = null;
-                    if ($widgetAsset->relatedPage) {
+                    if ($asset->linkedPage) {
                         $pageUrl = PageLoader::getPageUrlById(
-                            pageId: $widgetAsset->relatedPage->id,
-                            site: $widgetAsset->relatedPage->site,
+                            pageId: $asset->linkedPage->id,
+                            site: $asset->linkedPage->site,
                             language: $language,
                         );
 

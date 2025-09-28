@@ -70,9 +70,9 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      - name: Install PHP dependencies
+      - name: Install PHP dependencies (use dev v4 branches)
         if: steps.php-cache.outputs.cache-hit != 'true'
-        run: composer install --no-interaction --no-progress --ansi --optimize-autoloader
+        run: composer update capell-app/core capell-app/admin capell-app/frontend --no-interaction --no-progress --ansi --optimize-autoloader --with capell-app/core:dev-feature/4.x --with capell-app/admin:dev-feature/4.x --with capell-app/frontend:dev-feature/4.x
 
       - name: Configure environment
         run: |

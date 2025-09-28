@@ -7,6 +7,7 @@ namespace Capell\Layout\Models;
 use ArrayAccess;
 use Bkwld\Cloner\Cloneable;
 use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Concerns\CloneableExcept;
@@ -46,8 +47,9 @@ use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\NodeTrait;
 use Kalnoy\Nestedset\QueryBuilder;
 use Oddvalue\LaravelDrafts\Concerns\HasDrafts;
-use OwenIt\Auditing\Contracts\Auditable;
-use OwenIt\Auditing\Models\Audit;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
@@ -57,7 +59,6 @@ use Wildside\Userstamps\Userstamps;
 /**
  * @property-read Collection<int, AssetRelation> $assets
  * @property-read int|null $assets_count
- * @property-read Collection<int, Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Kalnoy\Nestedset\Collection<int, Content> $children
  * @property-read int|null $children_count
@@ -162,11 +163,13 @@ use Wildside\Userstamps\Userstamps;
  * @property-read Page|null $linkedPage
  * @property-read Collection<int, AssetRelation> $assetRelations
  * @property-read int|null $asset_relations_count
+ * @property-read Collection<int, Activity> $activities
+ * @property-read int|null $activities_count
  *
  * @mixin Eloquent
  */
 #[ObservedBy(ContentObserver::class)]
-class Content extends Model implements Auditable, Draftable, HasMedia, PageCacheable
+class Content extends Model implements Draftable, HasMedia, PageCacheable
 {
     use Cloneable;
     use CloneableExcept;
@@ -189,16 +192,14 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
     use HasTranslations;
     use HasTypes;
     use InteractsWithMedia;
+    use LogsActivity;
     use NodeTrait {
         NodeTrait::bootNodeTrait as protected;
         NodeTrait::parent as nodeTraitParent;
         NodeTrait::applyNestedSetScope as applyNestedSetScopeParent;
     }
-    use \OwenIt\Auditing\Auditable;
     use SoftDeletes;
     use Userstamps;
-
-    public const MEDIA_IMAGE = 'image';
 
     /**
      * The attributes that are mass assignable.
@@ -215,7 +216,7 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         'publish_to',
         'site_id',
         'type_id',
-        'draft_id',
+        'uuid',
     ];
 
     /**
@@ -228,6 +229,13 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         'translations',
     ];
 
+    protected $casts = [
+        'is_published' => 'boolean',
+        'meta' => 'json',
+        'publish_from' => 'datetime',
+        'publish_to' => 'datetime',
+    ];
+
     protected static string $factory = ContentFactory::class;
 
     public static function getMorphRelations(): array
@@ -235,7 +243,7 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         return [
             'ancestors',
             'image',
-            'media',
+            // 'media',
             'related',
             'site',
             'translation',
@@ -243,9 +251,33 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
         ];
     }
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('content')
+            ->logAll()
+            ->logExcept([
+                'updated_at',
+                'created_at',
+                'deleted_at',
+                'draft_id',
+                'is_published',
+                'is_current',
+                'publisher_type',
+                'publisher_id',
+                '_lft',
+                '_rgt',
+                'created_by',
+                'updated_by',
+                'deleted_by',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
+        $this->addMediaCollection(MediaCollectionEnum::Image->value)->singleFile();
     }
 
     public function applyNestedSetScope($query, $table = null)
@@ -302,7 +334,7 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
 
     public function image(): MorphOne
     {
-        return $this->morphOneMedia(static::MEDIA_IMAGE);
+        return $this->morphOneMedia(MediaCollectionEnum::Image->value);
     }
 
     public function linkedPage(): BelongsTo
@@ -354,20 +386,5 @@ class Content extends Model implements Auditable, Draftable, HasMedia, PageCache
     protected function actions(): Attribute
     {
         return Attribute::make(get: fn () => $this->meta['actions'] ?? []);
-    }
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'is_published' => 'boolean',
-            'meta' => 'json',
-            'publish_from' => 'datetime',
-            'publish_to' => 'datetime',
-        ];
     }
 }

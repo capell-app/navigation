@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Concerns;
 
-use Capell\Admin\Actions\ModifyPageSelectCreateAction;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Contracts\Draftable;
 use Capell\Core\Models\Page;
-use Capell\Layout\Actions\ModifyContentSelectCreateAction;
-use Capell\Layout\Models\Content;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\MorphToSelect;
 use Filament\Forms\Components\MorphToSelect\Type;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -71,13 +70,11 @@ trait HasAssetsRelationManager
 
     protected static function getMorphToSelectType(AssetData $asset, Model $record): Type
     {
-        $model = $asset->getModel();
-
-        return Type::make($model)
+        return Type::make($asset->model)
             ->titleAttribute($asset->getTitleKey())
             ->modifyOptionsQueryUsing(
                 fn (Builder $query) => $query->when(
-                    $record instanceof $model,
+                    $record instanceof $asset->model,
                     fn (Builder $query) => $query->whereKeyNot($record->id)
                 )
                     ->whereDoesntHave(
@@ -89,11 +86,11 @@ trait HasAssetsRelationManager
                             ->where('related_id', $record->getKey())
                     )
                     ->when(
-                        in_array(Draftable::class, class_implements($model), true),
+                        in_array(Draftable::class, class_implements($asset->model), true),
                         fn (Builder $query) => $query->withDrafts()
                     )
                     ->when(
-                        $model === Page::class,
+                        $asset->model === Page::class,
                         fn (Builder $query) => $query->with([
                             'ancestors' => fn (Relation $query) => $query->withDrafts(),
                             'site',
@@ -112,7 +109,7 @@ trait HasAssetsRelationManager
                             ->orderBy('site_id')
                     )
                     ->when(
-                        in_array(NestedSet::class, class_uses_recursive($model), true),
+                        in_array(NestedSet::class, class_uses_recursive($asset->model), true),
                         fn (Builder $query) => $query->defaultOrder()
                     )
             )
@@ -123,13 +120,31 @@ trait HasAssetsRelationManager
                 },
             )
             ->modifyKeySelectUsing(
-                // TODO make this configurable per asset type
-                fn (Select $select): Select => (match ($asset->getModel()) {
-                    Content::class => ModifyContentSelectCreateAction::run($select),
-                    Page::class => ModifyPageSelectCreateAction::run($select),
-                })
-                    ->preload()
-                    ->searchable()
+                function (Select $select) use ($asset): Select {
+                    $createOptionUsing = $select->getCreateOptionUsing();
+
+                    $adminAsset = CapellCore::getAsset($asset->name);
+
+                    return $select->createOptionForm(
+                        fn (Schema $schema): Schema => $adminAsset->formClass::configure(
+                            $schema->operation('createOption')->model($asset->model)
+                        )
+                    )
+                        ->createOptionUsing(function (Select $component, array $data) use ($asset, $adminAsset, $createOptionUsing): int|string {
+                            $page = $adminAsset->createAction
+                                ? $adminAsset->createAction::run($data)
+                                : $component->evaluate($createOptionUsing);
+
+                            Notification::make()
+                                ->title(__('capell-admin::message.asset_created_successfully', ['name' => $asset->name]))
+                                ->body($page->name)
+                                ->send();
+
+                            return $page->getKey();
+                        })
+                        ->preload()
+                        ->searchable();
+                }
             );
     }
 

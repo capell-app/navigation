@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 use Capell\Admin\Commands\DemoCommand;
 use Capell\Admin\Commands\InstallCommand;
-use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
 use Capell\Admin\Services\Creator\DemoCreator;
 use Capell\Core\Database\Factories\TypeFactory;
-use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
 use Capell\Frontend\Livewire\Page\SitemapPage;
+use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
 arch()
     ->expect('Capell\Blog')
@@ -33,15 +32,14 @@ arch()
     ->laravel()
     ->ignoring('exit');
 
-arch()->preset()->security();
+arch()->preset()->security()
+    ->ignoring([
+        HasRelationship::class,
+    ]);
 
 it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])
-    ->toBeUsedInNothing()
-    ->ignoring([
-        Frontend::class,
-        EditPage::class,
-    ]);
+    ->toBeUsedInNothing();
 
 it('does not use exit functions')
     ->expect(['exit'])

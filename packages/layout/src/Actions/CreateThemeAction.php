@@ -36,7 +36,7 @@ class CreateThemeAction
                     'status' => true,
                     'default' => true,
                     'meta' => [
-                        'build_path' => 'vendor/capell-layout',
+                        'build_path' => 'vendor/capell-layout/frontend',
                         'vendor_assets' => [
                             'resources/js/capell-frontend.js',
                         ],

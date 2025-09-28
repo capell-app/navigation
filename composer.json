@@ -31,6 +31,13 @@
     },
     "repositories": [
         {
+            "type": "path",
+            "url": "./packages/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
             "type": "vcs",
             "url": "https://github.com/capell-app/core"
         },
@@ -44,22 +51,19 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/howdu/activitylog"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/howdu/filament-adjacency-list"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/howdu/filament-title-with-slug"
         },
         {
             "type": "vcs",
             "url": "https://github.com/lara-zeus/translatable"
-        },
-        {
-            "type": "git",
-            "url": "git@github.com:backstagephp/filament-adjacency-list.git"
-        },
-        {
-            "type": "path",
-            "url": "./packages/*",
-            "options": {
-                "symlink": true
-            }
         }
     ],
     "require": {
@@ -76,6 +80,7 @@
         "capell-app/admin": "^4.0|dev-4.x",
         "capell-app/core": "^4.0|dev-4.x",
         "capell-app/frontend": "^4.0|dev-4.x",
+        "codewithdennis/filament-select-tree": "^4.0",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "filament/spatie-laravel-settings-plugin": "^4.0",
@@ -90,8 +95,9 @@
         "michaloravec/laravel-paginateroute": "^1.0",
         "oddvalue/laravel-drafts": "^1.0|^2.0",
         "openai-php/laravel": "*",
-        "owen-it/laravel-auditing": "^13.1|^14.0",
         "owenvoke/blade-fontawesome": "^2.8",
+        "rmsramos/activitylog": "filament4-dev",
+        "saade/filament-adjacency-list": "feature/item-label-dev",
         "silber/page-cache": "^1.0.9",
         "spatie/laravel-data": "^4.5",
         "spatie/laravel-package-tools": "^1.14.1",
@@ -102,7 +108,6 @@
         "symfony/process": "^7.2",
         "symplify/monorepo-builder": "^10.3.3",
         "tanmuhittin/laravel-google-translate": "^2.4",
-        "tapp/filament-auditing": "^4.0",
         "tapp/filament-authentication-log": "^4.0",
         "torann/geoip": "^3.0",
         "voku/html-min": "^4.5",

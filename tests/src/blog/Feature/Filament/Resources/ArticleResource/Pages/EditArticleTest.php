@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Exceptions\InvalidPageTypeException;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Blog\Database\Factories\ArticlePageFactory;
 use Capell\Blog\Filament\Resources\Articles\ArticleResource;
@@ -11,6 +10,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\get;
@@ -35,7 +35,7 @@ test('can not render article', function (): void {
     get(PageResource::getUrl('edit', [
         'record' => (new ArticlePageFactory)->create(),
     ]));
-})->throws(InvalidPageTypeException::class);
+})->throws(ModelNotFoundException::class);
 
 test('can not render page', function (): void {
     test()->withoutExceptionHandling();
@@ -43,7 +43,7 @@ test('can not render page', function (): void {
     get(ArticleResource::getUrl('edit', [
         'record' => Page::factory()->create(),
     ]));
-})->throws(InvalidPageTypeException::class);
+})->throws(ModelNotFoundException::class);
 
 it('can save', function (): void {
     $site = Site::factory()->hasSiteDomains()->create();
@@ -72,8 +72,7 @@ it('can save', function (): void {
         ->assertHasNoFormErrors();
 
     expect($page->refresh())
-        ->name->toBe($newData->name)
-        ->meta->image_id->toBeNull();
+        ->name->toBe($newData->name);
 });
 
 it('can delete', function (): void {

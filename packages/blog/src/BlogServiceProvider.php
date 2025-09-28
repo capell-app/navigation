@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -105,6 +106,12 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             demoParams: ['author', 'sites'],
         );
 
+        Relation::morphMap(
+            collect(BlogModelEnum::cases())
+                ->mapWithKeys(fn (BlogModelEnum $model): array => [Str::snake($model->name) => $model->value])
+                ->all()
+        );
+
         CapellAdmin::registerResource(
             ResourceEnum::Page,
             class: BlogResourceEnum::Article->getResource(),
@@ -116,10 +123,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         CapellAdmin::registerSchema(SchemaTypeEnum::Page, ArticlePageSchema::class);
 
         CapellAdmin::registerSchema(\Capell\Layout\Enums\SchemaTypeEnum::Widget->value, ArticleWidgetSchema::class);
-
-        Relation::morphMap([
-            'article' => Article::class,
-        ]);
 
         CapellCore::registerModel(BlogModelEnum::Article, Article::class);
 

@@ -11,7 +11,7 @@ use Capell\Core\Models;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Frontend\Facades\FrontendManager;
+use Capell\Frontend\Facades\CapellFrontend;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -24,7 +24,7 @@ class BlogLoader
 
         $fromCache = true;
 
-        $page = FrontendManager::cacheForever($cacheKey, function () use ($site, $language, &$fromCache): ?Page {
+        $page = CapellFrontend::cacheForever($cacheKey, function () use ($site, $language, &$fromCache): ?Page {
             $fromCache = false;
 
             /** @var class-string<Page> $model */
@@ -54,7 +54,7 @@ class BlogLoader
     ): Collection {
         $cacheKey = sprintf('site-%d-%d-%s-%s-page-%s', $site->id, $language->id, $type, $limit, $paginationPage);
 
-        return FrontendManager::cacheForever($cacheKey, function () use (
+        return CapellFrontend::cacheForever($cacheKey, function () use (
             $language,
             $limit,
             $paginationKey,

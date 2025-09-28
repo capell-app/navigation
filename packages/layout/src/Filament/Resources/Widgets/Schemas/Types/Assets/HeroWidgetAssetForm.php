@@ -91,6 +91,8 @@ class HeroWidgetAssetForm extends AbstractWidgetAssetSchema
     protected function getAssetsComponent(Schema $schema): Component
     {
         return AssetsRepeater::make('assets')
-            ->hiddenLabel();
+            ->compact()
+            ->hiddenLabel()
+            ->hint(__('capell-admin::generic.widget_assets_repeater_hint'));
     }
 }

@@ -43,7 +43,7 @@ class ListContents extends ListRecords
     {
         return [
             'translations' => [
-                'contents' => 'json_data',
+                'content',
                 'meta->label',
                 'title',
             ],

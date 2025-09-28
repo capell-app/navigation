@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Contents\RelationManagers;
 
-use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Actions\GetAssetResourceUrlAction;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
-use Capell\Core\Actions\GetEditPageResourceUrlAction;
 use Capell\Core\Data\AssetData;
-use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\AssetRelation;
 use Capell\Layout\Filament\Concerns\HasAssetsRelationManager;
@@ -70,19 +68,15 @@ class ContentAssetsRelationManager extends RelationManager
                 SpatieMediaLibraryImageColumn::make('asset.image')
                     ->label(__('capell-admin::table.image'))
                     ->collection('image')
-                    ->width(0)
                     ->autoEagerLoadRelation(false),
                 TextColumn::make('asset_type')
+                    ->label(__('capell-admin::table.type'))
+                    ->width(0)
+                    ->alignCenter()
                     ->badge(),
             ])
             ->recordUrl(
-                fn (AssetRelation $record): ?string => match ($record->asset_type) {
-                    TypeEnum::Page->value => GetEditPageResourceUrlAction::run($record->asset),
-                    default => CapellAdmin::getResource(ucfirst($record->asset_type))::getUrl(
-                        'edit',
-                        ['record' => $record->asset]
-                    ),
-                }
+                fn (AssetRelation $record): string => GetAssetResourceUrlAction::run($record->asset_type, $record->asset)
             )
             ->filters([
                 SelectFilter::make('asset_type')

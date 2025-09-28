@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\View\Components\Widget\Pages;
 
 use Capell\Core\Models\Page;
-use Capell\Frontend\Facades\Frontend;
+use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Capell\Frontend\Services\Loader\TagLoader;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -18,15 +18,15 @@ class RelatedWidget extends AbstractPagesWidget
     {
         $limit = $this->widget->meta['limit'] ?? config('capell-frontend.pagination_limit', 12);
 
-        $pageRecord = Frontend::getPage();
+        $pageRecord = FrontendLoader::getPage();
 
         $tags = TagLoader::getPageTags($pageRecord);
 
         $tagIds = $tags->pluck('id')->toArray();
 
         $this->pages = PageLoader::getPages(
-            site: Frontend::getSite(),
-            language: Frontend::getLanguage(),
+            site: FrontendLoader::getSite(),
+            language: FrontendLoader::getLanguage(),
             limit: $limit,
             withChildrenCount: $pageRecord->type->meta['with_children_count'] ?? true,
             withImage: $this->widget->meta['with_image'] ?? false,

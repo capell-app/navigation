@@ -6,6 +6,7 @@ namespace Capell\Layout\Filament\Resources\Widgets;
 
 use BackedEnum;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
+use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class WidgetResource extends Resource
 {
     use HasFormConfigurator;
+    use HasNavigationBadge;
     use HasTableConfigurator;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -72,15 +74,6 @@ class WidgetResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return (string) (__('capell-admin::navigation.group_layouts'));
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        if (! config('capell-admin.resources.widget.navigation_badge')) {
-            return null;
-        }
-
-        return number_format(static::getModel()::count());
     }
 
     public static function getPluralModelLabel(): string

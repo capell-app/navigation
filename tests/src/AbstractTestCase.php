@@ -18,6 +18,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Tests\Fixtures\Models\User;
 use Capell\Tests\Fixtures\Policies\RolePolicy;
+use CodeWithDennis\FilamentSelectTree\FilamentSelectTreeServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
@@ -35,6 +36,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
@@ -46,11 +48,13 @@ use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
+use Rmsramos\Activitylog\ActivitylogServiceProvider;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
+use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\MediaLibrary\MediaLibraryServiceProvider;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionServiceProvider;
@@ -102,9 +106,12 @@ abstract class AbstractTestCase extends TestCase
         $this->withoutVite();
     }
 
+    /**
+     * @param  Application  $app
+     */
     protected function getEnvironmentSetUp($app): void
     {
-        $this->registerPackageConfigs();
+        $this->registerPackageConfigs($app);
 
         Gate::policy(Utils::getRoleModel(), RolePolicy::class);
     }
@@ -138,7 +145,10 @@ abstract class AbstractTestCase extends TestCase
             FilamentAdjacencyListServiceProvider::class,
             FilamentShieldServiceProvider::class,
             FilamentTitleWithSlugServiceProvider::class,
+            FilamentSelectTreeServiceProvider::class,
+            ActivitylogServiceProvider::class,
             FormsServiceProvider::class,
+            \Spatie\Activitylog\ActivitylogServiceProvider::class,
             LaravelDataServiceProvider::class,
             NestedSetServiceProvider::class,
             LaravelServiceProvider::class,
@@ -149,6 +159,7 @@ abstract class AbstractTestCase extends TestCase
             SupportServiceProvider::class,
             SchemasServiceProvider::class,
             CapellServiceProvider::class,
+            LaravelSettingsServiceProvider::class,
             TablesServiceProvider::class,
             TagsServiceProvider::class,
             MediaLibraryServiceProvider::class,
@@ -158,7 +169,7 @@ abstract class AbstractTestCase extends TestCase
         ];
     }
 
-    protected function registerPackageConfigs(?array $packages = null)
+    protected function registerPackageConfigs(Application $app, ?array $packages = null)
     {
         if ($packages === null || $packages === []) {
             $packages = $this->getDefaultPackages();
@@ -186,6 +197,9 @@ abstract class AbstractTestCase extends TestCase
             'root' => public_path('page-cache'),
             'throw' => false,
         ]);
+
+        // Spatie Permission testing flag for sqlite compatibility
+        Config::set('permission.testing', true);
     }
 
     protected function getDefaultPackages(): array
@@ -200,6 +214,11 @@ abstract class AbstractTestCase extends TestCase
                 'user' => 'rappasoft',
                 'name' => 'laravel-authentication-log',
                 'file' => 'authentication-log',
+            ],
+            'permission' => [
+                'user' => 'spatie',
+                'name' => 'laravel-permission',
+                'file' => 'permission',
             ],
         ];
     }

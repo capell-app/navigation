@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 ?>
 
-@props(['containerKey', 'hasPageAssets', 'occurrence', 'assetTypes', 'widget', 'widgetIndex'])
+@props(['containerKey', 'hasPageAssets', 'occurrence', 'widget', 'widgetIndex'])
 @php
     use Capell\Core\Facades\CapellCore;
     use Capell\Layout\Models\WidgetAsset;
@@ -55,38 +55,6 @@ declare(strict_types=1);
                         "
                     ></span>
                 </x-filament::link>
-            @endif
-
-            @if ($assetTypes)
-                <div class="flex flex-wrap justify-end gap-1">
-                    <x-filament::dropdown placement="bottom-end">
-                        <x-slot name="trigger">
-                            <x-filament::link
-                                :iconSize="IconSize::Small"
-                                :weight="FontWeight::Medium"
-                                :size="Size::Small"
-                                color="primary"
-                                icon="heroicon-c-plus-circle"
-                                :outlined="true"
-                            >
-                                {{ __('capell-admin::button.assets') }}
-                            </x-filament::link>
-                        </x-slot>
-                        @foreach ($assetTypes as $assetType)
-                            <x-filament::dropdown.list>
-                                <x-filament::dropdown.header
-                                    class="cursor-default font-semibold"
-                                    color="gray"
-                                    :icon="CapellCore::getAsset($assetType)->getIcon()"
-                                >
-                                    {{ __('capell-admin::button.add_asset_type', ['type' => CapellCore::getAsset($assetType)->getLabel()]) }}
-                                </x-filament::dropdown.header>
-                                {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
-                                {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
-                            </x-filament::dropdown.list>
-                        @endforeach
-                    </x-filament::dropdown>
-                </div>
             @endif
         </div>
     </div>

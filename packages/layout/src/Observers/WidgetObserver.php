@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Observers;
 
-use Capell\Admin\Actions\GenerateUniqueKeyAction;
+use Capell\Core\Actions\GenerateUniqueKeyAction;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Models\Widget;

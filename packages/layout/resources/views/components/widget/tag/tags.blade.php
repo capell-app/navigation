@@ -5,10 +5,10 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 
-    $language = Frontend::getLanguage();
-    $site = Frontend::getSite();
+    $language = FrontendLoader::getLanguage();
+    $site = FrontendLoader::getSite();
 @endphp
 
 @props([
@@ -33,7 +33,7 @@ declare(strict_types=1);
             class="mb-4"
             :compact="true"
             :content="$widget->translation->content"
-            :contents="$widget->translation->content ? null : $widget->translation->contents"
+            :presenter="$widget->type->meta['content_presenter'] ?? null"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             :title="$widget->translation->title"
         />
@@ -46,7 +46,7 @@ declare(strict_types=1);
     @else
         <ul class="divide-y divide-gray-100 dark:divide-gray-600">
             @foreach ($tags as $tag)
-                @php($url = $tagPage->pageUrl->full_url.'/'.$tag->getTranslation('slug', $language->code))
+                @php($url = $tagPage->pageUrl->full_url . '/' . $tag->getTranslation('slug', $language->code))
                 <x-capell::list.list-item
                     :$url
                     :count="$tag->pages_count"
@@ -60,7 +60,7 @@ declare(strict_types=1);
     @if (method_exists($tags, 'total') && $tags->hasPages())
         <x-capell::pagination
             :results="$tags"
-            :scrollToElement="$containerKey.'-'.$widget->key.'-'.$index"
+            :scrollToElement="$containerKey . '-' . $widget->key . '-' . $index"
         />
     @endif
 </x-capell-layout::widget.wrapper>

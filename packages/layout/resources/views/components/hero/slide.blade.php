@@ -5,7 +5,7 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 @endphp
 
 @aware([
@@ -41,26 +41,23 @@ declare(strict_types=1);
                 'swiper-slide-inner relative flex min-h-full',
                 ...(
                     ! $backgroundColor && $colorScheme
-                    ? [
-                        'bg-gradient-to-t',
-                        'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
-                        'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
-                    ]
-                    : []
+                ? [
+                    'bg-gradient-to-t',
+                    'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
+                    'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
+                ]
+                : []
                 ),
             ])
                 ->style([
-                    "background-color: $backgroundColor" => $backgroundColor,
+                    "background-color: {$backgroundColor}" => $backgroundColor,
                 ])
         }}
     >
         @if ($backgroundImage)
-            <x-dynamic-component
+            <x-capell::media
                 format="webp"
-                component="capell::media.background.glider"
-                curation="hero"
                 :media="$backgroundImage"
-                :srcset="['1680w', '1024w', '640w']"
                 height="auto"
                 :loading="$first ? 'eager' : 'lazy'"
                 {{-- format-ignore-start --}}
@@ -68,20 +65,15 @@ declare(strict_types=1);
                     Illuminate\Support\Arr::toCssClasses([
                         'inset-0 h-full w-full pointer-events-none mix-blend-exclusion',
                         $slideBgImgClass ?? '',
-                        $backgroundAttachment !== 'scroll' ? 'absolute' : '',
-                        $backgroundAttachment === 'scroll' ? 'absolute bg-scroll' : '',
-                        $backgroundAttachment === 'fixed' ? 'bg-fixed' : '',
-                        $backgroundSize === 'contain' ? 'bg-contain' : '',
-                        $backgroundSize === 'cover' ? 'bg-cover' : '',
-                        $backgroundRepeat === 'repeat' ? 'bg-repeat' : '',
-                        $backgroundRepeat === 'no-repeat' ? 'bg-no-repeat' : '',
-                        $backgroundRepeat === 'repeat-x' ? 'bg-repeat-x' : '',
-                        $backgroundRepeat === 'repeat-y' ? 'bg-repeat-y' : '',
-                        $backgroundPosition === 'center' ? 'bg-center' : '',
-                        $backgroundPosition === 'top' ? 'bg-top' : '',
-                        $backgroundPosition === 'right' ? 'bg-right' : '',
-                        $backgroundPosition === 'bottom' ? 'bg-bottom' : '',
-                        $backgroundPosition === 'left' ? 'bg-left' : '',
+                        $backgroundAttachment !== 'fixed' ? 'absolute' : '',
+                        $backgroundAttachment === 'fixed' ? 'object-fixed' : '',
+                        $backgroundSize === 'contain' ? 'object-contain' : '',
+                        $backgroundSize === 'cover' ? 'object-cover' : '',
+                        $backgroundPosition === 'center' ? 'object-center' : '',
+                        $backgroundPosition === 'top' ? 'object-top' : '',
+                        $backgroundPosition === 'right' ? 'object-right' : '',
+                        $backgroundPosition === 'bottom' ? 'object-bottom' : '',
+                        $backgroundPosition === 'left' ? 'object-left' : '',
                     ])
                 "
                 {{-- format-ignore-end --}}

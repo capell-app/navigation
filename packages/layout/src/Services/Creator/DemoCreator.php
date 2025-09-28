@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
+use Capell\Admin\Services\Creator\DemoCreator as AdminDemoCreator;
 use Capell\Admin\Services\Creator\NavigationCreator;
+use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
@@ -25,6 +27,8 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Spatie\Image\Image;
 use Spatie\MediaLibrary\HasMedia;
 
 class DemoCreator
@@ -97,7 +101,7 @@ class DemoCreator
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
                 'title' => 'Example Content',
-                'contents' => [
+                'content' => [
                     [
                         'type' => 'content',
                         'data' => [
@@ -144,7 +148,7 @@ class DemoCreator
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
                 'title' => 'Example Content',
-                'contents' => [
+                'content' => [
                     [
                         'type' => 'content',
                         'data' => [
@@ -188,7 +192,7 @@ class DemoCreator
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
                 'title' => 'Example Content',
-                'contents' => [
+                'content' => [
                     [
                         'type' => 'content',
                         'data' => [
@@ -240,36 +244,43 @@ class DemoCreator
         if (
             $widget->assets()
                 ->where([
+                    'page_id' => $page->id,
                     'container' => $container,
                     'occurrence' => $occurrence,
                 ])
-                ->count() >= 3
+                ->exists()
         ) {
             return $widget;
         }
 
-        $this->pageModel::query()
+        $pages = $this->pageModel::query()
             ->whereHas('type', fn (BuilderContract $query) => $query->default())
+            ->whereHas('image')
             ->where('site_id', $page->site_id)
-            ->hasImage()
             ->notHomePage()
             ->inRandomOrder()
             ->limit(3)
-            ->pluck('id')
-            ->each(fn ($related_page_id): WidgetAsset => $widget->assets()->firstOrcreate([
-                'page_id' => $page->id,
-                'asset_id' => $related_page_id,
-                'asset_type' => app($this->pageModel)->getMorphClass(),
-                'container' => $container,
-                'occurrence' => $occurrence,
-            ]));
+            ->pluck('id');
+
+        if ($pages->isEmpty()) {
+            throw new RuntimeException('No pages found to associate with the widget.');
+        }
+
+        $pages->each(fn ($related_page_id): WidgetAsset => $widget->assets()->create([
+            'page_id' => $page->id,
+            'asset_id' => $related_page_id,
+            'asset_type' => app($this->pageModel)->getMorphClass(),
+            'container' => $container,
+            'occurrence' => $occurrence,
+        ]));
 
         return $widget;
     }
 
     public function createFaqWidget(Collection $languages): Widget
     {
-        $widgetType = $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)->firstWhere('key', 'assets');
+        $widgetType = $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)
+            ->firstWhere('key', 'assets');
 
         $widget = $this->widgetModel::firstOrCreate(['key' => 'faq'], [
             'key' => 'faq',
@@ -373,7 +384,7 @@ class DemoCreator
 
                 $content->translations()->firstOrCreate(['language_id' => $language->id], [
                     'title' => Str::title($questions[$language->code][$i]),
-                    'contents' => [
+                    'content' => [
                         [
                             'type' => 'content',
                             'data' => [
@@ -463,6 +474,7 @@ class DemoCreator
         $model::updateOrCreate([
             'key' => $key,
             'site_id' => $site->id,
+            'type_id' => $this->typeModel::navigationType()->default()->first()->id,
         ], [
             'name' => $name,
             'items' => $this->navigationPageItems($pages, $languages->first()),
@@ -481,14 +493,7 @@ class DemoCreator
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
                 'title' => 'Example Navigation',
-                'contents' => [
-                    [
-                        'type' => 'title',
-                        'data' => [
-                            'content' => config('capell-demo.contents')[$language->code],
-                        ],
-                    ],
-                ],
+                'content' => config('capell-demo.contents')[$language->code],
             ]);
         }
 
@@ -789,7 +794,7 @@ class DemoCreator
 
         foreach ($statistics as $statistic) {
             $content = Content::factory()
-                ->site($site)
+                ->recycle($site)
                 ->withTranslations($site->languages, [
                     'title' => $statistic['title'],
                     'content' => sprintf('<p>%s</p>', $statistic['value']),
@@ -912,6 +917,7 @@ class DemoCreator
         $parentPage = Page::updateOrCreate([
             'site_id' => $site->id,
             'name' => 'Features',
+        ], [
             'meta' => [
                 'author_id' => $this->user?->id,
             ],
@@ -1129,11 +1135,15 @@ class DemoCreator
             ],
         ];
 
-        $teamContent = Content::firstOrCreate([
+        $teamContent = Content::firstOrNew([
             'name' => 'Team Members',
-        ], [
-            'icon' => 'heroicon-o-user-circle',
         ]);
+
+        $meta = $teamContent->meta ?? [];
+        $meta['icon'] = 'heroicon-o-users';
+        $teamContent->meta = $meta;
+
+        $teamContent->save();
 
         $teamMembersCollection = new Collection;
 
@@ -1166,8 +1176,91 @@ class DemoCreator
         return $teamMembersCollection;
     }
 
-    private function createMedia(HasMedia $content, string $collection = 'image', string $type = 'image'): void
+    private function createMedia(HasMedia $model, ?string $name = null, string $type = 'image', string $collection = MediaCollectionEnum::Image->value): void
     {
-        app(\Capell\Admin\Services\Creator\DemoCreator::class)->createMedia($content, type: $type, collection: $collection);
+        if ($model instanceof Widget) {
+            $this->createWidgetMedia($model, $name, $type, $collection);
+
+            return;
+        }
+
+        app(AdminDemoCreator::class)->createMedia($model, $name, $type, $collection);
+    }
+
+    private function createWidgetMedia(HasMedia $model, ?string $name = null, string $type = 'image', string $collection = MediaCollectionEnum::Image->value): void
+    {
+        if ($type === 'video') {
+            $ext = 'mp4';
+            $demo_path = AdminDemoCreator::getDemoResourcePath('video');
+            $filename = $name ?? 'SampleVideo_1280x720_1mb';
+            $collection = MediaCollectionEnum::Video->value;
+        } else {
+            $ext = 'jpg';
+            $demo_path = AdminDemoCreator::getDemoResourcePath('img');
+            $filename = $name !== null && $name !== '' && $name !== '0' ? Str::slug($name) : null;
+        }
+
+        if ($filename !== null) {
+            $filename = pathinfo($filename, PATHINFO_FILENAME);
+        }
+
+        $demo_file = sprintf('%s/%s.%s', $demo_path, $filename, $ext);
+
+        if ($filename === '' || $filename === '0' || $filename === [] || $filename === null || ! file_exists($demo_file)) {
+            $demo_path = AdminDemoCreator::getDemoResourcePath('img');
+
+            $filename = $this->getRandomDemoImage($demo_path);
+
+            $demo_file = sprintf('%s/%s.%s', $demo_path, $filename, $ext);
+        }
+
+        // Create content and add via WidgetAsset
+        $content = Content::create([
+            'name' => str($filename)->title(),
+        ]);
+
+        $model->assets()->create([
+            'asset_id' => $content->getKey(),
+            'asset_type' => app(Content::class)->getMorphClass(),
+        ]);
+
+        $image = null;
+        if ($type !== 'video') {
+            $image = Image::load($demo_file);
+        }
+
+        $media = $content->addMedia($demo_file)
+            ->preservingOriginal()
+            ->withCustomProperties([
+                ...(
+                    $image instanceof Image
+                ? ['width' => $image->getWidth(), 'height' => $image->getHeight()]
+                : []
+                ),
+            ])
+            ->toMediaCollection($collection);
+
+        if ($type === 'video') {
+            $demo_path = AdminDemoCreator::getDemoResourcePath('img');
+
+            $filename = $this->getRandomDemoImage($demo_path);
+
+            $demo_file = sprintf('%s/%s.%s', $demo_path, $filename, 'jpg');
+
+            $image = Image::load($demo_file);
+
+            $content->addMedia($demo_file)
+                ->preservingOriginal()
+                ->withCustomProperties([
+                    'width' => $image->getWidth(),
+                    'height' => $image->getHeight(),
+                ])
+                ->toMediaCollection(MediaCollectionEnum::Image->value);
+        }
+    }
+
+    private function getRandomDemoImage(string $demo_path): string
+    {
+        return app(AdminDemoCreator::class)->getRandomDemoImage($demo_path);
     }
 }

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
-use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
 use Capell\Frontend\Livewire\Page\SitemapPage;
+use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
 arch('Layout package to be standalone')
     ->expect('Capell\Layout')
@@ -25,7 +25,10 @@ arch()
 
 arch()
     ->preset()
-    ->security();
+    ->security()
+    ->ignoring([
+        HasRelationship::class,
+    ]);
 
 it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])

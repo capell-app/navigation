@@ -28,28 +28,21 @@ class ContentCreator
     public function __construct()
     {
         $this->contentModel = CapellCore::getModel(LayoutModelEnum::Content->name);
+
         $this->typeModel = CapellCore::getModel(ModelEnum::Type);
     }
 
     public function createContent(array $data, ?Site $site, Collection $languages): Content
     {
+        $type = $this->typeModel::query()->where('type', LayoutTypeEnum::Content)->default()->first();
+
         if (! empty($data['type'])) {
-            $type = $this->typeModel::query()
-                ->where('type', LayoutTypeEnum::Content)
-                ->where('key', $data['type'])
-                ->first();
+            $type->where('key', $data['type'])->first();
         } else {
-            $type = $this->typeModel::query()
-                ->where('type', LayoutTypeEnum::Content)
-                ->default()
-                ->first();
+            $type->default()->first();
         }
 
         $meta = [];
-
-        if (! empty($data['image_id'])) {
-            $meta['image_id'] = $data['image_id'];
-        }
 
         $content = $this->contentModel::firstOrCreate([
             'name' => $data['name'],
@@ -67,7 +60,7 @@ class ContentCreator
                 'language_id' => $language->id,
             ], [
                 'title' => $translation_data['title'],
-                'content' => $translation_data['contents'] ?? null,
+                'content' => $translation_data['content'] ?? null,
                 'meta' => $translation_data['meta'] ?? [],
             ]);
         }

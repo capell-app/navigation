@@ -8,7 +8,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Translation;
-use Capell\Frontend\Facades\FrontendManager;
+use Capell\Frontend\Facades\CapellFrontend;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -23,7 +23,7 @@ class LayoutLoader
 
         $fromCache = true;
 
-        $layout = FrontendManager::cacheForever($key, function () use ($id, &$fromCache): ?Layout {
+        $layout = CapellFrontend::cacheForever($key, function () use ($id, &$fromCache): ?Layout {
             $fromCache = false;
 
             // @phpstan-ignore-next-line
@@ -61,7 +61,7 @@ class LayoutLoader
 
         $fromCache = true;
 
-        $widget = FrontendManager::cacheForever(
+        $widget = CapellFrontend::cacheForever(
             $key,
             function () use ($layout, $widgetKey, $language, $page, $containerKey, $occurrence, &$fromCache): ?Widget {
                 $fromCache = false;
@@ -76,6 +76,8 @@ class LayoutLoader
                 $widget->load([
                     'type',
                     'image',
+                    'backgroundImage',
+                    'media',
                     'translation' => fn (BuilderContract $query) => $query->where('language_id', $language->id),
                 ]);
 
@@ -115,18 +117,7 @@ class LayoutLoader
                     ]);
                 };
 
-                $relations = [
-                    'image',
-                    'related' => fn (BuilderContract $query) => $query->with('image')
-                        ->withWhereHas('translation'),
-                    'relatedPage' => fn (BuilderContract $query) => $query->with([
-                        'translation' => fn (BuilderContract $query) => $query->where('language_id', $language->id),
-                        'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')->where('language_id', $language->id),
-                    ]),
-                ];
-
                 $widgetAssets = $layoutWidget->pageAssets($page, $containerKey, $occurrence)
-                    ->with($relations)
                     ->whereHas('asset')
                     ->with('asset', $resourceRelationsCallback)
                     ->ordered()
@@ -134,7 +125,6 @@ class LayoutLoader
 
                 if ($widgetAssets->isEmpty()) {
                     $widgetAssets = $layoutWidget->widgetAssets()
-                        ->with($relations)
                         ->whereHas('asset')
                         ->with('asset', $resourceRelationsCallback)
                         ->ordered()

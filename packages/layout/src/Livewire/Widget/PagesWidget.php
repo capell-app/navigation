@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Livewire\Widget;
 
-use Capell\Frontend\Facades\Frontend;
+use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,7 +28,7 @@ class PagesWidget extends AbstractWidget
 
     protected function mountWidget(): void
     {
-        $page = Frontend::getPage();
+        $page = FrontendLoader::getPage();
 
         $limit = $this->widget->meta['limit'] ?? config('capell-frontend.pagination_limit', 12);
 
@@ -38,8 +38,8 @@ class PagesWidget extends AbstractWidget
         $selection = $this->widget->assets->pluck('asset_id')->toArray();
 
         $this->pages = PageLoader::getPages(
-            site: Frontend::getSite(),
-            language: Frontend::getLanguage(),
+            site: FrontendLoader::getSite(),
+            language: FrontendLoader::getLanguage(),
             page: $page,
             limit: $limit,
             paginationPage: $paginationPage,

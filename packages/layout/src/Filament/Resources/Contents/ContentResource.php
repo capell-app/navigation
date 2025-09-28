@@ -6,6 +6,7 @@ namespace Capell\Layout\Filament\Resources\Contents;
 
 use BackedEnum;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
+use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ContentResource extends Resource
 {
     use HasFormConfigurator;
+    use HasNavigationBadge;
     use HasTableConfigurator;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -76,15 +78,6 @@ class ContentResource extends Resource
     public static function getModel(): string
     {
         return CapellCore::getModel(LayoutModelEnum::Content->name);
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        if (! config('capell-admin.resources.content.navigation_badge')) {
-            return null;
-        }
-
-        return number_format(static::getModel()::count());
     }
 
     public static function getNavigationGroup(): ?string

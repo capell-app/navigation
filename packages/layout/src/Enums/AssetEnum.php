@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Capell\Layout\Enums;
 
 use BackedEnum;
+use Capell\Admin\Filament\Contracts\FormConfigurator;
+use Capell\Core\Contracts\Actionable;
+use Capell\Layout\Actions\CreateContentAction;
+use Capell\Layout\Actions\MutateContentDataBeforeFillAction;
+use Capell\Layout\Filament\Resources\Contents\Schemas\ContentForm;
 use Capell\Layout\Models\Content;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
@@ -54,7 +59,37 @@ enum AssetEnum: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function hasTranslation(): bool
+    /**
+     * @return class-string<FormConfigurator>
+     */
+    public function getFormClass(): string
+    {
+        return match ($this) {
+            self::Content => ContentForm::class,
+        };
+    }
+
+    /**
+     * @return class-string<Actionable>
+     */
+    public function getCreateActionClass(): string
+    {
+        return match ($this) {
+            self::Content => CreateContentAction::class,
+        };
+    }
+
+    /**
+     * @return class-string<Actionable>
+     */
+    public function getDefaultDataActionClass(): string
+    {
+        return match ($this) {
+            self::Content => MutateContentDataBeforeFillAction::class,
+        };
+    }
+
+    public function hasTranslations(): bool
     {
         return match ($this) {
             self::Content => true,

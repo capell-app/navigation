@@ -5,10 +5,11 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
+    use Spatie\Image\Image;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-    $theme = Frontend::getTheme();
+    $theme = FrontendLoader::getTheme();
 @endphp
 
 @props([
@@ -44,8 +45,8 @@ declare(strict_types=1);
             <x-capell::content
                 :compact="true"
                 :content="$widget->translation->content"
-                :contents="$widget->translation->content ? null : $widget->translation->contents"
                 :color-scheme="$colorScheme"
+                :presenter="$widget->type->meta['content_presenter'] ?? null"
                 :title="$widget->translation->title"
                 :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             />
@@ -80,15 +81,30 @@ declare(strict_types=1);
         <div class="swiper-wrapper w-full">
             @foreach ($widget->assets as $widgetAsset)
                 @php
-                    $resource = $widgetAsset->asset;
-                    $media = $widgetAsset->image ?? ($resource instanceof Media ? $resource : $resource->media);
+                    $asset = $widgetAsset->asset;
+
+                    /** @var Media|null $media */
+                    $media = $asset->image;
+
+                    if (! $media) {
+                        continue;
+                    }
+
+                    $mediaWidth = $media->getCustomProperty('width');
+                    $mediaHeight = $media->getCustomProperty('height');
+
+                    if (Str::startsWith($media->mime_type, 'image/') && (! $mediaWidth || ! $mediaHeight)) {
+                        $image = Image::load($media->getPath());
+
+                        $mediaWidth = $image->getWidth();
+                        $mediaHeight = $image->getHeight();
+                    } else {
+                        $mediaHeight = 400;
+                        $mediaWidth = 400;
+                    }
+
                     $width = 400;
-                @endphp
-
-                @continue(! $media?->width)
-
-                @php
-                    $height = floor($width * ($media->height / $media->width));
+                    $height = floor($width * ($mediaHeight / $mediaWidth));
                 @endphp
 
                 <div
@@ -99,21 +115,20 @@ declare(strict_types=1);
                     tabindex="0"
                 >
                     <x-capell::media
-                        :class="'swiper-slide-img h-64 bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
+                        :class="'swiper-slide-img object-cover h-64 bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
                         :$loop
                         :media="$media"
-                        :srcset="['400w', '200w']"
                         :width="$width"
                         :height="$height"
                         sizes="(max-width: 640px) 80vw, 20w"
                         lightbox="true"
                         rounded="true"
                     />
-                    @if ($media->name)
+                    @if ($asset->translation?->title)
                         <div
                             class="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-full transform items-center justify-center break-words bg-gray-600/75 px-2 py-4 text-sm font-medium leading-none leading-tight text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100"
                         >
-                            {{ $media->title }}
+                            {{ $asset->translation->title }}
                         </div>
                     @endif
                 </div>

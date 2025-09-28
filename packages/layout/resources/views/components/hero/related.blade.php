@@ -5,7 +5,7 @@ declare(strict_types=1);
 ?>
 
 @props([
-    'language' => Capell\Frontend\Facades\Frontend::getLanguage(),
+    'language' => Capell\Frontend\Facades\FrontendLoader::getLanguage(),
     'features',
     'key',
 ])

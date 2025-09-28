@@ -8,7 +8,7 @@ use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
-use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
 use Capell\Admin\Filament\Components\Forms\PublishSchema;
 use Capell\Admin\Filament\Components\Forms\PublishSection;
@@ -73,6 +73,7 @@ class DefaultContentSchema implements TypeSchemaInterface
         return [
             ...ContentDetailsSchema::make($schema),
             ContentTranslationsRepeater::make($schema)
+                ->contained()
                 ->hiddenLabel(),
             ...ContentSettingsSchema::make($schema),
             MediaLibraryFileUpload::make('image')
@@ -85,7 +86,7 @@ class DefaultContentSchema implements TypeSchemaInterface
     {
         return [
             Section::make()
-                ->contained(fn (string $operation): bool => $operation === 'created')
+                ->contained(fn (string $operation): bool => $operation === 'create')
                 ->hiddenOn('edit')
                 ->columnSpanFull()
                 ->columns()
@@ -94,7 +95,7 @@ class DefaultContentSchema implements TypeSchemaInterface
                 ->mainSchema([
                     Tabs::make()
                         ->tabs([
-                            $this->getContentTab($schema),
+                            $this->getTranslationsTab($schema),
                             $this->getSettingsTab($schema),
                         ]),
                 ])
@@ -120,7 +121,7 @@ class DefaultContentSchema implements TypeSchemaInterface
             ->schema($this->getMetaSchema());
     }
 
-    protected function getContentTab(Schema $schema): Tab
+    protected function getTranslationsTab(Schema $schema): Tab
     {
         return Tab::make(__('capell-admin::tab.content'))
             ->icon(Heroicon::Language)

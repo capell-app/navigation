@@ -40,7 +40,7 @@ class NavigationWidgetSchema extends DefaultWidgetSchema
             Section::make()
                 ->schema([$this->navigationSelect()]),
             WidgetTranslationsRepeater::make($schema)
-                ->section(),
+                ->contained(),
         ];
     }
 
@@ -69,7 +69,7 @@ class NavigationWidgetSchema extends DefaultWidgetSchema
             FixedWidthSidebar::make()
                 ->mainSchema([
                     WidgetTranslationsRepeater::make($schema)
-                        ->section(),
+                        ->contained(),
                 ])
                 ->sidebarSchema(
                     WidgetSettingsSchema::make($schema, [$this->navigationSelect()]),

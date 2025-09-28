@@ -6,10 +6,10 @@ namespace Capell\Layout\Filament\Components\Forms\Widget;
 
 use Capell\Admin\Filament\Components\Forms\AssetTypeSelect;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
-use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Components\Forms\SchemaSelect;
 use Capell\Layout\Enums\SchemaTypeEnum;
-use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\DefaultWidgetSchema;
+use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Models\Widget;
 use Filament\Schemas\Components\Fieldset;
 
@@ -19,7 +19,7 @@ class WidgetAdminSchema
     {
         return [
             SchemaSelect::make('schema')
-                ->default(fn (): string => DefaultWidgetSchema::getKey())
+                ->default(fn (): string => WidgetSchemaEnum::Default->name)
                 ->setupOptions(SchemaTypeEnum::Widget->value),
 
             SchemaSelect::make('layout_container_widget_schema')

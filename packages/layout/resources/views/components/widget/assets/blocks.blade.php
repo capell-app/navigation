@@ -7,6 +7,8 @@ declare(strict_types=1);
 @php
     use Capell\Core\Enums\AssetComponentEnum;
     use Capell\Core\Facades\CapellCore;
+    use Capell\Frontend\CapellFrontendManager;
+    use Capell\Frontend\Facades\CapellFrontend;
 @endphp
 
 @props([
@@ -65,8 +67,8 @@ declare(strict_types=1);
         <x-capell::content
             :compact="true"
             :content="$widget->translation->content"
-            :contents="$widget->translation->content ? null : $widget->translation->contents"
             :color-scheme="$colorScheme"
+            :presenter="$widget->type->meta['content_presenter'] ?? null"
             :title="$widget->translation->title"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         />
@@ -92,7 +94,7 @@ declare(strict_types=1);
             >
                 @foreach ($widget->assets as $asset)
                     <x-dynamic-component
-                        :component="CapellCore::getAsset($asset['asset_type'])->component"
+                        :component="CapellFrontend::getAsset($asset['asset_type'])->component"
                         :component-item="$widget->meta['component_item'] ?? AssetComponentEnum::Card->value"
                         :$container
                         :$containerKey

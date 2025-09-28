@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Livewire\Widget;
 
 use Capell\Core\Enums\AssetComponentEnum;
-use Capell\Core\Models;
-use Capell\Frontend\Facades\Frontend;
+use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Layout\Models\Widget;
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -16,7 +15,7 @@ use Livewire\Drawer\Utils;
 use stdClass;
 
 /**
- * @property-read Models\Widget $widget
+ * @property-read Widget $widget
  */
 abstract class AbstractWidget extends Component
 {
@@ -82,11 +81,11 @@ abstract class AbstractWidget extends Component
             'containerKey' => $this->containerKey,
             'component_item' => $this->getComponentItem(),
             'index' => $this->loop->index,
-            'language' => Frontend::getLanguage(),
-            'pageRecord' => Frontend::getPage(),
-            'pageParams' => Frontend::getPageParams(),
-            'site' => Frontend::getSite(),
-            'theme' => Frontend::getTheme(),
+            'language' => FrontendLoader::getLanguage(),
+            'pageRecord' => FrontendLoader::getPage(),
+            'pageParams' => FrontendLoader::getPageParams(),
+            'site' => FrontendLoader::getSite(),
+            'theme' => FrontendLoader::getTheme(),
             'widget' => $this->widget,
             'widgetData' => $this->widgetData,
         ], $data);

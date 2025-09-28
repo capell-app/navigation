@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Enums\DefaultColorEnum;
-    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Facades\FrontendLoader;
 
-    $theme = Frontend::getTheme();
+    $theme = FrontendLoader::getTheme();
 @endphp
 
 @props([

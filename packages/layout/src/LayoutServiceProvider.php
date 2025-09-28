@@ -6,6 +6,7 @@ namespace Capell\Layout;
 
 use Capell\Admin\Actions\CreatedModelAction;
 use Capell\Admin\Actions\DeletedModelAction;
+use Capell\Admin\Data\AdminAssetData;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
@@ -19,8 +20,11 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Tag;
 use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Frontend\Data\FrontendAssetData;
+use Capell\Frontend\Facades\CapellFrontend;
 use Capell\Layout\Actions\InstallPackageAction;
 use Capell\Layout\Commands\DemoCommand;
+use Capell\Layout\Commands\UpgradeCommand;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ContentSchemaEnum;
@@ -34,6 +38,7 @@ use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Filament\Resources\Layouts\LayoutResource;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExtender;
 use Capell\Layout\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
+use Capell\Layout\Filament\Resources\Types\Schemas\Types\ContentTypeSchema;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
 use Capell\Layout\Listeners\AfterRecordSaved;
 use Capell\Layout\Listeners\LayoutLoaded;
@@ -55,6 +60,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use RuntimeException;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -88,7 +94,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         $viewPath = realpath(__DIR__ . '/../resources/views/capell');
 
-        if (! $viewPath || ! is_dir($viewPath)) {
+        if ($viewPath === '' || $viewPath === '0' || $viewPath === false || ! is_dir($viewPath)) {
             throw new Exception('Theme view path not found: ' . $viewPath);
         }
 
@@ -117,6 +123,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->hasTranslations()
             ->hasCommands([
                 DemoCommand::class,
+                UpgradeCommand::class,
             ])
             ->hasInstallCommand(
                 fn (InstallCommand $command): InstallCommand => $command
@@ -157,6 +164,12 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             publishAssetsCommand: true,
         );
 
+        Relation::morphMap(
+            collect(LayoutModelEnum::cases())
+                ->mapWithKeys(fn (LayoutModelEnum $model): array => [Str::snake($model->name) => $model->value])
+                ->all()
+        );
+
         CapellAdmin::registerResource(LayoutResourceEnum::Content->name, class: LayoutResourceEnum::Content->value);
 
         CapellAdmin::registerResource(LayoutResourceEnum::Widget->name, class: LayoutResourceEnum::Widget->value);
@@ -184,10 +197,22 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                 name: $contentAsset->name,
                 model: $contentAsset->getModel(),
                 icon: $contentAsset->getIcon(),
-                component: $contentAsset->getComponent(),
-                hasTranslation: true,
+                hasTranslations: $contentAsset->hasTranslations(),
             )
         );
+
+        CapellAdmin::registerAsset(
+            $contentAsset,
+            new AdminAssetData(
+                formClass: $contentAsset->getFormClass(),
+                createAction: $contentAsset->getCreateActionClass(),
+                defaultDataAction: $contentAsset->getDefaultDataActionClass()
+            )
+        );
+
+        CapellFrontend::registerAsset($contentAsset, new FrontendAssetData(
+            component: $contentAsset->getComponent(),
+        ));
 
         $this->registerSchemaExtender(SchemaExtenderEnum::Page->value, PageSchemaExtender::class);
 
@@ -198,7 +223,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         $dir = realpath(__DIR__ . '/../publishes');
 
-        if (! $dir) {
+        if ($dir === '' || $dir === '0' || $dir === false) {
             throw new RuntimeException('Publish directory not found.');
         }
 
@@ -221,12 +246,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerModels(): self
     {
-        Relation::morphMap([
-            'content' => Content::class,
-            'widget' => Widget::class,
-            'widget_asset' => WidgetAsset::class,
-        ]);
-
         CapellCore::registerModel(LayoutModelEnum::Content, Content::class);
         CapellCore::registerModel(LayoutModelEnum::Widget, Widget::class);
         CapellCore::registerModel(LayoutModelEnum::WidgetAsset, WidgetAsset::class);
@@ -342,7 +361,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerPublishCommands(): self
     {
-        $vendorAssets = $this->package->basePath('/../publishes/dist');
+        $vendorAssets = $this->package->basePath('/../publishes/build');
         $appAssets = public_path('vendor/' . $this->package->shortName());
 
         $this->publishes([$vendorAssets => $appAssets], $this->package->shortName() . '-assets');
@@ -357,6 +376,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::WidgetAsset->value, WidgetAssetSchemaEnum::cases());
         CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutContainer->value, LayoutContainerSchemaEnum::cases());
         CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutWidget->value, LayoutWidgetSchemaEnum::cases());
+        CapellAdmin::registerSchema(SchemaTypeEnum::Type, ContentTypeSchema::class);
         CapellAdmin::registerSchema(SchemaTypeEnum::Type, WidgetTypeSchema::class);
 
         return $this;
@@ -364,7 +384,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemaExtender(string $tag, string $class): void
     {
-        $this->app->singleton($class, fn () => new $class);
+        $this->app->singleton($class, fn (): object => new $class);
 
         $this->app->tag($class, $tag);
     }

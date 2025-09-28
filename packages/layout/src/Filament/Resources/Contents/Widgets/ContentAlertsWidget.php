@@ -7,6 +7,7 @@ namespace Capell\Layout\Filament\Resources\Contents\Widgets;
 use Capell\Admin\Data\MessageData;
 use Capell\Admin\Enums\AlertTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Filament\Concerns\HasBlankPlaceholder;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Layout\Enums\ResourceEnum;
 use Capell\Layout\Filament\Actions\DeleteDraftContentAction;
@@ -23,9 +24,10 @@ use Filament\Widgets\Widget;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 
-#[On('update-alerts')]
+#[On('refresh-alerts')]
 class ContentAlertsWidget extends Widget implements HasActions, HasForms
 {
+    use HasBlankPlaceholder;
     use InteractsWithActions;
     use InteractsWithForms;
 

@@ -9,7 +9,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
-use Capell\Frontend\CapellFrontend;
+use Capell\Frontend\CapellFrontendLoader;
 use Capell\Frontend\Enums\ListenerEnum;
 use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Models\Widget;
@@ -23,7 +23,7 @@ class LayoutLoaded implements EventSubscriber
             return;
         }
 
-        if (! $context instanceof CapellFrontend) {
+        if (! $context instanceof CapellFrontendLoader) {
             return;
         }
 

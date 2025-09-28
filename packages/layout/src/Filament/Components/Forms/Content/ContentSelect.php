@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms\Content;
 
+use Capell\Admin\Actions\ModifyCreateAction;
+use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\HintEditAction;
 use Capell\Admin\Filament\Concerns\HasCustomSelectOption;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Actions\ModifyContentSelectCreateAction;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Filament\Resources\Contents\ContentResource;
-use Capell\Layout\Filament\Resources\Contents\Schemas\ContentForm;
 use Capell\Layout\Models\Content;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
@@ -84,19 +85,46 @@ class ContentSelect extends Select
 
     public function withCreateForm(): Select
     {
-        return ModifyContentSelectCreateAction::run(
-            $this->getOptionLabelFromRecordUsing(fn (Content $record): string => static::getSelectOption($record))
-        );
+        $asset = CapellCore::getAsset(LayoutModelEnum::Content->name);
+
+        $adminAsset = CapellAdmin::getAsset(LayoutModelEnum::Content);
+
+        $createOptionUsing = $this->getCreateOptionUsing();
+
+        return $this->createOptionAction(
+            fn (Action $action): Action => ModifyCreateAction::run($action)
+                ->fillForm(fn (): array => $adminAsset->defaultDataAction !== null && $adminAsset->defaultDataAction !== '' && $adminAsset->defaultDataAction !== '0' ? $adminAsset->defaultDataAction::run() : [])
+        )
+            ->createOptionForm(
+                fn (Schema $schema): Schema => $adminAsset->formClass::configure(
+                    $schema->operation('createOption')->model($asset->model)
+                )
+            )
+            ->createOptionUsing(function (Select $component, array $data) use ($asset, $adminAsset, $createOptionUsing): int|string {
+                $record = $adminAsset->createAction !== null && $adminAsset->createAction !== '' && $adminAsset->createAction !== '0'
+                    ? $adminAsset->createAction::run($data)
+                    : $component->evaluate($createOptionUsing);
+
+                Notification::make()
+                    ->title(__('capell-admin::message.asset_created_successfully', ['name' => $asset->name]))
+                    ->body($record->name)
+                    ->send();
+
+                return $record->getKey();
+            })
+            ->getOptionLabelFromRecordUsing(fn (Content $record): string => static::getSelectOption($record));
     }
 
     public function withEditForm(): self
     {
-        return $this->editOptionForm(function (mixed $state, Schema $schema): Schema {
+        $asset = CapellAdmin::getAsset(LayoutModelEnum::Content);
+
+        return $this->editOptionForm(function (mixed $state, Schema $schema) use ($asset): Schema {
             if (! $state) {
                 return $schema;
             }
 
-            return ContentForm::configure($schema->operation('editOption'));
+            return $asset->formClass::configure($schema->operation('editOption'));
         })
             ->editOptionAction(
                 fn (Action $action): Action => $action

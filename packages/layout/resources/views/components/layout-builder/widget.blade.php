@@ -14,8 +14,10 @@ declare(strict_types=1);
 ])
 @php
     use Capell\Admin\Facades\CapellAdmin;
+    use Capell\Core\Facades\CapellCore;
     use Capell\Layout\Enums\ResourceEnum;
     use Capell\Layout\Livewire\LayoutBuilder;
+    use Filament\Support\Enums\FontWeight;
     use Filament\Support\Enums\IconSize;
     use Filament\Support\Enums\Size;
     use Illuminate\View\ComponentAttributeBag;
@@ -31,9 +33,7 @@ declare(strict_types=1);
         ? $widget->admin['asset_types']
         : ($widget->type->admin['asset_types'] ?? []);
 
-    $widgetIcon = ! empty($widget->admin['icon'])
-        ? $widget->admin['icon']
-        : ($widget->type->admin['icon'] ?? null);
+    $widgetIcon = $widget->admin['icon'] ?? ($widget->type->admin['icon'] ?? null);
 
     $hasPageAssets = $this->hasPageAssets($containerKey, $widgetIndex);
 
@@ -132,7 +132,7 @@ declare(strict_types=1);
                         <x-filament::icon
                             :class="'h-5 w-5' . ($assetTypes ? ' text-primary-600' : ' text-gray-400')"
                             :x-tooltip.raw="$widget->type?->name"
-                            :icon="$assetTypes ? $widgetIcon : null"
+                            :icon="$widgetIcon"
                         />
 
                         @if ($assetTypes)
@@ -194,53 +194,81 @@ declare(strict_types=1);
                 class="ml-auto grid shrink flex-wrap items-center justify-end gap-x-4 gap-y-2 md:flex"
                 x-show="! isReordering"
             >
-                <div class="flex flex-wrap justify-end gap-3 md:order-2">
-                    <div class="fi-btn-group flex items-center">
-                        {{ $editWidgetAction }}
-
-                        <x-filament::dropdown
-                            class="fi-btn-group-dropdown"
-                            placement="bottom-end"
-                            teleport
-                        >
-                            <x-slot name="trigger">
-                                <x-filament::button
-                                    class="fi-btn-outlined"
-                                    icon="heroicon-o-ellipsis-vertical"
-                                    size="sm"
-                                    color="gray"
-                                    :label-sr-only="true"
-                                />
-                            </x-slot>
-
+                @if ($assetTypes)
+                    <x-filament::dropdown placement="bottom-end">
+                        <x-slot name="trigger">
+                            <x-filament::link
+                                :iconSize="IconSize::Small"
+                                :weight="FontWeight::Medium"
+                                :size="Size::Small"
+                                color="primary"
+                                icon="heroicon-c-plus-circle"
+                                :outlined="true"
+                            >
+                                {{ __('capell-admin::button.assets') }}
+                            </x-filament::link>
+                        </x-slot>
+                        @foreach ($assetTypes as $assetType)
                             <x-filament::dropdown.list>
-                                @if ($editContainerWidgetAction?->isVisible())
-                                    {{ $editContainerWidgetAction }}
-                                @endif
-
-                                @if ($editWidgetTypeAction?->isVisible())
-                                    {{ $editWidgetTypeAction }}
-                                @endif
-
-                                @if ($convertPageAssetsAction?->isVisible())
-                                    {{ $convertPageAssetsAction }}
-                                @endif
-
-                                {{ ($this->duplicateWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]) }}
-
-                                {{ ($this->removeWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]) }}
-
-                                <x-filament::dropdown.list.item
-                                    href="{{ CapellAdmin::getResource(ResourceEnum::Widget)::getUrl('edit', ['record' => $this->getContainerWidget($containerKey, $widgetIndex)]) }}"
-                                    icon="heroicon-o-arrow-top-right-on-square"
-                                    target="_blank"
-                                    tag="a"
+                                <x-filament::dropdown.header
+                                    class="cursor-default font-semibold"
+                                    color="gray"
+                                    :icon="CapellCore::getAsset($assetType)->getIcon()"
                                 >
-                                    {{ __('capell-admin::button.open_edit_widget') }}
-                                </x-filament::dropdown.list.item>
+                                    {{ __('capell-admin::button.add_asset_type', ['type' => CapellCore::getAsset($assetType)->getLabel()]) }}
+                                </x-filament::dropdown.header>
+                                {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
+                                {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
                             </x-filament::dropdown.list>
-                        </x-filament::dropdown>
-                    </div>
+                        @endforeach
+                    </x-filament::dropdown>
+                @endif
+
+                <div class="fi-btn-group flex items-center">
+                    {{ $editWidgetAction }}
+
+                    <x-filament::dropdown
+                        class="fi-btn-group-dropdown"
+                        placement="bottom-end"
+                        teleport
+                    >
+                        <x-slot name="trigger">
+                            <x-filament::button
+                                class="fi-btn-outlined"
+                                icon="heroicon-o-ellipsis-vertical"
+                                size="sm"
+                                color="gray"
+                                :label-sr-only="true"
+                            />
+                        </x-slot>
+
+                        <x-filament::dropdown.list>
+                            @if ($editContainerWidgetAction?->isVisible())
+                                {{ $editContainerWidgetAction }}
+                            @endif
+
+                            @if ($editWidgetTypeAction?->isVisible())
+                                {{ $editWidgetTypeAction }}
+                            @endif
+
+                            @if ($convertPageAssetsAction?->isVisible())
+                                {{ $convertPageAssetsAction }}
+                            @endif
+
+                            {{ ($this->duplicateWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]) }}
+
+                            {{ ($this->removeWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]) }}
+
+                            <x-filament::dropdown.list.item
+                                href="{{ CapellAdmin::getResource(ResourceEnum::Widget)::getUrl('edit', ['record' => $this->getContainerWidget($containerKey, $widgetIndex)]) }}"
+                                icon="heroicon-o-arrow-top-right-on-square"
+                                target="_blank"
+                                tag="a"
+                            >
+                                {{ __('capell-admin::button.open_edit_widget') }}
+                            </x-filament::dropdown.list.item>
+                        </x-filament::dropdown.list>
+                    </x-filament::dropdown>
                 </div>
             </div>
         </div>

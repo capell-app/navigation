@@ -32,7 +32,7 @@ class ReplicateContentAction
         $model->fill($data);
 
         $replica = $model->duplicate([
-            'draft_id',
+            'uuid',
         ]);
 
         $replica->created_at = now();

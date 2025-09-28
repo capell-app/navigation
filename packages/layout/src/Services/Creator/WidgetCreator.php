@@ -239,7 +239,7 @@ class WidgetCreator
             'meta' => [
                 'component' => WidgetComponentEnum::PageContent,
                 'margin' => ['t-lg'],
-                'page_content' => ['title', 'content', 'contents'],
+                'page_content' => ['title', 'content'],
             ],
         ]);
     }

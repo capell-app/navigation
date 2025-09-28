@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Contents\Pages;
 
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Layout\Actions\MutateContentDataBeforeCreateAction;
 use Capell\Layout\Actions\MutateContentDataBeforeFillAction;
 use Capell\Layout\Enums\ResourceEnum;
 use Capell\Layout\Filament\Resources\Contents\ContentResource;
@@ -26,12 +25,5 @@ class CreateContent extends CreateRecord
         $this->form->fill(MutateContentDataBeforeFillAction::run($this->data));
 
         $this->callHook('afterFill');
-    }
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        return MutateContentDataBeforeCreateAction::run(
-            parent::mutateFormDataBeforeCreate($data)
-        );
     }
 }

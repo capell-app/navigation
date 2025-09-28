@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasMetaData;
@@ -19,7 +20,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
@@ -27,7 +27,6 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
-use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 use Wildside\Userstamps\Userstamps;
 
 /**
@@ -89,8 +88,6 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable
     use InteractsWithMedia;
     use Userstamps;
 
-    public const MEDIA_IMAGE = 'image';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -107,11 +104,17 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable
         'widget_id',
     ];
 
+    protected $casts = [
+        'meta' => 'json',
+        'order' => 'integer',
+        'occurrence' => 'integer',
+    ];
+
     protected static string $factory = WidgetAssetFactory::class;
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
+        $this->addMediaCollection(MediaCollectionEnum::Image->value)->singleFile();
     }
 
     public function widget(): BelongsTo
@@ -126,22 +129,7 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable
 
     public function asset(): MorphTo
     {
-        return $this->morphTo('asset');
-    }
-
-    public function related(): BelongsToJson
-    {
-        return $this->belongsToJson(Content::class, 'meta->related');
-    }
-
-    public function image(): MorphOne
-    {
-        return $this->morphOneMedia(static::MEDIA_IMAGE);
-    }
-
-    public function relatedPage(): BelongsTo
-    {
-        return $this->belongsTo(Page::class, 'meta->related_page_id');
+        return $this->morphTo();
     }
 
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
@@ -152,19 +140,5 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable
     protected function assetKey(): Attribute
     {
         return Attribute::make(get: fn (): string => $this->asset_type . '.' . $this->asset_id);
-    }
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'meta' => 'json',
-            'order' => 'integer',
-            'occurrence' => 'integer',
-        ];
     }
 }

@@ -12,6 +12,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Actions\CreateThemeAction;
 use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Widget;
 use Capell\Layout\Services\Creator\ContentCreator;
 use Capell\Layout\Services\Creator\DemoCreator;
 use Capell\Layout\Services\Creator\TypeCreator;
@@ -75,6 +76,12 @@ class DemoCommand extends Command
             }
         }
 
+        if ($siteIds) {
+            $sites = Site::whereIn('id', $siteIds)->with(['languages', 'language'])->get();
+        } else {
+            $sites = Site::with(['languages', 'language'])->default()->limit(1)->get();
+        }
+
         $user = $this->option('author') ? CapellCore::getModel('User')::first() : null;
 
         $this->demoCreator = new DemoCreator(user: $user);
@@ -83,12 +90,6 @@ class DemoCommand extends Command
 
         $typeCreator = app(TypeCreator::class);
         $typeCreator->createDefaultContentType();
-
-        $sites = Site::whereIn('id', $siteIds)->get();
-
-        if ($sites->isEmpty()) {
-            throw new Exception('Unable to find any sites');
-        }
 
         foreach ($sites as $site) {
             $this->info(sprintf('Selected site: %s', $site->name));
@@ -122,6 +123,7 @@ class DemoCommand extends Command
     {
         $this->newLine();
         $this->line('Setting up homepage extras for site: ' . $site->name);
+        $this->newLine();
 
         $languages = $site->languages;
 
@@ -143,31 +145,50 @@ class DemoCommand extends Command
 
         $containers = $layout->containers;
 
-        $heroWidget = $this->demoCreator->createHeroWidget();
+        $heroWidget = Widget::firstWhere('key', 'hero');
 
         $this->demoCreator->createWidgetAssets($heroWidget, $page, container: 'hero');
+        $this->line('Created assets for hero widget');
+
+        $pageCardsWidget = $this->demoCreator->createPageCardsWidget($page);
+        $this->line('Created page cards widgets');
+
+        $galleryWidget = $this->demoCreator->createGalleryWidget();
+        $this->line('Created gallery widget');
+
+        $pageCardsWidget2 = $this->demoCreator->createPageCardsWidget($page, occurrence: 2);
+        $this->line('Created page cards widgets');
+
+        $mediaCarouselWidget = $this->demoCreator->createMediaCarouselWidget();
+        $this->line('Created media carousel widget');
 
         $containers['main']['widgets'] = [
             [
-                'widget_key' => $this->demoCreator->createPageCardsWidget($page)->key,
+                'widget_key' => $pageCardsWidget->key,
                 'occurrence' => 1,
             ],
-            ['widget_key' => $this->demoCreator->createGalleryWidget()->key],
+            ['widget_key' => $galleryWidget->key],
             [
-                'widget_key' => $this->demoCreator->createPageCardsWidget($page, occurrence: 2)->key,
+                'widget_key' => $pageCardsWidget2->key,
                 'occurrence' => 2,
             ],
-            ['widget_key' => $this->demoCreator->createMediaCarouselWidget()->key],
+            ['widget_key' => $mediaCarouselWidget->key],
         ];
+
+        $faqWidget = $this->demoCreator->createFaqWidget($languages);
+        $this->line('Created FAQ widget');
 
         $containers['faq-main'] = [
             'meta' => [
                 'colspan' => 8,
             ],
             'widgets' => [
-                ['widget_key' => $this->demoCreator->createFaqWidget($languages)->key],
+                ['widget_key' => $faqWidget->key],
             ],
         ];
+
+        $faqColWidget = $this->demoCreator->createStaticNavigationWidget($languages, $page->site);
+        $this->line('Created static FAQ widget: ' . $faqColWidget->key);
 
         $containers['faq-col'] = [
             'meta' => [
@@ -175,25 +196,52 @@ class DemoCommand extends Command
                 'container' => 'full',
             ],
             'widgets' => [
-                ['widget_key' => $this->demoCreator->createStaticNavigationWidget($languages, $page->site)->key],
+                ['widget_key' => $faqColWidget->key],
             ],
         ];
+
+        $teamPortfolioWidget = $this->demoCreator->createTeamPortfolioWidget($languages);
+        $this->line('Created team portfolio widget: ' . $teamPortfolioWidget->key);
+
+        $bannerImageWidget = $this->demoCreator->createBannerImageWidget($languages);
+        $this->line('Created banner image widget: ' . $bannerImageWidget->key);
+
+        $contentWidget = $this->demoCreator->createContentWidget($languages);
+        $this->line('Created content widget: ' . $contentWidget->key);
+
+        $statisticsWidget = $this->demoCreator->createStatisticsWidget();
+        $this->line('Created statistics widget: ' . $statisticsWidget->key);
+
+        $businessFeaturesWidget = $this->demoCreator->createBusinessFeaturesWidget($page->site);
+        $this->line('Created business features widget: ' . $businessFeaturesWidget->key);
+
+        $bannersWidget = $this->demoCreator->createBannersWidget();
+        $this->line('Created banners widget: ' . $bannersWidget->key);
+
+        $clientLogosWidget = $this->demoCreator->createClientLogosWidget($languages);
+        $this->line('Created client logos widget: ' . $clientLogosWidget->key);
+
+        $testimonialsWidget = $this->demoCreator->createTestimonialsWidget($languages);
+        $this->line('Created testimonials widget: ' . $testimonialsWidget->key);
 
         $containers['secondary'] = [
             'meta' => [
                 'colspan' => 12,
             ],
             'widgets' => [
-                ['widget_key' => $this->demoCreator->createTeamPortfolioWidget($languages)->key],
-                ['widget_key' => $this->demoCreator->createBannerImageWidget($languages)->key],
-                ['widget_key' => $this->demoCreator->createContentWidget($languages)->key],
-                ['widget_key' => $this->demoCreator->createStatisticsWidget()->key],
-                ['widget_key' => $this->demoCreator->createBusinessFeaturesWidget($page->site)->key],
-                ['widget_key' => $this->demoCreator->createBannersWidget()->key],
-                ['widget_key' => $this->demoCreator->createClientLogosWidget($languages)->key],
-                ['widget_key' => $this->demoCreator->createTestimonialsWidget($languages)->key],
+                ['widget_key' => $teamPortfolioWidget->key],
+                ['widget_key' => $bannerImageWidget->key],
+                ['widget_key' => $contentWidget->key],
+                ['widget_key' => $statisticsWidget->key],
+                ['widget_key' => $businessFeaturesWidget->key],
+                ['widget_key' => $bannersWidget->key],
+                ['widget_key' => $clientLogosWidget->key],
+                ['widget_key' => $testimonialsWidget->key],
             ],
         ];
+
+        $splitContentWidget = $this->demoCreator->createSplitContentWidget($languages);
+        $this->line('Created split content widget: ' . $splitContentWidget->key);
 
         $containers['split-two'] = [
             'meta' => [
@@ -204,13 +252,15 @@ class DemoCommand extends Command
                 'background_color' => 'light-gray',
             ],
             'widgets' => [
-                ['widget_key' => $this->demoCreator->createSplitContentWidget($languages)->key],
+                ['widget_key' => $splitContentWidget->key],
             ],
         ];
 
+        $this->line('Adding background media to split container');
         app(\Capell\Admin\Services\Creator\DemoCreator::class)->createMedia($layout, collection: 'split-two-background');
 
         $layout->containers = $containers;
+
         $layout->update(['containers' => $containers]);
     }
 
@@ -237,7 +287,7 @@ class DemoCommand extends Command
 
             $contentData['translations'][$language->code] = [
                 'title' => $name,
-                'contents' => $name,
+                'content' => $name,
             ];
         }
 

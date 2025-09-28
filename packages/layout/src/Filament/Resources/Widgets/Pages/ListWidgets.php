@@ -72,7 +72,7 @@ class ListWidgets extends ListRecords
         return [
             'translations' => [
                 'meta->actions',
-                'contents' => 'json_data',
+                'content',
                 'title',
             ],
         ];

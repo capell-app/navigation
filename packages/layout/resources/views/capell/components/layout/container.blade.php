@@ -6,9 +6,8 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Facades\CapellCore;
-    use Capell\Frontend\Facades\Frontend;
-    use Capell\Frontend\Services\Loader\LayoutLoader;
-    use Capell\Layout\Facades\Layout;
+    use Capell\Frontend\Facades\FrontendLoader;
+    use Capell\Layout\Facades\CapellLayout;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 @endphp
 
@@ -50,36 +49,36 @@ declare(strict_types=1);
 {{-- format-ignore-start --}}
 @if ($backgroundImage)
     <div class="relative">
-    <div
-        @if ($backgroundImage)
-            style="{{ $backgroundImage ? 'background-image:url('.$backgroundImage->url.');' : '' }}"
-        @endif
-        @class([
-            "absolute top-0 bottom-0 left-0 w-1/2 -z-1 h-full bg-cover bg-center bg-no-repeat",
-        ])
-    >
-    </div>
-@endif
-
-@if ($colspan !== 12)
-    @if (! $previousColspan || $previousColspan === 12)
         <div
-            @class([
-                "container" => $containerWidth !== 'full',
-            ])
+                @if ($backgroundImage)
+                    style="{{ $backgroundImage ? 'background-image:url('.$backgroundImage->url.');' : '' }}"
+                @endif
+                @class([
+                    "absolute top-0 bottom-0 left-0 w-1/2 -z-1 h-full bg-cover bg-center bg-no-repeat",
+                ])
         >
-            <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
-    @endif
+        </div>
+        @endif
 
-    <div
-        style="--colspan: {{ $colspan }}; --column-start: {{ $columnStart }};"
-        @class([
-            "lg:col-span-[var(--colspan)]",
-            "lg:col-start-[var(--column-start)]",
-        ])
-    >
-@endif
-{{-- format-ignore-end --}}
+        @if ($colspan !== 12)
+            @if (! $previousColspan || $previousColspan === 12)
+                <div
+                        @class([
+                            "container" => $containerWidth !== 'full',
+                        ])
+                >
+                    <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
+                        @endif
+
+                        <div
+                                style="--colspan: {{ $colspan }}; --column-start: {{ $columnStart }};"
+                                @class([
+                                    "lg:col-span-[var(--colspan)]",
+                                    "lg:col-start-[var(--column-start)]",
+                                ])
+                        >
+                            @endif
+                            {{-- format-ignore-end --}}
 
 <div
     id="layout-container-{{ $containerKey }}"
@@ -116,7 +115,7 @@ declare(strict_types=1);
 >
     @foreach ($container['widgets'] as $widgetIndex => $widgetData)
         @php
-            $widget = Layout::getContainerWidget(
+            $widget = CapellLayout::getContainerWidget(
                 $containerKey,
                 $widgetData['widget_key'],
                 $widgetData['occurrence'] ?? 1
@@ -168,16 +167,16 @@ declare(strict_types=1);
 </div>
 
 {{-- format-ignore-start --}}
-@if ($backgroundImage)
+                            @if ($backgroundImage)
+                        </div>
+                        @endif
+                        @if ($colspan !== 12)
+                    </div>
+
+                    @if ($currentColspan === 12)
+                </div>
     </div>
 @endif
-@if ($colspan !== 12)
-    </div>
-
-    @if ($currentColspan === 12)
-            </div>
-        </div>
-    @endif
 @endif
 {{-- format-ignore-end --}}
 

@@ -24,10 +24,14 @@ use Howdu\FilamentRecordSwitcher\Filament\Concerns\HasRecordSwitcher;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
+use Override;
+use Rmsramos\Activitylog\Actions\ActivityLogTimelineSimpleAction;
 
 /**
  * @property Content $record
  */
+#[On('$refresh')]
 class EditContent extends EditRecord
 {
     use HasAncestorBreadcrumbs;
@@ -70,6 +74,14 @@ class EditContent extends EditRecord
         ]);
     }
 
+    public function getPageClasses(): array
+    {
+        return [
+            ...parent::getPageClasses(),
+            'filament-page-content-hidden-widgets',
+        ];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -82,7 +94,16 @@ class EditContent extends EditRecord
                 ReplicateAction::make()
                     ->replicaModelAction(ReplicateContentAction::class)
                     ->hidden($this->record->trashed()),
+                ActivityLogTimelineSimpleAction::make(),
             ]),
+        ];
+    }
+
+    #[Override]
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ContentAlertsWidget::class,
         ];
     }
 
@@ -90,7 +111,7 @@ class EditContent extends EditRecord
     {
         $this->notifyPageCached($this->record);
 
-        $this->dispatch('update-alerts')->to(ContentAlertsWidget::class);
+        $this->dispatch('refresh-alerts')->to(ContentAlertsWidget::class);
 
         $this->recordSwitcherAfterSave();
     }

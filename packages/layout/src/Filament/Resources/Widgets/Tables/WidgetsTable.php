@@ -106,6 +106,7 @@ class WidgetsTable implements TableConfigurator
                 ->color('gray')
                 ->html()
                 ->listWithLineBreaks()
+                ->toggleable(isToggledHiddenByDefault: true)
                 ->formatStateUsing(
                     fn (ListWidgets $livewire, TextColumn $column, Widget $record): string => Str::limit(
                         $record->translation->title ?? '',
@@ -114,27 +115,18 @@ class WidgetsTable implements TableConfigurator
                     )
                 )
                 ->description(function (ListWidgets $livewire, TextColumn $column, Widget $record): ?HtmlString {
-                    if (! $record->translation?->contents) {
+                    if (! $record->translation?->content) {
                         return null;
                     }
 
-                    $contents = '';
-
-                    foreach ($record->translation->contents as $content) {
-                        if (! isset($content['data']['content'])) {
-                            continue;
-                        }
-
-                        $contents .= strip_tags((string) $content['data']['content']);
-
-                        if (Str::length($contents) >= $column->getCharacterLimit()) {
-                            break;
-                        }
-                    }
-
-                    return new HtmlString(Str::limit($contents, $column->getCharacterLimit(), $column->getCharacterLimitEnd()));
-                })
-                ->toggleable(isToggledHiddenByDefault: true),
+                    return new HtmlString(
+                        Str::limit(
+                            $record->translation->content,
+                            $column->getCharacterLimit(),
+                            $column->getCharacterLimitEnd()
+                        )
+                    );
+                }),
             TextColumn::make('key')
                 ->label(__('capell-admin::table.key'))
                 ->searchable()

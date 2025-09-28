@@ -6,7 +6,7 @@ namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types;
 
 use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
 use Capell\Layout\Enums\SchemaExtenderEnum;
 use Capell\Layout\Enums\SchemaTypeEnum;
@@ -53,7 +53,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
             FixedWidthSidebar::make()
                 ->mainSchema([
                     WidgetTranslationsRepeater::make($schema)
-                        ->section(),
+                        ->contained(),
                     ...$this->getExtraSchema($schema),
                 ])
                 ->sidebarSchema(

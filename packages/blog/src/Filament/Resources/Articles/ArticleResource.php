@@ -74,7 +74,7 @@ class ArticleResource extends PageResource
     }
 
     #[Override]
-    public static function mutateFormDataBeforeCreate(array &$data, array $formData): void
+    public static function mutateFormDataBeforeCreate(array &$data, array $formData = []): void
     {
         $data['layout_id'] = GetArticleLayoutAction::run()?->id;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types;
 
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
-use Capell\Admin\Filament\Components\Forms\Media\MediaLibraryFileUpload;
+use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\AssetsRepeater;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
@@ -41,8 +41,8 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
             Tabs::make()
                 ->columnSpanFull()
                 ->tabs([
-                    $this->getContentTab($schema),
                     $this->getAssetsTab($schema),
+                    $this->getTranslationsTab($schema),
                     $this->getSettingsTab($schema),
                     $this->getAdminTab($schema),
                 ]),
@@ -59,7 +59,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
                         ->columnSpanFull()
                         ->tabs([
                             $this->getAssetsTab($schema),
-                            $this->getContentTab($schema),
+                            $this->getTranslationsTab($schema),
                             $this->getSettingsTab($schema),
                             $this->getAdminTab($schema),
                         ]),
@@ -79,7 +79,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
             ]);
     }
 
-    protected function getContentTab(Schema $schema): Tab
+    protected function getTranslationsTab(Schema $schema): Tab
     {
         return Tab::make(__('capell-admin::tab.content'))
             ->icon(Heroicon::Language)
@@ -113,6 +113,8 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
     protected function getAssetsComponent(Schema $schema): Component
     {
         return AssetsRepeater::make('assets')
-            ->hiddenLabel();
+            ->compact()
+            ->hiddenLabel()
+            ->hint(__('capell-admin::generic.widget_assets_repeater_hint'));
     }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms;
 
-use BackedEnum;
+use Capell\Admin\Actions\GetAssetResourceUrlAction;
+use Capell\Admin\Actions\ModifyCreateAction;
+use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
@@ -15,7 +17,9 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Htmlable;
@@ -39,11 +43,35 @@ class AssetsRepeater extends Repeater
                 TableColumn::make(__('capell-admin::form.asset')),
             ])
             ->addAction(self::modifyAddAction(...))
-            ->schema(self::getFormSchema());
+            ->schema(self::getFormSchema())
+            ->extraItemActions([
+                Action::make('edit_asset')
+                    ->visible(
+                        fn (array $arguments, Repeater $component): bool => ! empty(
+                            $component->getRawItemState($arguments['item'])['asset_id']
+                        )
+                    )
+                    ->tooltip(function (array $arguments, Repeater $component): ?string {
+                        $itemData = $component->getRawItemState($arguments['item']);
 
-        $this->registerActions([
-            fn (self $component): Action => $component->getAddAssetAction(),
-        ]);
+                        return __(
+                            'capell-admin::button.edit_asset_type',
+                            ['type' => $itemData['asset_type']]
+                        );
+                    })
+                    ->icon(Heroicon::PencilSquare)
+                    ->url(
+                        function (array $arguments, Repeater $component): ?string {
+                            $itemData = $component->getRawItemState($arguments['item']);
+
+                            return GetAssetResourceUrlAction::run($itemData['asset_type'], $itemData['asset_id']);
+                        },
+                        shouldOpenInNewTab: true
+                    ),
+            ])
+            ->registerActions([
+                fn (self $component): Action => $component->getAddAssetAction(),
+            ]);
     }
 
     public function getAddAssetAction(): Action
@@ -74,21 +102,26 @@ class AssetsRepeater extends Repeater
 
     protected static function getFormSchema(): array
     {
+        $select = Select::make('asset_id');
+
+        $createOptionUsing = $select->getCreateOptionUsing();
+
         return [
             Hidden::make('asset_type'),
-            Select::make('asset_id')
+            $select
                 ->label(__('capell-layout::form.select_add_asset_type'))
                 ->required()
                 ->searchable()
-                ->prefixIcon(
-                    fn (Get $get): string|BackedEnum => CapellCore::getAsset($get('asset_type'))->getIcon()
-                )
                 ->placeholder(
                     fn (Get $get): string => __(
                         'capell-admin::generic.select_asset_placeholder',
-                        ['type' => CapellCore::getAsset($get('asset_type'))->getLabel()]
+                        ['asset' => CapellCore::getAsset($get('asset_type'))->getLabel()]
                     )
                 )
+                ->prefixIcon(
+                    fn (Get $get): null|string|Heroicon => CapellCore::getAsset($get('asset_type'))->getIcon()
+                )
+                ->selectablePlaceholder(false)
                 ->getSearchResultsUsing(
                     static fn (Select $component, Get $get, string $search): array => self::getAssetOptions(
                         $component,
@@ -103,7 +136,39 @@ class AssetsRepeater extends Repeater
                         $get('asset_type'),
                         limit: $component->getOptionsLimit()
                     )
-                ),
+                )
+                ->createOptionForm(function (Schema $schema, Get $get): Schema {
+                    $asset = CapellCore::getAsset($get('asset_type'));
+
+                    $assetAdmin = CapellAdmin::getAsset($get('asset_type'));
+
+                    return $assetAdmin->formClass::configure(
+                        $schema->operation('createOption')->model($asset->model)
+                    );
+                })
+                ->createOptionUsing(function (Select $component, Schema $schema, Get $get, array $data) use ($createOptionUsing): int|string {
+                    $asset = CapellAdmin::getAsset($get('asset_type'));
+
+                    $record = $asset->createAction !== null && $asset->createAction !== '' && $asset->createAction !== '0'
+                        ? $asset->createAction::run($data)
+                        : $component->evaluate($createOptionUsing);
+
+                    $schema->model($record)->saveRelationships();
+
+                    Notification::make()
+                        ->title(__('capell-admin::message.page_created_successfully'))
+                        ->body($record->name)
+                        ->send();
+
+                    return $record->getKey();
+                })
+                ->createOptionAction(function (Action $action, Get $get): Action {
+                    $asset = CapellAdmin::getAsset($get('asset_type'));
+
+                    return ModifyCreateAction::run($action)
+                        ->fillForm(fn (): array => $asset->defaultDataAction !== null && $asset->defaultDataAction !== '' && $asset->defaultDataAction !== '0' ? $asset->defaultDataAction::run() : []);
+                })
+                ->getOptionLabelFromRecordUsing(fn (Model $record): string => $record->name),
         ];
     }
 

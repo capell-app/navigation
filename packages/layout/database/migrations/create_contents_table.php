@@ -54,7 +54,7 @@ return new class extends Migration
 
     private function draftsCreateSchema(Blueprint $table): void
     {
-        $uuid = config('drafts.column_names.uuid', 'draft_id');
+        $uuid = config('drafts.column_names.uuid', 'uuid');
         $publishedAt = config('drafts.column_names.published_at', 'published_at');
         $isPublished = config('drafts.column_names.is_published', 'is_published');
         $isCurrent = config('drafts.column_names.is_current', 'is_current');

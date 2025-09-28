@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
+use Capell\Admin\Enums\ContentEditorEnum;
 use Capell\Core\Enums\AssetComponentEnum as CapellAssetComponentEnum;
 use Capell\Core\Enums\AssetEnum;
+use Capell\Core\Enums\ContentPresenterEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
@@ -17,6 +19,7 @@ use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Enums\WidgetTypeGroupEnum;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Widgets\DefaultLayoutWidgetSchema;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Widgets\PageLayoutWidgetSchema;
+use Capell\Layout\Filament\Resources\Types\Schemas\Types\ContentTypeSchema;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\AssetsWidgetSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\NavigationWidgetSchema;
@@ -54,6 +57,13 @@ class TypeCreator
         ], [
             'name' => __('capell-admin::generic.default'),
             'key' => 'default',
+            'admin' => [
+                'type_schema' => ContentTypeSchema::getKey(),
+                'content_editor' => ContentEditorEnum::ContentBuilder,
+            ],
+            'meta' => [
+                'content_presenter' => ContentPresenterEnum::Blocks,
+            ],
         ]);
     }
 

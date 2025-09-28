@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Livewire\Page;
 
-use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\Facades\FrontendManager;
+use Capell\Frontend\CapellFrontendManager;
+use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Carbon\Carbon;
@@ -30,13 +30,13 @@ class ArchivePage extends AbstractPage
      */
     protected function getArchiveDateFromUrl(): array
     {
-        $current = Frontend::getPageSlug();
+        $current = FrontendLoader::getPageSlug();
 
         $month = null;
         $year = null;
 
         if ($current === '' || $current === '0') {
-            FrontendManager::throwErrorPage();
+            CapellFrontendManager::throwErrorPage();
         }
 
         $parts = explode('/', $current);
@@ -53,7 +53,7 @@ class ArchivePage extends AbstractPage
         }
 
         if (! is_numeric($current) && ($year === 0 || $year === null)) {
-            FrontendManager::throwErrorPage();
+            CapellFrontendManager::throwErrorPage();
         }
 
         return [$year, $month];
@@ -80,13 +80,13 @@ class ArchivePage extends AbstractPage
             abort(404);
         }
 
-        $pageRecord = Frontend::getPage();
+        $pageRecord = FrontendLoader::getPage();
 
         $paginationKey = config('capell-admin.page_query', 'pageQuery');
 
         $this->results = PageLoader::getPages(
-            site: Frontend::getSite(),
-            language: Frontend::getLanguage(),
+            site: FrontendLoader::getSite(),
+            language: FrontendLoader::getLanguage(),
             limit: $pageRecord->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
             paginationPage: $this->getPage($paginationKey),
             typeKey: $pageRecord->type->meta['page_group'] ?? 'article',
@@ -122,6 +122,6 @@ class ArchivePage extends AbstractPage
 
         $this->pageParams = $this->getViewData();
 
-        Frontend::setPageParams($this->pageParams);
+        FrontendLoader::setPageParams($this->pageParams);
     }
 }

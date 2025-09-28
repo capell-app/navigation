@@ -6,7 +6,6 @@ namespace Capell\Layout\Filament\Actions;
 
 use Capell\Admin\Actions\PublishRecordAction;
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
-use Capell\Core\Models\Page;
 use Capell\Layout\Models\Content;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -24,10 +23,10 @@ class PublishContentAction extends Action
             ->button()
             ->modal()
             ->icon(Heroicon::CheckCircle)
-            ->visible(fn (?Page $record): bool => $record?->isDraft() && ! $record?->trashed())
+            ->visible(fn (?Content $record): bool => $record?->isDraft() && ! $record?->trashed())
             ->requiresConfirmation()
             ->modalDescription(__('capell-admin::message.publish_draft_confirmation'))
-            ->action($this->publishPage(...));
+            ->action($this->publishContent(...));
     }
 
     public static function getDefaultName(): ?string
@@ -42,11 +41,11 @@ class PublishContentAction extends Action
             ->action(function (EditPage $livewire, ?Content $record): void {
                 $livewire->save(shouldRedirect: false);
 
-                $this->publishPage($record);
+                $this->publishContent($record);
             });
     }
 
-    private function publishPage(?Content $record): void
+    private function publishContent(?Content $record): void
     {
         PublishRecordAction::run($record);
 

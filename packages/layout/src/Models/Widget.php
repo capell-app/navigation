@@ -6,6 +6,7 @@ namespace Capell\Layout\Models;
 
 use Bkwld\Cloner\Cloneable;
 use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasMetaData;
@@ -35,6 +36,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -87,6 +91,8 @@ use Wildside\Userstamps\Userstamps;
  * @property-read Media|null $backgroundImage
  * @property-read \Illuminate\Database\Eloquent\Collection<int, WidgetAsset> $widgetPageAssets
  * @property-read int|null $widget_page_assets_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
+ * @property-read int|null $activities_count
  *
  * @mixin \Eloquent
  */
@@ -107,14 +113,11 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
     use HasStatus;
     use HasTranslations;
     use InteractsWithMedia;
+    use LogsActivity;
     use SoftDeletes;
     use Userstamps;
 
     public const COMPONENT_SLOT = 'slot';
-
-    public const MEDIA_IMAGE = 'image';
-
-    public const MEDIA_BACKGROUND_IMAGE = 'background_image';
 
     /**
      * The attributes that are mass assignable.
@@ -130,6 +133,14 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
         'publish_to',
         'status',
         'type_id',
+    ];
+
+    protected $casts = [
+        'admin' => 'json',
+        'meta' => 'json',
+        'publish_from' => 'datetime',
+        'publish_to' => 'datetime',
+        'status' => 'boolean',
     ];
 
     /**
@@ -172,10 +183,20 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
             ->pluck('group');
     }
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('widget')
+            ->logAll()
+            ->logExcept(['updated_at', 'created_at', 'deleted_at'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection(static::MEDIA_IMAGE)->singleFile();
-        $this->addMediaCollection(static::MEDIA_BACKGROUND_IMAGE)->singleFile();
+        $this->addMediaCollection(MediaCollectionEnum::Image->value)->singleFile();
+        $this->addMediaCollection(MediaCollectionEnum::BackgroundImage->value)->singleFile();
     }
 
     public function getComponent(): ?string
@@ -202,12 +223,12 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
 
     public function image(): MorphOne
     {
-        return $this->morphOneMedia(static::MEDIA_IMAGE);
+        return $this->morphOneMedia(MediaCollectionEnum::Image->value);
     }
 
     public function backgroundImage(): MorphOne
     {
-        return $this->morphOneMedia(static::MEDIA_BACKGROUND_IMAGE);
+        return $this->morphOneMedia(MediaCollectionEnum::BackgroundImage->value);
     }
 
     public function type(): BelongsTo
@@ -285,21 +306,5 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
                 SQL,
             } . ' AS layouts_count'
         );
-    }
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'admin' => 'json',
-            'meta' => 'json',
-            'publish_from' => 'datetime',
-            'publish_to' => 'datetime',
-            'status' => 'boolean',
-        ];
     }
 }

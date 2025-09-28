@@ -81,7 +81,7 @@ class DemoCommand extends Command
         }
 
         foreach ($sites as $site) {
-            $this->info(sprintf('Selected site: %s', $site->name));
+            $this->line(sprintf('Selected site: %s', $site->name));
 
             CreateBlogPagesAction::run($site);
 
@@ -92,7 +92,7 @@ class DemoCommand extends Command
             }
         }
 
-        $this->info('Demo blog articles have been successfully created.');
+        $this->line('Demo blog articles have been successfully created.');
 
         return Command::SUCCESS;
     }
@@ -122,6 +122,8 @@ class DemoCommand extends Command
         }
 
         foreach ($data['children'] as $child) {
+            $this->line(sprintf('Creating page: %s', $data['name']['en'] . ' - ' . $child['name']['en']));
+
             $this->createPage(
                 data: $child,
                 site: $site,
@@ -137,6 +139,8 @@ class DemoCommand extends Command
 
     private function createDemoPages(Site $site, ?Model $user): bool
     {
+        $site->loadMissing('languages', 'language');
+
         $blogPage = BlogLoader::getBlogPage($site);
 
         if (! $blogPage instanceof Page) {
@@ -148,7 +152,7 @@ class DemoCommand extends Command
         $demo = config('capell-demo.pages');
 
         foreach ($demo as $pageData) {
-            $this->comment(sprintf('Creating page: %s', $pageData['name']['en']));
+            $this->line(sprintf('Creating page: %s', $pageData['name']['en']));
 
             $this->createPage(
                 $pageData,

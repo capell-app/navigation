@@ -9,12 +9,15 @@ use Capell\Admin\Filament\Components\Forms\RepeaterTabs;
 use Capell\Admin\Filament\Components\Forms\TranslationLanguageSelect;
 use Capell\Admin\Filament\Components\Forms\TranslationsRepeater;
 use Capell\Admin\Filament\Components\Forms\TranslationTitle;
+use Capell\Core\Enums\ModelEnum;
+use Capell\Core\Facades\CapellCore;
+use Capell\Layout\Enums\TypeEnum;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
-final class ContentTranslationsRepeater
+class ContentTranslationsRepeater
 {
     public static function make(
         Schema $schema,
@@ -26,22 +29,30 @@ final class ContentTranslationsRepeater
         $operation = $schema->getOperation();
 
         return TranslationsRepeater::make('translations')
-            ->contained(false)
             ->when(
                 $operation === 'replicate',
                 fn (TranslationsRepeater $repeater): TranslationsRepeater => $repeater->withoutRelationship()
             )
             ->schema([
                 ...($hasTitle ? self::getTitleSchema($titleRequired) : []),
-                ...($hasContent ? self::getContentSchema() : []),
+                ...($hasContent ? self::getContentSchema($schema) : []),
                 ...$components,
             ]);
     }
 
-    private static function getContentSchema(): array
+    private static function getContentSchema(Schema $schema): array
     {
+        $type = $schema->getRecord()?->type ?? null;
+
+        if (! $type && $typeId = $schema->getRawState()['type_id'] ?? null) {
+            $type = CapellCore::getModel(ModelEnum::Type)::query()
+                ->where('type', TypeEnum::Content)
+                ->whereKey($typeId)
+                ->first();
+        }
+
         return [
-            ContentEditor::make(),
+            ContentEditor::make(editor: $type?->admin['content_editor'] ?? null),
         ];
     }
 

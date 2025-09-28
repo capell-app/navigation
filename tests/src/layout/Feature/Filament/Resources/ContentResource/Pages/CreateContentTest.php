@@ -44,7 +44,6 @@ it('can create', function (string $type): void {
 
     livewire(CreateContent::class)
         ->assertSuccessful()
-        ->set('data.translations', [])
         ->fillForm([
             'type_id' => $newData->type->getKey(),
             'name' => $newData->name,
@@ -90,7 +89,7 @@ test('create with translations', function (string $mode): void {
                         (string) Str::uuid() => [
                             'language_id' => $language->getKey(),
                             'title' => $newData->name . ' - ' . $language->name,
-                            'contents' => $newData->name . ' - ' . $language->name,
+                            'content' => $newData->name . ' - ' . $language->name,
                         ],
                     ]
                 )
@@ -114,7 +113,7 @@ test('create with translations', function (string $mode): void {
         fn (Language $language) => assertDatabaseHas(Translation::class, [
             'language_id' => $language->getKey(),
             'title' => $newData->name . ' - ' . $language->name,
-            'contents' => '"<p>' . $newData->name . ' - ' . htmlentities($language->name, ENT_QUOTES, 'UTF-8') . '<\\/p>"',
+            'content' => $newData->name . ' - ' . htmlentities($language->name, ENT_QUOTES, 'UTF-8'),
             'translatable_type' => 'content',
         ])
     );
