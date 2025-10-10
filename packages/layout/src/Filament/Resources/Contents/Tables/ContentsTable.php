@@ -12,10 +12,11 @@ use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\PublishStatusColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\TypeNameColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\TypeColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Enums\ModelEnum;
@@ -39,7 +40,6 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
@@ -138,7 +138,7 @@ class ContentsTable implements TableConfigurator
                 ->label(__('capell-admin::table.page'))
                 ->withParents()
                 ->toggleable(isToggledHiddenByDefault: true),
-            TypeNameColumn::make('type.name'),
+            TypeColumn::make('type.name'),
             SpatieTagsColumn::make('tags')
                 ->label(__('capell-admin::table.tags'))
                 ->type(TagTypeEnum::CONTENT->value)
@@ -163,6 +163,10 @@ class ContentsTable implements TableConfigurator
                         ['tableFilters' => ['filter' => ['parent_id' => $record->id]]]
                     );
                 }),
+            MediaLibraryImageColumn::make('image')
+                ->label(__('capell-admin::table.image'))
+                ->collection('image')
+                ->toggleable(),
             BadgeableColumn::make('assets_count')
                 ->label(__('capell-admin::table.assets'))
                 ->alignRight()
@@ -176,10 +180,6 @@ class ContentsTable implements TableConfigurator
                     fn (HasTable $livewire): bool => $livewire->activeTab
                         || ! empty($livewire->getTableFilterState('filter')['site_id'])
                 ),
-            SpatieMediaLibraryImageColumn::make('image')
-                ->label(__('capell-admin::table.image'))
-                ->collection('image')
-                ->toggleable(),
             PublishStatusColumn::make('status'),
             DateColumn::make('publish_from')
                 ->label(__('capell-admin::table.publish_from'))

@@ -11,6 +11,7 @@ use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\StatusColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
@@ -27,7 +28,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -94,7 +94,7 @@ class WidgetsTable implements TableConfigurator
                 ->searchable()
                 ->sortable()
                 ->alignCenter(),
-            SpatieMediaLibraryImageColumn::make('meta.image')
+            MediaLibraryImageColumn::make('meta.image')
                 ->toggleable(isToggledHiddenByDefault: true),
             LanguagesColumn::make('translations.language'),
             TextColumn::make('translation.contents')
@@ -226,7 +226,7 @@ class WidgetsTable implements TableConfigurator
 
             TextFilter::make('file')
                 ->label(__('capell-admin::form.component'))
-                ->query(function (TextFilter $filter, $data, Builder $query): void {
+                ->query(function (TextFilter $filter, array $data, Builder $query): void {
                     if (! empty($data['clause'])) {
                         $columns = ['meta->component', 'meta->file', 'meta->component_item'];
                         $filter->applyQueryClause($query, $columns, $data['clause'], $data);

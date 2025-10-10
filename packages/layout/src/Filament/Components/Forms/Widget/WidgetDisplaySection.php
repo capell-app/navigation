@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Components\Forms\Widget;
 
+use Capell\Admin\Filament\Components\Forms\ContentPresenterSelect;
 use Capell\Layout\Filament\Components\Forms\AlignSelect;
 use Capell\Layout\Filament\Components\Forms\BackgroundSettingsFieldset;
 use Capell\Layout\Filament\Components\Forms\ContainerWidthSelect;
@@ -26,6 +27,8 @@ class WidgetDisplaySection
             ->columns(3)
             ->schema([
                 ...$schema,
+
+                ContentPresenterSelect::make(),
 
                 PaddingSelect::make('padding'),
 

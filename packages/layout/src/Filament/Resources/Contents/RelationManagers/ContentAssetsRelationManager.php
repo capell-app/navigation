@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Contents\RelationManagers;
 
 use Capell\Admin\Actions\GetAssetResourceUrlAction;
+use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
@@ -65,7 +65,7 @@ class ContentAssetsRelationManager extends RelationManager
                         query: fn (Builder $query, string $search): Builder => $query->where('asset_id', $search),
                     ),
                 NameColumn::make('asset.name'),
-                SpatieMediaLibraryImageColumn::make('asset.image')
+                MediaLibraryImageColumn::make('asset.image')
                     ->label(__('capell-admin::table.image'))
                     ->collection('image')
                     ->autoEagerLoadRelation(false),

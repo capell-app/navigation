@@ -75,6 +75,10 @@ class ContentFactory extends Factory
             $languages ??= $content->site?->languages ?? Language::all();
 
             $languages->each(function (Language $language) use ($content, $data): void {
+                if ($content->translations()->where('language_id', $language->id)->exists()) {
+                    return;
+                }
+
                 $title = $content->name . ' ' . $language->locale;
 
                 $translation = Translation::factory()

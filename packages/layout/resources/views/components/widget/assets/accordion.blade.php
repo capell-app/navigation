@@ -74,7 +74,7 @@ declare(strict_types=1);
                             ])
                         </div>
                         <div class="font-medium">
-                            {!! $widgetAsset->asset->translation->title !!}
+                            {!! $widgetAsset->asset->translation?->title !!}
                         </div>
                     </button>
 
@@ -121,7 +121,7 @@ declare(strict_types=1);
                                             color="default"
                                             icon="heroicon-o-chevron-right"
                                         >
-                                            {{ $item->translation->link_text }}
+                                            {{ $item->translation?->link_text }}
                                         </x-capell::button>
                                     @endif
                                 </x-capell::actions>

@@ -15,6 +15,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\AssetEnum;
+use Capell\Layout\Enums\ContentTypeEnum;
 use Capell\Layout\Enums\LayoutModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
@@ -73,6 +74,7 @@ class DemoCreator
         $siteId = Site::default()?->value('id');
         $widget = $this->widgetModel::firstOrCreate(['key' => 'example-content'], [
             'name' => 'Example Content',
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'size' => 'md',
                 'margin' => '',
@@ -121,6 +123,7 @@ class DemoCreator
 
         $widget = $this->widgetModel::firstOrCreate(['key' => 'example-split-content'], [
             'name' => 'Example Split Content',
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'align' => 'center',
                 'size' => 'md',
@@ -167,6 +170,7 @@ class DemoCreator
         $siteId = Site::default()?->value('id');
         $widget = $this->widgetModel::firstOrCreate(['key' => 'banner-full-width'], [
             'name' => 'Banner Full Width',
+            'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'component' => 'capell-layout::widget.banner-image',
                 'margin' => ['lg'],
@@ -308,7 +312,7 @@ class DemoCreator
 
         $contentType = $this->typeModel::query()
             ->where('type', LayoutTypeEnum::Content)
-            ->default()
+            ->where('key', ContentTypeEnum::Builder)
             ->first();
 
         $parentContent = $this->contentModel::firstOrCreate([
@@ -365,9 +369,9 @@ class DemoCreator
         $languages->skip(1)
             ->each(fn (Language $language) => $this->tagModel::findOrCreate('faq', 'content', $language->code));
 
-        for ($i = 1; $i <= 6; $i++) {
+        foreach ($questions['en'] as $i => $question) {
             $content = $this->contentModel::firstOrCreate([
-                'name' => $questions['en'][$i],
+                'name' => $question,
                 'parent_id' => $parentContent->id,
                 'type_id' => $contentType->id,
             ]);
@@ -412,35 +416,6 @@ class DemoCreator
         }
 
         $this->createMedia($widget, type: 'video');
-
-        return $widget;
-    }
-
-    public function createArticlesCardWidget(Collection $languages, Page $page, int $occurrence = 1): Widget
-    {
-        $widget = $this->widgetModel::firstWhere('key', 'articles-card');
-
-        if (! $widget) {
-            $widget = $this->widgetModel::firstOrCreate([
-                'key' => 'articles-card',
-                'name' => __('capell-admin::generic.articles'),
-                'type_id' => $this->typeModel::firstWhere('key', WidgetTypeEnum::Pages)->id,
-                'meta' => [
-                    'limit' => 10,
-                    'with_image' => true,
-                    'with_summary' => true,
-                    'with_link_text' => true,
-                    'spacing' => 'lg',
-                    'padding' => ['t-lg'],
-                ],
-            ]);
-        }
-
-        foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => __('Article - Cards'),
-            ]);
-        }
 
         return $widget;
     }
@@ -499,9 +474,16 @@ class DemoCreator
         return $widget;
     }
 
-    public function createWidgetAssets(Widget $widget, Page $page, string $container, int $occurrence = 1): void
+    public function createContentsWidget(Widget $widget, Page $page, string $container, int $occurrence = 1): void
     {
-        if ($widget->assets()->exists()) {
+        $pageWidgetAssets = $widget->assets()->where([
+            'page_id' => $page->id,
+            'container' => $container,
+            'occurrence' => $occurrence,
+        ])
+            ->exists();
+
+        if ($pageWidgetAssets) {
             return;
         }
 
@@ -525,47 +507,52 @@ class DemoCreator
         ];
 
         foreach ($features as $feature) {
-            $content = Content::factory()
-                ->site($page->site)
-                ->withTranslations($page->site->languages, ['content' => sprintf('<p>%s</p>', $feature['title'])])
-                ->state([
-                    'meta' => fn ($attributes): array => array_merge_recursive((array) $attributes['meta'], [
-                        'actions' => [
-                            [
-                                'type' => 'page',
-                                'page_id' => Page::where('site_id', $page->site->id)
-                                    ->whereHas(
-                                        'type',
-                                        /** @param Type $query */
-                                        fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
-                                    )
-                                    ->inRandomOrder()
-                                    ->value('id'),
-                                'site_id' => $page->site->id,
-                            ],
-                            [
-                                'type' => 'page',
-                                'page_id' => Page::where('site_id', $page->site->id)
-                                    ->whereHas(
-                                        'type',
-                                        /** @param Type $query */
-                                        fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
-                                    )
-                                    ->inRandomOrder()
-                                    ->value('id'),
-                                'site_id' => $page->site->id,
-                                'color' => 'secondary',
-                            ],
-                            [
-                                'type' => 'url',
-                                'url' => 'https://example.com',
-                                'label' => 'External',
-                                'color' => 'default',
-                            ],
+            $content = Content::firstOrCreate([
+                'name' => $feature['title'],
+            ], [
+                'meta' => [
+                    'actions' => [
+                        [
+                            'type' => 'page',
+                            'page_id' => Page::where('site_id', $page->site->id)
+                                ->whereHas(
+                                    'type',
+                                    /** @param Type $query */
+                                    fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
+                                )
+                                ->inRandomOrder()
+                                ->value('id'),
+                            'site_id' => $page->site->id,
                         ],
-                    ]),
-                ])
-                ->create();
+                        [
+                            'type' => 'page',
+                            'page_id' => Page::where('site_id', $page->site->id)
+                                ->whereHas(
+                                    'type',
+                                    /** @param Type $query */
+                                    fn (BuilderContract $query) => $query->listable()->enabled()->accessible()
+                                )
+                                ->inRandomOrder()
+                                ->value('id'),
+                            'site_id' => $page->site->id,
+                            'color' => 'secondary',
+                        ],
+                        [
+                            'type' => 'url',
+                            'url' => 'https://example.com',
+                            'label' => 'External',
+                            'color' => 'default',
+                        ],
+                    ],
+                ],
+            ]);
+
+            foreach ($page->site->languages as $language) {
+                $content->translations()->create([
+                    'language_id' => $language->id,
+                    'content' => sprintf('<p>%s</p>', $feature['title']),
+                ]);
+            }
 
             $this->createMedia($content);
 
@@ -792,20 +779,22 @@ class DemoCreator
         $site = Site::default()->first();
 
         foreach ($statistics as $statistic) {
-            $content = Content::factory()
-                ->recycle($site)
-                ->withTranslations($site->languages, [
+            $content = Content::firstOrCreate([
+                'name' => $statistic['title'],
+            ], [
+                'meta' => [
+                    'icon' => $statistic['icon'],
+                    'color' => $statistic['color'],
+                ],
+            ]);
+
+            foreach ($site->languages as $language) {
+                $content->translations()->create([
+                    'language_id' => $language->id,
                     'title' => $statistic['title'],
                     'content' => sprintf('<p>%s</p>', $statistic['value']),
-                ])
-                ->state([
-                    'name' => $statistic['title'],
-                    'meta' => [
-                        'icon' => $statistic['icon'],
-                        'color' => $statistic['color'],
-                    ],
-                ])
-                ->create();
+                ]);
+            }
 
             $widget->assets()->firstOrCreate([
                 'asset_id' => $content->id,
@@ -987,8 +976,9 @@ class DemoCreator
 
     private function createTestimonials(Collection $languages): Collection
     {
-        $testimonialContent = Content::create([
+        $testimonialContent = Content::firstOrCreate([
             'name' => 'Testimonials',
+        ], [
             'meta' => [
                 'icon' => 'heroicon-o-chat-bubble-left-right',
             ],
@@ -1008,7 +998,7 @@ class DemoCreator
                 'content' => '<p>The team at Capell is incredibly knowledgeable and always goes the extra mile for us.</p>',
             ],
             [
-                'name' => 'Alice Johnson',
+                'name' => 'Jeff Wilson',
                 'position' => 'Marketing Director at Creative Agency',
                 'content' => '<p>We have seen significant growth since partnering with Capell. Their expertise is unmatched.</p>',
             ],
@@ -1211,7 +1201,7 @@ class DemoCreator
 
         $demo_file = sprintf('%s/%s.%s', $demo_path, $filename, $ext);
 
-        if ($filename === '' || $filename === '0' || $filename === [] || $filename === null || ! file_exists($demo_file)) {
+        if (in_array($filename, ['', '0', [], null], true) || ! file_exists($demo_file)) {
             $demo_path = AdminDemoCreator::getDemoResourcePath('img');
 
             $filename = $this->getRandomDemoImage($demo_path);
@@ -1234,7 +1224,7 @@ class DemoCreator
             $image = Image::load($demo_file);
         }
 
-        $media = $content->addMedia($demo_file)
+        $content->addMedia($demo_file)
             ->preservingOriginal()
             ->withCustomProperties([
                 ...(

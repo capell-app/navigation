@@ -111,8 +111,10 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
                 ColorSchemeComponent::make('color_scheme'),
             ]),
             WidgetComponentFilesSection::make(),
-            Section::make(__('capell-admin::section.results_settings'))
+            Section::make(__('capell-admin::generic.results_settings'))
                 ->collapsible()
+                ->columnSpanFull()
+                ->columns(['md' => 2, 'lg' => 3, 'xl' => 4])
                 ->schema(WidgetResultsSettingsSchema::make()),
         ])
             ->statePath('meta');

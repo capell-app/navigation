@@ -47,12 +47,23 @@ class DemoCommand extends Command
     public function handle(): int
     {
         if ($this->option('sites')) {
-            $siteIds = is_string($this->option('sites'))
+            $sites = is_string($this->option('sites'))
                 ? [$this->option('sites')]
                 : $this->option('sites');
+
+            $siteIds = Site::query()
+                ->whereIn('id', $sites)
+                ->orWhereIn('name', $sites)
+                ->pluck('id')
+                ->all();
+
+            if (! $siteIds) {
+                $this->error('No valid sites found for the provided identifiers: ' . implode(', ', $sites));
+
+                return Command::FAILURE;
+            }
         } else {
             $sites = CapellCore::getModel(ModelEnum::Site)::query()
-                ->limit(10)
                 ->select(['id', 'name']);
 
             if ($sites->count() === 1) {
@@ -60,10 +71,11 @@ class DemoCommand extends Command
             } else {
                 $siteIds = multisearch(
                     'Select a site to insert demo pages',
-                    options: fn (string $search) => $sites->when(
-                        mb_strlen($search) > 0,
-                        fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
-                    )
+                    options: fn (string $search) => CapellCore::getModel(ModelEnum::Site)::query()
+                        ->when(
+                            mb_strlen($search) > 0,
+                            fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
+                        )
                         ->get()
                         ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
                         ->all(),
@@ -76,22 +88,24 @@ class DemoCommand extends Command
             }
         }
 
-        if ($siteIds) {
-            $sites = Site::whereIn('id', $siteIds)->with(['languages', 'language'])->get();
-        } else {
-            $sites = Site::with(['languages', 'language'])->default()->limit(1)->get();
+        $sites = Site::query()->with('languages')->whereIn('id', $siteIds)->get();
+
+        if ($sites->isEmpty()) {
+            throw new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds));
         }
 
         $user = $this->option('author') ? CapellCore::getModel('User')::first() : null;
 
         $this->demoCreator = new DemoCreator(user: $user);
 
-        $demo_data = config('capell-demo.pages');
+        $data = config('capell-demo.pages');
 
         $typeCreator = app(TypeCreator::class);
         $typeCreator->createDefaultContentType();
+        $typeCreator->createBuilderContentType();
 
         foreach ($sites as $site) {
+            $this->newLine();
             $this->info(sprintf('Selected site: %s', $site->name));
 
             $this->line('Associating theme with site: ' . $site->name);
@@ -105,7 +119,7 @@ class DemoCommand extends Command
             /** @var ContentCreator $contentCreator */
             $contentCreator = app(ContentCreator::class);
 
-            $this->createSiteContents($contentCreator, $demo_data[0], $site);
+            $this->createSiteContents($contentCreator, $data[0], $site);
 
             if (! $this->createDemoLayouts($site)) {
                 $this->error('Failed to create demo pages for the selected site.');
@@ -147,7 +161,7 @@ class DemoCommand extends Command
 
         $heroWidget = Widget::firstWhere('key', 'hero');
 
-        $this->demoCreator->createWidgetAssets($heroWidget, $page, container: 'hero');
+        $this->demoCreator->createContentsWidget($heroWidget, $page, container: 'hero');
         $this->line('Created assets for hero widget');
 
         $pageCardsWidget = $this->demoCreator->createPageCardsWidget($page);

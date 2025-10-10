@@ -243,7 +243,7 @@ abstract class AbstractTestCase extends TestCase
             $path = realpath(__DIR__ . '/../../packages/' . $package . '/publishes/config');
         }
 
-        if ($path === '' || $path === '0' || $path === false) {
+        if (in_array($path, ['', '0', false], true)) {
             return [];
         }
 

@@ -169,9 +169,7 @@ class AssetsRepeater extends Repeater
                                     . ' » ';
                             }
 
-                            $label .= Str::limit($record->name, 40);
-
-                            return $label;
+                            return $label . Str::limit($record->name, 40);
                         }
 
                         return $record->{$component->getRelationshipTitleAttribute()};

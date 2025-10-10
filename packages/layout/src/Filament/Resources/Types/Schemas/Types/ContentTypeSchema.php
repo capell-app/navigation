@@ -24,13 +24,13 @@ class ContentTypeSchema extends DefaultTypeSchema
     {
         return [
             ...$this->getSettingsSchema($schema),
-            ...$this->getStatusSchema(),
             Tabs::make()
                 ->columnSpanFull()
                 ->tabs([
                     $this->getFrontendTab(),
                     $this->getAdminTab(),
                 ]),
+            ...$this->getStatusSchema(),
         ];
     }
 

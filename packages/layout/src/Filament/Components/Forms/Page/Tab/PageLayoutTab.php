@@ -26,6 +26,7 @@ class PageLayoutTab
                         'page_id' => $record->id,
                     ]
                 )
+                    ->lazy()
                     ->columnSpanFull(),
             ]);
     }

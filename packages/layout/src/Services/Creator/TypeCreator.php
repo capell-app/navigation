@@ -13,6 +13,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\AssetComponentEnum;
 use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
+use Capell\Layout\Enums\ContentTypeEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
@@ -42,11 +43,17 @@ class TypeCreator
 
     public function create(string $key): void
     {
-        match ($key) {
-            LayoutTypeEnum::Content->value => $this->createDefaultContentType(),
-            LayoutTypeEnum::Widget->value => $this->defaultWidgetType(),
-            default => throw new Exception('Invalid page type key: ' . $key),
-        };
+        switch ($key) {
+            case LayoutTypeEnum::Content->value:
+                $this->createDefaultContentType();
+                $this->createBuilderContentType();
+                break;
+            case LayoutTypeEnum::Widget->value:
+                $this->defaultWidgetType();
+                break;
+            default:
+                throw new Exception('Invalid page type key: ' . $key);
+        }
     }
 
     public function createDefaultContentType(): void
@@ -56,7 +63,21 @@ class TypeCreator
             'type' => LayoutTypeEnum::Content,
         ], [
             'name' => __('capell-admin::generic.default'),
-            'key' => 'default',
+            'key' => ContentTypeEnum::Default,
+            'admin' => [
+                'type_schema' => ContentTypeSchema::getKey(),
+                'content_editor' => ContentEditorEnum::HtmlEditor,
+            ],
+        ]);
+    }
+
+    public function createBuilderContentType(): void
+    {
+        $this->typeModel::firstOrCreate([
+            'key' => ContentTypeEnum::Builder,
+            'type' => LayoutTypeEnum::Content,
+        ], [
+            'name' => __('capell-admin::generic.contents_builder'),
             'admin' => [
                 'type_schema' => ContentTypeSchema::getKey(),
                 'content_editor' => ContentEditorEnum::ContentBuilder,
@@ -71,6 +92,7 @@ class TypeCreator
     {
         $this->contentsWidgetType();
         $this->defaultWidgetType();
+        $this->contentBuilderWidgetType();
         $this->mediaWidgetType();
         $this->navigationWidgetType();
         $this->pageContentWidgetType();
@@ -83,7 +105,7 @@ class TypeCreator
     public function defaultWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Default->value,
+            'key' => WidgetTypeEnum::Default,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.default'),
@@ -99,18 +121,38 @@ class TypeCreator
         ]);
     }
 
+    public function contentBuilderWidgetType(): Type
+    {
+        return $this->typeModel::firstOrCreate([
+            'key' => WidgetTypeEnum::ContentBuilder,
+            'type' => LayoutTypeEnum::Widget,
+        ], [
+            'name' => __('capell-admin::generic.contents_builder'),
+            'admin' => [
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'icon' => 'heroicon-o-puzzle-piece',
+                'content_editor' => ContentEditorEnum::ContentBuilder,
+            ],
+            'meta' => [
+                'content_presenter' => ContentPresenterEnum::Blocks,
+                'component' => WidgetComponentEnum::Default,
+                'padding' => ['lg'],
+            ],
+        ]);
+    }
+
     public function mediaWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Media->value,
+            'key' => WidgetTypeEnum::Media,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.media'),
-            'group' => WidgetTypeGroupEnum::Asset->value,
+            'group' => WidgetTypeGroupEnum::Asset,
             'admin' => [
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => config('capell-admin.assets.media.icon'),
-                'asset_types' => [\Capell\Layout\Enums\AssetEnum::Content->value],
+                'asset_types' => [\Capell\Layout\Enums\AssetEnum::Content],
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,
@@ -123,11 +165,11 @@ class TypeCreator
     public function navigationWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Navigation->value,
+            'key' => WidgetTypeEnum::Navigation,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.navigation'),
-            'group' => WidgetTypeGroupEnum::Page->value,
+            'group' => WidgetTypeGroupEnum::Page,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => NavigationWidgetSchema::getKey(),
@@ -142,11 +184,11 @@ class TypeCreator
     public function pageContentWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::PageContents->value,
+            'key' => WidgetTypeEnum::PageContents,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.page_content'),
-            'group' => WidgetTypeGroupEnum::Page->value,
+            'group' => WidgetTypeGroupEnum::Page,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => PageContentWidgetSchema::getKey(),
@@ -163,11 +205,11 @@ class TypeCreator
     public function pageResultsWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::PageResults->value,
+            'key' => WidgetTypeEnum::PageResults,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.page_results'),
-            'group' => WidgetTypeGroupEnum::Asset->value,
+            'group' => WidgetTypeGroupEnum::Asset,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => ResultsWidgetSchema::getKey(),
@@ -182,16 +224,16 @@ class TypeCreator
     public function pagesWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Pages->value,
+            'key' => WidgetTypeEnum::Pages,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.pages'),
-            'group' => WidgetTypeGroupEnum::Asset->value,
+            'group' => WidgetTypeGroupEnum::Asset,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-document-text',
-                'asset_types' => [AssetEnum::Page->value],
+                'asset_types' => [AssetEnum::Page],
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,
@@ -202,18 +244,18 @@ class TypeCreator
     public function assetsWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Assets->value,
+            'key' => WidgetTypeEnum::Assets,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.assets'),
-            'group' => WidgetTypeGroupEnum::Asset->value,
+            'group' => WidgetTypeGroupEnum::Asset,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-rectangle-stack',
                 'asset_types' => [
-                    AssetEnum::Page->value,
-                    LayoutAssetEnum::Content->value,
+                    AssetEnum::Page,
+                    LayoutAssetEnum::Content,
                 ],
             ],
             'meta' => [
@@ -225,11 +267,11 @@ class TypeCreator
     public function systemWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::System->value,
+            'key' => WidgetTypeEnum::System,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.system'),
-            'group' => WidgetTypeGroupEnum::System->value,
+            'group' => WidgetTypeGroupEnum::System,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => SystemWidgetSchema::getKey(),
@@ -245,20 +287,22 @@ class TypeCreator
     public function contentsWidgetType(): Type
     {
         return $this->typeModel::firstOrCreate([
-            'key' => WidgetTypeEnum::Contents->value,
+            'key' => WidgetTypeEnum::Contents,
             'type' => LayoutTypeEnum::Widget,
         ], [
             'name' => __('capell-admin::generic.contents'),
-            'group' => WidgetTypeGroupEnum::Asset->value,
+            'group' => WidgetTypeGroupEnum::Asset,
             'admin' => [
                 'type_schema' => WidgetTypeSchema::getKey(),
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-rectangle-stack',
-                'asset_types' => [LayoutAssetEnum::Content->value],
+                'asset_types' => [LayoutAssetEnum::Content],
+                'content_editor' => ContentEditorEnum::ContentBuilder,
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,
-                'component_item' => AssetComponentEnum::Content->value,
+                'component_item' => AssetComponentEnum::Content,
+                'content_presenter' => ContentPresenterEnum::Blocks,
                 'margin' => ['lg'],
             ],
         ]);

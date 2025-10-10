@@ -24,6 +24,7 @@ class InstallPackageAction
         $typeCreator->createWidgetTypes();
 
         $typeCreator->createDefaultContentType();
+        $typeCreator->createBuilderContentType();
 
         $widgetCreator = app(WidgetCreator::class);
         $widgetCreator->createWidgets(Language::all());

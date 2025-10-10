@@ -17,6 +17,7 @@ class ContentNameColumn extends BadgeableColumn
 
         $this->searchable()
             ->sortable()
+            ->wrap()
             ->weight(FontWeight::Medium)
             ->description(function (Content $record): ?string {
                 $ancestors = $record->ancestors()->get();

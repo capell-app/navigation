@@ -94,7 +94,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         $viewPath = realpath(__DIR__ . '/../resources/views/capell');
 
-        if ($viewPath === '' || $viewPath === '0' || $viewPath === false || ! is_dir($viewPath)) {
+        if (in_array($viewPath, ['', '0', false], true) || ! is_dir($viewPath)) {
             throw new Exception('Theme view path not found: ' . $viewPath);
         }
 
@@ -223,7 +223,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         $dir = realpath(__DIR__ . '/../publishes');
 
-        if ($dir === '' || $dir === '0' || $dir === false) {
+        if (in_array($dir, ['', '0', false], true)) {
             throw new RuntimeException('Publish directory not found.');
         }
 

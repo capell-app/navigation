@@ -56,7 +56,6 @@ use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Isolate;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -65,7 +64,6 @@ use ReflectionProperty;
 /**
  * @property-read ?Page $page
  */
-#[Isolate]
 class LayoutBuilder extends Component implements HasActions, HasForms
 {
     use HasPageCacheNotification;
@@ -106,7 +104,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     public function hydrate(): void
     {
-        $this->loadFromStore();
+        // $this->loadFromStore();
     }
 
     public function boot(): void
@@ -907,9 +905,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     public function render(): string|View|Factory
     {
         if (! isset($this->layout)) {
-            $this->skipRender();
-
-            return '<div></div>';
+            $this->loadFromStore();
         }
 
         return view($this->view);
@@ -1286,7 +1282,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     private function saveContainer(array $data, ?string $key = null): void
     {
-        if ($key === null || $key === '' || $key === '0') {
+        if (in_array($key, [null, '', '0'], true)) {
             $key = $data['key'];
         }
 
@@ -1675,9 +1671,26 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ]);
     }
 
-    private function loadWidgets(bool $withAssets = true): void
+    private function loadWidgets(bool $withAssets = true, ?string $containerKey = null, ?int $widgetIndex = null): void
     {
-        $widgetKeys = $this->getContainerWidgetKeys();
+        if ($containerKey !== null && $widgetIndex !== null) {
+            $container = $this->containers[$containerKey] ?? null;
+            if ($container === null || ! isset($container['widgets'][$widgetIndex])) {
+                return;
+            }
+
+            $containerWidgets = [$widgetIndex => $container['widgets'][$widgetIndex]];
+            $containers = [$containerKey => ['widgets' => $containerWidgets]];
+        } else {
+            $containers = $this->containers;
+        }
+
+        $widgetKeys = [];
+        foreach ($containers as $cKey => $container) {
+            foreach ($container['widgets'] as $containerWidget) {
+                $widgetKeys[] = $containerWidget['widget_key'];
+            }
+        }
 
         $widgets = $this->getWidgetQuery()
             ->whereIn('key', $widgetKeys)
@@ -1701,8 +1714,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->get()
             ->mapWithKeys(fn (Widget $widget): array => [$widget->key => $widget]);
 
-        foreach ($this->containers as $containerKey => $container) {
-            foreach ($container['widgets'] as $widgetIndex => $containerWidget) {
+        foreach ($containers as $cKey => $container) {
+            foreach ($container['widgets'] as $wIndex => $containerWidget) {
                 if (! isset($widgets[$containerWidget['widget_key']])) {
                     Notification::make('widget-not-found')
                         ->title(__('capell-admin::generic.widget_not_found'))
@@ -1710,7 +1723,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                         ->warning()
                         ->send();
 
-                    unset($this->containers[$containerKey]['widgets'][$widgetIndex]);
+                    unset($this->containers[$cKey]['widgets'][$wIndex]);
 
                     continue;
                 }
@@ -1721,7 +1734,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 $widget = clone $widgets[$widgetKey];
 
                 $assets = $widget->assets->filter(
-                    function (WidgetAsset $widgetAsset) use ($containerKey, $occurrence): bool {
+                    function (WidgetAsset $widgetAsset) use ($cKey, $occurrence): bool {
                         if (! $widgetAsset->page_id) {
                             return true;
                         }
@@ -1730,7 +1743,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                             return false;
                         }
 
-                        if ($widgetAsset->container !== (string) $containerKey) {
+                        if ($widgetAsset->container !== (string) $cKey) {
                             return false;
                         }
 
@@ -1742,12 +1755,12 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 $widget->setRelation('assets', $assets);
 
-                $this->containerWidgets[$containerKey][$widgetIndex] = $widget;
+                $this->containerWidgets[$cKey][$wIndex] = $widget;
             }
         }
     }
 
-    private function getContainerOptions(): \Illuminate\Support\Collection
+    private function getContainerOptions(): SupportCollection
     {
         return collect($this->containers)
             ->keys()
@@ -1825,15 +1838,15 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
     }
 
-    private function getAssetTypes(): \Illuminate\Support\Collection
+    private function getAssetTypes(): SupportCollection
     {
         return collect($this->assets)->flatten(2)->filter()->groupBy('asset_type');
     }
 
-    private function loadAllAssetsByType(\Illuminate\Support\Collection $assetTypes): \Illuminate\Support\Collection
+    private function loadAllAssetsByType(SupportCollection $assetTypes): SupportCollection
     {
         return $assetTypes->mapWithKeys(
-            fn (\Illuminate\Support\Collection $assets, string $type): array => [
+            fn (SupportCollection $assets, string $type): array => [
                 $type => CapellCore::getAsset($type)->model::query()
                     ->with($this->getAssetRelations($type))
                     ->whereIn('id', $assets->pluck('asset_id')->unique()->toArray())
@@ -2086,6 +2099,10 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     private function getContainerWidget(string $containerKey, int $widgetIndex): Widget
     {
+        if ($this->containerWidgets === null) {
+            $this->loadWidgets(containerKey: $containerKey, widgetIndex: $widgetIndex);
+        }
+
         return $this->containerWidgets[$containerKey][$widgetIndex];
     }
 

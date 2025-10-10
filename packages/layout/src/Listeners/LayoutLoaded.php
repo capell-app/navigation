@@ -71,12 +71,12 @@ class LayoutLoaded implements EventSubscriber
                 if (! $widget instanceof Widget) {
                     CapellCore::log(
                         'Widget not found for layout',
-                        type: 'error',
                         context: [
                             'containerKey' => $containerKey,
                             'widgetKey' => $widgetKey,
                             'occurrence' => $occurrence,
-                        ]
+                        ],
+                        type: 'error'
                     );
                 }
 

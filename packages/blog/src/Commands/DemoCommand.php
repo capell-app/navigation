@@ -36,7 +36,7 @@ class DemoCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'capell-blog:demo {--author} {--sites=}';
+    protected $signature = 'capell-blog:demo {--author} {--sites=} {--limit=}';
 
     private DemoCreator $demoCreator;
 
@@ -46,28 +46,45 @@ class DemoCommand extends Command
     public function handle(): int
     {
         if ($this->option('sites')) {
-            $siteIds = is_string($this->option('sites'))
+            $sites = is_string($this->option('sites'))
                 ? [$this->option('sites')]
                 : $this->option('sites');
+
+            $siteIds = Site::query()
+                ->whereIn('id', $sites)
+                ->orWhereIn('name', $sites)
+                ->pluck('id')
+                ->all();
+
+            if (! $siteIds) {
+                $this->error('No valid sites found for the provided identifiers: ' . implode(', ', $sites));
+
+                return Command::FAILURE;
+            }
         } else {
-            $siteIds = multisearch(
-                'Select a site to insert demo pages',
-                options: fn (string $search) => CapellCore::getModel(ModelEnum::Site)::query()
-                    ->when(
-                        mb_strlen($search) > 0,
-                        fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
-                    )
-                    ->limit(10)
-                    ->select(['id', 'name'])
-                    ->get()
-                    ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
-                    ->all(),
-                validate: [
-                    'required',
-                    'array',
-                    'min:1',
-                ],
-            );
+            $sites = CapellCore::getModel(ModelEnum::Site)::query()
+                ->select(['id', 'name']);
+
+            if ($sites->count() === 1) {
+                $siteIds = $sites->pluck('id')->toArray();
+            } else {
+                $siteIds = multisearch(
+                    'Select a site to insert demo pages',
+                    options: fn (string $search) => CapellCore::getModel(ModelEnum::Site)::query()
+                        ->when(
+                            mb_strlen($search) > 0,
+                            fn (Builder $query) => $query->where('name', 'like', sprintf('%%%s%%', $search))
+                        )
+                        ->get()
+                        ->mapWithKeys(fn (Site $site): array => [$site->id => $site->name])
+                        ->all(),
+                    validate: [
+                        'required',
+                        'array',
+                        'min:1',
+                    ],
+                );
+            }
         }
 
         $user = $this->option('author') ? CapellCore::getModel('User')::find($this->option('author')) : null;
@@ -77,15 +94,18 @@ class DemoCommand extends Command
         $sites = Site::query()->with('languages')->whereIn('id', $siteIds)->get();
 
         if ($sites->isEmpty()) {
-            throw new Exception('Unable to find any sites');
+            throw new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds));
         }
 
+        $limit = $this->option('limit') ? (int) $this->option('limit') : 20;
+
         foreach ($sites as $site) {
+            $this->newLine();
             $this->line(sprintf('Selected site: %s', $site->name));
 
             CreateBlogPagesAction::run($site);
 
-            if (! $this->createDemoPages($site, $user)) {
+            if (! $this->createDemoPages($site, $user, $limit)) {
                 $this->error('Failed to create demo pages for the selected site.');
 
                 return Command::FAILURE;
@@ -107,7 +127,7 @@ class DemoCommand extends Command
         string $type = '',
         ?Model $author = null
     ): void {
-        $name = Str::title($data['name'][$defaultLanguage->code]);
+        $name = Str::title($data['name']['en']);
 
         if ($type !== '' && $type !== '0') {
             $name .= ' ' . Str::title($type);
@@ -122,7 +142,7 @@ class DemoCommand extends Command
         }
 
         foreach ($data['children'] as $child) {
-            $this->line(sprintf('Creating page: %s', $data['name']['en'] . ' - ' . $child['name']['en']));
+            $this->line(sprintf('Creating article: %s', $data['name']['en'] . ' - ' . $child['name']['en']));
 
             $this->createPage(
                 data: $child,
@@ -137,7 +157,7 @@ class DemoCommand extends Command
         }
     }
 
-    private function createDemoPages(Site $site, ?Model $user): bool
+    private function createDemoPages(Site $site, ?Model $user, ?int $limit = null): bool
     {
         $site->loadMissing('languages', 'language');
 
@@ -149,10 +169,25 @@ class DemoCommand extends Command
             return false;
         }
 
+        // Count blog pages
+        $totalBlogPages = Page::query()
+            ->where('site_id', $site->id)
+            ->whereRelation('type', 'key', BlogResourceEnum::Article->value)
+            ->count();
+
+        if ($totalBlogPages >= $limit) {
+            $this->info(sprintf('The site already has %d or more blog articles. Skipping demo creation.', $limit));
+
+            return true;
+        }
+
         $demo = config('capell-demo.pages');
+        if ($limit > 0) {
+            $demo = array_slice($demo, 0, $limit);
+        }
 
         foreach ($demo as $pageData) {
-            $this->line(sprintf('Creating page: %s', $pageData['name']['en']));
+            $this->line(sprintf('Creating article: %s', $pageData['name']['en']));
 
             $this->createPage(
                 $pageData,
