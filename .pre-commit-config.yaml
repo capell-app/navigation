@@ -24,7 +24,7 @@ repos:
       - id: checkfordebugging
         name: check for debugging methods
         description: 'Check the dd(), debug(), dump() or any ray() methods have not been left in'
-        entry: '[\s>@]dd\(|[\s>@]debug\(|[\s>@]dump\(|[\s>@]ray\(|[\s]rd\(|[\s]die\(|[\s]exit\('
+        entry: '[\s>@]dd\(|[\s>@]debug\(|[\s>@]dump\(|[\s>@]ray\(|[\s>@]rd\(|[\s]die\(|[\s]exit\(|[\s>@]ddRawSql\('
         language: pygrep
         types: [text]
       - id: pint
