@@ -296,7 +296,7 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
 
     protected function scopeWithLayoutsCount(Builder $query): void
     {
-        $query->addRawSelect(
+        $query->addSelect(DB::raw(
             match (DB::getDriverName()) {
                 'sqlite' => <<<'SQL'
                     (SELECT COUNT(*) FROM layouts WHERE EXISTS (SELECT 1 FROM json_each(layouts.widgets) WHERE value = widgets.key))
@@ -305,6 +305,6 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
                     (SELECT COUNT(*) FROM layouts WHERE JSON_CONTAINS(layouts.widgets, JSON_QUOTE(widgets.key)))
                 SQL,
             } . ' AS layouts_count'
-        );
+        ));
     }
 }
