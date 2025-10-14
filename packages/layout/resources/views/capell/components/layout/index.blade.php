@@ -105,6 +105,7 @@ declare(strict_types=1);
                 <x-capell::layout.container
                     :$container
                     :$containerKey
+                    :$layout
                     :containerIndex="$loop->index"
                     :colspan="$colspan"
                     :column-start="$columnStart"

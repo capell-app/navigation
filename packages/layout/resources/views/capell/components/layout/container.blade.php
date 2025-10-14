@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Facades\CapellCore;
+    use Capell\Core\Models\Layout;
     use Capell\Frontend\Facades\FrontendLoader;
     use Capell\Layout\Facades\CapellLayout;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -32,11 +33,8 @@ declare(strict_types=1);
         $htmlClass .= ' ' . $container['meta']['html_class'];
     }
 
-    if ($container['meta']['background_image_id'] ?? false) {
-        $backgroundImage = Media::find($container['meta']['background_image_id']);
-    } else {
-        $backgroundImage = null;
-    }
+    /** @var ?Media $backgroundImage */
+    $backgroundImage = $layout->getFirstMedia($containerKey . '-background');
 
     $currentColspan = $colspan;
 @endphp
@@ -51,34 +49,34 @@ declare(strict_types=1);
     <div class="relative">
         <div
                 @if ($backgroundImage)
-                    style="{{ $backgroundImage ? 'background-image:url('.$backgroundImage->url.');' : '' }}"
+                    style="{{ $backgroundImage ? 'background-image:url('.$backgroundImage->getAvailableUrl(['large']).');' : '' }}"
                 @endif
                 @class([
                     "absolute top-0 bottom-0 left-0 w-1/2 -z-1 h-full bg-cover bg-center bg-no-repeat",
                 ])
         >
         </div>
-        @endif
+@endif
 
-        @if ($colspan !== 12)
-            @if (! $previousColspan || $previousColspan === 12)
-                <div
-                        @class([
-                            "container" => $containerWidth !== 'full',
-                        ])
-                >
-                    <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
-                        @endif
+@if ($colspan !== 12)
+    @if (! $previousColspan || $previousColspan === 12)
+        <div
+            @class([
+                "container" => $containerWidth !== 'full',
+            ])
+        >
+            <div class="flex w-full flex-col gap-x-12 lg:grid lg:grid-cols-12 xl:gap-x-16">
+    @endif
 
-                        <div
-                                style="--colspan: {{ $colspan }}; --column-start: {{ $columnStart }};"
-                                @class([
-                                    "lg:col-span-[var(--colspan)]",
-                                    "lg:col-start-[var(--column-start)]",
-                                ])
-                        >
-                            @endif
-                            {{-- format-ignore-end --}}
+    <div
+        @class([
+            "lg:col-span-[var(--colspan)]",
+            "lg:col-start-[var(--column-start)]",
+        ])
+        style="--colspan: {{ $colspan }}; --column-start: {{ $columnStart }};"
+    >
+@endif
+{{-- format-ignore-end --}}
 
 <div
     id="layout-container-{{ $containerKey }}"
@@ -124,8 +122,8 @@ declare(strict_types=1);
             if (! $widget) {
                 CapellCore::log(
                     'Unable to find container widget',
-                    'error',
-                    ['containerKey' => $containerKey, 'widgetData' => $widgetData]
+                    context: ['containerKey' => $containerKey, 'widgetData' => $widgetData],
+                    type: 'error',
                 );
 
                 continue;
@@ -136,7 +134,7 @@ declare(strict_types=1);
             $component = $widget->getComponent();
 
             if (! $component) {
-                CapellCore::log("Unable to find component for widget {$widget->key} ({$widget->id})", 'error');
+                CapellCore::log("Unable to find component for widget {$widget->key} ({$widget->id})", type: 'error');
 
                 continue;
             }
@@ -167,16 +165,16 @@ declare(strict_types=1);
 </div>
 
 {{-- format-ignore-start --}}
-                            @if ($backgroundImage)
-                        </div>
-                        @endif
-                        @if ($colspan !== 12)
-                    </div>
-
-                    @if ($currentColspan === 12)
-                </div>
+@if ($backgroundImage)
     </div>
 @endif
+@if ($colspan !== 12)
+    </div>
+
+    @if ($currentColspan === 12)
+            </div>
+        </div>
+    @endif
 @endif
 {{-- format-ignore-end --}}
 

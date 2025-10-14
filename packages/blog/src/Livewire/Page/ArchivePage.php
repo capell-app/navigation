@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Livewire\Page;
 
+use Capell\Blog\Enums\BlogResourceEnum;
 use Capell\Frontend\CapellFrontendManager;
 use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Livewire\Page\AbstractPage;
@@ -89,7 +90,7 @@ class ArchivePage extends AbstractPage
             language: FrontendLoader::getLanguage(),
             limit: $pageRecord->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
             paginationPage: $this->getPage($paginationKey),
-            typeKey: $pageRecord->type->meta['page_group'] ?? 'article',
+            typeKey: $pageRecord->type->meta['page_group'] ?? BlogResourceEnum::Article->value,
             withImage: $pageRecord->type->meta['with_image'] ?? false,
             withPagination: $pageRecord->type->meta['pagination'] ?? true,
             withParent: $pageRecord->type->meta['with_parent'] ?? false,

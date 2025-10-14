@@ -135,7 +135,7 @@ class LayoutUpdater
                 'container' => 'full',
                 'tag' => 'aside',
                 'padding' => ['md'],
-                'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
+                'html_class' => 'sidebar-sticky space-y-10',
             ],
             'widgets' => $widgets,
         ];

@@ -18,6 +18,7 @@ return [
     'blog_article' => 'Blog Article',
     'blog_articles' => 'Blog Articles',
     'blog_info' => 'List of all articles with pagination',
+    'blog_page' => 'Blog Page',
     'blog_page_archives' => 'Blog Archives',
     'latest_articles' => 'Latest Articles',
 ];

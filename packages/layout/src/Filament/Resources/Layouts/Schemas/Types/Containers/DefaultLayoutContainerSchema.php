@@ -17,8 +17,8 @@ use Capell\Layout\Filament\Components\Forms\PaddingSelect;
 use Capell\Layout\Filament\Components\Forms\SpacingSelect;
 use Capell\Layout\Filament\Components\Forms\TagSelect;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class DefaultLayoutContainerSchema implements TypeSchemaInterface
@@ -46,7 +46,9 @@ class DefaultLayoutContainerSchema implements TypeSchemaInterface
                         ->default(12),
                     ColumnInput::make('column_start')
                         ->label(__('capell-admin::form.column_start')),
-                    Grid::make(['md' => 2])
+                    Section::make(__('capell-layout::generic.container_settings'))
+                        ->columns(['md' => 2])
+                        ->collapsed()
                         ->columnSpanFull()
                         ->schema([
                             ContainerWidthSelect::make('container'),

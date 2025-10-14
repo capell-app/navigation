@@ -161,6 +161,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             permissions: $this->getPackagePermissions(),
             demoCommand: true,
             demoParams: ['author', 'sites'],
+            upgradeCommand: true,
             publishAssetsCommand: true,
         );
 

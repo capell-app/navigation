@@ -14,7 +14,7 @@ declare(strict_types=1);
     'containerWidth' => null,
     'loop',
     'widget',
-    'pageRecord' => Frontend::getPage(),
+    'pageRecord' => FrontendLoader::getPage(),
     'headingSize' => $widget->meta['heading_size'] ?? 'h1',
     'withAuthor' => $widget->meta['with_author'] ?? false,
     'withDate' => $widget->meta['with_date'] ?? false,

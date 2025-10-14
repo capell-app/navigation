@@ -72,7 +72,6 @@ class ContentAssetsRelationManager extends RelationManager
                 TextColumn::make('asset_type')
                     ->label(__('capell-admin::table.type'))
                     ->width(0)
-                    ->alignCenter()
                     ->badge(),
             ])
             ->recordUrl(

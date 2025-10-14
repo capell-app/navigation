@@ -158,11 +158,46 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
+                        'html_class' => 'sidebar-sticky space-y-10',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-articles'],
                         ['widget_key' => 'tags'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public static function createBlogPageLayout(): Layout
+    {
+        return Layout::firstOrCreate(['key' => 'blogs'], [
+            'name' => __('capell-blog::generic.blog_page'),
+            'group' => LayoutGroupEnum::System->value,
+            'containers' => [
+                ...self::heroContainer(),
+                'main' => [
+                    'meta' => [
+                        'colspan' => 9,
+                        'container' => 'full',
+                    ],
+                    'widgets' => [
+                        ['widget_key' => 'breadcrumbs'],
+                        ['widget_key' => 'page-content'],
+                        ['widget_key' => 'page-slot'],
+                    ],
+                ],
+                'sidebar' => [
+                    'meta' => [
+                        'colspan' => 3,
+                        'override_columns' => 1,
+                        'container' => 'full',
+                        'padding' => ['md'],
+                        'html_class' => 'sidebar-sticky space-y-10',
+                    ],
+                    'widgets' => [
+                        ['widget_key' => 'tags'],
+                        ['widget_key' => 'archives'],
                     ],
                 ],
             ],
@@ -182,7 +217,7 @@ class BlogCreator
             'type_id' => Type::firstWhere(['key' => WidgetTypeEnum::System, 'type' => LayoutTypeEnum::Widget])?->id,
             'meta' => [
                 'component' => 'capell-blog::widget.page.archives',
-                'page_group' => 'article',
+                'page_group' => BlogResourceEnum::Article->value,
                 'pagination' => true,
                 'with_image' => true,
                 'with_date' => true,
@@ -281,7 +316,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10 pt-10 pb-20',
+                        'html_class' => 'sidebar-sticky space-y-10',
                     ],
                     'widgets' => [
                         ['widget_key' => 'related-pages'],
@@ -358,7 +393,7 @@ class BlogCreator
         }
 
         if (! $layout instanceof Layout) {
-            $layout = app(LayoutCreator::class)->resultsLayout();
+            $layout = self::createBlogPageLayout();
         }
 
         if (! $languages instanceof \Illuminate\Support\Collection) {
@@ -415,7 +450,7 @@ class BlogCreator
             ],
             'meta' => [
                 'component' => BlogWidgetComponentEnum::BlogPage,
-                'page_group' => 'article',
+                'page_group' => BlogResourceEnum::Article->value,
                 'limit' => 10,
                 'pagination' => true,
                 'listable' => false,
@@ -443,7 +478,7 @@ class BlogCreator
             'meta' => [
                 'component' => WidgetComponentEnum::LivewirePages,
                 'limit' => 5,
-                'page_group' => 'article',
+                'page_group' => BlogResourceEnum::Article->value,
                 'pagination' => false,
                 'with_date' => true,
                 'with_image' => true,

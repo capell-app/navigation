@@ -156,7 +156,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 collect([$this->getLayout()])
                     ->when(
                         $this->getLayoutPage(),
-                        fn (Collection $collection, $page): Collection => $collection->push($page)
+                        fn (SupportCollection $collection, $page): SupportCollection => $collection->push($page)
                     )
             );
         }
@@ -271,9 +271,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->icon('heroicon-m-plus')
             ->color('gray')
             ->outlined()
-            ->slideOver()
             ->size(Size::Small)
-            ->modalWidth(Width::Large)
+            ->modalWidth(Width::ThreeExtraLarge)
             ->modalSubmitActionLabel(fn (Action $action): string => $action->getTooltip())
             ->schema(
                 static fn (self $livewire, Schema $schema, array $arguments): Schema => $schema->operation('createOption')
@@ -1352,7 +1351,9 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     private function removeSelectedAssets(string $containerKey, int $widgetIndex): void
     {
-        $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]->assets
+        $widget = $this->getContainerWidget($containerKey, $widgetIndex);
+
+        $widgetAssets = $widget->assets
             ->reject(
                 fn (WidgetAsset $widgetAsset): bool => in_array(
                     sprintf('%s.%s', $widgetAsset->asset_type, $widgetAsset->asset_id),
@@ -1371,7 +1372,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $this->assets[$containerKey][$widgetIndex] = array_values($this->assets[$containerKey][$widgetIndex]);
 
-        $this->containerWidgets[$containerKey][$widgetIndex]->setRelation('assets', $widgetAssets);
+        $widget->setRelation('assets', $widgetAssets);
 
         $this->layoutUpdated();
     }
@@ -1515,8 +1516,10 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
             $widgetAssets = [];
 
-            if ($this->containerWidgets[$containerKey][$widgetIndex]->assets->isNotEmpty()) {
-                $widgetAssets = $this->containerWidgets[$containerKey][$widgetIndex]
+            $widget = $this->getContainerWidget($containerKey, $widgetIndex);
+
+            if ($widget->assets->isNotEmpty()) {
+                $widgetAssets = $widget
                     ->assets
                     ->map(fn (WidgetAsset $widgetAsset): array => [
                         'id' => $widgetAsset->id,
@@ -1766,11 +1769,11 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         foreach ($this->assets as $containerKey => $widgets) {
             foreach ($widgets as $widgetIndex => $assets) {
-                if (! isset($this->containerWidgets[$containerKey][$widgetIndex])) {
+                $widget = $this->getContainerWidget($containerKey, $widgetIndex);
+
+                if (! $widget) {
                     continue;
                 }
-
-                $widget = $this->getContainerWidget($containerKey, $widgetIndex);
 
                 $widgetAssets = new Collection;
 
@@ -1860,7 +1863,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             $this->assets[$containerKey][$widgetIndex] = [];
         }
 
-        $widget = $this->containerWidgets[$containerKey][$widgetIndex];
+        $widget = $this->getContainerWidget($containerKey, $widgetIndex);
 
         $occurrence = $this->getLastContainerWidgetOccurrence($containerKey, $widget->key);
 

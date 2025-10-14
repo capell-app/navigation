@@ -19,6 +19,7 @@ use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\Assets\HeroWidgetAsse
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\CarouselWidgetSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\HeroWidgetSchema;
 use Capell\Layout\Models\Widget;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 
 class WidgetCreator
@@ -347,7 +348,10 @@ class WidgetCreator
             'meta' => [
                 'component' => WidgetComponentEnum::Tags,
                 'size' => 'sm',
-                'margin' => ['lg'],
+                'margin' => ['md'],
+            ],
+            'admin' => [
+                'icon' => Heroicon::OutlinedTag->value,
             ],
         ]);
 

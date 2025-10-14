@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
+use BackedEnum;
 use Capell\Admin\Services\Creator\DemoCreator as AdminDemoCreator;
 use Capell\Admin\Services\Creator\NavigationCreator;
+use Capell\Core\Enums\DefaultColorEnum;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -72,6 +74,7 @@ class DemoCreator
     public function createContentWidget(Collection $languages): Widget
     {
         $siteId = Site::default()?->value('id');
+
         $widget = $this->widgetModel::firstOrCreate(['key' => 'example-content'], [
             'name' => 'Example Content',
             'type_id' => $this->typeModel::firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
@@ -98,7 +101,7 @@ class DemoCreator
             ],
         ]);
 
-        $this->createMedia($widget);
+        $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -146,7 +149,7 @@ class DemoCreator
             ],
         ]);
 
-        $this->createMedia($widget);
+        $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -191,7 +194,7 @@ class DemoCreator
             ],
         ]);
 
-        $this->createMedia($widget);
+        $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -219,7 +222,7 @@ class DemoCreator
         }
 
         for ($i = 1; $i <= 5; $i++) {
-            $this->createMedia($widget);
+            $this->createWidgetMedia($widget);
         }
 
         return $widget;
@@ -412,10 +415,10 @@ class DemoCreator
         }
 
         for ($i = 1; $i <= 7; $i++) {
-            $this->createMedia($widget);
+            $this->createWidgetMedia($widget);
         }
 
-        $this->createMedia($widget, type: 'video');
+        $this->createWidgetMedia($widget, type: 'video');
 
         return $widget;
     }
@@ -548,8 +551,9 @@ class DemoCreator
             ]);
 
             foreach ($page->site->languages as $language) {
-                $content->translations()->create([
+                $content->translations()->updateOrCreate([
                     'language_id' => $language->id,
+                ], [
                     'content' => sprintf('<p>%s</p>', $feature['title']),
                 ]);
             }
@@ -599,7 +603,7 @@ class DemoCreator
         });
 
         for ($i = 1; $i <= 12; $i++) {
-            $this->createMedia($widget);
+            $this->createWidgetMedia($widget);
         }
 
         return $widget;
@@ -687,12 +691,12 @@ class DemoCreator
             'meta' => [
                 'align' => 'center',
                 'background_overlay' => true,
-                'background_color' => 'dark-gray',
+                'background_color' => DefaultColorEnum::Gray->value,
                 'view_file' => 'capell-layout::components.widget.assets.testimonials',
             ],
         ]);
 
-        $this->createMedia($widget, collection: 'backgroundImage');
+        $this->createMedia($widget, collection: MediaCollectionEnum::BackgroundImage);
 
         $languages->each(function (Language $language) use ($widget): void {
             $widget->translations()->firstOrCreate(['language_id' => $language->id], [
@@ -978,17 +982,17 @@ class DemoCreator
             [
                 'name' => 'John Doe',
                 'position' => 'CEO of Example Corp',
-                'content' => '<p>Capell has transformed our business with their innovative solutions and exceptional service.</p>',
+                'content' => 'Capell has transformed our business with their innovative solutions and exceptional service.',
             ],
             [
                 'name' => 'Jane Smith',
                 'position' => 'CTO of Tech Innovations',
-                'content' => '<p>The team at Capell is incredibly knowledgeable and always goes the extra mile for us.</p>',
+                'content' => 'The team at Capell is incredibly knowledgeable and always goes the extra mile for us.',
             ],
             [
                 'name' => 'Jeff Wilson',
                 'position' => 'Marketing Director at Creative Agency',
-                'content' => '<p>We have seen significant growth since partnering with Capell. Their expertise is unmatched.</p>',
+                'content' => 'We have seen significant growth since partnering with Capell. Their expertise is unmatched.',
             ],
         ];
 
@@ -1019,11 +1023,13 @@ class DemoCreator
             $this->createMedia($content);
 
             $content->translations()->createMany(
-                $languages->map(fn (Language $language): array => [
-                    'language_id' => $language->id,
-                    'title' => $testimonial['name'],
-                    'content' => sprintf('<p>%s</p>', $testimonial['content']),
-                ])
+                $languages
+                    ->filter(fn (Language $language) => ! $content->translations->contains('language_id', $language->id))
+                    ->map(fn (Language $language): array => [
+                        'language_id' => $language->id,
+                        'title' => $testimonial['name'],
+                        'content' => sprintf('<p>%s</p>', $testimonial['content']),
+                    ])
                     ->all()
             );
 
@@ -1159,24 +1165,18 @@ class DemoCreator
         return $teamMembersCollection;
     }
 
-    private function createMedia(HasMedia $model, ?string $name = null, string $type = 'image', string $collection = MediaCollectionEnum::Image->value): void
+    private function createMedia(HasMedia $model, ?string $name = null, string $type = 'image', BackedEnum|string $collection = MediaCollectionEnum::Image): void
     {
-        if ($model instanceof Widget) {
-            $this->createWidgetMedia($model, $name, $type, $collection);
-
-            return;
-        }
-
         app(AdminDemoCreator::class)->createMedia($model, $name, $type, $collection);
     }
 
-    private function createWidgetMedia(HasMedia $model, ?string $name = null, string $type = 'image', string $collection = MediaCollectionEnum::Image->value): void
+    private function createWidgetMedia(HasMedia $model, ?string $name = null, string $type = 'image', BackedEnum|string $collection = MediaCollectionEnum::Image): void
     {
         if ($type === 'video') {
             $ext = 'mp4';
             $demo_path = AdminDemoCreator::getDemoResourcePath('video');
             $filename = $name ?? 'SampleVideo_1280x720_1mb';
-            $collection = MediaCollectionEnum::Video->value;
+            $collection = MediaCollectionEnum::Video;
         } else {
             $ext = 'jpg';
             $demo_path = AdminDemoCreator::getDemoResourcePath('img');
@@ -1221,7 +1221,7 @@ class DemoCreator
                 : []
                 ),
             ])
-            ->toMediaCollection($collection);
+            ->toMediaCollection($collection instanceof BackedEnum ? $collection->value : $collection);
 
         if ($type === 'video') {
             $demo_path = AdminDemoCreator::getDemoResourcePath('img');

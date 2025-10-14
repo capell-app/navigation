@@ -60,7 +60,7 @@ declare(strict_types=1);
     @if (method_exists($tags, 'total') && $tags->hasPages())
         <x-capell::pagination
             :results="$tags"
-            :scrollToElement="$containerKey . '-' . $widget->key . '-' . $index"
+            :scrollToElement="$containerKey . '-' . $widget->key . '-' . $loop->index"
         />
     @endif
 </x-capell-layout::widget.wrapper>

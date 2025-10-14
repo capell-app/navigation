@@ -92,8 +92,7 @@ class WidgetsTable implements TableConfigurator
                 ->label(__('capell-admin::table.type'))
                 ->badge()
                 ->searchable()
-                ->sortable()
-                ->alignCenter(),
+                ->sortable(),
             MediaLibraryImageColumn::make('meta.image')
                 ->toggleable(isToggledHiddenByDefault: true),
             LanguagesColumn::make('translations.language'),

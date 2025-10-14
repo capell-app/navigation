@@ -238,7 +238,8 @@ class Widget extends Model implements HasMedia, PageCacheable, Statusable
 
     public function assets(): HasMany
     {
-        return $this->hasMany(WidgetAsset::class);
+        return $this->hasMany(WidgetAsset::class)
+            ->chaperone();
     }
 
     public function widgetAssets(): HasMany

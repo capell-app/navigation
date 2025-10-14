@@ -14,7 +14,9 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
+use Capell\Layout\Models\Widget;
 use Filament\Schemas\Components\Group;
+use Illuminate\Database\Eloquent\Builder;
 
 class HeroEditor extends Group
 {
@@ -37,9 +39,22 @@ class HeroEditor extends Group
                         return false;
                     }
 
+                    /** @var Layout $layout */
                     $layout = $this->getLayout((int) $layoutId);
 
-                    return in_array('hero', $layout->widgets, true);
+                    if (! in_array('hero', $layout->widgets, true)) {
+                        return false;
+                    }
+
+                    $heroWidget = Widget::firstWhere('key', 'hero');
+
+                    return ! $heroWidget->assets()
+                        ->where(
+                            fn (Builder $query): Builder => $query
+                                ->where('page_id', $record?->id ?? 0)
+                                ->orWhereNull('page_id')
+                        )
+                        ->exists();
                 }
             )
             ->schema([

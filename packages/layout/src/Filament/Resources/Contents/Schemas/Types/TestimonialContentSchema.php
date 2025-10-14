@@ -91,15 +91,17 @@ class TestimonialContentSchema extends DefaultContentSchema
     protected function getEditOptionFormSchema(Schema $schema): array
     {
         return [
-            ContentTranslationsRepeater::make($schema, hasTitle: false),
+            ContentTranslationsRepeater::make($schema),
             Grid::make()
                 ->statePath('meta')
+                ->columnSpanFull()
                 ->schema($this->getMetaSchema()),
             Section::make(__('capell-admin::generic.settings'))
                 ->collapsed()
                 ->compact()
                 ->icon('heroicon-o-cog-6-tooth')
                 ->columns()
+                ->columnSpanFull()
                 ->schema([
                     ...ContentDetailsSchema::make($schema),
                     ...ContentSettingsSchema::make($schema),

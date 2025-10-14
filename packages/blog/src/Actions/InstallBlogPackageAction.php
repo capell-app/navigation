@@ -28,6 +28,7 @@ class InstallBlogPackageAction
         // Layouts
         BlogCreator::createArticleLayout();
         BlogCreator::createArchivesLayout();
+        BlogCreator::createBlogPageLayout();
 
         $layouts = [
             LayoutEnum::Results,

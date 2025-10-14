@@ -28,7 +28,7 @@ class Tags extends AbstractWidget
 
     protected function mountWidget(): void
     {
-        $limit = $this->widget->meta['limit'] ?? config('capell-frontend.pagination_limit', 12);
+        $limit = $this->widget->meta['limit'] ?? null;
 
         $this->tags = TagLoader::getTags(
             site: FrontendLoader::getSite(),
