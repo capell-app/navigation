@@ -48,7 +48,6 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Blade;
@@ -212,9 +211,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $widgetAsset = $this->getWidgetAsset($containerKey, $widgetIndex, $index);
 
-        if ($widgetAsset === null || $widgetAsset === []) {
-            throw new Exception(sprintf('Asset %d not found for container: %s widget: %d', $index, $containerKey, $widgetIndex));
-        }
+        throw_if($widgetAsset === null || $widgetAsset === [], new Exception(sprintf('Asset %d not found for container: %s widget: %d', $index, $containerKey, $widgetIndex)));
 
         unset($assets[$index]);
 
@@ -334,7 +331,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     public function editContainerWidgetAction(): Action
     {
         return Action::make('editContainerWidget')
-            ->label(__('capell-admin::button.edit_container_widget'))
+            ->label(__('capell-admin::button.edit'))
+            ->tooltip(__('capell-admin::button.edit_container_widget'))
             ->groupedIcon('heroicon-o-cog-6-tooth')
             ->color('gray')
             ->grouped()
@@ -748,18 +746,31 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     return false;
                 }
 
+                $widget = $livewire->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
+
+                $assetTypes = empty($widget->admin['asset_types'])
+                    ? $widget->type->admin['asset_types'] ?? []
+                    : ($widget->admin['asset_types']);
+
+                if (! $assetTypes) {
+                    return false;
+                }
+
+                $assets = $livewire->getWidgetAssets(
+                    $arguments['containerKey'],
+                    $arguments['widgetIndex'],
+                );
+
+                if ($assets === []) {
+                    return false;
+                }
+
                 $hasPageAssets = $livewire->hasPageAssets(
                     containerKey: $arguments['containerKey'],
                     widgetIndex: $arguments['widgetIndex']
                 );
 
-                if (! $hasPageAssets) {
-                    return true;
-                }
-
-                $widget = $livewire->getContainerWidget($arguments['containerKey'], $arguments['widgetIndex']);
-
-                return ! $widget->widgetAssets()->exists();
+                return ! $hasPageAssets;
             })
             ->requiresConfirmation()
             ->modalDescription(
@@ -836,7 +847,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     public function page(): ?Page
     {
         if ($this->page_id !== null && $this->page_id !== 0) {
-            return Page::find($this->page_id);
+            return Page::query()->find($this->page_id);
         }
 
         return null;
@@ -1052,14 +1063,12 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->where('asset_id', $asset['asset_id'])
             ->first();
 
-        if (! $widgetAsset) {
-            throw new Exception(
-                'Widget asset not found for container: ' . $arguments['containerKey'] .
-                ' widget: ' . $arguments['widgetIndex'] .
-                ' (key: ' . ($widget->key ?? 'unknown') . ')' .
-                ' index: ' . $arguments['index']
-            );
-        }
+        throw_unless($widgetAsset, new Exception(
+            'Widget asset not found for container: ' . $arguments['containerKey'] .
+            ' widget: ' . $arguments['widgetIndex'] .
+            ' (key: ' . ($widget->key ?? 'unknown') . ')' .
+            ' index: ' . $arguments['index']
+        ));
 
         return $widgetAsset->exists ? $widgetAsset : null;
     }
@@ -1150,7 +1159,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                             return null;
                         }
 
-                        $total = Layout::find($state)->pages()->count();
+                        $total = Layout::query()->find($state)->pages()->count();
 
                         return new HtmlString(
                             trans_choice(
@@ -1238,9 +1247,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $layout = $model::withCount('pages')->find($this->layout_id);
 
-        if (! $layout) {
-            throw new Exception('Layout not found');
-        }
+        throw_unless($layout, new Exception('Layout not found'));
 
         $this->layout = $layout;
 
@@ -1530,7 +1537,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                         'order' => $widgetAsset->order,
                         'page_id' => $widgetAsset->page_id,
                     ])
-                    ->toArray();
+                    ->all();
             }
 
             $this->assets[$containerKey][$widgetIndex] = $widgetAssets;
@@ -1841,9 +1848,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     {
         $widget = $this->getWidgetQuery()->find($id);
 
-        if (! $widget) {
-            throw new Exception(sprintf("Unable to find '%d' widget", $id));
-        }
+        throw_unless($widget, new Exception(sprintf("Unable to find '%d' widget", $id)));
 
         return $widget;
     }
@@ -2165,7 +2170,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     }
                 }
 
-                $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+                $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
                 WidgetAsset::query()
                     ->where('widget_id', $widget->id)

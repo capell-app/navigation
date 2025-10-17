@@ -14,22 +14,22 @@ class BlogPage extends AbstractPage
 
     protected function loadPage(): void
     {
-        $pageRecord = FrontendLoader::getPage();
+        $page = FrontendLoader::getPage();
 
         $paginationKey = config('capell-admin.page_query', 'pageQuery');
 
         $this->results = PageLoader::getPages(
             site: FrontendLoader::getSite(),
             language: FrontendLoader::getLanguage(),
-            limit: $pageRecord->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
+            limit: $page->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
             paginationPage: $this->getPage($paginationKey),
-            pageGroup: $pageRecord->type->meta['page_group'] ?? null,
-            typeKey: $pageRecord->type->meta['page_type'] ?? null,
-            withImage: $pageRecord->type->meta['with_image'] ?? false,
-            withPagination: $pageRecord->type->meta['pagination'] ?? true,
-            withParent: $pageRecord->type->meta['with_parent'] ?? false,
-            withDate: $pageRecord->type->meta['with_date'] ?? false,
-            withTags: $pageRecord->type->meta['with_tags'] ?? false,
+            pageGroup: $page->type->meta['page_group'] ?? null,
+            typeKey: $page->type->meta['page_type'] ?? null,
+            withImage: $page->type->meta['with_image'] ?? false,
+            withPagination: $page->type->meta['pagination'] ?? true,
+            withParent: $page->type->meta['with_parent'] ?? false,
+            withDate: $page->type->meta['with_date'] ?? false,
+            withTags: $page->type->meta['with_tags'] ?? false,
             paginationKey: $paginationKey,
         );
     }

@@ -46,7 +46,7 @@ class HeroEditor extends Group
                         return false;
                     }
 
-                    $heroWidget = Widget::firstWhere('key', 'hero');
+                    $heroWidget = Widget::query()->firstWhere('key', 'hero');
 
                     return ! $heroWidget->assets()
                         ->where(

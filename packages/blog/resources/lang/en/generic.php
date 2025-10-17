@@ -21,4 +21,5 @@ return [
     'blog_page' => 'Blog Page',
     'blog_page_archives' => 'Blog Archives',
     'latest_articles' => 'Latest Articles',
+    'blog_intro' => 'Discover our latest articles on a variety of topics and stay updated with new insights.',
 ];

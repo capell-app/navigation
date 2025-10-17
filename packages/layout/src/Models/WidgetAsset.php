@@ -13,7 +13,6 @@ use Capell\Core\Models\Concerns\HasPageCache;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\WidgetAssetFactory;
-use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -47,7 +46,7 @@ use Wildside\Userstamps\Userstamps;
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int|null $deleted_by
- * @property-read Model|Eloquent $asset
+ * @property-read Model $asset
  * @property-read User|null $creator
  * @property-read User|null $destroyer
  * @property-read User|null $editor
@@ -73,7 +72,8 @@ use Wildside\Userstamps\Userstamps;
  * @property-read Collection<int, AssetRelation> $assets
  * @property-read int|null $assets_count
  *
- * @mixin Eloquent
+ * @mixin Model
+ * @mixin \Eloquent
  */
 class WidgetAsset extends Model implements HasMedia, PageCacheable
 {

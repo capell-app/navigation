@@ -61,7 +61,7 @@ abstract class AbstractWidget extends Component
     #[Computed]
     public function widget(): Widget
     {
-        return once(fn () => Widget::firstWhere('key', $this->widgetData['widget_key']));
+        return once(fn () => Widget::query()->firstWhere('key', $this->widgetData['widget_key']));
     }
 
     /**

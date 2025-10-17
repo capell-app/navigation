@@ -198,7 +198,7 @@ describe('page layout', function () use ($types): void {
 
         $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-        $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+        $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
         $existingAssets = WidgetAsset::factory()
             ->count(2)

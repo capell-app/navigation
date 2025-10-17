@@ -90,9 +90,7 @@ class DemoCommand extends Command
 
         $sites = Site::query()->with('languages')->whereIn('id', $siteIds)->get();
 
-        if ($sites->isEmpty()) {
-            throw new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds));
-        }
+        throw_if($sites->isEmpty(), new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds)));
 
         $user = $this->option('author') ? CapellCore::getModel('User')::first() : null;
 
@@ -151,15 +149,13 @@ class DemoCommand extends Command
     public function setupHomepage(Page $page, Collection $languages): void
     {
         $layout = $this->getHomeLayout();
-        if (! $layout instanceof Layout) {
-            throw new Exception('Unable to find homepage layout');
-        }
+        throw_unless($layout instanceof Layout, new Exception('Unable to find homepage layout'));
 
         $page->update(['layout_id' => $layout->id]);
 
         $containers = $layout->containers;
 
-        $heroWidget = Widget::firstWhere('key', 'hero');
+        $heroWidget = Widget::query()->firstWhere('key', 'hero');
 
         $this->demoCreator->createContentsWidget($heroWidget, $page, container: 'hero');
         $this->line('Created assets for hero widget');

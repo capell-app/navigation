@@ -94,6 +94,7 @@ use Wildside\Userstamps\Userstamps;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  *
+ * @mixin Model
  * @mixin \Eloquent
  */
 #[ObservedBy(WidgetObserver::class)]

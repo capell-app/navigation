@@ -93,9 +93,7 @@ class DemoCommand extends Command
 
         $sites = Site::query()->with('languages')->whereIn('id', $siteIds)->get();
 
-        if ($sites->isEmpty()) {
-            throw new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds));
-        }
+        throw_if($sites->isEmpty(), new Exception('Unable to find any sites for the provided identifiers: ' . implode(', ', $siteIds)));
 
         $limit = $this->option('limit') ? (int) $this->option('limit') : 20;
 
@@ -182,9 +180,7 @@ class DemoCommand extends Command
         }
 
         $demo = config('capell-demo.pages');
-        if ($limit > 0) {
-            $demo = array_slice($demo, 0, $limit);
-        }
+        $demo = array_slice($demo, 0, $limit);
 
         foreach ($demo as $pageData) {
             $this->line(sprintf('Creating article: %s', $pageData['name']['en']));

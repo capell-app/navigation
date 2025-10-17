@@ -13,10 +13,10 @@ class LayoutUpdater
     public function setup(?string $key = null): void
     {
         if ($key === null) {
-            $this->defaultLayout(Layout::firstWhere('key', LayoutEnum::Default));
-            $this->homeLayout(Layout::firstWhere('key', LayoutEnum::Home));
-            $this->resultsLayout(Layout::firstWhere('key', LayoutEnum::Results));
-            $this->tagsLayout(Layout::firstWhere('key', LayoutEnum::Tags));
+            $this->defaultLayout(Layout::query()->firstWhere('key', LayoutEnum::Default));
+            $this->homeLayout(Layout::query()->firstWhere('key', LayoutEnum::Home));
+            $this->resultsLayout(Layout::query()->firstWhere('key', LayoutEnum::Results));
+            $this->tagsLayout(Layout::query()->firstWhere('key', LayoutEnum::Tags));
 
             $this->addHeroContainerToOtherLayouts();
 
@@ -24,10 +24,10 @@ class LayoutUpdater
         }
 
         match ($key) {
-            LayoutEnum::Home->value => $this->homeLayout(Layout::firstWhere('key', LayoutEnum::Home)),
-            LayoutEnum::Results->value => $this->resultsLayout(Layout::firstWhere('key', LayoutEnum::Results)),
-            LayoutEnum::Tags->value => $this->tagsLayout(Layout::firstWhere('key', LayoutEnum::Tags)),
-            LayoutEnum::Default->value => $this->defaultLayout(Layout::firstWhere('key', LayoutEnum::Default)),
+            LayoutEnum::Home->value => $this->homeLayout(Layout::query()->firstWhere('key', LayoutEnum::Home)),
+            LayoutEnum::Results->value => $this->resultsLayout(Layout::query()->firstWhere('key', LayoutEnum::Results)),
+            LayoutEnum::Tags->value => $this->tagsLayout(Layout::query()->firstWhere('key', LayoutEnum::Tags)),
+            LayoutEnum::Default->value => $this->defaultLayout(Layout::query()->firstWhere('key', LayoutEnum::Default)),
             default => throw new InvalidArgumentException('Invalid layout key: ' . $key)
         };
     }
@@ -83,9 +83,9 @@ class LayoutUpdater
     {
         $layout->update([
             'containers' => [
+                'hero' => $this->heroContainer(),
                 'main' => $this->mainContainer([
-                    ['widget_key' => 'breadcrumbs'],
-                    ['widget_key' => 'tags', 'meta' => ['hide_content' => true]],
+                    ['widget_key' => 'tags', 'meta' => ['show_page_title' => true]],
                 ]),
                 'sidebar' => $this->sidebarContainer([
                     ['widget_key' => 'latest-pages'],
@@ -96,7 +96,7 @@ class LayoutUpdater
 
     private function addHeroContainerToOtherLayouts(): void
     {
-        Layout::whereNotIn('key', [
+        Layout::query()->whereNotIn('key', [
             LayoutEnum::Default->value,
             LayoutEnum::Home->value,
             LayoutEnum::Results->value,

@@ -19,8 +19,8 @@ class ContentDetailsSchema
                 ->withRelation()
                 ->withCreateForm()
                 ->withEditForm()
-                ->when(
-                    ! in_array($schema->getOperation(), ['create', 'createOption']),
+                ->unless(
+                    in_array($schema->getOperation(), ['create', 'createOption']),
                     fn (ContentTypeSelect $component): ContentTypeSelect => $component->changeConfirmation()
                 ),
         ];

@@ -9,13 +9,14 @@ use Capell\Layout\Livewire\LayoutBuilder;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Icons\Heroicon;
 
 class PageLayoutTab
 {
     public static function make(): Tab
     {
         return Tab::make(__('capell-admin::tab.layout'))
-            ->icon('heroicon-o-puzzle-piece')
+            ->icon(Heroicon::OutlinedPuzzlePiece)
             ->visible(fn (Get $get, Page $record): bool => (bool) ($get('layout_id') ?: $record->layout_id))
             ->schema([
                 Livewire::make(

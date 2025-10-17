@@ -50,7 +50,7 @@ declare(strict_types=1);
             :heading-tag="$headingTag"
             :presenter="$widget->type->meta['content_presenter'] ?? null"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
-            :title="in_array('title', $pageContents, true) && ! (empty($widgetData['meta']['hide_title']) && $hasHero) ? $page->translation->title : null"
+            :title="in_array('title', $pageContents, true) && ! (empty($widgetData['meta']['show_page_title']) && $hasHero) ? $page->translation->title : null"
         />
 
         @if (! empty($widget->translation?->actions))

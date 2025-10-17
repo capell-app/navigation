@@ -33,9 +33,7 @@ class RelatedRepeater
 
                         $existingContent = Content::query()->withDrafts()->find($newData['content_id']);
 
-                        if (! $existingContent) {
-                            throw new Exception('Content not found with ID: ' . $newData['content_id']);
-                        }
+                        throw_unless($existingContent, new Exception('Content not found with ID: ' . $newData['content_id']));
 
                         $newContent = ReplicateContentAction::run($existingContent);
 

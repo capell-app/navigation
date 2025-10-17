@@ -36,9 +36,7 @@ trait HasAssetsRelationManager
             ->color('primary')
             ->successNotificationTitle(__('capell-admin::message.asset_added'))
             ->using(function (array $data, self $livewire): Model {
-                if (empty($data['asset_id'])) {
-                    throw new RuntimeException('No asset selected');
-                }
+                throw_if(empty($data['asset_id']), new RuntimeException('No asset selected'));
 
                 $asset = null;
 

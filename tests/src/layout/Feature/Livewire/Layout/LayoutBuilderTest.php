@@ -221,7 +221,7 @@ test('Can clone layout', function (): void {
         ->assertHasNoFormErrors()
         ->call('saveLayout');
 
-    $clonedLayout = Layout::where('name', $layout->name . ' 1')
+    $clonedLayout = Layout::query()->where('name', $layout->name . ' 1')
         ->where('key', $layout->key . '-1')
         ->first();
 
@@ -259,7 +259,7 @@ test('Can edit container', function (): void {
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][0];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->count(2)
@@ -339,7 +339,7 @@ test('Can add existing widget', function (): void {
     $lastWidgetKey = array_key_last($layout->containers[$containerKey]['widgets']);
     $lastWidget = $layout->containers[$containerKey]['widgets'][$lastWidgetKey];
 
-    $widget = Widget::firstWhere('key', $lastWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -424,7 +424,7 @@ test('Can duplicate widget', function (): void {
     $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
     $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $lastWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,

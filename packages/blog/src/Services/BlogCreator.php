@@ -61,19 +61,19 @@ class BlogCreator
         ?Collection $languages = null
     ): Page {
         if (! $type instanceof Type) {
-            $type = Type::where('key', 'archive')->pageType()->first()
+            $type = Type::query()->where('key', 'archive')->pageType()->first()
                 ?? self::createArchivePageType();
         }
 
         if (! $layout instanceof Layout) {
-            $layout = Layout::firstWhere('key', 'results') ?? app(LayoutCreator::class)->resultsLayout();
+            $layout = Layout::query()->firstWhere('key', 'results') ?? app(LayoutCreator::class)->resultsLayout();
         }
 
         if (! $languages instanceof Collection) {
             $languages = $site->languages;
         }
 
-        $page = Page::firstOrNew([
+        $page = Page::query()->firstOrNew([
             'layout_id' => $layout->id,
             'site_id' => $site->id,
             'type_id' => $type->id,
@@ -110,7 +110,7 @@ class BlogCreator
 
     public static function createArchivePageType(): Type
     {
-        return Type::firstOrCreate([
+        return Type::query()->firstOrCreate([
             'key' => 'archive',
             'type' => TypeEnum::Page,
         ], [
@@ -138,7 +138,7 @@ class BlogCreator
 
     public static function createArchivesLayout(): Layout
     {
-        return Layout::firstOrCreate(['key' => 'archives'], [
+        return Layout::query()->firstOrCreate(['key' => 'archives'], [
             'name' => __('capell-blog::generic.archives_page'),
             'group' => LayoutGroupEnum::System->value,
             'containers' => [
@@ -149,7 +149,7 @@ class BlogCreator
                     ],
                     'widgets' => [
                         ['widget_key' => 'breadcrumbs'],
-                        ['widget_key' => 'archives', 'meta' => ['hide_content' => true]],
+                        ['widget_key' => 'archives', 'meta' => ['show_page_content' => true]],
                     ],
                 ],
                 'sidebar' => [
@@ -171,7 +171,7 @@ class BlogCreator
 
     public static function createBlogPageLayout(): Layout
     {
-        return Layout::firstOrCreate(['key' => 'blogs'], [
+        return Layout::query()->firstOrCreate(['key' => 'blogs'], [
             'name' => __('capell-blog::generic.blog_page'),
             'group' => LayoutGroupEnum::System->value,
             'containers' => [
@@ -182,8 +182,6 @@ class BlogCreator
                         'container' => 'full',
                     ],
                     'widgets' => [
-                        ['widget_key' => 'breadcrumbs'],
-                        ['widget_key' => 'page-content'],
                         ['widget_key' => 'page-slot'],
                     ],
                 ],
@@ -210,11 +208,11 @@ class BlogCreator
             $languages = Language::all();
         }
 
-        $widget = Widget::firstOrCreate([
+        $widget = Widget::query()->firstOrCreate([
             'key' => 'archives',
         ], [
             'name' => __('capell-blog::generic.archive'),
-            'type_id' => Type::firstWhere(['key' => WidgetTypeEnum::System, 'type' => LayoutTypeEnum::Widget])?->id,
+            'type_id' => Type::query()->firstWhere(['key' => WidgetTypeEnum::System, 'type' => LayoutTypeEnum::Widget])?->id,
             'meta' => [
                 'component' => 'capell-blog::widget.page.archives',
                 'page_group' => BlogResourceEnum::Article->value,
@@ -247,11 +245,11 @@ class BlogCreator
         ?Collection $languages = null
     ): Page {
         if (! $layout instanceof Layout) {
-            $layout = Layout::firstWhere('key', 'archives') ?? self::createArchivesLayout();
+            $layout = Layout::query()->firstWhere('key', 'archives') ?? self::createArchivesLayout();
         }
 
         if (! $type instanceof Type) {
-            $type = Type::where('key', 'system')->pageType()->first()
+            $type = Type::query()->where('key', 'system')->pageType()->first()
                 ?? app(TypeCreator::class)::systemPageType();
         }
 
@@ -259,7 +257,7 @@ class BlogCreator
             $languages = $site->languages;
         }
 
-        $page = Page::firstOrNew([
+        $page = Page::query()->firstOrNew([
             'layout_id' => $layout->id,
             'site_id' => $site->id,
             'type_id' => $type->id,
@@ -295,7 +293,7 @@ class BlogCreator
 
     public static function createArticleLayout(): Layout
     {
-        return Layout::firstOrCreate(['key' => 'article'], [
+        return Layout::query()->firstOrCreate(['key' => 'article'], [
             'name' => __('capell-blog::generic.article'),
             'group' => LayoutGroupEnum::Default->value,
             'containers' => [
@@ -330,7 +328,7 @@ class BlogCreator
 
     public static function createArticlePageType(): Type
     {
-        return Type::firstOrCreate([
+        return Type::query()->firstOrCreate([
             'key' => 'article',
             'type' => TypeEnum::Page,
         ], [
@@ -348,7 +346,7 @@ class BlogCreator
 
     public static function createArticleWidget(Type $type): Widget
     {
-        return Widget::firstOrCreate([
+        return Widget::query()->firstOrCreate([
             'key' => 'article',
         ], [
             'name' => __('capell-blog::generic.article'),
@@ -364,7 +362,7 @@ class BlogCreator
 
     public static function createArticleWidgetType(): Type
     {
-        return Type::firstOrCreate([
+        return Type::query()->firstOrCreate([
             'key' => 'article',
             'type' => LayoutTypeEnum::Widget,
         ], [
@@ -400,7 +398,7 @@ class BlogCreator
             $languages = $site->languages;
         }
 
-        $page = Page::firstOrNew([
+        $page = Page::query()->firstOrNew([
             'layout_id' => $layout->id,
             'site_id' => $site->id,
             'type_id' => $type->id,
@@ -418,11 +416,11 @@ class BlogCreator
             $pageTranslation = $page->translations()->firstOrCreate([
                 'language_id' => $language->id,
             ], [
-                'title' => __('capell-blog::generic.blog'),
+                'title' => __('capell-blog::generic.latest_articles'),
                 'slug' => 'blog',
                 'meta' => [
                     'label' => __('capell-blog::generic.blog'),
-                    'title' => '<h1>' . __('capell-blog::generic.latest_articles') . '</h1>',
+                    'hero' => '<h1>' . __('capell-blog::generic.latest_articles') . '</h1><p>' . __('capell-blog::generic.blog_intro') . '</p>',
                 ],
             ]);
 
@@ -436,7 +434,7 @@ class BlogCreator
 
     public static function createBlogPageType(): Type
     {
-        return Type::firstOrCreate([
+        return Type::query()->firstOrCreate([
             'key' => 'blog',
             'type' => TypeEnum::Page,
         ], [
@@ -470,11 +468,11 @@ class BlogCreator
             $languages = Language::all();
         }
 
-        $widget = Widget::firstOrCreate([
+        $widget = Widget::query()->firstOrCreate([
             'key' => 'latest-articles',
         ], [
             'name' => __('capell-blog::generic.latest_articles'),
-            'type_id' => Type::firstWhere(['key' => WidgetTypeEnum::PageResults, 'type' => LayoutTypeEnum::Widget])?->id,
+            'type_id' => Type::query()->firstWhere(['key' => WidgetTypeEnum::PageResults, 'type' => LayoutTypeEnum::Widget])?->id,
             'meta' => [
                 'component' => WidgetComponentEnum::LivewirePages,
                 'limit' => 5,

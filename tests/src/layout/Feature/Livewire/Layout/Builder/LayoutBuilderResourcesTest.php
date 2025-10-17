@@ -37,7 +37,7 @@ test('Can save without affecting widget assets', function (bool $withPage): void
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $widgetKey = $layout->containers[$containerKey]['widgets'][$widgetIndex]['widget_key'];
 
-    $widget = Widget::firstWhere('key', $widgetKey);
+    $widget = Widget::query()->firstWhere('key', $widgetKey);
     WidgetAsset::factory()->count(2)->create();
     Content::factory()->count(2)->create();
     Page::factory()->count(3)->create();
@@ -66,10 +66,10 @@ test('Can sync new widget assets to page layout', function (): void {
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $occurrence = $layout->containers[$containerKey]['widgets'][$widgetIndex]['occurrence'];
-    $widget = Widget::firstWhere('key', $layout->containers[$containerKey]['widgets'][$widgetIndex]['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $layout->containers[$containerKey]['widgets'][$widgetIndex]['widget_key']);
 
     $secondWidgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
-    $secondWidget = Widget::firstWhere('key', $layout->containers[$containerKey]['widgets'][$secondWidgetIndex]['widget_key']);
+    $secondWidget = Widget::query()->firstWhere('key', $layout->containers[$containerKey]['widgets'][$secondWidgetIndex]['widget_key']);
     $secondOccurrence = $layout->containers[$containerKey]['widgets'][$secondWidgetIndex]['occurrence'];
 
     // 2 existing
@@ -139,7 +139,7 @@ test('Can sync new widget assets to layout', function (): void {
 
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = 2;
-    $widget = Widget::firstWhere('key', 'first');
+    $widget = Widget::query()->firstWhere('key', 'first');
 
     // 2 existing
     WidgetAsset::factory()
@@ -194,7 +194,7 @@ test('Can sync new page assets', function (): void {
     $widgetKey = $layout->containers[$containerKey]['widgets'][$widgetIndex]['widget_key'];
     $occurrence = $layout->containers[$containerKey]['widgets'][$widgetIndex]['occurrence'];
 
-    $widget = Widget::firstWhere('key', $widgetKey);
+    $widget = Widget::query()->firstWhere('key', $widgetKey);
 
     $contents = Content::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
@@ -302,7 +302,7 @@ test('Can select all widget assets', function (): void {
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     foreach ([AssetEnum::Page, Capell\Layout\Enums\AssetEnum::Content] as $assetType) {
         WidgetAsset::factory()
@@ -352,7 +352,7 @@ test('can add page asset', function (): void {
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -411,7 +411,7 @@ test('can add page asset to existing widget with page layout', function (): void
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->widget($widget)
@@ -480,7 +480,7 @@ test('can add page asset to widget with page layout', function (): void {
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -551,7 +551,7 @@ test('can edit asset', function (): void {
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     $layoutAsset = WidgetAsset::factory()
         ->widget($widget)
@@ -590,7 +590,7 @@ test('can remove widget assets', function (): void {
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->widget($widget)
@@ -632,7 +632,7 @@ test('can remove page assets', function (): void {
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->widget($widget)
@@ -683,7 +683,7 @@ test('can not remove assets if no records selected', function (): void {
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->widget($widget)
@@ -725,7 +725,7 @@ test('Can revert page assets', function (): void {
 
     $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
 
-    $widget = Widget::firstWhere('key', $containerWidget['widget_key']);
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
         ->widget($widget)

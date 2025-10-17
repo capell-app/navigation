@@ -43,7 +43,7 @@ class LayoutBuilderAddWidgetSchema
                         ->mapWithKeys(function ($widget) use ($component): array {
                             $data = [
                                 'label' => $widget->name,
-                                'description' => ($widget->type->group ? str($widget->type->group)->title()->append(' - ') : ''),
+                                'description' => ($widget->type->group ? str($widget->type->group)->title() : ''),
                             ];
 
                             return [$widget->getKey() => $component::getSelectOption($widget, $data)];

@@ -6,6 +6,7 @@ namespace Capell\Blog\Filament\Resources\Articles\Schemas\Extenders;
 
 use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
 use Capell\Layout\Filament\Components\Forms\Page\HeroEditor;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,10 +25,10 @@ class BlogPageSchemaExtender implements PageSchemaExtender
     public function extendTranslationComponents(Schema $schema, array $components): array
     {
         $inserted = false;
-        foreach (array_keys($components) as $index) {
-            // ContentEditor is a Section via Capell\Admin\Filament\Components\Forms\ContentEditor::make()
-            // We cannot rely on class comparison here, so insert after the second item (title, content editor) by convention.
-            if ($index === 1) {
+
+        /** @var Component $component */
+        foreach ($components as $index => $component) {
+            if ($component->getKey(isAbsolute: false) === 'page-title-with-slug-input-wrapper') {
                 array_splice($components, $index + 1, 0, [HeroEditor::make()]);
                 $inserted = true;
                 break;

@@ -53,7 +53,7 @@ class ContentSelect extends Select
                     search: $search
                 );
             })
-            ->getOptionLabelUsing(fn (self $component, $value): ?string => Content::find($value, ['name'])?->name)
+            ->getOptionLabelUsing(fn (self $component, $value): ?string => Content::query()->find($value, ['name'])?->name)
             ->options(fn (self $component): array => $component->getContentOptions());
     }
 
@@ -152,7 +152,7 @@ class ContentSelect extends Select
 
                 return $record?->attributesToArray() ?? [];
             })
-            ->getSelectedRecordUsing(static fn (self $component, $state): ?Model => Content::find($state))
+            ->getSelectedRecordUsing(static fn (self $component, $state): ?Model => Content::query()->find($state))
             ->updateOptionUsing(static function (array $data, Schema $schema): void {
                 $schema->getRecord()?->update($data);
             });

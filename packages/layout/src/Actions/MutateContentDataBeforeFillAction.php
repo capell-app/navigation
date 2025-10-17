@@ -49,9 +49,7 @@ class MutateContentDataBeforeFillAction
             ->orderBy('id')
             ->first();
 
-        if (! $contentType) {
-            throw new Exception('No default content type found');
-        }
+        throw_unless($contentType, new Exception('No default content type found'));
 
         return $contentType;
     }

@@ -26,9 +26,12 @@ class DefaultLayoutWidgetSchema implements TypeSchemaInterface
     public function make(Schema $schema): array
     {
         return [
-            Checkbox::make('hide_content')
-                ->label(__('capell-admin::form.hide_content'))
-                ->helperText(__('capell-admin::generic.hide_content_info')),
+            Checkbox::make('show_page_title')
+                ->label(__('capell-admin::form.show_page_title'))
+                ->helperText(__('capell-admin::generic.show_page_title_info')),
+            Checkbox::make('show_page_content')
+                ->label(__('capell-admin::form.show_page_content'))
+                ->helperText(__('capell-admin::generic.show_page_content_info')),
             HtmlClassInput::make('html_class'),
         ];
     }

@@ -119,16 +119,16 @@ class WidgetAssetsTable implements TableConfigurator
                 ])
                 ->query(
                     fn (Builder $query, array $data) => $query
-                        ->when(
-                            ! empty($data['asset_type']),
+                        ->unless(
+                            empty($data['asset_type']),
                             fn (Builder $query) => $query->where('asset_type', $data['asset_type'])
                         )
-                        ->when(
-                            ! empty($data['type_id']),
+                        ->unless(
+                            empty($data['type_id']),
                             fn (Builder $query) => $query->where('type_id', $data['type_id'])
                         )
-                        ->when(
-                            ! empty($data['page_id']),
+                        ->unless(
+                            empty($data['page_id']),
                             fn (Builder $query) => $query->where('page_id', $data['page_id'])
                         ),
                 )
@@ -145,7 +145,7 @@ class WidgetAssetsTable implements TableConfigurator
                     if (! empty($data['type_id'])) {
                         $indicators['type_id'] = __(
                             'capell-admin::filter.type',
-                            ['search' => Type::find($data['type_id'])->name]
+                            ['search' => Type::query()->find($data['type_id'])->name]
                         );
                     }
 

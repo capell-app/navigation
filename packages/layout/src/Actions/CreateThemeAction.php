@@ -28,35 +28,32 @@ class CreateThemeAction
         $theme = DB::transaction(function () use ($type): Theme {
             Theme::default()->update(['default' => false]);
 
-            return Theme::updateOrCreate(
-                ['key' => LayoutServiceProvider::$name],
-                [
-                    'name' => CapellCore::getPackage('capell-layout')->shortName,
-                    'type_id' => $type->id,
-                    'status' => true,
-                    'default' => true,
-                    'meta' => [
-                        'build_path' => 'vendor/capell-layout/frontend',
-                        'vendor_assets' => [
-                            'resources/js/capell-frontend.js',
-                        ],
-                        'assets' => [
-                            'resources/css/capell-layout.css',
-                            'resources/js/capell-layout.js',
-                        ],
-                        'rounded_images' => true,
-                        'header' => true,
-                        'header_fixed' => true,
-                        'footer' => true,
-                        'colors' => DefaultColorEnum::getKeyValues(),
-                        'link_color' => 'rgb(91, 204, 228)',
+            return Theme::query()->updateOrCreate(['key' => LayoutServiceProvider::$name], [
+                'name' => CapellCore::getPackage('capell-layout')->shortName,
+                'type_id' => $type->id,
+                'status' => true,
+                'default' => true,
+                'meta' => [
+                    'build_path' => 'vendor/capell-layout/frontend',
+                    'vendor_assets' => [
+                        'resources/js/capell-frontend.js',
                     ],
-                ]
-            );
+                    'assets' => [
+                        'resources/css/capell-layout.css',
+                        'resources/js/capell-layout.js',
+                    ],
+                    'rounded_images' => true,
+                    'header' => true,
+                    'header_fixed' => true,
+                    'footer' => true,
+                    'colors' => DefaultColorEnum::getKeyValues(),
+                    'link_color' => 'rgb(91, 204, 228)',
+                ],
+            ]);
         });
 
-        if (Site::count() === 1) {
-            $site = Site::first();
+        if (Site::query()->count() === 1) {
+            $site = Site::query()->first();
             $site->theme_id = $theme->id;
             $site->save();
         }

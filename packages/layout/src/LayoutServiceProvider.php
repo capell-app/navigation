@@ -52,6 +52,7 @@ use Filament\Facades\Filament;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -94,11 +95,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
         $viewPath = realpath(__DIR__ . '/../resources/views/capell');
 
-        if (in_array($viewPath, ['', '0', false], true) || ! is_dir($viewPath)) {
-            throw new Exception('Theme view path not found: ' . $viewPath);
-        }
+        throw_if(in_array($viewPath, ['', '0', false], true) || ! is_dir($viewPath), new Exception('Theme view path not found: ' . $viewPath));
 
-        app('view')->prependNamespace('capell', $viewPath);
+        app(Factory::class)->prependNamespace('capell', $viewPath);
 
         Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
         Blade::anonymousComponentNamespace('Capell\\Layout\\View\\Components');
@@ -160,9 +159,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             path: __DIR__,
             permissions: $this->getPackagePermissions(),
             demoCommand: true,
-            demoParams: ['author', 'sites'],
             upgradeCommand: true,
-            publishAssetsCommand: true,
+            demoParams: ['author', 'sites'],
         );
 
         Relation::morphMap(
@@ -224,9 +222,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         $dir = realpath(__DIR__ . '/../publishes');
 
-        if (in_array($dir, ['', '0', false], true)) {
-            throw new RuntimeException('Publish directory not found.');
-        }
+        throw_if(in_array($dir, ['', '0', false], true), new RuntimeException('Publish directory not found.'));
 
         return $dir;
     }

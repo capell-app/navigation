@@ -87,7 +87,7 @@ class DemoCreator
                 'actions' => [
                     [
                         'type' => 'page',
-                        'page_id' => Page::where('site_id', $siteId)
+                        'page_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -135,7 +135,7 @@ class DemoCreator
                 'actions' => [
                     [
                         'type' => 'page',
-                        'page_id' => Page::where('site_id', $siteId)
+                        'page_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -180,7 +180,7 @@ class DemoCreator
                 'actions' => [
                     [
                         'type' => 'page',
-                        'page_id' => Page::where('site_id', $siteId)
+                        'page_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -269,9 +269,7 @@ class DemoCreator
             ->limit(3)
             ->pluck('id');
 
-        if ($pages->isEmpty()) {
-            throw new RuntimeException('No pages found to associate with the widget.');
-        }
+        throw_if($pages->isEmpty(), new RuntimeException('No pages found to associate with the widget.'));
 
         $pages->each(fn ($related_page_id): WidgetAsset => $widget->assets()->create([
             'page_id' => $page->id,
@@ -432,7 +430,7 @@ class DemoCreator
         $name = 'Example Menu';
         $key = Str::slug($name);
 
-        $pages = Page::where([
+        $pages = Page::query()->where([
             'site_id' => $site->id,
         ])
             ->whereHas(
@@ -510,14 +508,14 @@ class DemoCreator
         ];
 
         foreach ($features as $feature) {
-            $content = Content::firstOrCreate([
+            $content = Content::query()->firstOrCreate([
                 'name' => $feature['title'],
             ], [
                 'meta' => [
                     'actions' => [
                         [
                             'type' => 'page',
-                            'page_id' => Page::where('site_id', $page->site->id)
+                            'page_id' => Page::query()->where('site_id', $page->site->id)
                                 ->whereHas(
                                     'type',
                                     /** @param Type $query */
@@ -529,7 +527,7 @@ class DemoCreator
                         ],
                         [
                             'type' => 'page',
-                            'page_id' => Page::where('site_id', $page->site->id)
+                            'page_id' => Page::query()->where('site_id', $page->site->id)
                                 ->whereHas(
                                     'type',
                                     /** @param Type $query */
@@ -572,7 +570,7 @@ class DemoCreator
 
     public function createClientLogosWidget(Collection $languages): Widget
     {
-        $widget = Widget::firstOrCreate([
+        $widget = Widget::query()->firstOrCreate([
             'key' => 'client-logos',
         ], [
             'name' => 'Client Logos',
@@ -611,7 +609,7 @@ class DemoCreator
 
     public function createBusinessFeaturesWidget(Site $site): Widget
     {
-        $widget = Widget::firstOrCreate([
+        $widget = Widget::query()->firstOrCreate([
             'key' => 'business-features',
         ], [
             'name' => 'Business Features',
@@ -771,7 +769,7 @@ class DemoCreator
         $site = Site::default()->first();
 
         foreach ($statistics as $statistic) {
-            $content = Content::firstOrCreate([
+            $content = Content::query()->firstOrCreate([
                 'name' => $statistic['title'],
             ], [
                 'meta' => [
@@ -900,7 +898,7 @@ class DemoCreator
             ],
         ];
 
-        $parentPage = Page::updateOrCreate([
+        $parentPage = Page::query()->updateOrCreate([
             'site_id' => $site->id,
             'name' => 'Features',
         ], [
@@ -920,7 +918,7 @@ class DemoCreator
         $contentFeatures = new Collection;
 
         foreach ($features as $feature) {
-            $page = Page::updateOrCreate([
+            $page = Page::query()->updateOrCreate([
                 'site_id' => $site->id,
                 'name' => $feature['title'],
             ], [
@@ -933,7 +931,7 @@ class DemoCreator
 
             $this->createMedia($page);
 
-            $content = Content::updateOrCreate([
+            $content = Content::query()->updateOrCreate([
                 'name' => $feature['title'],
             ], [
                 'meta' => [
@@ -968,7 +966,7 @@ class DemoCreator
 
     private function createTestimonials(Collection $languages): Collection
     {
-        $testimonialContent = Content::firstOrCreate([
+        $testimonialContent = Content::query()->firstOrCreate([
             'name' => 'Testimonials',
         ], [
             'meta' => [
@@ -998,7 +996,7 @@ class DemoCreator
 
         $testimonialsCollection = new Collection;
 
-        $testimonialType = Type::updateOrCreate([
+        $testimonialType = Type::query()->updateOrCreate([
             'key' => 'testimonial',
             'type' => LayoutTypeEnum::Content,
         ], [
@@ -1010,7 +1008,7 @@ class DemoCreator
         ]);
 
         foreach ($testimonials as $testimonial) {
-            $content = Content::firstOrCreate([
+            $content = Content::query()->firstOrCreate([
                 'name' => $testimonial['name'],
                 'parent_id' => $testimonialContent->id,
                 'type_id' => $testimonialType->id,
@@ -1024,7 +1022,7 @@ class DemoCreator
 
             $content->translations()->createMany(
                 $languages
-                    ->filter(fn (Language $language) => ! $content->translations->contains('language_id', $language->id))
+                    ->reject(fn (Language $language): bool => (bool) $content->translations->contains('language_id', $language->id))
                     ->map(fn (Language $language): array => [
                         'language_id' => $language->id,
                         'title' => $testimonial['name'],
@@ -1124,7 +1122,7 @@ class DemoCreator
             ],
         ];
 
-        $teamContent = Content::firstOrNew([
+        $teamContent = Content::query()->firstOrNew([
             'name' => 'Team Members',
         ]);
 
@@ -1137,7 +1135,7 @@ class DemoCreator
         $teamMembersCollection = new Collection;
 
         foreach ($teamMembers as $member) {
-            $content = Content::firstOrCreate([
+            $content = Content::query()->firstOrCreate([
                 'name' => $member['name'],
                 'parent_id' => $teamContent->id,
             ], [
@@ -1150,7 +1148,7 @@ class DemoCreator
 
             $content->translations()->createMany(
                 $languages
-                    ->filter(fn (Language $language): bool => ! $content->translations->contains('language_id', $language->id))
+                    ->reject(fn (Language $language): bool => (bool) $content->translations->contains('language_id', $language->id))
                     ->map(fn (Language $language): array => [
                         'language_id' => $language->id,
                         'title' => $member['name'],

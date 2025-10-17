@@ -351,7 +351,7 @@ class WidgetCreator
                 'margin' => ['md'],
             ],
             'admin' => [
-                'icon' => Heroicon::OutlinedTag->value,
+                'icon' => 'heroicon-' . Heroicon::OutlinedTag->value,
             ],
         ]);
 
@@ -359,7 +359,7 @@ class WidgetCreator
             $widget->translations()->firstOrCreate([
                 'language_id' => $language->id,
             ], [
-                'title' => __('capell-admin::generic.tags'),
+                'content' => 'Pages are organized by tags. Click any tag to see all related pages grouped by topic, so you can quickly find what you’re looking for.',
             ]);
         });
     }

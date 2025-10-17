@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Services\Creator;
 
+use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Translation;
-use Capell\Frontend\Facades\CapellFrontend;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -23,7 +23,7 @@ class LayoutLoader
 
         $fromCache = true;
 
-        $layout = CapellFrontend::cache($key, function () use ($id, &$fromCache): ?Layout {
+        $layout = CapellCore::rememberCache($key, function () use ($id, &$fromCache): ?Layout {
             $fromCache = false;
 
             // @phpstan-ignore-next-line
@@ -61,7 +61,7 @@ class LayoutLoader
 
         $fromCache = true;
 
-        $widget = CapellFrontend::cache(
+        $widget = CapellCore::rememberCache(
             $key,
             function () use ($layout, $widgetKey, $language, $page, $containerKey, $occurrence, &$fromCache): ?Widget {
                 $fromCache = false;

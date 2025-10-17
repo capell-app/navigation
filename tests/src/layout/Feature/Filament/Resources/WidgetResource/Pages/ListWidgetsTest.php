@@ -76,9 +76,9 @@ test('can replicate widget', function (): void {
         ->assertHasNoFormErrors()
         ->assertCountTableRecords(2);
 
-    expect(Widget::count())->toBe(2);
+    expect(Widget::query()->count())->toBe(2);
 
-    expect(Widget::firstWhere('name', $name))
+    expect(Widget::query()->firstWhere('name', $name))
         ->toBeInstanceOf(Widget::class)
         ->name->toBe($name);
 });

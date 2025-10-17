@@ -15,10 +15,7 @@ class ContentObserver
     {
         if (! $content->type_id) {
             $content->type_id = Type::query()->where('type', LayoutTypeEnum::Content)->default()->value('id');
-
-            if (! $content->type_id) {
-                throw new InvalidArgumentException('Unable to create content without a type.');
-            }
+            throw_unless($content->type_id, new InvalidArgumentException('Unable to create content without a type.'));
         }
     }
 }

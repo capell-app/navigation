@@ -24,10 +24,7 @@ class WidgetObserver
 
         if (! $widget->type_id) {
             $widget->type_id = Type::query()->where('type', LayoutTypeEnum::Widget)->default()->value('id');
-
-            if (! $widget->type_id) {
-                throw new InvalidArgumentException('Unable to create widget without a type.');
-            }
+            throw_unless($widget->type_id, new InvalidArgumentException('Unable to create widget without a type.'));
         }
     }
 }

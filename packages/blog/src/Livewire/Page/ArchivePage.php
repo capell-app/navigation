@@ -77,25 +77,23 @@ class ArchivePage extends AbstractPage
             [$this->year, $this->month] = $this->getArchiveDateFromUrl();
         }
 
-        if (($this->year === null || $this->year === 0) && ($this->month === null || $this->month === 0)) {
-            abort(404);
-        }
+        abort_if(($this->year === null || $this->year === 0) && ($this->month === null || $this->month === 0), 404);
 
-        $pageRecord = FrontendLoader::getPage();
+        $page = FrontendLoader::getPage();
 
         $paginationKey = config('capell-admin.page_query', 'pageQuery');
 
         $this->results = PageLoader::getPages(
             site: FrontendLoader::getSite(),
             language: FrontendLoader::getLanguage(),
-            limit: $pageRecord->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
+            limit: $page->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
             paginationPage: $this->getPage($paginationKey),
-            typeKey: $pageRecord->type->meta['page_group'] ?? BlogResourceEnum::Article->value,
-            withImage: $pageRecord->type->meta['with_image'] ?? false,
-            withPagination: $pageRecord->type->meta['pagination'] ?? true,
-            withParent: $pageRecord->type->meta['with_parent'] ?? false,
-            withDate: $pageRecord->type->meta['with_date'] ?? false,
-            withTags: $pageRecord->type->meta['with_tags'] ?? false,
+            typeKey: $page->type->meta['page_group'] ?? BlogResourceEnum::Article->value,
+            withImage: $page->type->meta['with_image'] ?? false,
+            withPagination: $page->type->meta['pagination'] ?? true,
+            withParent: $page->type->meta['with_parent'] ?? false,
+            withDate: $page->type->meta['with_date'] ?? false,
+            withTags: $page->type->meta['with_tags'] ?? false,
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('year-%s-month-%s', $this->year, $this->month),
             modifyQuery: function (Builder $query) {

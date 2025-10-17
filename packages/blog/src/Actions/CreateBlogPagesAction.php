@@ -25,12 +25,12 @@ class CreateBlogPagesAction
 
     public function handle(Site $site): void
     {
-        $archivesLayout = Layout::firstWhere('key', 'archives');
-        $resultsLayout = Layout::firstWhere('key', 'results');
+        $archivesLayout = Layout::query()->firstWhere('key', 'archives');
+        $resultsLayout = Layout::query()->firstWhere('key', 'results');
 
-        $archivePageType = Type::where('key', 'archive')->pageType()->first();
-        $blogPageType = Type::where('key', 'blog')->pageType()->first();
-        $systemPageType = Type::where('key', 'system')->pageType()->first();
+        $archivePageType = Type::query()->where('key', 'archive')->pageType()->first();
+        $blogPageType = Type::query()->where('key', 'blog')->pageType()->first();
+        $systemPageType = Type::query()->where('key', 'system')->pageType()->first();
 
         $blogPage = BlogCreator::createBlogPage($site, $blogPageType, $resultsLayout, $site->languages);
 
@@ -56,7 +56,7 @@ class CreateBlogPagesAction
             return;
         }
 
-        $site = Site::find($siteId);
+        $site = Site::query()->find($siteId);
 
         if (! $site) {
             $command->error('Site not found with ID: ' . $siteId);

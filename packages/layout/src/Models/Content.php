@@ -30,7 +30,6 @@ use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\ContentFactory;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Observers\ContentObserver;
-use Eloquent;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -77,7 +76,7 @@ use Wildside\Userstamps\Userstamps;
  * @property-read \Kalnoy\Nestedset\Collection<int, Page> $pages
  * @property-read int|null $pages_count
  * @property-read Content|null $parent
- * @property-read Model|Eloquent $publisher
+ * @property-read Model $publisher
  * @property-read \Kalnoy\Nestedset\Collection<int, Content> $revisions
  * @property-read int|null $revisions_count
  * @property-write mixed $parent_id
@@ -166,7 +165,8 @@ use Wildside\Userstamps\Userstamps;
  * @property-read Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  *
- * @mixin Eloquent
+ * @mixin Model
+ * @mixin \Eloquent
  */
 #[ObservedBy(ContentObserver::class)]
 class Content extends Model implements Draftable, HasMedia, PageCacheable

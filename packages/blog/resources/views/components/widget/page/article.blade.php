@@ -14,7 +14,7 @@ declare(strict_types=1);
     'containerWidth' => null,
     'loop',
     'widget',
-    'pageRecord' => FrontendLoader::getPage(),
+    'page' => FrontendLoader::getPage(),
     'headingSize' => $widget->meta['heading_size'] ?? 'h1',
     'withAuthor' => $widget->meta['with_author'] ?? false,
     'withDate' => $widget->meta['with_date'] ?? false,
@@ -33,9 +33,9 @@ declare(strict_types=1);
     <div class="grid">
         <x-capell::content
             :$containerKey
-            :image="$pageRecord->image"
+            :image="$page->image"
             :heading-size="$headingSize"
-            :content="$pageRecord->translation->content"
+            :content="$page->translation->content"
             :presenter="$widget->type->meta['content_presenter'] ?? null"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         >
@@ -43,13 +43,13 @@ declare(strict_types=1);
                 <x-capell::page.title
                     :$containerKey
                     :heading-size="$headingSize"
-                    :title="$pageRecord->translation->title"
+                    :title="$page->translation->title"
                 />
 
                 @if ($withDate)
                     <x-capell::page.published_date
                         class="mt-4 whitespace-nowrap"
-                        :date="$pageRecord->publish_from ?: $pageRecord->created_at"
+                        :date="$page->publish_from ?: $page->created_at"
                     />
                 @endif
             </div>

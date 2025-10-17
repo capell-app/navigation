@@ -12,15 +12,15 @@ class SiblingsWidget extends AbstractPagesWidget
 {
     protected function mountWidget(): void
     {
-        $pageRecord = FrontendLoader::getPage();
+        $page = FrontendLoader::getPage();
 
-        if (! empty($pageRecord->type->meta['hidden'])) {
+        if (! empty($page->type->meta['hidden'])) {
             $this->skipRender = true;
 
             return;
         }
 
-        if (! $pageRecord->parent_id) {
+        if (! $page->parent_id) {
             $this->skipRender = true;
 
             return;
@@ -29,7 +29,7 @@ class SiblingsWidget extends AbstractPagesWidget
         $this->pages = PageLoader::getPages(
             site: FrontendLoader::getSite(),
             language: FrontendLoader::getLanguage(),
-            page: $pageRecord,
+            page: $page,
             type: 'siblings',
             ordering: 'alphabetical',
             withChildrenCount: $this->widget->meta['with_children_count'] ?? false,
@@ -37,7 +37,7 @@ class SiblingsWidget extends AbstractPagesWidget
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
             withTags: $this->widget->meta['with_tags'] ?? false,
-            modifyQuery: fn (BuilderContract $query) => $query->whereKeyNot($pageRecord->id)
+            modifyQuery: fn (BuilderContract $query) => $query->whereKeyNot($page->id)
         );
 
         if ($this->pages->isEmpty()) {

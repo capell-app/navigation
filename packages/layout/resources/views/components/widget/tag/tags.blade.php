@@ -9,13 +9,15 @@ declare(strict_types=1);
 
     $language = FrontendLoader::getLanguage();
     $site = FrontendLoader::getSite();
+    $page = FrontendLoader::getPage();
 @endphp
 
 @props([
     'container',
     'containerKey',
     'containerWidth' => null,
-    'hideContent' => $widgetData['meta']['hide_content'] ?? false,
+    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
+    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'loop',
     'widget',
 ])
@@ -28,14 +30,16 @@ declare(strict_types=1);
     :index="$loop->index"
     :$widget
 >
-    @if ($widget->translation && ! $hideContent)
+    @if (($widget->translation && ($widget->translation->title || $widget->translation->content))
+         || ($showPageContent && $page->translation->title)
+         || ($showPageTitle && $page->translation->content))
         <x-capell::content
             class="mb-4"
             :compact="true"
-            :content="$widget->translation->content"
+            :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
             :presenter="$widget->type->meta['content_presenter'] ?? null"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
-            :title="$widget->translation->title"
+            :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
         />
     @endif
 
@@ -44,16 +48,16 @@ declare(strict_types=1);
             {{ __('No tags found.') }}
         </x-capell::no-results>
     @else
-        <ul class="divide-y divide-gray-100 dark:divide-gray-600">
+        <ul class="@sm:grid-cols-2 @md:grid-cols-3 grid gap-x-6 gap-y-2">
             @foreach ($tags as $tag)
                 @php($url = $tagPage->pageUrl->full_url . '/' . $tag->getTranslation('slug', $language->code))
-                <x-capell::list.list-item
+                <x-capell::badge
                     :$url
                     :count="$tag->pages_count"
                     size="sm"
                 >
                     {{ $tag->getTranslation('name', $language->code) }}
-                </x-capell::list.list-item>
+                </x-capell::badge>
             @endforeach
         </ul>
     @endif

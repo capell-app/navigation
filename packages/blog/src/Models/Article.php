@@ -16,7 +16,6 @@ use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Tag;
 use Capell\Core\Models\Type;
-use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -53,7 +52,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $page_urls_count
  * @property-read Article|null $parent
  * @property-read Article|null $publishedPage
- * @property-read Model|Eloquent $publisher
+ * @property-read Model $publisher
  * @property-read \Kalnoy\Nestedset\Collection<int, Article> $revisions
  * @property-read int|null $revisions_count
  * @property-write mixed $parent_id
@@ -153,7 +152,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Collection|Page[] $related
  * @property-read int|null $related_count
  *
- * @mixin Eloquent
+ * @mixin Model
+ * @mixin \Eloquent
  */
 class Article extends Page
 {

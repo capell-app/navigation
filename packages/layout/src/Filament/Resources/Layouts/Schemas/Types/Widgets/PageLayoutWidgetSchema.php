@@ -14,8 +14,8 @@ class PageLayoutWidgetSchema extends DefaultLayoutWidgetSchema
     public function make(Schema $schema): array
     {
         return [
-            Checkbox::make('hide_title')
-                ->label(__('capell-admin::form.hide_title')),
+            Checkbox::make('show_page_title')
+                ->label(__('capell-admin::form.show_page_title')),
         ];
     }
 }

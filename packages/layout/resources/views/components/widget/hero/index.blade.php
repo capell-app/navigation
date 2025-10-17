@@ -62,13 +62,13 @@ declare(strict_types=1);
     >
         @if ($widget->assets->isEmpty())
             @php
-                $content = $pageRecord->translation->meta['hero'] ?? $widget->translation->content;
+                $content = $page->translation->meta['hero'] ?? null;
             @endphp
 
             <x-capell-layout::hero.slide
                 :background-image="$widget->image ?: $backgroundImage"
                 :background-color="$widget->meta['background_color'] ?? ($theme['meta']['background_color'] ?? '')"
-                :background-size="$widget->meta['background_size'] ?? 'cover'"
+                @lgeurvdUVvM0mRbFpLVUn3fodnPzkAOR6gndlGqgSrhghOosHDs5K0Xr10RuB
                 :background-position="$widget->meta['background_position'] ?? 'center'"
                 :background-attachment="$widget->meta['background_attachment'] ?? 'scroll'"
                 :background-repeat="$widget->meta['background_repeat'] ?? 'no-repeat'"
@@ -82,13 +82,13 @@ declare(strict_types=1);
                     <x-capell-layout::hero.content
                         :title="
                             $widget->translation
-                            ? ReplacePageDataAction::run($widget->translation->title, $pageRecordParams)
+                            ? ReplacePageDataAction::run($widget->translation->title, $pageParams)
                             : null
                         "
                         :color-scheme="$colorScheme"
                         size="lg"
                     >
-                        {!! ReplacePageDataAction::run($content, $pageRecordParams) !!}
+                        {!! ReplacePageDataAction::run($content, $pageParams) !!}
                     </x-capell-layout::hero.content>
                 </div>
             </x-capell-layout::hero.slide>

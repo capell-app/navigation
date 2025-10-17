@@ -41,7 +41,7 @@ class ActionsRepeater extends Repeater
                 }
 
                 return match ($state['type']) {
-                    'page' => Page::find($state['page_id'], ['name'])?->name,
+                    'page' => Page::query()->find($state['page_id'], ['name'])?->name,
                     'url' => $state['url'],
                     default => null
                 } ?? __('capell-admin::generic.action');

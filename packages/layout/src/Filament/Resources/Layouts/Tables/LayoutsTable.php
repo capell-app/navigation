@@ -79,8 +79,8 @@ class LayoutsTable extends \Capell\Admin\Filament\Resources\Layouts\Tables\Layou
                     return $indicators;
                 })
                 ->modifyQueryUsing(
-                    fn (Builder $query, $state) => $query->when(
-                        ! empty($state['value']),
+                    fn (Builder $query, $state) => $query->unless(
+                        empty($state['value']),
                         fn (Builder $query) => $query->whereJsonContains('widgets', $state['value'])
                     )
                 ),

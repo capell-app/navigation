@@ -26,7 +26,8 @@ declare(strict_types=1);
     'container',
     'containerKey',
     'containerWidth' => null,
-    'hideContent' => $widgetData['meta']['hide_content'] ?? false,
+    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
+    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'loop',
     'rounded' => $theme->meta['rounded_images'] ?? false,
     'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
@@ -40,14 +41,16 @@ declare(strict_types=1);
     :index="$loop->index"
     :$widget
 >
-    @if ($widget->translation && ! $hideContent)
+    @if (($widget->translation && ($widget->translation->title || $widget->translation->content))
+         || ($showPageContent && $page->translation->title)
+         || ($showPageTitle && $page->translation->content))
         <div class="container mb-8">
             <x-capell::content
                 :compact="true"
-                :content="$widget->translation->content"
+                :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
                 :color-scheme="$colorScheme"
                 :presenter="$widget->type->meta['content_presenter'] ?? null"
-                :title="$widget->translation->title"
+                :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
                 :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             />
         </div>

@@ -16,7 +16,8 @@ declare(strict_types=1);
     'container',
     'containerKey',
     'containerWidth' => null,
-    'hideContent' => $widgetData['meta']['hide_content'] ?? false,
+    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
+    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'loop',
     'results',
     'archiveDate' => $pageParams['archive_date'] ?? null,
@@ -30,13 +31,15 @@ declare(strict_types=1);
     :index="$loop->index"
     :$widget
 >
-    @if ($widget->translation && ! $hideContent)
+    @if (($widget->translation && ($widget->translation->title || $widget->translation->content))
+         || ($showPageContent && $page->translation->title)
+         || ($showPageTitle && $page->translation->content))
         <x-capell::content
             class="mb-4"
             :compact="true"
-            :content="$widget->translation->content"
+            :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
             :presenter="$widget->type->meta['content_presenter'] ?? null"
-            :title="$widget->translation->title"
+            :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
         />
     @endif
@@ -44,7 +47,9 @@ declare(strict_types=1);
     @if ($archives?->isEmpty())
         <x-capell::no-results />
     @else
-        <ul class="divide-y divide-gray-100 dark:divide-gray-600">
+        <ul
+            class="@md:grid-cols-2 grid gap-x-6 divide-y divide-gray-100 dark:divide-gray-600"
+        >
             @foreach ($archives as $archive)
                 @php
                     $url = $archivePage->pageUrl->full_url . '/' . $archive->year . '-' . $archive->month;
@@ -56,6 +61,7 @@ declare(strict_types=1);
                     :count="$archive->total"
                     :active="$active"
                     size="sm"
+                    class="px-2"
                 >
                     {{ Carbon\Carbon::create()->day(1)->month($archive->month)->year($archive->year)->format('F Y') }}
                 </x-capell::list.list-item>

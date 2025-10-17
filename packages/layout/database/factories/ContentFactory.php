@@ -34,7 +34,7 @@ class ContentFactory extends Factory
             'site_id' => null,
             'meta' => fn (array $attributes): array => [
                 'label' => fake()->optional()->sentence(),
-                'page_id' => fake()->optional() && $attributes['site_id'] ? Page::where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
+                'page_id' => fake()->optional() && $attributes['site_id'] ? Page::query()->where('site_id', $attributes['site_id'])->inRandomOrder()->first()?->getKey() : null,
             ],
             'order' => fake()->numberBetween(1, 100),
             'publish_from' => fake()->dateTimeBetween('-1 year', '-6 month'),

@@ -18,9 +18,9 @@ class RelatedWidget extends AbstractPagesWidget
     {
         $limit = $this->widget->meta['limit'] ?? config('capell-frontend.pagination_limit', 12);
 
-        $pageRecord = FrontendLoader::getPage();
+        $page = FrontendLoader::getPage();
 
-        $tags = TagLoader::getPageTags($pageRecord);
+        $tags = TagLoader::getPageTags($page);
 
         $tagIds = $tags->pluck('id')->toArray();
 
@@ -28,7 +28,7 @@ class RelatedWidget extends AbstractPagesWidget
             site: FrontendLoader::getSite(),
             language: FrontendLoader::getLanguage(),
             limit: $limit,
-            withChildrenCount: $pageRecord->type->meta['with_children_count'] ?? true,
+            withChildrenCount: $page->type->meta['with_children_count'] ?? true,
             withImage: $this->widget->meta['with_image'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
@@ -37,10 +37,10 @@ class RelatedWidget extends AbstractPagesWidget
              * @param  Builder<Page>  $query
              */
             modifyQuery: fn (Builder $query) => $query
-                ->where('pages.id', '!=', $pageRecord->id)
+                ->where('pages.id', '!=', $page->id)
                 ->when(
-                    $this->widget->meta['exclude_parent'] ?? false && $pageRecord->parent_id,
-                    fn (BuilderContract $query) => $query->where('pages.id', '!=', $pageRecord->parent_id)
+                    $this->widget->meta['exclude_parent'] ?? false && $page->parent_id,
+                    fn (BuilderContract $query) => $query->where('pages.id', '!=', $page->parent_id)
                 )
                 ->whereHas(
                     'type',
