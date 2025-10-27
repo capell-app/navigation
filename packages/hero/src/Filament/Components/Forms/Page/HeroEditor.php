@@ -9,12 +9,10 @@ use Capell\Admin\Filament\Components\Forms\ContentEditor;
 use Capell\Admin\Filament\Components\Forms\Editor\ContentBuilder;
 use Capell\Admin\Filament\Components\Forms\Editor\RichEditor;
 use Capell\Admin\Filament\Components\Forms\Editor\TinyEditor;
-use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
-use Capell\Layout\Models\Widget;
+use Capell\Layout\Enums\LayoutModelEnum;
 use Filament\Schemas\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -27,34 +25,13 @@ class HeroEditor extends Group
         $this->statePath('meta')
             ->visible(
                 function (null|PageTranslation|Page $record): bool {
-                    $layoutId = $this->getRootContainer()->getRawState()['layout_id'] ?? null;
-
-                    if ($record !== null) {
-                        $layoutId = $record instanceof PageTranslation
-                            ? $record->page->layout_id
-                            : $record->layout_id;
-                    }
-
-                    if (! $layoutId) {
+                    if ($record === null) {
                         return false;
                     }
 
-                    /** @var Layout $layout */
-                    $layout = $this->getLayout((int) $layoutId);
+                    $page = $record instanceof Page ? $record : $record->page;
 
-                    if (! in_array('hero', $layout->widgets, true)) {
-                        return false;
-                    }
-
-                    $heroWidget = Widget::query()->firstWhere('key', 'hero');
-
-                    return ! $heroWidget->assets()
-                        ->where(
-                            fn (Builder $query): Builder => $query
-                                ->where('page_id', $record?->id ?? 0)
-                                ->orWhereNull('page_id')
-                        )
-                        ->exists();
+                    return ! $this->hasPageWidgetHeroAssets($page);
                 }
             )
             ->schema([
@@ -69,8 +46,13 @@ class HeroEditor extends Group
             ]);
     }
 
-    protected function getLayout(int $layoutId): ?Layout
+    protected function hasPageWidgetHeroAssets(Page $page): bool
     {
-        return once(fn (): ?Layout => CapellCore::getModel(ModelEnum::Layout)::find($layoutId));
+        return cache()->driver('array')->rememberForever(
+            sprintf('page-%d-has-hero-widget-assets', $page->id),
+            fn (): bool => CapellCore::getModel(LayoutModelEnum::WidgetAsset)::where('page_id', $page->id)
+                ->whereHas('widget', fn (Builder $query): Builder => $query->where('key', 'hero'))
+                ->exists()
+        );
     }
 }

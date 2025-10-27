@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\Models;
 
 use ArrayAccess;
+use Capell\Blog\Models\Concerns\HasTags;
 use Capell\Core\Database\Factories\PageFactory;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Core\Models\AssetRelation;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\QueryBuilder;
+use Override;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -154,14 +156,18 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * @mixin Model
  * @mixin Model
+ *
+ * @property-read string|null $title
+ *
  * @mixin Model
- * @mixin Model
- * @mixin \Eloquent
  */
 class Article extends Page
 {
+    use HasTags;
+
     protected $table = 'pages';
 
+    #[Override]
     public function getForeignKey()
     {
         return 'page_' . $this->getKeyName();

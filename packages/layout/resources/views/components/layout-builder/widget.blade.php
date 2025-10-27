@@ -44,7 +44,7 @@ declare(strict_types=1);
         'widgetIndex' => $widgetIndex,
     ]);
 
-    $convertPageAssetsAction = ($this->convertPageAssetsAction)([
+    $togglePageAssetsAction = ($this->togglePageAssetsAction)([
         'containerKey' => $containerKey,
         'widgetIndex' => $widgetIndex,
     ]);
@@ -107,9 +107,8 @@ declare(strict_types=1);
         <div
             class="group/widget layout-builder-widget-heading !lg:px-4 flex flex-1 items-center gap-4 px-4 py-3 group-[&:last-child]:rounded-b-lg"
             :class="{
-                '!rounded-b-none' : ! isCollapsed,
+                '!rounded-b-none pb-2' : ! isCollapsed,
                 {{ $assetTypes ? "'cursor-pointer' : ! isReordering," : '' }}
-                {{ $assetTypes ? "'hover:bg-gray-50 dark:hover:bg-white/5' : ! isReordering && isCollapsed," : '' }}
             }"
             @if ($assetTypes)
                 x-on:click.self="! isReordering ? toggleCollapse() : null"
@@ -202,7 +201,7 @@ declare(strict_types=1);
                             <x-filament::link
                                 :iconSize="IconSize::Small"
                                 :weight="FontWeight::Medium"
-                                :size="Size::Small"
+                                :size="Size::ExtraSmall"
                                 color="primary"
                                 icon="heroicon-c-plus-circle"
                                 :outlined="true"
@@ -217,7 +216,7 @@ declare(strict_types=1);
                                     color="gray"
                                     :icon="CapellCore::getAsset($assetType)->getIcon()"
                                 >
-                                    {{ __('capell-admin::button.add_asset_type', ['type' => CapellCore::getAsset($assetType)->getLabel()]) }}
+                                    {{ CapellCore::getAsset($assetType)->getLabel() }}
                                 </x-filament::dropdown.header>
                                 {{ ($this->selectAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
                                 {{ ($this->addAssetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex, 'type' => $assetType, 'types' => $assetTypes]) }}
@@ -249,8 +248,8 @@ declare(strict_types=1);
                                 {{ $editContainerWidgetAction }}
                             @endif
 
-                            @if ($convertPageAssetsAction?->isVisible())
-                                {{ $convertPageAssetsAction }}
+                            @if ($togglePageAssetsAction?->isVisible())
+                                {{ $togglePageAssetsAction }}
                             @endif
 
                             {{ ($this->duplicateWidgetAction)(['containerKey' => $containerKey, 'widgetIndex' => $widgetIndex]) }}

@@ -34,7 +34,7 @@ declare(strict_types=1);
         >
             <div class="flex-grow">
                 <div class="text-lg font-semibold">
-                    {{ __('capell-admin::heading.layout_record', ['name' => $this->layout->name]) }}
+                    {{ __('capell-admin::heading.layout_record', ['name' => $this->layoutRecord->name]) }}
                 </div>
 
                 <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
@@ -42,10 +42,10 @@ declare(strict_types=1);
 
                     <span class="text-gray-800 dark:text-gray-300">
                         {!!
-                            trans_choice('capell-admin::message.layout_count_on_pages', $this->layout->pages_count, [
-                                'count' => $this->layout->pages_count,
+                            trans_choice('capell-admin::message.layout_count_on_pages', $this->layoutRecord->pages_count, [
+                                'count' => $this->layoutRecord->pages_count,
                                 'url' => CapellAdmin::getResource(ResourceEnum::Page)::getUrl('index', [
-                                    'tableFilters' => ['layout_id' => ['value' => $this->layout->id]],
+                                    'tableFilters' => ['layout_id' => ['value' => $this->layoutRecord->id]],
                                 ]),
                             ])
                         !!}

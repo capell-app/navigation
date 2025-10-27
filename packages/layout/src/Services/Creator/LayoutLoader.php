@@ -87,33 +87,8 @@ class LayoutLoader
 
                 $resourceRelationsCallback = function (MorphTo $morphTo) use ($language): void {
                     $morphTo->morphWith([
-                        Content::class => [
-                            'image',
-                            'media',
-                            'linkedPage' => fn (BuilderContract $query) => $query->with([
-                                'translation' => fn (BuilderContract $query) => $query->with('language')->where('language_id', $language->id),
-                                'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')->where('language_id', $language->id),
-                            ]),
-                            'translation' => fn (BuilderContract $query) => $query->with('language')->where('language_id', $language->id),
-                            'related' => fn (BuilderContract $query) => $query->with([
-                                'image',
-                                'page' => fn (BuilderContract $query) => $query->with([
-                                    'translation' => fn (BuilderContract $query) => $query->with('language')->where('language_id', $language->id),
-                                    'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')->where('language_id', $language->id),
-                                    'site',
-                                ]),
-                            ])
-                                ->withWhereHas('translation', fn (BuilderContract $query) => $query->with('language')),
-                            'tags',
-                            'type',
-                        ],
-                        Page::class => [
-                            'image',
-                            'translation' => fn (BuilderContract $query) => $query->with('language')->where('language_id', $language->id),
-                            'type',
-                            'tags',
-                            'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')->where('language_id', $language->id),
-                        ],
+                        Content::class => Content::getMorphRelations($language),
+                        Page::class => Page::getMorphRelations($language),
                     ]);
                 };
 

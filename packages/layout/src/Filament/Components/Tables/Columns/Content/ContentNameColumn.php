@@ -8,6 +8,7 @@ use Awcodes\BadgeableColumn\Components\Badge;
 use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
 use Capell\Layout\Models\Content;
 use Filament\Support\Enums\FontWeight;
+use Illuminate\Support\HtmlString;
 
 class ContentNameColumn extends BadgeableColumn
 {
@@ -19,14 +20,14 @@ class ContentNameColumn extends BadgeableColumn
             ->sortable()
             ->wrap()
             ->weight(FontWeight::Medium)
-            ->description(function (Content $record): ?string {
+            ->description(function (Content $record): ?HtmlString {
                 $ancestors = $record->ancestors()->get();
 
                 if ($ancestors->isEmpty()) {
                     return null;
                 }
 
-                return '» ' . $ancestors->pluck('name')->join(' » ');
+                return new HtmlString($ancestors->pluck('name')->join(' &raquo; '));
             })
             ->suffixBadges([
                 Badge::make('children')

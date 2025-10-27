@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Layout\View\Components\Widget\Pages;
 
+use Capell\Blog\Services\Loader\TagLoader;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Services\Loader\PageLoader;
-use Capell\Frontend\Services\Loader\TagLoader;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;

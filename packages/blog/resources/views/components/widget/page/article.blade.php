@@ -18,7 +18,6 @@ declare(strict_types=1);
     'headingSize' => $widget->meta['heading_size'] ?? 'h1',
     'withAuthor' => $widget->meta['with_author'] ?? false,
     'withDate' => $widget->meta['with_date'] ?? false,
-    'withTags' => $widget->meta['with_tags'] ?? false,
     'withNextPrev' => $widget->meta['with_next_prev'] ?? false,
 ])
 <x-capell-layout::widget.wrapper
@@ -56,13 +55,13 @@ declare(strict_types=1);
         </x-capell::content>
     </div>
 
-    @if (($withAuthor && $author) || ($withTags && $tags->isNotEmpty()))
+    @if (($withAuthor && $author) || $tags->isNotEmpty())
         <div class="mb-4 flex items-end justify-between">
             @if ($withAuthor && $author)
                 <x-capell::page.author :$author />
             @endif
 
-            @if ($withTags && $tags->isNotEmpty())
+            @if ($tags->isNotEmpty())
                 <div
                     class="flex flex-col items-center gap-x-10 gap-y-6 md:flex-row md:justify-between lg:flex-row-reverse"
                 >

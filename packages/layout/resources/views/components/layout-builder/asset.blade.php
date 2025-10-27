@@ -20,12 +20,15 @@ declare(strict_types=1);
 @php
     use Capell\Admin\Facades\CapellAdmin;
     use Capell\Core\Actions\GetResourceFromTypeAction;
+    use Capell\Core\Enums\ModelEnum;
+    use Capell\Core\Facades\CapellCore;
     use Capell\Core\Models\Page;
     use Capell\Layout\Models\Content;
     use Filament\Actions\Action;
     use Filament\Support\Contracts\ScalableIcon;
     use Filament\Support\Enums\IconSize;
     use Filament\Support\Enums\Size;
+    use Illuminate\Database\Eloquent\Model;
     use Illuminate\Support\Str;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -37,7 +40,12 @@ declare(strict_types=1);
         'type' => $widgetAsset->asset_type,
     ]);
 
+    /** @var Model $asset */
     $asset = $widgetAsset->asset;
+
+    if (! $asset?->getKey()) {
+        throw new \RuntimeException("Asset of type [{$widgetAsset->asset_type}] with ID [{$widgetAsset->asset_id}] not found.");
+    }
 
     $assetKey = "{$widgetAsset->asset_type}.{$widgetAsset->asset_id}";
 
@@ -66,13 +74,6 @@ declare(strict_types=1);
 
     $label = '';
 
-    if ($asset->ancestors?->isNotEmpty()) {
-        $label .= $asset->ancestors->pluck('name')
-            ->map(fn ($item) => Str::limit($item, 30))
-            ->implode(' » ')
-            . ' » ';
-    }
-
     if (! $name) {
         $name = $asset->name;
     }
@@ -80,13 +81,27 @@ declare(strict_types=1);
     $label .= $name;
 
     if (! $description) {
-        $description = match (get_class($asset)) {
+        $description = '';
+
+        if ($asset->ancestors?->isNotEmpty()) {
+            $description .= $asset->ancestors->pluck('name')
+                ->map(fn ($item) => Str::limit($item, 30))
+                ->implode(' &raquo; ');
+        }
+
+        $description .= match (get_class($asset)) {
             Page::class, Content::class => $asset->translation?->title &&
             $asset->translation->title !== $asset->name
                 ? $asset->translation->title
                 : null,
             default => null,
         };
+    }
+
+    if (CapellCore::getModel(ModelEnum::Site)::totalSites() > 1) {
+        if ($asset->hasAttribute('site_id') && $asset->site_id) {
+            $description = $asset->site?->name . ($description ? ' - ' . $description : '');
+        }
     }
 
     $icon = $editWidgetAssetAction->getIcon();
@@ -128,15 +143,16 @@ declare(strict_types=1);
                 :wire:loading.delay="config('filament.livewire_loading_delay', 'default')"
             />
 
-            <div
-                class="cursor-pointer transition"
+            <button
+                type="button"
+                class="hover:text-primary-600 dark:hover:text-primary-400 focus:text-primary-600 dark:focus:text-primary-400 cursor-pointer text-gray-400 transition dark:text-gray-500"
                 wire:loading.class="pointer-events-none opacity-40"
                 x-sort:handle
                 x-show="isWidgetReorderingResources('{{ $containerKey }}', {{ $widgetIndex }})"
                 x-cloak
             >
-                @svg('heroicon-o-arrows-up-down', 'h-5 w-5 text-gray-400 dark:text-gray-500')
-            </div>
+                @svg('heroicon-o-arrows-up-down', 'h-5 w-5')
+            </button>
         </label>
 
         <div
@@ -145,22 +161,24 @@ declare(strict_types=1);
                 'lg:!grid lg:grid-cols-4 lg:gap-4' => $image,
             ])
         >
-            <div @class(['py-4', 'lg:col-span-3' => $image])>
+            <div @class(['py-2.5', 'lg:col-span-3' => $image])>
                 <div
                     class="group-hover/asset:text-primary-600 dark:group-hover/asset:text-primary-400 line-clamp-1 text-sm text-gray-800 dark:text-gray-100"
-                    x-tooltip.raw="{{ $editWidgetAssetAction->getTooltip() }}"
                 >
-                    {{ $label }}
+                    {!! $label !!}
 
                     @svg($icon,
-                        'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 inline h-4 w-4 align-text-bottom text-gray-400 dark:text-gray-500')
+                        [
+                            'class' => 'group-hover/asset:text-primary-500 dark:group-hover/asset:text-primary-400 inline h-4 w-4 align-text-bottom text-gray-400 dark:text-gray-500',
+                            'x-tooltip.raw' => $editWidgetAssetAction->getTooltip(),
+                        ])
                 </div>
 
                 @if (! empty($description) && ! $description !== $name)
                     <div
-                        class="line-clamp-2 text-xs leading-tight text-gray-600 dark:text-gray-300"
+                        class="mt-0.5 line-clamp-2 text-xs leading-tight text-gray-600 dark:text-gray-300"
                     >
-                        {{ $description }}
+                        {!! $description !!}
                     </div>
                 @endif
             </div>
@@ -171,7 +189,7 @@ declare(strict_types=1);
                 @if ($mediaCount || $image)
                     <span class="relative">
                         @if ($image)
-                            {{ $image->img('thumb')->lazy()->attributes(['class' => 'ml-auto max-h-12 max-w-12 object-contain']) }}
+                            {{ $image->img('thumb')->lazy()->attributes(['class' => 'bg-gray-100 dark:bg-gray-800 max-h-10 max-w-10 ml-auto object-contain']) }}
                         @endif
 
                         @if ($mediaCount)
@@ -189,7 +207,7 @@ declare(strict_types=1);
                 @if ($actionsCount)
                     <span class="relative inline-block">
                         <x-filament::icon
-                            icon="heroicon-c-arrow-path-rounded-square"
+                            icon="heroicon-c-arrow-down-tray"
                             class="h-5 w-5"
                             color="gray"
                             :badge="$actionsCount"

@@ -45,7 +45,6 @@ class WidgetSettingsSchema
                     $schema->isCreating(),
                     fn (WidgetTypeSelect $component): WidgetTypeSelect => $component->withCreateForm(),
                     fn (WidgetTypeSelect $component): WidgetTypeSelect => $component->withEditForm()
-                        ->changeConfirmation()
                 ),
 
             ...$components,

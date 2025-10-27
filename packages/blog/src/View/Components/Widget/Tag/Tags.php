@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\View\Components\Widget\Tag;
+namespace Capell\Blog\View\Components\Widget\Tag;
 
+use Capell\Blog\Services\Loader\TagLoader;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\FrontendLoader;
-use Capell\Frontend\Services\Loader\TagLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 
 class Tags extends AbstractWidget
@@ -15,7 +15,7 @@ class Tags extends AbstractWidget
 
     public $tags;
 
-    protected static string $defaultView = 'capell-layout::components.widget.tag.tags';
+    protected static string $defaultView = 'capell-blog::components.widget.tag.tags';
 
     public function render(array $data = [])
     {

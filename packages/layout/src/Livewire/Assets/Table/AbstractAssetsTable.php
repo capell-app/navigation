@@ -111,6 +111,8 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
             assets: $selectedRecords->pluck('id')->toArray(),
         );
 
+        $this->resetPage();
+
         $this->dispatch('close-modal', id: $this->actionModalId);
 
         $action->success();

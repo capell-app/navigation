@@ -14,9 +14,9 @@ use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasDraftsAndNestedSet;
 use Capell\Core\Models\Concerns\HasMetaData;
+use Capell\Core\Models\Concerns\HasModelRelations;
 use Capell\Core\Models\Concerns\HasPageCache;
 use Capell\Core\Models\Concerns\HasPublishDates;
-use Capell\Core\Models\Concerns\HasTags;
 use Capell\Core\Models\Concerns\HasTranslations;
 use Capell\Core\Models\Concerns\HasTypes;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
@@ -38,9 +38,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\NodeTrait;
@@ -104,7 +103,7 @@ use Wildside\Userstamps\Userstamps;
  * @method static QueryBuilder<static>|Content defaultOrder(string $dir = 'asc')
  * @method static QueryBuilder<static>|Content descendantsAndSelf($id, array $columns = [])
  * @method static QueryBuilder<static>|Content descendantsOf($id, array $columns = [], $andSelf = false)
- * @method static QueryBuilder<static>|Content excludeRevision((Model|int) $exclude)
+ * @method static QueryBuilder<static>|Content excludeRevision(Model|int $exclude)
  * @method static QueryBuilder<static>|Content expired(Model $model)
  * @method static ContentFactory factory($count = null, $state = [])
  * @method static QueryBuilder<static>|Content fixSubtree($root)
@@ -144,11 +143,11 @@ use Wildside\Userstamps\Userstamps;
  * @method static QueryBuilder<static>|Content whereIsRoot()
  * @method static QueryBuilder<static>|Content whereNodeBetween($values, $boolean = 'and', $not = false, $query = null)
  * @method static QueryBuilder<static>|Content whereNotDescendantOf($id)
- * @method static QueryBuilder<static>|Content withAllTags((ArrayAccess|\Spatie\Tags\Tag|array|string) $tags, ?string $type = null)
+ * @method static QueryBuilder<static>|Content withAllTags(ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static QueryBuilder<static>|Content withAllTagsOfAnyType($tags)
- * @method static QueryBuilder<static>|Content withAnyTags((ArrayAccess|\Spatie\Tags\Tag|array|string) $tags, ?string $type = null)
+ * @method static QueryBuilder<static>|Content withAnyTags(ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static QueryBuilder<static>|Content withAnyTagsOfAnyType($tags)
- * @method static QueryBuilder<static>|Content withAnyTagsOfType((array|string) $type)
+ * @method static QueryBuilder<static>|Content withAnyTagsOfType(array|string $type)
  * @method static QueryBuilder<static>|Content withDepth(string $as = 'depth')
  * @method static QueryBuilder<static>|Content withAssets(bool $withDrafts = true)
  * @method static Builder<static>|Content withTrashed()
@@ -156,7 +155,7 @@ use Wildside\Userstamps\Userstamps;
  * @method static QueryBuilder<static>|Content withoutCurrent()
  * @method static QueryBuilder<static>|Content withoutRoot()
  * @method static QueryBuilder<static>|Content withoutSelf()
- * @method static QueryBuilder<static>|Content withoutTags((ArrayAccess|\Spatie\Tags\Tag|array|string) $tags, ?string $type = null)
+ * @method static QueryBuilder<static>|Content withoutTags(ArrayAccess|\Spatie\Tags\Tag|array|string $tags, ?string $type = null)
  * @method static Builder<static>|Content withoutTrashed()
  *
  * @property-read Page|null $linkedPage
@@ -167,9 +166,12 @@ use Wildside\Userstamps\Userstamps;
  *
  * @mixin Model
  * @mixin Model
+ *
+ * @property-read string|null $title
+ * @property-read Collection<int, WidgetAsset> $widgetAssets
+ * @property-read int|null $widget_assets_count
+ *
  * @mixin Model
- * @mixin Model
- * @mixin \Eloquent
  */
 #[ObservedBy(ContentObserver::class)]
 class Content extends Model implements Draftable, HasMedia, PageCacheable
@@ -189,9 +191,9 @@ class Content extends Model implements Draftable, HasMedia, PageCacheable
 
     use HasJsonRelationships;
     use HasMetaData;
+    use HasModelRelations;
     use HasPageCache;
     use HasPublishDates;
-    use HasTags;
     use HasTranslations;
     use HasTypes;
     use InteractsWithMedia;
@@ -228,7 +230,6 @@ class Content extends Model implements Draftable, HasMedia, PageCacheable
      * @var array|string[]
      */
     protected array $cloneable_relations = [
-        'tags',
         'translations',
     ];
 
@@ -241,17 +242,35 @@ class Content extends Model implements Draftable, HasMedia, PageCacheable
 
     protected static string $factory = ContentFactory::class;
 
-    public static function getMorphRelations(): array
+    public static function getMorphRelations(?Language $language = null): array
     {
-        return [
+        $base = [
             'ancestors',
             'image',
             'media',
-            'related',
-            'site',
-            'translation',
+            'linkedPage' => fn (BuilderContract $query) => $query->with([
+                'translation' => fn (BuilderContract $query) => $query->with('language')
+                    ->when($language, fn ($q) => $q->where('language_id', $language->id)),
+                'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')
+                    ->when($language, fn ($q) => $q->where('language_id', $language->id)),
+            ]),
+            'translation' => fn (BuilderContract $query) => $query->with('language')
+                ->when($language, fn ($q) => $q->where('language_id', $language->id)),
+            'related' => fn (BuilderContract $query) => $query->with([
+                'image',
+                'page' => fn (BuilderContract $query) => $query->with([
+                    'translation' => fn (BuilderContract $query) => $query->with('language')
+                        ->when($language, fn ($q) => $q->where('language_id', $language->id)),
+                    'pageUrl' => fn (BuilderContract $query) => $query->with('siteDomain')
+                        ->when($language, fn ($q) => $q->where('language_id', $language->id)),
+                    'site',
+                ]),
+            ])
+                ->withWhereHas('translation', fn (BuilderContract $query) => $query->with('language')),
             'type',
         ];
+
+        return static::mergeMorphRelationDefinitions($base, self::class, $language);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -350,24 +369,10 @@ class Content extends Model implements Draftable, HasMedia, PageCacheable
         return $this->belongsToJson(self::class, 'meta->related');
     }
 
-    public function widgets(): HasManyThrough
+    public function widgetAssets(): HasMany
     {
-        return $this->hasManyThrough(Widget::class, WidgetAsset::class, 'asset_id', 'id', 'id', 'widget_id')
-            ->where('asset_type', $this->getMorphClass())
-            ->whereNull('widget_assets.page_id');
-    }
-
-    public function pages(): HasManyThrough
-    {
-        return $this->hasManyThrough(Page::class, WidgetAsset::class, 'asset_id', 'id', 'id', 'page_id')
-            ->where('asset_type', $this->getMorphClass())
-            ->whereNotNull('widget_assets.page_id')
-            ->groupBy('pages.id');
-    }
-
-    public function tags(): MorphToMany
-    {
-        return $this->morphToMany(Tag::class, 'taggable', 'taggables');
+        return $this->hasMany(WidgetAsset::class, 'asset_id')
+            ->where('asset_type', $this->getMorphClass());
     }
 
     protected static function bootNodeTrait(): void

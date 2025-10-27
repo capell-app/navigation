@@ -27,6 +27,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSet;
 
@@ -155,26 +156,24 @@ class AssetsRepeater extends Repeater
                     fn (Get $get): null|string|Heroicon => CapellCore::getAsset($get('asset_type'))->getIcon()
                 )
                 ->selectablePlaceholder(false)
-                ->getOptionLabelFromRecordUsing(
-                    function (Select $component, Model $record): string {
-                        if ($record instanceof Page) {
-                            $label = $record->site->name . ' » ';
-
-                            $ancestors = $record->ancestors()->get();
-
-                            if ($ancestors->isNotEmpty()) {
-                                $label .= $ancestors->pluck('name')
-                                    ->map(fn ($item) => Str::limit($item, 30))
-                                    ->implode(' » ')
-                                    . ' » ';
-                            }
-
-                            return $label . Str::limit($record->name, 40);
-                        }
-
-                        return $record->{$component->getRelationshipTitleAttribute()};
+                ->getOptionLabelFromRecordUsing(function (Select $component, Model $record): HtmlString {
+                    if (! $record instanceof Page) {
+                        return new HtmlString($record->{$component->getRelationshipTitleAttribute()});
                     }
-                )
+
+                    $label = $record->site->name . ' &raquo; ';
+
+                    $ancestors = $record->ancestors()->get();
+
+                    if ($ancestors->isNotEmpty()) {
+                        $label .= $ancestors->pluck('name')
+                            ->map(fn ($item) => Str::limit($item, 30))
+                            ->implode(' &raquo; ')
+                            . ' &raquo; ';
+                    }
+
+                    return new HtmlString($label . Str::limit($record->name, 40));
+                })
                 ->createOptionForm(function (Schema $schema, Get $get): Schema {
                     $asset = CapellCore::getAsset($get('asset_type'));
 
@@ -204,6 +203,7 @@ class AssetsRepeater extends Repeater
                     $asset = CapellAdmin::getAsset($get('asset_type'));
 
                     return ModifyCreateAction::run($action)
+                        ->visible(fn (?int $state): bool => $state === null)
                         ->fillForm(fn (): array => $asset->defaultDataAction !== null && $asset->defaultDataAction !== '' && $asset->defaultDataAction !== '0' ? $asset->defaultDataAction::run() : []);
                 }),
         ];

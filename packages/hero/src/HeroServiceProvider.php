@@ -9,6 +9,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Hero\Commands\DemoCommand;
 use Capell\Hero\Commands\InstallCommand;
+use Capell\Hero\Enums\ContentSchemaEnum;
 use Capell\Hero\Enums\WidgetComponentEnum;
 use Capell\Hero\Enums\WidgetSchemaEnum;
 use Capell\Hero\Filament\Extenders\Page\HeroPageSchemaExtender;
@@ -55,6 +56,8 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         );
 
         CapellCore::registerComponents(ComponentTypeEnum::Widget->value, WidgetComponentEnum::cases());
+
+        CapellAdmin::registerSchemas(SchemaTypeEnum::Content->value, ContentSchemaEnum::cases());
 
         CapellAdmin::registerSchemas(SchemaTypeEnum::Widget->value, WidgetSchemaEnum::cases());
 

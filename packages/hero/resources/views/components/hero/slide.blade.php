@@ -87,7 +87,7 @@ declare(strict_types=1);
         @endif
 
         @if ($slot->isNotEmpty())
-            <div @class(['relative', $container_class])>
+            <div @class(['relative grid', $container_class])>
                 {{ $slot }}
             </div>
         @endif

@@ -8,7 +8,6 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
 use Capell\Hero\Enums\WidgetComponentEnum;
-use Capell\Hero\Filament\Resources\Widgets\Schemas\Types\Assets\HeroWidgetAssetForm;
 use Capell\Hero\Filament\Resources\Widgets\Schemas\Types\HeroWidgetSchema;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\LayoutModelEnum;
@@ -37,12 +36,12 @@ class CreateHeroWidgetAction
         ], [
             'name' => __('capell-hero::generic.hero'),
             'type_id' => $typeModel::query()
-                ->where(['key' => WidgetTypeEnum::Contents, 'type' => LayoutTypeEnum::Widget])
+                ->where(['key' => WidgetTypeEnum::Assets, 'type' => LayoutTypeEnum::Widget])
                 ->value('id'),
             'meta' => [
                 'component' => WidgetComponentEnum::Hero->value,
                 'heading_size' => 'h1',
-                'height' => 'full',
+                'height' => 'large',
                 'carousel_fade' => true,
                 'carousel_arrows' => false,
                 'carousel_pagination' => true,
@@ -55,7 +54,6 @@ class CreateHeroWidgetAction
                 'icon' => 'heroicon-o-gift',
                 'schema' => HeroWidgetSchema::getKey(),
                 'asset_types' => [AssetEnum::Content->value],
-                'widget_asset_schema' => HeroWidgetAssetForm::getKey(),
             ],
         ]);
     }

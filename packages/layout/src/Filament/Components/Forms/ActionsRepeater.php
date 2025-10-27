@@ -29,7 +29,7 @@ class ActionsRepeater extends Repeater
             ->collapsed(function (?Schema $item): bool {
                 $state = $item->getRawState();
 
-                return filled($state['page_id']) || filled($state['url']);
+                return ! empty($state['page_id']) || ! empty($state['url']);
             })
             ->cloneable()
             ->orderColumn()

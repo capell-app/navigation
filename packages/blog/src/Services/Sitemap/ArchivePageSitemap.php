@@ -58,7 +58,7 @@ class ArchivePageSitemap extends AbstractSitemapPages
             /** @var class-string<Page> $model */
             $model = CapellCore::getModel(ModelEnum::Page);
 
-            return $model::getPageByType('archive', $site, $language);
+            return $model::getFirstPageByTypeForSite('archive', $site, $language);
         });
     }
 

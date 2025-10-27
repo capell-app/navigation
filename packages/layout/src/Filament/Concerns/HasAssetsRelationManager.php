@@ -20,6 +20,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSet;
 use RuntimeException;
@@ -146,19 +147,19 @@ trait HasAssetsRelationManager
             );
     }
 
-    protected static function getPageOptionLabel(Page $page): string
+    protected static function getPageOptionLabel(Page $page): HtmlString
     {
-        $label = $page->site->name . ' » ';
+        $label = $page->site->name . ' &raquo; ';
 
         $ancestors = $page->ancestors()->get();
 
         if ($ancestors->isNotEmpty()) {
             $label .= $ancestors->pluck('name')
                 ->map(fn ($item) => Str::limit($item, 30))
-                ->implode(' » ')
-                . ' » ';
+                ->implode(' &raquo; ')
+                . ' &raquo; ';
         }
 
-        return $label . Str::limit($page->name, 40);
+        return new HtmlString($label . Str::limit($page->name, 40));
     }
 }

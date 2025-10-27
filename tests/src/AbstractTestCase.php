@@ -82,9 +82,15 @@ abstract class AbstractTestCase extends TestCase
 
         $migrations = CapellCoreManager::getMigrations();
         $path = realpath(__DIR__ . '/../../vendor/capell-app/core/database/migrations');
+
         array_walk($migrations, fn (&$migration): string => $migration = sprintf('%s/%s.php', $path, $migration));
 
         $this->loadMigrationsFrom($migrations);
+
+        // Automatically discover package migrations if not manually set.
+        if ($this->packageMigrations === []) {
+            $this->packageMigrations = $this->discoverPackageMigrations();
+        }
 
         if ($this->packageMigrations !== []) {
             $this->loadMigrationsFrom($this->packageMigrations);
@@ -281,5 +287,15 @@ abstract class AbstractTestCase extends TestCase
 
             config()->set(sprintf('%s.%s', $package, $key), $value);
         }
+    }
+
+    private function discoverPackageMigrations(): array
+    {
+        preg_match('/\\\\src\\\\([^\\\\]+)/', static::class, $matches);
+
+        $path = realpath(__DIR__ . '/../../packages/' . ($matches[1] ?? null) . '/database/migrations');
+        $files = glob($path . '/*.php');
+
+        return $files === false ? [] : $files;
     }
 }

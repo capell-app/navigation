@@ -10,12 +10,13 @@ use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Admin\Filament\Concerns\HideEmptyRelationManager;
 use Capell\Layout\Filament\Resources\Widgets\WidgetResource;
-use Capell\Layout\Models\Widget;
+use Capell\Layout\Models\WidgetAsset;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class WidgetsRelationManager extends RelationManager
 {
@@ -24,7 +25,13 @@ class WidgetsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string $relationship = 'widgets';
+    protected static string $relationship = 'widgetAssets';
+
+    /**
+     * Allows customizing which relationship is counted for the badge.
+     * This can be changed independently from $relationship if desired.
+     */
+    protected static string $badgeRelationship = 'widgetAssets';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
@@ -36,26 +43,43 @@ class WidgetsRelationManager extends RelationManager
         return $table
             ->modifyQueryUsing(
                 fn (Builder $query): Builder => $query->with([
-                    'creator',
-                    'editor',
-                    'type',
+                    'widget' => [
+                        'creator',
+                        'editor',
+                        'type',
+                    ],
                 ])
+                    ->select('widget_assets.widget_id')
+                    ->groupBy('widget_assets.widget_id')
             )
             ->columns([
-                IdentifierColumn::make('id'),
-                NameColumn::make('name')
+                IdentifierColumn::make('widget.id'),
+                NameColumn::make('widget.name')
                     ->icon(fn ($record) => $record->type->admin['icon'] ?? '')
                     ->suffixBadges([
-                        Badge::make('type.name')
-                            ->label(fn (Widget $record) => $record->type?->name)
+                        Badge::make('widget.type.name')
+                            ->label(fn (WidgetAsset $record) => $record->widget?->type?->name)
                             ->color('gray'),
                     ]),
-                TextColumn::make('key')
+                TextColumn::make('widget.key')
                     ->label(__('capell-admin::table.key'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordUrl(fn (Widget $record): string => WidgetResource::getUrl('edit', ['record' => $record]));
+            ->recordUrl(fn (WidgetAsset $record): string => WidgetResource::getUrl('edit', ['record' => $record->widget]));
+    }
+
+    /**
+     * @param  Model | array<string, mixed>  $record
+     */
+    public function getTableRecordKey(Model|array $record): string
+    {
+        return (string) $record->widget_id;
+    }
+
+    protected static function modifyBadgeQueryUsing(Relation $query): Relation
+    {
+        return $query->distinct('widget_assets.widget_id');
     }
 }

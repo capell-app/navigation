@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('line1', 128)->index();
             $table->string('line2', 128)->nullable();
-            $table->string('city', 64)->index();
-            $table->string('state', 32)->index();
+            $table->string('city', 64)->nullable()->index();
+            $table->string('state', 32)->nullable()->index();
             $table->string('postal_code', 16)->index()->default('');
             $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete()->index();
             $table->boolean('default')->index()->default(0);

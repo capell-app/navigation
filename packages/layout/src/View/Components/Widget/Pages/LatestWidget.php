@@ -23,7 +23,6 @@ class LatestWidget extends AbstractPagesWidget
             withImage: $this->widget->meta['with_image'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
-            withTags: $this->widget->meta['with_tags'] ?? false,
             cacheKeyPrepend: 'latest-widget-' . $this->widget->id,
             modifyQuery: fn (Builder $query) => $query->whereKeyNot(FrontendLoader::getPage()->id)
         );

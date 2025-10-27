@@ -11,7 +11,7 @@ use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\StatusColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\StatusIconColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Filament\Actions\ActionGroup;
@@ -71,7 +71,7 @@ class AddressesTable implements TableConfigurator
                     'postal_code',
                 ])
                 ->wrap(),
-            StatusColumn::make('status'),
+            StatusIconColumn::make('status'),
             DateColumn::make('created_at'),
             DateColumn::make('updated_at'),
             DateColumn::make('deleted_at'),

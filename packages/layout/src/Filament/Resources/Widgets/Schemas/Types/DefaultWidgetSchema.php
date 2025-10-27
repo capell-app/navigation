@@ -94,7 +94,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
             ->tabs([
                 $this->getDetailsTab(),
                 $this->getDisplayTab($schema),
-                ...$withSettingsTab ? $this->getSettingsTab($schema) : [],
+                ...$withSettingsTab ? [$this->getSettingsTab($schema)] : [],
             ]);
     }
 

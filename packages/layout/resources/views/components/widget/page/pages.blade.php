@@ -29,7 +29,6 @@ declare(strict_types=1);
     'withParent' => $widget->meta['with_parent'] ?? ($widget->type->meta['with_parent'] ?? false),
     'withDate' => $widget->meta['with_date'] ?? ($widget->type->meta['with_date'] ?? false),
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? false),
-    'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? false),
 ])
 <x-capell-layout::widget.wrapper
     class="widget-pages"
@@ -87,7 +86,6 @@ declare(strict_types=1);
                     :publish-date="$withDate ? $item->getPublishDate() : null"
                     :size="$size"
                     :summary="$withSummary ? $item->translation->summary : null"
-                    :tags="$withTags ? $item->tags : null"
                     :title="$item->translation->title"
                     :url="$item->pageUrl->full_url"
                     :with-summary="$withSummary"

@@ -6,15 +6,15 @@ namespace Capell\Blog\Listeners;
 
 use Capell\Admin\Actions\AddPageToNavigationAction;
 use Capell\Blog\Services\Loader\BlogLoader;
-use Capell\Core\Enums\DefaultNavigationEnum;
+use Capell\Core\Enums\NavigationHandle;
 use Capell\Core\Events\NavigationCreating;
 use Capell\Core\Models\Page;
 
 class AddBlogPagesToNavigation
 {
     private array $keys = [
-        DefaultNavigationEnum::Main->value,
-        DefaultNavigationEnum::Footer->value,
+        NavigationHandle::Main->value,
+        NavigationHandle::Footer->value,
     ];
 
     public function handle(NavigationCreating $event): void

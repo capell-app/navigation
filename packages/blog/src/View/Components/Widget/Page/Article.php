@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Capell\Blog\View\Components\Widget\Page;
 
 use App\Models\User;
+use Capell\Blog\Services\Loader\TagLoader;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Services\Loader\PageLoader;
-use Capell\Frontend\Services\Loader\TagLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 
 class Article extends AbstractWidget
@@ -53,12 +53,10 @@ class Article extends AbstractWidget
             $this->author = PageLoader::getPageAuthor($page);
         }
 
-        if (! empty($this->widget->meta['with_tags'])) {
-            $this->tags = TagLoader::getPageTags($page);
+        $this->tags = TagLoader::getPageTags($page);
 
-            if ($this->tags->isNotEmpty()) {
-                $this->tagPage = TagLoader::getTagResultsPage($site, $language);
-            }
+        if ($this->tags->isNotEmpty()) {
+            $this->tagPage = TagLoader::getTagResultsPage($site, $language);
         }
     }
 }

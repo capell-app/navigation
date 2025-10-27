@@ -25,7 +25,6 @@ declare(strict_types=1);
     'withParent' => $widget->meta['with_parent'] ?? ($widget->type->meta['with_parent'] ?? false),
     'withDate' => $widget->meta['with_date'] ?? ($widget->type->meta['with_date'] ?? true),
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
-    'withTags' => $widget->meta['with_tags'] ?? ($widget->type->meta['with_tags'] ?? true),
     'spacing' => $widget->meta['spacing'] ?? ($widget->type->meta['spacing'] ?? true),
     'columns' => $widget->meta['columns'] ?? ($widget->type->meta['columns'] ?? null),
 ])
@@ -106,7 +105,6 @@ declare(strict_types=1);
                         :with-image="$withImage"
                         :with-parent="$withParent"
                         :with-summary="$withSummary"
-                        :with-tags="$withTags"
                     />
                 @endforeach
             </div>

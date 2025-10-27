@@ -22,6 +22,7 @@ use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\Collection;
 use Kalnoy\Nestedset\NestedSet;
@@ -173,12 +174,12 @@ class ContentSelect extends Select
         );
     }
 
-    private function getContentOptionLabel(Content $record, ?int $siteId): string
+    private function getContentOptionLabel(Content $record, ?int $siteId): HtmlString
     {
         $label = '';
 
         if (($siteId === null || $siteId === 0) && $record->site) {
-            $label .= $record->site->name . ' » ';
+            $label .= $record->site->name . ' &raquo; ';
         }
 
         $ancestors = $record->ancestors()->get();
@@ -186,11 +187,11 @@ class ContentSelect extends Select
         if ($ancestors->isNotEmpty()) {
             $label .= $ancestors->pluck('name')
                 ->map(fn ($item) => Str::limit($item, 30))
-                ->implode(' » ')
-                . ' » ';
+                ->implode(' &raquo; ')
+                . ' &raquo; ';
         }
 
-        return $label . Str::limit($record->name, 40);
+        return new HtmlString($label . Str::limit($record->name, 40));
     }
 
     private function getContentOptions(?int $site_id = null, ?string $search = null): array

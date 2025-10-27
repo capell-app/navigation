@@ -57,11 +57,6 @@ class DemoCreator
      */
     private readonly string $pageModel;
 
-    /**
-     * @var class-string<Models\Tag>
-     */
-    private readonly string $tagModel;
-
     public function __construct(
         protected readonly ?Model $user = null,
     ) {
@@ -69,7 +64,6 @@ class DemoCreator
         $this->widgetModel = CapellCore::getModel(LayoutModelEnum::Widget->name);
         $this->typeModel = CapellCore::getModel(ModelEnum::Type);
         $this->pageModel = CapellCore::getModel(ModelEnum::Page);
-        $this->tagModel = CapellCore::getModel(ModelEnum::Tag);
     }
 
     public function createContentWidget(Collection $languages): Widget
@@ -366,19 +360,12 @@ class DemoCreator
             ],
         ];
 
-        $faqTag = $this->tagModel::findOrCreate('faq', 'content', $languages->first()->code);
-
-        $languages->skip(1)
-            ->each(fn (Language $language) => $this->tagModel::findOrCreate('faq', 'content', $language->code));
-
         foreach ($questions['en'] as $i => $question) {
             $content = $this->contentModel::firstOrCreate([
                 'name' => $question,
                 'parent_id' => $parentContent->id,
                 'type_id' => $contentType->id,
             ]);
-
-            $content->tags()->syncWithoutDetaching([$faqTag->id]);
 
             $widget->assets()->firstOrcreate([
                 'asset_id' => $content->id,
@@ -441,10 +428,12 @@ class DemoCreator
                     ->enabled()
                     ->listable()
                     ->accessible()
+                    ->hiddenSystemGroup()
             )
-            ->with([
-                'children' => fn (BuilderContract $query) => $query->whereHas('type')->limit(2),
-            ])
+            ->withWhereHas(
+                'children',
+                fn (BuilderContract $query) => $query->whereHas('type')->limit(2),
+            )
             ->limit(4)
             ->get();
 
@@ -476,7 +465,7 @@ class DemoCreator
         return $widget;
     }
 
-    public function createContentsWidget(Widget $widget, Page $page, string $container, int $occurrence = 1): void
+    public function createContentsWidget(Widget $widget, Page $page, string $container, int $occurrence = 1, ?Type $type = null): void
     {
         $pageWidgetAssets = $widget->assets()->where([
             'page_id' => $page->id,
@@ -487,6 +476,13 @@ class DemoCreator
 
         if ($pageWidgetAssets) {
             return;
+        }
+
+        if (! $type instanceof Type) {
+            $type = $this->typeModel::query()
+                ->where('type', LayoutTypeEnum::Content)
+                ->default()
+                ->first();
         }
 
         $features = [
@@ -511,6 +507,7 @@ class DemoCreator
         foreach ($features as $feature) {
             $content = Content::query()->firstOrCreate([
                 'name' => $feature['title'],
+                'type_id' => $type->getKey(),
             ], [
                 'meta' => [
                     'actions' => [

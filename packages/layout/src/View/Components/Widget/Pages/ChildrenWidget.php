@@ -27,7 +27,6 @@ class ChildrenWidget extends AbstractPagesWidget
             withImage: $this->widget->meta['with_image'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
-            withTags: $this->widget->meta['with_tags'] ?? false,
         );
 
         if ($this->pages->isEmpty()) {

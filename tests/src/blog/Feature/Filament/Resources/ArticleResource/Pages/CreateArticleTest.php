@@ -88,7 +88,8 @@ describe('from edit article', function (): void {
 
 describe('from list article', function (): void {
     test('can create new article', function (): void {
-        $type = BlogCreator::createArticlePageType();
+        $blogCreator = app(BlogCreator::class);
+        $type = $blogCreator->createArticlePageType();
 
         $language = Language::factory()->create();
 
@@ -99,9 +100,9 @@ describe('from list article', function (): void {
 
         $newData = Page::factory()->recycle($site)->type($type)->make();
 
-        BlogCreator::createArticleLayout();
+        $blogCreator->createArticleLayout();
 
-        $blogPage = BlogCreator::createBlogPage($site);
+        $blogPage = $blogCreator->createBlogPage($site);
 
         livewire(ListArticles::class)
             ->assertSuccessful()
@@ -137,8 +138,10 @@ describe('from list article', function (): void {
     });
 
     test('can create new article from list page', function (): void {
-        $type = BlogCreator::createArticlePageType();
-        $layout = BlogCreator::createArticleLayout();
+        $blogCreator = app(BlogCreator::class);
+
+        $type = $blogCreator->createArticlePageType();
+        $layout = $blogCreator->createArticleLayout();
 
         $language = Language::factory()->create();
         $site = Site::factory()->recycle($language)->hasSiteDomains()->create();

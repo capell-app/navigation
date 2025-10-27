@@ -29,7 +29,6 @@ class BlogPage extends AbstractPage
             withPagination: $page->type->meta['pagination'] ?? true,
             withParent: $page->type->meta['with_parent'] ?? false,
             withDate: $page->type->meta['with_date'] ?? false,
-            withTags: $page->type->meta['with_tags'] ?? false,
             paginationKey: $paginationKey,
         );
     }

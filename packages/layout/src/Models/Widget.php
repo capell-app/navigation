@@ -93,12 +93,9 @@ use Wildside\Userstamps\Userstamps;
  * @property-read int|null $widget_page_assets_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read string|null $title
  *
  * @mixin Model
- * @mixin Model
- * @mixin Model
- * @mixin Model
- * @mixin \Eloquent
  */
 #[ObservedBy(WidgetObserver::class)]
 class Widget extends Model implements HasMedia, PageCacheable, Statusable

@@ -50,7 +50,6 @@ class PagesWidget extends AbstractWidget
             withPagination: $this->widget->meta['pagination'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
-            withTags: $this->widget->meta['with_tags'] ?? false,
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('page-%d-widget-%d-container-%s-%d', $page->id, $this->widget->id, $this->containerKey, $this->occurrence),
             modifyQuery: fn (Builder $query) => $query->when(

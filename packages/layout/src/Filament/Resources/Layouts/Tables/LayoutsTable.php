@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Layouts\Tables;
 
+use Capell\Admin\Enums\FilamentColorEnum;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
@@ -57,7 +58,7 @@ class LayoutsTable extends \Capell\Admin\Filament\Resources\Layouts\Tables\Layou
                 TextColumn::make('layoutWidgets.name')
                     ->label(__('capell-admin::table.container_widgets'))
                     ->wrap()
-                    ->color('gray')
+                    ->color(FilamentColorEnum::LightGray->value)
                     ->bulleted()
                     ->limitList()
                     ->expandableLimitedList()

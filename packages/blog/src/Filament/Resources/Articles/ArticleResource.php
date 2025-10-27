@@ -6,6 +6,7 @@ namespace Capell\Blog\Filament\Resources\Articles;
 
 use BackedEnum;
 use Capell\Admin\Enums\ResourceEnum;
+use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Blog\Actions\GetArticleLayoutAction;
 use Capell\Blog\Enums\BlogModelEnum;
@@ -14,6 +15,7 @@ use Capell\Blog\Enums\BlogTypeGroupEnum;
 use Capell\Blog\Filament\Resources\Articles\Pages\CreateArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
+use Capell\Blog\Filament\Resources\Articles\Tables\ArticlePagesTable;
 use Capell\Blog\Models\Article;
 use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Core\Actions\GetNameFromTranslationsAction;
@@ -30,6 +32,9 @@ class ArticleResource extends PageResource
     protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'article';
+
+    /** @var class-string<TableConfigurator> */
+    protected static string $tableConfigurator = ArticlePagesTable::class;
 
     /**
      * @return class-string<Article>
@@ -111,7 +116,7 @@ class ArticleResource extends PageResource
     }
 
     #[Override]
-    public static function applyTypeAdminResourceConstraint(BuilderContract $query, bool $showSystem = false): void
+    public static function applyTypeAdminResourceConstraint(BuilderContract $query, ?bool $hideSystemPages = false): void
     {
         $query->where('group', BlogTypeGroupEnum::Article);
     }

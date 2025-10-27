@@ -9,12 +9,10 @@ describe('Country model', function (): void {
     it('can create a country with attributes', function (): void {
         $country = Country::factory()->create([
             'name' => 'Testland',
-            'code' => 'TST',
             'iso2' => 'TL',
             'iso3' => 'TST',
         ]);
         expect($country->name)->toBe('Testland');
-        expect($country->code)->toBe('TST');
         expect($country->iso2)->toBe('TL');
         expect($country->iso3)->toBe('TST');
     });

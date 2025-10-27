@@ -27,7 +27,7 @@ class PageLayoutTab
                         'page_id' => $record->id,
                     ]
                 )
-                    ->lazy()
+                    ->lazy(config('capell-layout.layout_builder.lazy', true))
                     ->columnSpanFull(),
             ]);
     }

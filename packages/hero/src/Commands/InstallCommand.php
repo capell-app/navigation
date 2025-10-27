@@ -42,7 +42,6 @@ class InstallCommand extends Command
             LayoutEnum::Default->value,
             LayoutEnum::Home->value,
             LayoutEnum::Results->value,
-            LayoutEnum::Tags->value,
         ])
             ->each(function (Layout $layout): void {
                 AddHeroToLayoutAction::run($layout);

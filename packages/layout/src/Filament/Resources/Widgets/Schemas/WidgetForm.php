@@ -32,9 +32,7 @@ class WidgetForm implements FormConfigurator
 
                         $record = $component->getRecord();
 
-                        if ($record?->admin['schema'] ?? false) {
-                            $adminSchema = $record->admin['schema'];
-                        }
+                        $adminSchema = $record?->admin['schema'] ?? null;
 
                         if (! $adminSchema) {
                             $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;

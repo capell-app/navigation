@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Filament\Resources\Widgets\Tables;
 
+use Capell\Admin\Enums\FilamentColorEnum;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
@@ -13,7 +14,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\StatusColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\StatusIconColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Components\Tables\Filters\TextFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
@@ -102,7 +103,7 @@ class WidgetsTable implements TableConfigurator
                 ->searchable()
                 ->limit(200)
                 ->wrap()
-                ->color('gray')
+                ->color(FilamentColorEnum::LightGray->value)
                 ->html()
                 ->listWithLineBreaks()
                 ->toggleable(isToggledHiddenByDefault: true)
@@ -151,7 +152,7 @@ class WidgetsTable implements TableConfigurator
                     );
                 })
                 ->size('xs')
-                ->color('gray')
+                ->color(FilamentColorEnum::LightGray->value)
                 ->formatStateUsing(function (Widget $record): ?HtmlString {
                     $components = [
                         __('capell-admin::form.component') => $record->meta['component'] ?? '',
@@ -195,7 +196,7 @@ class WidgetsTable implements TableConfigurator
                         )
                     )
                 ),
-            StatusColumn::make('status'),
+            StatusIconColumn::make('status'),
             DateColumn::make('created_at'),
             DateColumn::make('updated_at'),
             DateColumn::make('deleted_at'),

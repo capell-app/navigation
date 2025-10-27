@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Capell\Hero\Commands;
 
+use Capell\Blog\Enums\BlogResourceEnum;
 use Capell\Core\Commands\Concerns\HasSitesOption;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
+use Capell\Hero\Actions\CreateHeroContentTypeAction;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
 use Capell\Layout\Services\Creator\DemoCreator;
 use Illuminate\Console\Command;
@@ -68,7 +70,9 @@ class DemoCommand extends Command
 
             AddHeroToLayoutAction::run($homepage->layout);
 
-            $this->demoCreator->createContentsWidget($heroWidget, $homepage, container: 'hero');
+            $type = CreateHeroContentTypeAction::run();
+
+            $this->demoCreator->createContentsWidget($heroWidget, $homepage, container: 'hero', type: $type);
 
             if (CapellCore::hasPackage('capell-blog')) {
                 $blogPage = CapellCore::getModel(ModelEnum::Page)::query()
@@ -85,6 +89,21 @@ class DemoCommand extends Command
                         $translation->update(['meta' => $meta]);
                     }
                 }
+
+                $articlePages = CapellCore::getModel(ModelEnum::Page)::query()
+                    ->with('translations')
+                    ->where('site_id', $site->id)
+                    ->whereRelation('type', 'key', BlogResourceEnum::Article->value)
+                    ->get();
+
+                $articlePages->each(function (Page $page): void {
+                    foreach ($page->translations as $translation) {
+                        $meta = $translation->meta;
+                        $meta['hero'] = '<h1>' . $translation->title . '</h1>';
+
+                        $translation->update(['meta' => $meta]);
+                    }
+                });
             }
 
             $this->line('Demo hero content has been successfully created for site: ' . $site->name);

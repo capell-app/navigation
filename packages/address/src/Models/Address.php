@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Address\Models;
 
+use Capell\Address\Database\Factories\AddressFactory;
 use Capell\Address\Observers\AddressObserver;
-use Capell\Core\Database\Factories\AddressFactory;
 use Capell\Core\Models\Concerns\HasDefault;
 use Capell\Core\Models\Concerns\HasStatus;
 use Capell\Core\Models\Contracts\Defaultable;
@@ -26,6 +26,16 @@ use Wildside\Userstamps\Userstamps;
 /**
  * @mixin Model
  *
+ * @property string|null $city
+ * @property int|null $country_id
+ * @property bool|null $default
+ * @property string|null $line1
+ * @property string|null $line2
+ * @property array|null $meta
+ * @property string|null $name
+ * @property string|null $postal_code
+ * @property string|null $state
+ * @property bool|null $status
  * @property-read Country|null $country
  * @property-read User|null $creator
  * @property-read User|null $destroyer
@@ -49,8 +59,6 @@ use Wildside\Userstamps\Userstamps;
  * @method static Builder<static>|Address withoutTrashed()
  *
  * @mixin Model
- * @mixin Model
- * @mixin \Eloquent
  */
 #[ObservedBy(AddressObserver::class)]
 class Address extends Model implements Defaultable

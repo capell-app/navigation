@@ -10,7 +10,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\ImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\StatusColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\StatusIconColumn;
 use Capell\Admin\Filament\Concerns\HasRelationManagerBadge;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Core\Models\Layout;
@@ -72,7 +72,7 @@ class LayoutsRelationManager extends RelationManager
                             'url' => PageResource::getUrl('index', ['tableFilters[layout_id][value]' => $record->id]),
                         ]))
                     ),
-                StatusColumn::make('status'),
+                StatusIconColumn::make('status'),
                 DateColumn::make('created_at'),
                 DateColumn::make('updated_at'),
             ])

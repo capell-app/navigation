@@ -2,11 +2,27 @@
 
 declare(strict_types=1);
 
-use Capell\Tests\Blog\BlogTestCase;
-use Capell\Tests\Layout\LayoutTestCase;
+$testsRoot = __DIR__ . DIRECTORY_SEPARATOR . 'src';
 
-pest()->extends(BlogTestCase::class)
-    ->in(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Blog');
+// Safety: ensure root exists before iterating
+if (is_dir($testsRoot)) {
+    foreach (new DirectoryIterator($testsRoot) as $info) {
+        if (! $info->isDir() || $info->isDot()) {
+            continue;
+        }
 
-pest()->extends(LayoutTestCase::class)
-    ->in(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Layout');
+        $name = $info->getBasename();
+
+        // Skip non test suite directories
+        if (in_array($name, ['Fixtures'], true)) {
+            continue;
+        }
+
+        $testCaseClass = "Capell\\Tests\\{$name}\\{$name}TestCase"; // Convention: Capell\Tests\{Dir}\{Dir}TestCase
+
+        if (class_exists($testCaseClass)) {
+            pest()->extends($testCaseClass)
+                ->in($testsRoot . DIRECTORY_SEPARATOR . $name);
+        }
+    }
+}

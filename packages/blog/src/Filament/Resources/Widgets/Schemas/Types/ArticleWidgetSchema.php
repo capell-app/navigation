@@ -67,8 +67,6 @@ class ArticleWidgetSchema extends DefaultWidgetSchema
                     ->label(__('capell-admin::form.next_prev')),
                 Checkbox::make('with_author')
                     ->label(__('capell-admin::form.author')),
-                Checkbox::make('with_tags')
-                    ->label(__('capell-admin::form.tags')),
             ]);
     }
 }

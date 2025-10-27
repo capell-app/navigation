@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\Actions;
 
 use Capell\Blog\Services\BlogCreator;
-use Capell\Core\Enums\DefaultNavigationEnum;
+use Capell\Core\Enums\NavigationHandle;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
@@ -32,18 +32,24 @@ class CreateBlogPagesAction
         $blogPageType = Type::query()->where('key', 'blog')->pageType()->first();
         $systemPageType = Type::query()->where('key', 'system')->pageType()->first();
 
-        $blogPage = BlogCreator::createBlogPage($site, type: $blogPageType, languages: $site->languages);
+        $blogCreator = app(BlogCreator::class);
 
-        $archivesPage = BlogCreator::createArchivesPage($site, $blogPage, type: $systemPageType, layout: $archivesLayout);
+        $blogPage = $blogCreator->createBlogPage($site, type: $blogPageType, languages: $site->languages);
 
-        BlogCreator::createArchivePage($site, $archivesPage, type: $archivePageType, layout: $resultsLayout, languages: $site->languages);
+        $archivesPage = $blogCreator->createArchivesPage($site, $blogPage, type: $systemPageType, layout: $archivesLayout);
 
-        BlogCreator::addPagesToNavigations(
-            [DefaultNavigationEnum::Main->value, DefaultNavigationEnum::Footer->value],
+        $blogCreator->createArchivePage($site, $archivesPage, type: $archivePageType, layout: $resultsLayout, languages: $site->languages);
+
+        $blogCreator->addPagesToNavigations(
+            [NavigationHandle::Main->value, NavigationHandle::Footer->value],
             site: $site,
             pages: [$blogPage],
             languages: $site->languages
         );
+
+        $tagsPage = $blogCreator->createTagsPage($site, $site->languages);
+
+        $blogCreator->createTagPage($site, $tagsPage, $site->languages);
     }
 
     public function asCommand(Command $command): void

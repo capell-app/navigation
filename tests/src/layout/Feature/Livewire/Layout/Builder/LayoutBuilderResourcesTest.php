@@ -739,7 +739,7 @@ test('Can revert page assets', function (): void {
     ])
         ->assertSuccessful()
         ->mountAction(
-            TestAction::make('convertPageAssets')->arguments([
+            TestAction::make('togglePageAssets')->arguments([
                 'containerKey' => $containerKey,
                 'widgetIndex' => $widgetIndex,
             ]),

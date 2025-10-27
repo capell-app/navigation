@@ -16,7 +16,6 @@ class LayoutUpdater
             $this->defaultLayout(Layout::query()->firstWhere('key', LayoutEnum::Default));
             $this->homeLayout(Layout::query()->firstWhere('key', LayoutEnum::Home));
             $this->resultsLayout(Layout::query()->firstWhere('key', LayoutEnum::Results));
-            $this->tagsLayout(Layout::query()->firstWhere('key', LayoutEnum::Tags));
 
             return;
         }
@@ -24,7 +23,6 @@ class LayoutUpdater
         match ($key) {
             LayoutEnum::Home->value => $this->homeLayout(Layout::query()->firstWhere('key', LayoutEnum::Home)),
             LayoutEnum::Results->value => $this->resultsLayout(Layout::query()->firstWhere('key', LayoutEnum::Results)),
-            LayoutEnum::Tags->value => $this->tagsLayout(Layout::query()->firstWhere('key', LayoutEnum::Tags)),
             LayoutEnum::Default->value => $this->defaultLayout(Layout::query()->firstWhere('key', LayoutEnum::Default)),
             default => throw new InvalidArgumentException('Invalid layout key: ' . $key)
         };
@@ -67,20 +65,6 @@ class LayoutUpdater
                     ['widget_key' => 'breadcrumbs'],
                     ['widget_key' => 'page-content'],
                     ['widget_key' => 'page-slot'],
-                ]),
-                'sidebar' => $this->sidebarContainer([
-                    ['widget_key' => 'latest-pages'],
-                ]),
-            ],
-        ]);
-    }
-
-    public function tagsLayout(Layout $layout): void
-    {
-        $layout->update([
-            'containers' => [
-                'main' => $this->mainContainer([
-                    ['widget_key' => 'tags', 'meta' => ['show_page_title' => true]],
                 ]),
                 'sidebar' => $this->sidebarContainer([
                     ['widget_key' => 'latest-pages'],

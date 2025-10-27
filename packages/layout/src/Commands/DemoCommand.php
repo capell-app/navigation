@@ -80,6 +80,7 @@ class DemoCommand extends Command
             $contentCreator = app(ContentCreator::class);
 
             // $this->createSiteContents($contentCreator, $data[0], $site);
+            $this->createSiteContents($contentCreator, $data[0], $site);
 
             if (! $this->createDemoLayouts($site)) {
                 $this->error('Failed to create demo pages for the selected site.');
@@ -101,6 +102,7 @@ class DemoCommand extends Command
 
         $languages = $site->languages;
 
+        /** @var Page $homePage */
         $homePage = $site->pages()->homePage()->first();
 
         $this->setupHomepage($homePage, $languages);

@@ -15,13 +15,11 @@ class ContentDetailsSchema
             NameInput::make('name')
                 ->withTitleUpdater(),
             ContentTypeSelect::make('type_id')
-                ->live()
                 ->withRelation()
                 ->when(
                     $schema->isCreating(),
                     fn (ContentTypeSelect $component): ContentTypeSelect => $component->withCreateForm(),
                     fn (ContentTypeSelect $component): ContentTypeSelect => $component->withEditForm()
-                        ->changeConfirmation()
                 ),
         ];
     }

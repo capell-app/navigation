@@ -17,7 +17,6 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Tag;
 use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Data\FrontendAssetData;
@@ -306,11 +305,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                 'meta->page_id',
                 'id',
             )
-        );
-
-        Tag::resolveRelationUsing(
-            'contents',
-            fn (Tag $model): MorphToMany => $model->morphedByMany(Content::class, 'taggable')
         );
 
         Site::resolveRelationUsing(

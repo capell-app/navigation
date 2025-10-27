@@ -12,13 +12,6 @@ use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
 
 class LayoutTestCase extends AbstractTestCase
 {
-    protected function setUp(): void
-    {
-        $this->packageMigrations = glob(__DIR__ . '/../../../packages/layout/database/migrations/*.php');
-
-        parent::setUp();
-    }
-
     protected function getPackageProviders($app): array
     {
         return [

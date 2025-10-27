@@ -39,4 +39,7 @@ return [
     'widget' => [
         'hide_empty' => false,
     ],
+    'layout_builder' => [
+        'lazy' => env('CAPELL_LAYOUT_BUILDER_LAZY', true),
+    ],
 ];

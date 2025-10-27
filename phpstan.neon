@@ -18,13 +18,19 @@ parameters:
     checkUnusedViews: true
     noUnnecessaryEnumerableToArrayCalls: true
     databaseMigrationsPath:
+        - packages/address/database/migrations
+        - packages/blog/database/migrations
         - packages/layout/database/migrations
     configDirectories:
         - packages/blog/config
+        - packages/layout/config
     translationDirectories:
+        - packages/address/resources/lang
         - packages/blog/resources/lang
+        - packages/hero/resources/lang
         - packages/layout/resources/lang
     viewDirectories:
         - packages/blog/resources/views
+        - packages/hero/resources/views
         - packages/layout/resources/views
     tmpDir: /tmp/phpstan

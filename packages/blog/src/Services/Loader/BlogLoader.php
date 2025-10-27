@@ -28,7 +28,7 @@ class BlogLoader
             /** @var class-string<Page> $model */
             $model = CapellCore::getModel(ModelEnum::Page);
 
-            return $model::getPageByType('archive', site: $site, language: $language);
+            return $model::getFirstPageByTypeForSite('archive', site: $site, language: $language);
         }) ?: null;
 
         if ($fromCache && $page) {

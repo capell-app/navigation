@@ -16,11 +16,9 @@
         "lint": "pint",
         "analyze": "phpstan analyse --memory-limit=-1 --configuration=phpstan.neon",
         "prettier": "npx prettier --write \"packages/**/*.{css,js,yml,json,md,blade.php}\"",
-        "ide-models-helper": "@php ./vendor/bin/testbench ide-helper:models --dir=\"packages\" -WE",
         "preflight": [
             "@prettier",
             "@rector",
-            "@ide-models-helper",
             "@lint",
             "@analyze"
         ],
@@ -51,19 +49,15 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/howdu/activitylog"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/howdu/filament-adjacency-list"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/howdu/filament-title-with-slug"
         },
         {
             "type": "vcs",
             "url": "https://github.com/lara-zeus/translatable"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/TappNetwork/activitylog"
         }
     ],
     "require": {
@@ -77,9 +71,9 @@
         "bkwld/cloner": "^3.11",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blendbyte/filament-title-with-slug": "dev-fila4",
-        "capell-app/admin": "^4.0|dev-4.x",
-        "capell-app/core": "^4.0|dev-4.x",
-        "capell-app/frontend": "^4.0|dev-4.x",
+        "capell-app/admin": "^4.0|4.x-dev",
+        "capell-app/core": "^4.0|4.x-dev",
+        "capell-app/frontend": "^4.0|4.x-dev",
         "codewithdennis/filament-select-tree": "^4.0",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
@@ -96,8 +90,8 @@
         "oddvalue/laravel-drafts": "^1.0|^2.0",
         "openai-php/laravel": "*",
         "owenvoke/blade-fontawesome": "^2.8",
-        "rmsramos/activitylog": "filament4-dev",
-        "saade/filament-adjacency-list": "feature/item-label-dev",
+        "rmsramos/activitylog": "dev-filament4",
+        "saade/filament-adjacency-list": "4.x-dev",
         "silber/page-cache": "^1.0.9",
         "spatie/laravel-data": "^4.5",
         "spatie/laravel-package-tools": "^1.14.1",
@@ -124,18 +118,19 @@
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.8.2",
         "orchestra/testbench": "*",
-        "pestphp/pest": "^4.1.0",
-        "pestphp/pest-plugin-browser": "^4.1",
-        "pestphp/pest-plugin-arch": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-livewire": "^4.0",
-        "pestphp/pest-plugin-type-coverage": "^4.0.2",
+        "pestphp/pest": "^3.0|^4.1",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+        "pestphp/pest-plugin-type-coverage": "^3.0|^4.0",
         "rector/rector": "^2.0",
         "spatie/laravel-ray": "^1.36"
     },
     "autoload": {
         "psr-4": {
+            "Capell\\Address\\": "packages/address/src",
             "Capell\\Blog\\": "packages/blog/src",
+            "Capell\\Hero\\": "packages/hero/src",
             "Capell\\Layout\\": "packages/layout/src"
         }
     },
@@ -143,6 +138,7 @@
         "psr-4": {
             "Capell\\Blog\\Database\\Factories\\": "packages/blog/database/factories",
             "Capell\\Layout\\Database\\Factories\\": "packages/layout/database/factories",
+            "Capell\\Address\\Database\\Factories\\": "packages/address/database/factories",
             "Capell\\Tests\\": "tests/src"
         }
     },
@@ -160,7 +156,9 @@
     "extra": {
         "laravel": {
             "providers": [
+                "Capell\\Address\\AddressServiceProvider",
                 "Capell\\Blog\\BlogServiceProvider",
+                "Capell\\Hero\\HeroServiceProvider",
                 "Capell\\Layout\\LayoutServiceProvider"
             ]
         }

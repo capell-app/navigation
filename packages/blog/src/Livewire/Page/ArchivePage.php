@@ -93,7 +93,6 @@ class ArchivePage extends AbstractPage
             withPagination: $page->type->meta['pagination'] ?? true,
             withParent: $page->type->meta['with_parent'] ?? false,
             withDate: $page->type->meta['with_date'] ?? false,
-            withTags: $page->type->meta['with_tags'] ?? false,
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('year-%s-month-%s', $this->year, $this->month),
             modifyQuery: function (Builder $query) {

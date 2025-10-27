@@ -16,7 +16,6 @@ use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\CarouselWidgetSchema;
 use Capell\Layout\Models\Widget;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 
 class WidgetCreator
@@ -58,7 +57,6 @@ class WidgetCreator
         $this->pagesCardWidget($pagesWidgetType);
         $this->relatedPagesWidget($systemWidgetType, $languages);
         $this->siblingsWidget($pageResultsWidgetType, $languages);
-        $this->tagsWidget($systemWidgetType, $languages);
     }
 
     private function breadcrumbWidget(Type $systemWidgetType): void
@@ -303,31 +301,6 @@ class WidgetCreator
                 'language_id' => $language->id,
             ], [
                 'title' => __('capell-admin::heading.page_siblings'),
-            ]);
-        });
-    }
-
-    private function tagsWidget(Type $systemWidgetType, Collection $languages): void
-    {
-        $widget = $this->widgetModel::firstOrCreate([
-            'key' => 'tags',
-        ], [
-            'name' => __('capell-admin::generic.tags'),
-            'type_id' => $systemWidgetType->id,
-            'meta' => [
-                'component' => WidgetComponentEnum::Tags,
-                'size' => 'sm',
-            ],
-            'admin' => [
-                'icon' => 'heroicon-' . Heroicon::OutlinedTag->value,
-            ],
-        ]);
-
-        $languages->each(function (Language $language) use ($widget): void {
-            $widget->translations()->firstOrCreate([
-                'language_id' => $language->id,
-            ], [
-                'content' => 'Browse by tag to explore related topics and content.',
             ]);
         });
     }

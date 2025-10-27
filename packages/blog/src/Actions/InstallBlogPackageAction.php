@@ -20,19 +20,22 @@ class InstallBlogPackageAction
 
     public function handle(): void
     {
+        $blogCreator = app(BlogCreator::class);
+
         // Widgets
-        BlogCreator::createArticleWidget(BlogCreator::createArticleWidgetType());
-        $latestArticlesWidget = BlogCreator::createLatestArticlesWidget();
-        $archivesWidget = BlogCreator::createArchivesListWidget();
+        $blogCreator->createArticleWidget($blogCreator->createArticleWidgetType());
+
+        $latestArticlesWidget = $blogCreator->createLatestArticlesWidget();
+        $archivesWidget = $blogCreator->createArchivesListWidget();
 
         // Layouts
-        BlogCreator::createArticleLayout();
-        BlogCreator::createArchivesLayout();
-        BlogCreator::createBlogPageLayout();
+        $blogCreator->createArticleLayout();
+        $blogCreator->createArchivesLayout();
+        $blogCreator->createBlogPageLayout();
+        $blogCreator->createTagsLayout();
 
         $layouts = [
             LayoutEnum::Results,
-            LayoutEnum::Tags,
             LayoutEnum::Default,
         ];
 
@@ -63,11 +66,16 @@ class InstallBlogPackageAction
             $layout->update(['containers' => $containers]);
         }
 
-        // Page Forms
-        BlogCreator::createArticlePageType();
-        BlogCreator::createArchivePageType();
-        BlogCreator::createBlogPageType();
+        // Page Types
+        $blogCreator->createArticlePageType();
+        $blogCreator->createArchivePageType();
+        $blogCreator->createBlogPageType();
+        $blogCreator->createTagPageType();
 
-        Site::with('languages')->each(fn (Site $site) => CreateBlogPagesAction::run($site));
+        Site::with('languages')->each(function (Site $site) use ($blogCreator): void {
+            $blogCreator->createTagsWidget($site->languages);
+
+            CreateBlogPagesAction::run($site);
+        });
     }
 }

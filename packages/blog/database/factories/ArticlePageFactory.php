@@ -9,6 +9,7 @@ use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
 use Capell\Blog\Enums\BlogResourceEnum;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
+use Capell\Blog\Models\Tag;
 use Capell\Core\Database\Factories\PageFactory;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
@@ -33,7 +34,6 @@ class ArticlePageFactory extends PageFactory
                         'type_schema' => PageTypeSchema::getKey(),
                         'schema' => ArticlePageSchema::getKey(),
                         'resource' => BlogResourceEnum::Article->value,
-                        'with_tags' => true,
                         'exclude' => true,
                     ],
                 ]),
@@ -46,5 +46,18 @@ class ArticlePageFactory extends PageFactory
         return $this->state(fn (): array => [
             'parent_id' => $parent?->getKey(),
         ]);
+    }
+
+    public function withTags(): self
+    {
+        return $this->afterCreating(function (Page $page): void {
+            if (Tag::query()->count() < 10) {
+                Tag::factory()->count(3)->create();
+            }
+
+            $tags = Tag::query()->inRandomOrder()->limit(fake()->numberBetween(1, 3))->get();
+
+            $page->tags()->attach($tags);
+        });
     }
 }

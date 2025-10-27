@@ -21,6 +21,7 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Override;
@@ -77,6 +78,15 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
     protected function getAssetsTab(Schema $schema): Tab
     {
         return Tab::make(__('capell-admin::tab.assets'))
+            ->badge(function (Get $get): ?int {
+                if (! $get('widgetAssets')) {
+                    return null;
+                }
+
+                $count = count($get('widgetAssets'));
+
+                return $count > 0 ? $count : null;
+            })
             ->schema([
                 self::getAssetsComponent($schema),
             ]);
@@ -122,7 +132,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
 
     protected function getAssetsComponent(Schema $schema): Component
     {
-        return AssetsRepeater::make('assets')
+        return AssetsRepeater::make('widgetAssets')
             ->compact()
             ->hiddenLabel()
             ->hint(__('capell-admin::generic.widget_assets_repeater_hint'));

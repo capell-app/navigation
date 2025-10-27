@@ -45,10 +45,10 @@ declare(strict_types=1);
         'mt-10' => ! $loop->first,
         'bg-gray-50 dark:bg-gray-900' => $colorScheme === 'light',
         'bg-gray-800 dark:bg-gray-900' => $colorScheme === 'dark',
-        'min-h-[calc(100vh-var(--header-height))]' => $height === 'full',
-        'min-h-[calc(100vh-var(--header-height))] lg:min-h-[900px]' => $height === 'large',
-        'min-h-[calc(100vh-var(--header-height))] md:min-h-[600px]' => $height === 'medium',
-        'min-h-[calc(100vh-var(--header-height))] sm:min-h-[400px]' => $height === 'small',
+        'h-[calc(100vh-var(--header-height))]' => $height === 'full',
+        'h-[calc(100vh-var(--header-height))] lg:max-h-[60vh]' => $height === 'large',
+        'h-[calc(100vh-var(--header-height))] md:max-h-[40vh]' => $height === 'medium',
+        'h-[calc(100vh-var(--header-height))] sm:max-h-[24rem]' => $height === 'small',
     ])
 >
     <x-capell-hero::hero.wrapper
@@ -158,7 +158,7 @@ declare(strict_types=1);
                 >
                     <div
                         @class([
-                            '@container grid select-text gap-4 gap-x-10 gap-y-8 py-14 lg:gap-x-16',
+                            '@container grid select-text gap-4 gap-x-10 gap-y-8 py-14 lg:gap-x-16 lg:py-24',
                             'lg:grid-cols-12' => $images?->isNotEmpty(),
                         ])
                     >
@@ -166,7 +166,7 @@ declare(strict_types=1);
                             @class([
                                 'flex flex-col justify-center',
                                 'items-center text-center' => ! $images?->isNotEmpty(),
-                                'lg:col-span-8 xl:col-span-7' => $images?->isNotEmpty(),
+                                'lg:col-span-5 xl:col-span-7' => $images?->isNotEmpty(),
                                 'py-[4vh]' => ! $asset->image && ! $bgImage,
                             ])
                         >
@@ -216,7 +216,7 @@ declare(strict_types=1);
 
                         @if ($images?->isNotEmpty())
                             <div
-                                class="relative z-30 w-full lg:col-span-4 xl:col-span-5"
+                                class="relative z-30 flex w-full items-center lg:col-span-6 xl:col-span-5"
                             >
                                 @foreach ($images as $media)
                                     @capture($mediaContent)

@@ -14,17 +14,15 @@ use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\PublishStatusColumn;
+use Capell\Admin\Filament\Components\Tables\Columns\PublishIconColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Enums\ModelEnum;
-use Capell\Core\Enums\TagTypeEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Tag;
 use Capell\Core\Models\Type;
 use Capell\Layout\Actions\ReplicateContentAction;
 use Capell\Layout\Enums\LayoutModelEnum;
@@ -40,7 +38,6 @@ use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
@@ -50,7 +47,6 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ContentsTable implements TableConfigurator
@@ -67,7 +63,6 @@ class ContentsTable implements TableConfigurator
                         'image',
                         'parent.type',
                         'site',
-                        'tags',
                         'translation.language',
                         'translations.language',
                         'type',
@@ -139,10 +134,6 @@ class ContentsTable implements TableConfigurator
                 ->withParents()
                 ->toggleable(isToggledHiddenByDefault: true),
             TypeColumn::make('type.name'),
-            SpatieTagsColumn::make('tags')
-                ->label(__('capell-admin::table.tags'))
-                ->type(TagTypeEnum::CONTENT->value)
-                ->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('children_count')
                 ->label(__('capell-admin::table.children'))
                 ->alignRight()
@@ -180,7 +171,7 @@ class ContentsTable implements TableConfigurator
                     fn (HasTable $livewire): bool => $livewire->activeTab
                         || ! empty($livewire->getTableFilterState('filter')['site_id'])
                 ),
-            PublishStatusColumn::make('status'),
+            PublishIconColumn::make('status'),
             DateColumn::make('publish_from')
                 ->label(__('capell-admin::table.publish_from'))
                 ->toggleable(isToggledHiddenByDefault: true),
@@ -258,6 +249,7 @@ class ContentsTable implements TableConfigurator
 
                     Select::make('parent_id')
                         ->label(__('capell-admin::form.parent'))
+                        ->allowHtml()
                         ->options(function (HasTable $livewire, Get $get) {
                             $siteId = static::getSiteId($livewire);
 
@@ -286,7 +278,7 @@ class ContentsTable implements TableConfigurator
                                 $label = '';
 
                                 if (! $siteId && $content->site) {
-                                    $label .= $content->site->name . ' » ';
+                                    $label .= $content->site->name . ' &raquo; ';
                                 }
 
                                 $ancestors = $content->ancestors()->get();
@@ -294,58 +286,14 @@ class ContentsTable implements TableConfigurator
                                 if ($ancestors->isNotEmpty()) {
                                     $label .= $ancestors->pluck('name')
                                         ->map(fn ($item) => Str::limit($item, 30))
-                                        ->implode(' » ')
-                                        . ' » ';
+                                        ->implode(' &raquo; ')
+                                        . ' &raquo; ';
                                 }
 
                                 $label .= Str::limit($content->name, 40);
 
                                 return [$content->id => $label];
                             });
-                        }),
-
-                    Select::make('tags')
-                        ->label(__('capell-admin::form.tags'))
-                        ->relationship(
-                            name: 'tags',
-                            titleAttribute: 'name',
-                            modifyQueryUsing: function (Builder $query, HasTable $livewire, Get $get): void {
-                                $siteId = static::getSiteId($livewire);
-
-                                if (! $siteId) {
-                                    $query->with('site')
-                                        ->orderBy('site_id');
-                                } else {
-                                    $query->where(
-                                        fn (Builder $query) => $query->where('site_id', $siteId)->orWhereNull('site_id')
-                                    );
-                                    $query->whereHas('contents', fn (BuilderContract $query) => $query->where('site_id', $siteId));
-                                }
-
-                                if ($language_id = $get('language_id')) {
-                                    $code = CapellCore::getModel(ModelEnum::Language)::find($language_id, 'code')->code;
-                                    $query->whereRaw('JSON_EXTRACT(`tags`.`name`, ' . DB::getPdo()->quote('$.' . $code) . ') IS NOT NULL');
-                                }
-                            }
-                        )
-                        ->getOptionLabelFromRecordUsing(function (Tag $record, HasTable $livewire, Get $get): string {
-                            $label = '';
-
-                            $siteId = static::getSiteId($livewire);
-
-                            if (! $siteId && $record->site) {
-                                $label .= $record->site->name . ' » ';
-                            }
-
-                            if ($language_id = $get('language_id')) {
-                                $code = CapellCore::getModel(ModelEnum::Language)::find($language_id, 'code')->code;
-
-                                $label .= $record->getTranslation('name', $code);
-                            } else {
-                                $label .= $record->getTranslation('name', 'en');
-                            }
-
-                            return $label;
                         }),
                 ])
                 ->query(function (Builder $query, array $data): void {
@@ -357,16 +305,6 @@ class ContentsTable implements TableConfigurator
                                 fn (BuilderContract $query) => $query->where(
                                     'language_id',
                                     (int) $data['language_id']
-                                )
-                            )
-                        )
-                        ->when(
-                            $data['tags'] ?? null,
-                            fn (Builder $query) => $query->whereHas(
-                                'tags',
-                                fn (BuilderContract $query) => $query->where(
-                                    'tags.id',
-                                    (int) $data['tags']
                                 )
                             )
                         )
@@ -401,16 +339,6 @@ class ContentsTable implements TableConfigurator
                                 )
                                     ?->name,
                             ]
-                        );
-                    }
-
-                    if (! empty($data['tags'])) {
-                        /** @var class-string<Tag> $model */
-                        $model = CapellCore::getModel(ModelEnum::Tag);
-
-                        $indicators['tags'] = __(
-                            'capell-admin::filter.tag',
-                            ['search' => $model::find($data['tags'], 'name')?->name]
                         );
                     }
 

@@ -11,6 +11,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Filament\Resources\Contents\Schemas\Types\DefaultContentSchema;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class ContentForm implements FormConfigurator
@@ -20,16 +21,26 @@ class ContentForm implements FormConfigurator
         return $schema->components(static::getFormSchema($schema->columns()));
     }
 
-    protected static function getFormSchema(Schema $schema): array
+    public static function getFormSchema(Schema $schema): array
     {
         return [
             TypeSchema::make()
                 ->columns($schema->getColumns())
                 ->schema(
-                    function (Get $get, TypeSchema $component) use ($schema): array {
-                        $typeId = $get('type_id');
+                    function (Get $get, Set $set, TypeSchema $component) use ($schema): array {
+                        if (! $get('cached_type_id')) {
+                            $set('cached_type_id', $get('type_id'));
+                        }
 
-                        $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
+                        $typeId = $get('cached_type_id');
+
+                        $record = $component->getRecord();
+
+                        if ($record?->relationLoaded('type') && $record->type?->id === $typeId) {
+                            $type = $record->type;
+                        } else {
+                            $type = $typeId ? CapellCore::getModel(ModelEnum::Type)::find($typeId, ['admin']) : null;
+                        }
 
                         $name = $type->admin['schema'] ?? DefaultContentSchema::getKey();
 

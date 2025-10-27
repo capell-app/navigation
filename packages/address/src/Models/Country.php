@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Address\Models;
 
+use Capell\Address\Database\Factories\CountryFactory;
 use Capell\Address\Observers\CountryObserver;
-use Capell\Core\Database\Factories\CountryFactory;
 use Capell\Core\Models\Concerns\HasDefault;
 use Capell\Core\Models\Concerns\HasStatus;
 use Capell\Core\Models\Contracts\Defaultable;
@@ -48,8 +48,6 @@ use Wildside\Userstamps\Userstamps;
  * @method static Builder<static>|Country withoutTrashed()
  *
  * @mixin Model
- * @mixin Model
- * @mixin \Eloquent
  */
 #[ObservedBy(CountryObserver::class)]
 class Country extends Model implements Defaultable
