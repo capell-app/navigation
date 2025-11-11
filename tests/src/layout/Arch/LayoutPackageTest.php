@@ -34,7 +34,6 @@ it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])
     ->toBeUsedInNothing()
     ->ignoring([
-        Frontend::class,
         EditPage::class,
     ]);
 

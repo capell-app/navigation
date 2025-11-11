@@ -236,6 +236,44 @@ test('removeContainer action', function (): void {
         ->not->toHaveKey($containerKey);
 });
 
+test('Can save layout without editing container', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+
+    $containers = $layout->containers;
+
+    $containerKey = array_key_first($containers);
+
+    $containerWidget = $containers[$containerKey]['widgets'][0];
+
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
+
+    WidgetAsset::factory()
+        ->count(2)
+        ->widget($widget)
+        ->occurrence($containerWidget['occurrence'])
+        ->create();
+
+    livewire(LayoutBuilder::class, [
+        'layout_id' => $layout->id,
+    ])
+        ->assertSuccessful()
+        ->set('layoutModified', true)
+        ->call('saveLayout');
+
+    expect($layout->refresh())
+        ->containers
+        ->toHaveCount(count($containers))
+        ->toEqual($containers);
+
+    $assets = WidgetAsset::query()
+        ->where('widget_id', $widget->id)
+        ->whereNull('page_id')
+        ->exists();
+
+    expect($assets)
+        ->toBeTrue();
+});
+
 test('Can edit container', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
 
@@ -275,20 +313,37 @@ test('Can edit container', function (): void {
     $assets = WidgetAsset::query()
         ->where('widget_id', $widget->id)
         ->whereNull('page_id')
-        ->exists();
+        ->get();
 
     expect($assets)
-        ->toBeTrue();
+        ->toHaveCount(2)
+        ->each(
+            fn (Pest\Expectation $expect) => $expect
+                ->widget_id->toEqual($widget->id)
+                ->container->toBeNull()
+                ->page_id->toBeNull()
+        );
 });
 
-test('Can edit container for page layout', function (): void {
+test('Can edit container for page layout', function (string $widgetKey): void {
     $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 
     $containerKey = array_key_first($layout->containers);
     $newContainerKey = $containerKey . '-new';
 
-    $containerWidget = $layout->containers[$containerKey]['widgets'][0];
+    foreach ($layout->containers as $key => $container) {
+        foreach ($container['widgets'] as $index => $widget) {
+            if ($widget['widget_key'] === $widgetKey) {
+                $containerWidget = $widget;
+                break 2;
+            }
+        }
+    }
+
+    if (! isset($containerWidget)) {
+        throw new \Exception("Widget with key {$widgetKey} not found in layout containers.");
+    }
 
     $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
@@ -321,12 +376,18 @@ test('Can edit container for page layout', function (): void {
 
     $assets = WidgetAsset::query()
         ->where('widget_id', $widget->id)
-        ->whereNull('page_id')
-        ->exists();
+        ->where('page_id', $page->id)
+        ->get();
 
     expect($assets)
-        ->toBeTrue();
-});
+        ->toHaveCount(2)
+        ->each(
+            fn (Pest\Expectation $expect) => $expect
+                ->container->toEqual($newContainerKey)
+                ->widget_id->toEqual($widget->id)
+                ->page_id->toEqual($page->id)
+        );
+})->with(['first', 'second']);
 
 test('Can add new widget', function (): void {
     $layout = (new LayoutFactory)->containers()->create();

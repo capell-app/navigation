@@ -15,6 +15,8 @@ use Capell\Layout\Models\WidgetAsset;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Str;
+use Pest\Expectation;
+use Pest\Expectations\HigherOrderExpectation;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -60,23 +62,41 @@ test('Can save without affecting widget assets', function (bool $withPage): void
 })->with(['with page' => true, 'without page' => false]);
 
 test('Can sync new widget assets to page layout', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
+    $firstWidget = Widget::factory(['key' => 'first'])->create();
+    $secondWidget = Widget::factory(['key' => 'second'])->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => fn (): array => [
+            'main' => [
+                'widgets' => [
+                    [
+                        'widget_key' => $firstWidget->key,
+                        'occurrence' => 1,
+                    ],
+                    [
+                        'widget_key' => $secondWidget->key,
+                        'occurrence' => 1,
+                    ],
+                    [
+                        'widget_key' => $firstWidget->key,
+                        'occurrence' => 2,
+                    ],
+                ],
+                'meta' => [],
+            ],
+        ],
+    ])
+        ->create();
+
     $page = Page::factory()->layout($layout)->create();
 
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-    $occurrence = $layout->containers[$containerKey]['widgets'][$widgetIndex]['occurrence'];
-    $widget = Widget::query()->firstWhere('key', $layout->containers[$containerKey]['widgets'][$widgetIndex]['widget_key']);
-
-    $secondWidgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
-    $secondWidget = Widget::query()->firstWhere('key', $layout->containers[$containerKey]['widgets'][$secondWidgetIndex]['widget_key']);
-    $secondOccurrence = $layout->containers[$containerKey]['widgets'][$secondWidgetIndex]['occurrence'];
+    $containerKey = 'main';
 
     // 2 existing
     WidgetAsset::factory()
         ->count(2)
-        ->widget($widget)
-        ->page($page, $containerKey, $occurrence)
+        ->widget($firstWidget)
+        ->page($page, $containerKey, 1)
         ->create();
 
     // 5 to add
@@ -88,10 +108,8 @@ test('Can sync new widget assets to page layout', function (): void {
         ->count(3)
         ->create();
 
-    expect($widget->pageAssets($page, $containerKey, $occurrence)->count())
-        ->toBe(2)
-        ->and($widget->key)
-        ->toBe($secondWidget->key);
+    expect($firstWidget->pageAssets($page, $containerKey, 1)->count())
+        ->toBe(2);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -102,7 +120,7 @@ test('Can sync new widget assets to page layout', function (): void {
             'syncSelectedAssets',
             arguments: [
                 'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
+                'widgetIndex' => 0,
                 'hasPageAssets' => true,
             ],
             type: \Capell\Layout\Enums\AssetEnum::Content->value,
@@ -112,7 +130,7 @@ test('Can sync new widget assets to page layout', function (): void {
             'syncSelectedAssets',
             arguments: [
                 'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
+                'widgetIndex' => 0,
                 'hasPageAssets' => true,
             ],
             type: AssetEnum::Page->value,
@@ -120,13 +138,11 @@ test('Can sync new widget assets to page layout', function (): void {
         )
         ->call('saveLayout');
 
-    expect($widget->widgetAssets()->count())
+    expect($firstWidget->widgetAssets()->count())
         ->toBe(0)
-        ->and($widget->pageAssets($page, $containerKey, $occurrence)->count())
+        ->and($firstWidget->pageAssets($page, $containerKey, 1)->count())
         ->toBe(7)
-        ->and($secondWidget->widgetAssets()->count())
-        ->toBe(0)
-        ->and($secondWidget->pageAssets($page, $containerKey, $secondOccurrence)->count())
+        ->and($secondWidget->assets()->count())
         ->toBe(0);
 });
 
@@ -138,7 +154,8 @@ test('Can sync new widget assets to layout', function (): void {
     $pages = Page::factory()->count(3)->create();
 
     $containerKey = array_key_first($layout->containers);
-    $widgetIndex = 2;
+    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
+    $occurrence = $layout->containers[$containerKey]['widgets'][$widgetIndex]['occurrence'];
     $widget = Widget::query()->firstWhere('key', 'first');
 
     // 2 existing
@@ -152,8 +169,13 @@ test('Can sync new widget assets to layout', function (): void {
         ->count(3)
         ->create();
 
-    expect($widget->widgetAssets()->count())
-        ->toBe(2);
+    expect($widget->widgetAssets()->get())
+        ->toHaveCount(2)
+        ->each(
+            fn (Expectation $expectation): HigherOrderExpectation => $expectation
+                ->container->toBeNull()
+                ->occurrence->toBe($occurrence)
+        );
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -181,7 +203,7 @@ test('Can sync new widget assets to layout', function (): void {
         )
         ->call('saveLayout');
 
-    expect($widget->widgetAssets()->count())
+    expect($widget->widgetAssets()->where('occurrence', $occurrence)->count())
         ->toBe(7);
 });
 
@@ -260,7 +282,6 @@ test('Can reorder assets', function (): void {
         ->widget($widget)
         ->asset(\Capell\Layout\Enums\AssetEnum::Content)
         ->state([
-            'container' => 'test',
             'order' => 2,
             'occurrence' => 2,
         ])
@@ -270,7 +291,6 @@ test('Can reorder assets', function (): void {
         ->widget($widget)
         ->asset(AssetEnum::Page)
         ->state([
-            'container' => 'test',
             'order' => 1,
             'occurrence' => 2,
         ])
@@ -358,7 +378,6 @@ test('can add page asset', function (): void {
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertActionExists('addAsset')
         ->mountAction(
             TestAction::make('addAsset')
                 ->arguments([
@@ -393,7 +412,7 @@ test('can add page asset', function (): void {
         'page_id' => null,
         'widget_id' => $widget->id,
         'container' => null,
-        'occurrence' => null,
+        'occurrence' => 1,
         'asset_type' => 'page',
     ]);
 });
@@ -555,7 +574,6 @@ test('can edit asset', function (): void {
 
     $layoutAsset = WidgetAsset::factory()
         ->widget($widget)
-        ->container($containerKey)
         ->asset(AssetEnum::Page)
         ->create();
 
@@ -594,7 +612,6 @@ test('can remove widget assets', function (): void {
 
     WidgetAsset::factory()
         ->widget($widget)
-        ->container($containerKey)
         ->occurrence($containerWidget['occurrence'])
         ->count(3)
         ->create();
@@ -636,7 +653,6 @@ test('can remove page assets', function (): void {
 
     WidgetAsset::factory()
         ->widget($widget)
-        ->container($containerKey)
         ->occurrence($containerWidget['occurrence'])
         ->create();
 
@@ -672,7 +688,7 @@ test('can remove page assets', function (): void {
     assertDatabaseHas('widget_assets', [
         'widget_id' => $widget->id,
         'page_id' => null,
-        'container' => $containerKey,
+        'container' => null,
         'occurrence' => $containerWidget['occurrence'],
     ]);
 });
@@ -746,5 +762,3 @@ test('Can revert page assets', function (): void {
         )
         ->callMountedAction();
 });
-
-todo('add tests for editWidgetAsset');

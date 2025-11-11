@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('widget_id')->constrained()->cascadeOnDelete();
             $table->foreignId('page_id')->nullable()->index()->constrained()->cascadeOnDelete();
             $table->string('container')->nullable();
-            $table->unsignedInteger('occurrence')->nullable();
+            $table->unsignedInteger('occurrence')->nullable()->default(1);
             $table->uuidMorphs('asset');
             $table->unsignedInteger('order')->default(0)->index();
             $table->json('meta')->nullable();

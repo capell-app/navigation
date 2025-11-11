@@ -19,13 +19,6 @@ class WidgetAssetFactory extends Factory
 {
     protected $model = WidgetAsset::class;
 
-    public function container(?string $containerKey): self
-    {
-        return $this->state(fn (array $attributes): array => [
-            'container' => $containerKey,
-        ]);
-    }
-
     /**
      * Define the model's default state.
      *
@@ -46,11 +39,18 @@ class WidgetAssetFactory extends Factory
                 LayoutAssetEnum::Content => (string) Content::factory()->create()->id,
                 AssetEnum::Page => (string) Page::factory()->create()->id,
             },
-            'occurrence' => null,
+            'occurrence' => 1,
             'order' => fake()->randomNumber(1),
             'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];
+    }
+
+    public function container(?string $containerKey): self
+    {
+        return $this->state(fn (array $attributes): array => [
+            'container' => $containerKey,
+        ]);
     }
 
     public function occurrence(int $occurrence): self
