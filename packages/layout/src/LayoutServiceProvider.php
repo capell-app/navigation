@@ -342,11 +342,11 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemas(): self
     {
-        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::Content->value, ContentSchemaEnum::cases());
-        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::Widget->value, WidgetSchemaEnum::cases());
-        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::WidgetAsset->value, WidgetAssetSchemaEnum::cases());
-        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutContainer->value, LayoutContainerSchemaEnum::cases());
-        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutWidget->value, LayoutWidgetSchemaEnum::cases());
+        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::Content->name, ContentSchemaEnum::cases());
+        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::Widget->name, WidgetSchemaEnum::cases());
+        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::WidgetAsset->name, WidgetAssetSchemaEnum::cases());
+        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutContainer->name, LayoutContainerSchemaEnum::cases());
+        CapellAdmin::registerSchemas(Enums\SchemaTypeEnum::LayoutWidget->name, LayoutWidgetSchemaEnum::cases());
         CapellAdmin::registerSchema(SchemaTypeEnum::Type, ContentTypeSchema::class);
         CapellAdmin::registerSchema(SchemaTypeEnum::Type, WidgetTypeSchema::class);
 

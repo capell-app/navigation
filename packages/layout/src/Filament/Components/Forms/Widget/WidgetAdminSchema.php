@@ -20,11 +20,11 @@ class WidgetAdminSchema
         return [
             SchemaSelect::make('schema')
                 ->default(fn (): string => WidgetSchemaEnum::Default->name)
-                ->setupOptions(SchemaTypeEnum::Widget->value),
+                ->setupOptions(SchemaTypeEnum::Widget->name),
 
             SchemaSelect::make('layout_container_widget_schema')
                 ->label(__('capell-admin::form.container_widget_schema'))
-                ->setupOptions(SchemaTypeEnum::LayoutWidget->value),
+                ->setupOptions(SchemaTypeEnum::LayoutWidget->name),
 
             IconPicker::make('icon')
                 ->label(__('capell-admin::form.admin_icon')),
@@ -40,7 +40,7 @@ class WidgetAdminSchema
                     SchemaSelect::make('widget_asset_schema')
                         ->label(__('capell-admin::form.widget_asset_schema'))
                         ->helperText(__('capell-admin::generic.widget_asset_schema_info'))
-                        ->setupOptions(SchemaTypeEnum::WidgetAsset->value),
+                        ->setupOptions(SchemaTypeEnum::WidgetAsset->name),
 
                     AssetTypeSelect::make('asset_types')
                         ->label(__('capell-admin::form.asset_type'))

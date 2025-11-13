@@ -116,8 +116,8 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemas(): self
     {
-        CapellAdmin::registerSchemas(SchemaTypeEnum::Address->value, AddressSchemaEnum::cases());
-        CapellAdmin::registerSchemas(SchemaTypeEnum::Country->value, CountrySchemaEnum::cases());
+        CapellAdmin::registerSchemas(SchemaTypeEnum::Address->name, AddressSchemaEnum::cases());
+        CapellAdmin::registerSchemas(SchemaTypeEnum::Country->name, CountrySchemaEnum::cases());
 
         return $this;
     }

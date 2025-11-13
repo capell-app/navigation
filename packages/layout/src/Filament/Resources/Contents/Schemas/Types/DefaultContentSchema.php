@@ -30,7 +30,7 @@ class DefaultContentSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::Content->value;
+    public static string $schemaType = SchemaTypeEnum::Content->name;
 
     public static function getExtenders(): iterable
     {

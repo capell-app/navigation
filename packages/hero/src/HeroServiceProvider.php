@@ -57,9 +57,9 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
 
         CapellCore::registerComponents(ComponentTypeEnum::Widget->value, WidgetComponentEnum::cases());
 
-        CapellAdmin::registerSchemas(SchemaTypeEnum::Content->value, ContentSchemaEnum::cases());
+        CapellAdmin::registerSchemas(SchemaTypeEnum::Content->name, ContentSchemaEnum::cases());
 
-        CapellAdmin::registerSchemas(SchemaTypeEnum::Widget->value, WidgetSchemaEnum::cases());
+        CapellAdmin::registerSchemas(SchemaTypeEnum::Widget->name, WidgetSchemaEnum::cases());
 
         $this->registerSchemaExtender(HeroPageSchemaExtender::TAG, HeroPageSchemaExtender::class);
     }

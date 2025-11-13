@@ -22,7 +22,7 @@ class DefaultCountrySchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::Country->value;
+    public static string $schemaType = SchemaTypeEnum::Country->name;
 
     public static function getExtenders(): iterable
     {

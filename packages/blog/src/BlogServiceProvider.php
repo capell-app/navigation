@@ -153,7 +153,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
         CapellAdmin::registerSchema(SchemaTypeEnum::Page, ArticlePageSchema::class);
 
-        CapellAdmin::registerSchemas(\Capell\Layout\Enums\SchemaTypeEnum::Widget->value, WidgetSchemaEnum::cases());
+        CapellAdmin::registerSchemas(\Capell\Layout\Enums\SchemaTypeEnum::Widget->name, WidgetSchemaEnum::cases());
 
         CapellCore::registerModels(BlogModelEnum::cases());
 

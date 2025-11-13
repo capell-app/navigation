@@ -376,7 +376,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->modalWidth(Width::ScreenSmall)
             ->schema(function (array $arguments, self $livewire, Schema $schema): Schema {
                 $adminSchema = CapellAdmin::getSchema(
-                    SchemaTypeEnum::LayoutWidget->value,
+                    SchemaTypeEnum::LayoutWidget->name,
                     $livewire->getContainerWidgetSchema($arguments['containerKey'], $arguments['widgetIndex']),
                 );
 
@@ -1743,7 +1743,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         $containerKey = $arguments['containerKey'] ?? null;
 
         $adminSchema = CapellAdmin::getSchema(
-            SchemaTypeEnum::LayoutContainer->value,
+            SchemaTypeEnum::LayoutContainer->name,
             $this->layoutRecord->admin['container_schema'][$containerKey] ?? DefaultLayoutContainerSchema::getKey(),
         );
 
@@ -2043,13 +2043,13 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     fn (BuilderContract $query) => $query->orderByRaw(
                         'CASE id '
                         . implode(' ', array_map(
-                            fn ($id, $pos): string => sprintf('WHEN %d THEN %d', (int) $id, (int) $pos),
+                            fn ($id, $pos): string => sprintf('WHEN %d THEN %d', (int) $id, $pos),
                             $existingIds,
                             array_keys($existingIds),
                         ))
                           . ' END',
                     ),
-                    fn (BuilderContract $query) => $query->orderByRaw('FIELD(id, ' . implode(',', array_map('intval', $existingIds)) . ')'),
+                    fn (BuilderContract $query) => $query->orderByRaw('FIELD(id, ' . implode(',', array_map(intval(...), $existingIds)) . ')'),
                 )
                 ->get();
 

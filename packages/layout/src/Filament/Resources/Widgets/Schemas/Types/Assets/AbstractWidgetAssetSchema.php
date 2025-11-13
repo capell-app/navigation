@@ -15,7 +15,7 @@ abstract class AbstractWidgetAssetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::WidgetAsset->value;
+    public static string $schemaType = SchemaTypeEnum::WidgetAsset->name;
 
     abstract protected function getAssetSchema(Schema $schema): array;
 

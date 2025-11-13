@@ -27,7 +27,7 @@ class PageContentWidgetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::Widget->value;
+    public static string $schemaType = SchemaTypeEnum::Widget->name;
 
     public static function getExtenders(): iterable
     {

@@ -6,10 +6,10 @@ namespace Capell\Layout\Enums;
 
 enum SchemaTypeEnum: string
 {
-    case Content = 'Content';
-    case Layout = 'Layout';
-    case LayoutContainer = 'LayoutContainer';
-    case LayoutWidget = 'LayoutWidget';
-    case Widget = 'Widget';
-    case WidgetAsset = 'WidgetAsset';
+    case Content = 'Contents';
+    case Layout = 'Layouts';
+    case LayoutContainer = 'LayoutContainers';
+    case LayoutWidget = 'LayoutWidgets';
+    case Widget = 'Widgets';
+    case WidgetAsset = 'WidgetAssets';
 }

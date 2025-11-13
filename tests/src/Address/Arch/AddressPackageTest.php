@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Capell\Frontend\Livewire\Page\SitemapPage;
+
 arch()
     ->expect('Capell\\Address')
     ->toOnlyBeUsedIn('Capell\\Address');
@@ -19,7 +21,7 @@ arch()
     ->laravel()
     ->ignoring([
         'exit',
-        'Capell\\Frontend\\Livewire\\Page\\SitemapPage',
+        SitemapPage::class,
     ]);
 
 arch()->preset()->security();

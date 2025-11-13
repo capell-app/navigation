@@ -19,7 +19,7 @@ class DefaultAddressSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::Address->value;
+    public static string $schemaType = SchemaTypeEnum::Address->name;
 
     public static function getExtenders(): iterable
     {

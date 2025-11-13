@@ -22,7 +22,7 @@ declare(strict_types=1);
         x-load-src="{{
             Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc(
                 'layout-builder',
-                'capell-layout'
+                'capell-layout',
             )
         }}"
         x-data="layoutBuilderComponent"

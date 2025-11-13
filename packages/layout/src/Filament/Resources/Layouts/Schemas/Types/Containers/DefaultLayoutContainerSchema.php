@@ -25,7 +25,7 @@ class DefaultLayoutContainerSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::LayoutContainer->value;
+    public static string $schemaType = SchemaTypeEnum::LayoutContainer->name;
 
     public static function getExtenders(): iterable
     {

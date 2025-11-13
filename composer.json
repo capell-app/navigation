@@ -13,7 +13,7 @@
     "scripts": {
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
         "rector": "rector",
-        "lint": "pint",
+        "lint": "pint --diff=4.x --parallel",
         "analyze": "phpstan analyse --memory-limit=-1 --configuration=phpstan.neon",
         "prettier": "npx prettier --write \"packages/**/*.{css,js,yml,json,md,blade.php}\"",
         "preflight": [

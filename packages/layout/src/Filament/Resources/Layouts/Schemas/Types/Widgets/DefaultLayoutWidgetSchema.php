@@ -16,7 +16,7 @@ class DefaultLayoutWidgetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static string $schemaType = SchemaTypeEnum::LayoutWidget->value;
+    public static string $schemaType = SchemaTypeEnum::LayoutWidget->name;
 
     public static function getExtenders(): iterable
     {

@@ -90,9 +90,7 @@ abstract class AbstractTestCase extends TestCase
             $path = realpath(__DIR__ . '/../../vendor/capell-app/core/packages/core/database/migrations');
         }
 
-        if (! $path) {
-            throw new RuntimeException('Could not find core migrations path.');
-        }
+        throw_unless($path, RuntimeException::class, 'Could not find core migrations path.');
 
         array_walk($migrations, fn (&$migration): string => $migration = sprintf('%s/%s.php', $path, $migration));
 

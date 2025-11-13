@@ -6,6 +6,6 @@ namespace Capell\Address\Enums;
 
 enum SchemaTypeEnum: string
 {
-    case Address = 'Address';
-    case Country = 'Country';
+    case Address = 'Addresses';
+    case Country = 'Countries';
 }
