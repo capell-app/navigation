@@ -11,9 +11,8 @@ use Capell\Admin\Filament\Concerns\HasTableConfigurator;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Enums\ResourceEnum;
+use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Filament\Resources\Contents\Pages\CreateContent;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Filament\Resources\Contents\Pages\ListContents;
@@ -38,7 +37,6 @@ class ContentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-
     /** @var class-string<FormConfigurator> */
     protected static string $formConfigurator = ContentForm::class;
 
@@ -57,7 +55,7 @@ class ContentResource extends Resource
 
     public static function getResourceType(): string
     {
-        return ResourceEnum::Content->name;
+        return 'Contents';
     }
 
     public static function getEloquentQuery(): Builder

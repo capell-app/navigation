@@ -6,8 +6,8 @@ namespace Capell\Blog\Database\Factories;
 
 use Capell\Admin\Enums\ContentEditorEnum;
 use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
-use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
+use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Models\Tag;
 use Capell\Core\Database\Factories\PageFactory;

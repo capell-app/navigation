@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Address;
 
-use Override;
 use Capell\Address\AddressServiceProvider;
 use Capell\Admin\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Override;
 
 class AddressTestCase extends AbstractTestCase
 {
@@ -18,8 +18,8 @@ class AddressTestCase extends AbstractTestCase
         return [
             ...parent::getPackageProviders($app),
             AddressServiceProvider::class,
-            AdminServiceProvider::class,
             AdminPanelProvider::class,
+            AdminServiceProvider::class,
         ];
     }
 
@@ -28,11 +28,12 @@ class AddressTestCase extends AbstractTestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
     }
 
-    protected function getPackageName(): string
+    protected function requiredPackages(): array
     {
-        return 'address';
+        return ['address'];
     }
 }

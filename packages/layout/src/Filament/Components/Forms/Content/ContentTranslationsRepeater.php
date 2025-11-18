@@ -9,9 +9,6 @@ use Capell\Admin\Filament\Components\Forms\RepeaterTabs;
 use Capell\Admin\Filament\Components\Forms\TranslationLanguageSelect;
 use Capell\Admin\Filament\Components\Forms\TranslationsRepeater;
 use Capell\Core\CapellCoreHelper;
-use Capell\Core\Enums\ModelEnum;
-use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Enums\TypeEnum;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
@@ -47,7 +44,7 @@ class ContentTranslationsRepeater
             $type = $record->type;
         } else {
             $type = CapellCoreHelper::getType(
-                typeId: $schema->getRawState()['type_id'] ?? null
+                typeId: $schema->getRawState()['type_id'] ?? null,
             );
         }
 

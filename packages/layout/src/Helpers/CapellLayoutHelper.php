@@ -15,20 +15,10 @@ use Illuminate\Support\Facades\Cache;
 
 class CapellLayoutHelper
 {
-    private static function getCached(string $key, callable $resolver, bool $asBool = false): mixed
-    {
-        $cached = Cache::driver('array')->get($key);
-        if ($cached !== null) {
-            return $asBool ? (bool) $cached : $cached;
-        }
-        $result = $resolver();
-        Cache::driver('array')->forever($key, $result);
-        return $asBool ? (bool) $result : $result;
-    }
-
     public static function getWidgetOptions(?array $typeId, ?array $group, ?string $search = null): Collection
     {
-        $cacheKey = CapellLayoutCacheKeyEnum::WidgetOptions->value . md5(json_encode([$typeId, $group, $search]));
+        $cacheKey = CapellLayoutCacheKeyEnum::WidgetOptions->value . hash('sha256', json_encode([$typeId, $group, $search]));
+
         return self::getCached(
             $cacheKey,
             fn (): Collection => self::getWidgetOptionsQuery($typeId, $group)
@@ -81,9 +71,26 @@ class CapellLayoutHelper
     public static function getWidgetByKey(string $widgetKey): ?Widget
     {
         $cacheKey = CapellLayoutCacheKeyEnum::WidgetByKey->value . $widgetKey;
+
         return self::getCached(
             $cacheKey,
-            fn () => Widget::query()->firstWhere('key', $widgetKey)
+            fn () => Widget::query()->firstWhere('key', $widgetKey),
         );
+    }
+
+    /**
+     * Retrieve (and store if missing) a cached value using the array cache driver.
+     */
+    protected static function getCached(string $key, callable $resolver, bool $asBool = false): mixed
+    {
+        $cached = Cache::driver('array')->get($key);
+        if ($cached !== null) {
+            return $asBool ? (bool) $cached : $cached;
+        }
+
+        $result = $resolver();
+        Cache::driver('array')->forever($key, $result);
+
+        return $asBool ? (bool) $result : $result;
     }
 }

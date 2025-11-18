@@ -11,14 +11,8 @@ use Illuminate\Support\Str;
 
 class LayoutModelRegistrar
 {
-    protected static bool $registered = false;
-
     public static function register(): void
     {
-        if (static::$registered) {
-            return;
-        }
-
         CapellCore::registerModels(ModelEnum::cases());
 
         Relation::morphMap(
@@ -26,7 +20,5 @@ class LayoutModelRegistrar
                 ->mapWithKeys(fn (ModelEnum $model): array => [Str::snake($model->name) => $model->value])
                 ->all(),
         );
-
-        static::$registered = true;
     }
 }
