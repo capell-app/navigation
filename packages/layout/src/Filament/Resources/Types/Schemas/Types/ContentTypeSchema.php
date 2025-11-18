@@ -13,7 +13,6 @@ use Capell\Admin\Filament\Resources\Types\Schemas\Types\DefaultTypeSchema;
 use Capell\Layout\Enums\ContentSchemaEnum;
 use Capell\Layout\Enums\SchemaTypeEnum;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -58,7 +57,7 @@ class ContentTypeSchema extends DefaultTypeSchema
                     RequiredFields::make()
                         ->visibleJs(<<<'JS'
                              $get('required_translation')
-                        JS)
+                        JS),
                 ]),
             ]);
     }

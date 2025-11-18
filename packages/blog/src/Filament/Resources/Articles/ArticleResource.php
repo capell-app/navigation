@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Capell\Blog\Filament\Resources\Articles;
 
 use BackedEnum;
-use Capell\Admin\Enums\ResourceEnum as AdminResourceEnum;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Blog\Actions\GetArticleLayoutAction;
+use Capell\Blog\Enums\BlogTypeGroupEnum;
 use Capell\Blog\Enums\ModelEnum;
 use Capell\Blog\Enums\ResourceEnum;
-use Capell\Blog\Enums\BlogTypeGroupEnum;
 use Capell\Blog\Filament\Resources\Articles\Pages\CreateArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
@@ -46,7 +45,7 @@ class ArticleResource extends PageResource
 
     public static function getResourceType(): string
     {
-        return AdminResourceEnum::Page->name;
+        return 'Pages';
     }
 
     public static function getLabel(): string

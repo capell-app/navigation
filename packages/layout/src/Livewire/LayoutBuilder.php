@@ -376,7 +376,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->modalWidth(Width::ScreenSmall)
             ->schema(function (array $arguments, self $livewire, Schema $schema): Schema {
                 $adminSchema = CapellAdmin::getSchema(
-                    SchemaTypeEnum::LayoutWidget->name,
+                    SchemaTypeEnum::LayoutWidget->value,
                     $livewire->getContainerWidgetSchema($arguments['containerKey'], $arguments['widgetIndex']),
                 );
 
@@ -1743,7 +1743,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         $containerKey = $arguments['containerKey'] ?? null;
 
         $adminSchema = CapellAdmin::getSchema(
-            SchemaTypeEnum::LayoutContainer->name,
+            SchemaTypeEnum::LayoutContainer->value,
             $this->layoutRecord->admin['container_schema'][$containerKey] ?? DefaultLayoutContainerSchema::getKey(),
         );
 

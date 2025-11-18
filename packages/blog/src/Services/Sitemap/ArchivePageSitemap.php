@@ -6,14 +6,11 @@ namespace Capell\Blog\Services\Sitemap;
 
 use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
-use Capell\Core\CapellCoreHelper;
 use Capell\Core\Data\ArchiveMonthData;
 use Capell\Core\Data\SitemapPageData;
-use Capell\Core\Enums\ModelEnum;
+use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Site;
 use Capell\Core\Services\Sitemap\AbstractSitemapPages;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +22,10 @@ class ArchivePageSitemap extends AbstractSitemapPages
         $cacheKey = sprintf('sitemap.archive_pages.%d.%d', $this->site->id, $this->language->id);
 
         return Cache::remember($cacheKey, 3600, function (): Collection {
-            $archivePage = CapellCoreHelper::getFirstPageByTypeForSite('archive', $this->site, $this->language);
+            /** @var class-string<Page> $model */
+            $model = CapellCore::getModel(CoreModelEnum::Page);
+
+            $archivePage = $model::getFirstPageByTypeForSite('archive', $this->site, $this->language);
             if (! $archivePage instanceof Page) {
                 return collect([]);
             }

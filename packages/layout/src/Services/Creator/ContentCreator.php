@@ -8,8 +8,8 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Site;
-use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
+use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Models\Content;
 use Illuminate\Database\Eloquent\Collection;
 

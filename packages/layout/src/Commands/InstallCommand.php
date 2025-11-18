@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Commands;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Capell\Admin\Actions\AssignPermissionsToRole;
-use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Actions\AddVendorAssetToThemeAction;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Theme;
 use Capell\Layout\Actions\InstallPackageAction;
 use Capell\Layout\CapellLayoutManager;
-use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\ResourceEnum;
 use Capell\Layout\LayoutModelRegistrar;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 
 class InstallCommand extends Command
 {

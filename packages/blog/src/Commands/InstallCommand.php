@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Commands;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Capell\Admin\Actions\AssignPermissionsToRole;
 use Capell\Blog\Actions\InstallBlogPackageAction;
 use Capell\Blog\BlogModelRegistrar;
-use Capell\Blog\Enums\ModelEnum;
 use Capell\Blog\Enums\ResourceEnum;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 
 class InstallCommand extends Command
 {

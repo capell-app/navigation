@@ -7,13 +7,11 @@ namespace Capell\Layout\Filament\Components\Forms\LayoutBuilder;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSelect;
-use Capell\Layout\Models\Widget;
 use Capell\Layout\Helpers\CapellLayoutHelper;
+use Capell\Layout\Models\Widget;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
-use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class LayoutBuilderAddWidgetSchema

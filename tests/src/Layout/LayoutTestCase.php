@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Layout;
 
-use Override;
 use Capell\Admin\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Override;
 
 class LayoutTestCase extends AbstractTestCase
 {
@@ -28,11 +28,12 @@ class LayoutTestCase extends AbstractTestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(LayoutServiceProvider::$packageName);
     }
 
-    protected function getPackageName(): string
+    protected function requiredPackages(): array
     {
-        return 'layout';
+        return ['layout'];
     }
 }

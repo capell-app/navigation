@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Services\Sitemap;
 
+use Capell\Blog\Enums\BlogCacheEnum;
 use Capell\Blog\Models\Tag;
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
-use Capell\Core\CapellCoreHelper;
 use Capell\Core\Data\SitemapPageData;
-use Capell\Core\Enums\CacheEnum;
-use Capell\Core\Enums\ModelEnum;
+use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Site;
 use Capell\Core\Services\Sitemap\AbstractSitemapPages;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Support\Collection;
@@ -23,10 +20,13 @@ class TagPageSitemap extends AbstractSitemapPages
 {
     public function fetch(): Collection
     {
-        $cacheKey = CacheEnum::sitemapTagPages($this->site->id, $this->language->id);
+        $cacheKey = BlogCacheEnum::sitemapTagPages($this->site->id, $this->language->id);
 
         return Cache::remember($cacheKey, 3600, function (): Collection {
-            $tagPage = CapellCoreHelper::getFirstPageByTypeForSite(
+            /** @var class-string<Page> $model */
+            $model = CapellCore::getModel(CoreModelEnum::Page);
+
+            $tagPage = $model::getFirstPageByTypeForSite(
                 'tag',
                 $this->site,
                 $this->language,
@@ -77,7 +77,7 @@ class TagPageSitemap extends AbstractSitemapPages
     private function getTagPages(Page $tagPage): Collection
     {
         /** @var class-string<Page> $model */
-        $model = CapellCore::getModel(ModelEnum::Page);
+        $model = CapellCore::getModel(CoreModelEnum::Page);
 
         return $model::getTags(site: $this->site, language: $this->language, with_page_count: true)
             ->limit(100)

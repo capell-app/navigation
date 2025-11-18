@@ -7,7 +7,7 @@ namespace Capell\Layout\Filament\Components\Forms\Widget\Tab;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetAdminSchema;
 use Filament\Schemas\Components\Tabs\Tab;
 
-class WidadminTab
+class WidgetAdminTab
 {
     public static function make(array $schema = []): Tab
     {

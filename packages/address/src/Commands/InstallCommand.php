@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Address\Commands;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Capell\Address\AddressModelRegistrar;
-use Capell\Address\Enums\ModelEnum;
 use Capell\Address\Enums\ResourceEnum;
 use Capell\Admin\Actions\AssignPermissionsToRole;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 
 class InstallCommand extends Command
 {

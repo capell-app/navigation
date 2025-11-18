@@ -9,7 +9,7 @@ use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Layout\Filament\Components\Forms\AssetsRepeater;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
-use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidadminTab;
+use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetSettingsTab;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
@@ -104,7 +104,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
 
     protected function adminTab(Schema $schema): Tab
     {
-        return WidadminTab::make();
+        return WidgetAdminTab::make();
     }
 
     protected function getSettingsTab(Schema $schema): Tab

@@ -15,6 +15,9 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Data\TypeData;
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
+use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Facades\CapellFrontend;
@@ -24,9 +27,9 @@ use Capell\Layout\Commands\InstallCommand;
 use Capell\Layout\Commands\UpgradeCommand;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ComponentTypeEnum;
-use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Enums\ResourceEnum as LayoutResourceEnum; // kept for potential future use if needed
+use Capell\Layout\Enums\ModelEnum;
+use Capell\Layout\Enums\ResourceEnum as LayoutResourceEnum;
 use Capell\Layout\Filament\Resources\Layouts\LayoutResource;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExtender;
 use Capell\Layout\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
@@ -36,6 +39,8 @@ use Capell\Layout\Listeners\AfterRecordSaved;
 use Capell\Layout\Listeners\LayoutLoaded;
 use Capell\Layout\Listeners\SiteTreeRebuilt;
 use Capell\Layout\Listeners\TypeValidated;
+use Capell\Layout\Models\Content;
+use Capell\Layout\Models\WidgetAsset;
 use Composer\InstalledVersions;
 use Exception;
 use Filament\Facades\Filament;
@@ -44,6 +49,7 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
@@ -69,7 +75,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             $this->registerAll();
         }
 
-        $this->registerPublishCommands();
+        $this->registerPublishCommands()
+            ->registerLivewireComponents()
+            ->registerBladeComponents();
     }
 
     public function configurePackage(Package $package): void
@@ -116,6 +124,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         return $this
             ->registerListeners()
             ->registerModels()
+            ->registerRelationships()
             ->registerSchemas()
             ->registerManager()
             ->registerFilamentServing()
@@ -125,8 +134,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerAssets()
             ->registerSchemaExtenders()
             ->registerCloneableAndDraftableRelations()
-            ->registerLivewireComponents()
-            ->registerBladeComponents()
             ->registerThemeViewPath()
             ->registerFilamentAssets();
     }
@@ -389,5 +396,55 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         $this->app->singleton($class, fn (): object => new $class);
 
         $this->app->tag($class, $tag);
+    }
+
+    private function registerRelationships(): self
+    {
+        Page::resolveRelationUsing(
+            'contents',
+            fn (Page $model): HasManyThrough => $model->hasManyThrough(
+                ModelEnum::Content->value,
+                ModelEnum::WidgetAsset->value,
+                'page_id',
+                'id',
+                'id',
+                'asset_id',
+            )
+                ->where('widget_assets.asset_type', (new Content)->getMorphClass()),
+        );
+
+        Page::resolveRelationUsing(
+            'widgetAssets',
+            fn (Page $model) => $model->hasMany(ModelEnum::WidgetAsset->value, 'page_id'),
+        );
+
+        Page::resolveRelationUsing(
+            'widgets',
+            fn (Page $model) => $model->morphToMany(
+                ModelEnum::Widget->value,
+                'asset',
+                'widget_assets',
+                'asset_id',
+                'widget_id',
+            )
+                ->wherePivot('asset_type', $model->getMorphClass()),
+        );
+
+        Site::resolveRelationUsing(
+            'contents',
+            fn (Site $model) => $model->hasMany(ModelEnum::Content->value, 'site_id'),
+        );
+
+        Type::resolveRelationUsing(
+            'contents',
+            fn (Type $model) => $model->hasMany(ModelEnum::Content->value, 'type_id'),
+        );
+
+        Type::resolveRelationUsing(
+            'widgets',
+            fn (Type $model) => $model->hasMany(ModelEnum::Widget->value, 'type_id'),
+        );
+
+        return $this;
     }
 }

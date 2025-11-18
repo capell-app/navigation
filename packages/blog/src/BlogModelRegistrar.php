@@ -11,11 +11,11 @@ use Illuminate\Support\Str;
 
 class BlogModelRegistrar
 {
-    protected static bool $registered = false;
-
     public static function register(): void
     {
-        if (static::$registered) {
+        // If Article model already registered assume all blog models registered.
+        $models = CapellCore::getModels();
+        if (isset($models[ModelEnum::Article->name])) {
             return;
         }
 
@@ -26,7 +26,5 @@ class BlogModelRegistrar
                 ->mapWithKeys(fn (ModelEnum $model): array => [Str::snake($model->name) => $model->value])
                 ->all(),
         );
-
-        static::$registered = true;
     }
 }
