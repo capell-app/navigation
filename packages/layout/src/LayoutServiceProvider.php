@@ -16,8 +16,6 @@ use Capell\Core\Data\AssetData;
 use Capell\Core\Data\TypeData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Facades\CapellFrontend;
@@ -29,7 +27,7 @@ use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Enums\ResourceEnum as LayoutResourceEnum;
+use Capell\Layout\Enums\ResourceEnum as LayoutResourceEnum; // kept for potential future use if needed
 use Capell\Layout\Filament\Resources\Layouts\LayoutResource;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExtender;
 use Capell\Layout\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
@@ -403,46 +401,13 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         Page::resolveRelationUsing(
             'contents',
             fn (Page $model): HasManyThrough => $model->hasManyThrough(
-                ModelEnum::Content->value,
-                ModelEnum::WidgetAsset->value,
+                Content::class,
+                WidgetAsset::class,
                 'page_id',
                 'id',
                 'id',
                 'asset_id',
-            )
-                ->where('widget_assets.asset_type', (new Content)->getMorphClass()),
-        );
-
-        Page::resolveRelationUsing(
-            'widgetAssets',
-            fn (Page $model) => $model->hasMany(ModelEnum::WidgetAsset->value, 'page_id'),
-        );
-
-        Page::resolveRelationUsing(
-            'widgets',
-            fn (Page $model) => $model->morphToMany(
-                ModelEnum::Widget->value,
-                'asset',
-                'widget_assets',
-                'asset_id',
-                'widget_id',
-            )
-                ->wherePivot('asset_type', $model->getMorphClass()),
-        );
-
-        Site::resolveRelationUsing(
-            'contents',
-            fn (Site $model) => $model->hasMany(ModelEnum::Content->value, 'site_id'),
-        );
-
-        Type::resolveRelationUsing(
-            'contents',
-            fn (Type $model) => $model->hasMany(ModelEnum::Content->value, 'type_id'),
-        );
-
-        Type::resolveRelationUsing(
-            'widgets',
-            fn (Type $model) => $model->hasMany(ModelEnum::Widget->value, 'type_id'),
+            )->where('widget_assets.asset_type', (new Content)->getMorphClass()),
         );
 
         return $this;
