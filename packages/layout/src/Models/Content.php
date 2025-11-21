@@ -236,7 +236,7 @@ class Content extends Model implements Draftable, HasMedia, PageCacheable
     public static function getMorphRelations(?Language $language = null): array
     {
         $base = [
-            'ancestors',
+            'ancestors.type',
             'image',
             'media',
             'linkedPage' => fn (BuilderContract $query) => $query->with([

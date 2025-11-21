@@ -20,7 +20,6 @@
     "require": {
         "php": "^8.2",
         "capell-app/admin": "*",
-        "capell-app/frontend": "*",
         "capell-app/layout": "*"
     },
     "autoload": {

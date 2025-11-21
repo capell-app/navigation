@@ -11,9 +11,12 @@ use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\FrontendServiceProvider;
 use Capell\Hero\Commands\DemoCommand;
 use Capell\Hero\Commands\InstallCommand;
+use Capell\Hero\Enums\ContentSchemaEnum;
 use Capell\Hero\Enums\WidgetComponentEnum;
+use Capell\Hero\Enums\WidgetSchemaEnum;
 use Capell\Hero\Filament\Extenders\Page\HeroPageSchemaExtender;
 use Capell\Layout\Enums\ComponentTypeEnum;
+use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\LayoutServiceProvider;
 use Composer\InstalledVersions;
@@ -122,9 +125,8 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemas(): self
     {
-        foreach (SchemaTypeEnum::getAllSchemas() as $type => $schemas) {
-            CapellAdmin::registerSchemas($type, $schemas, defaultSchemas: true);
-        }
+        CapellAdmin::registerSchema(SchemaTypeEnum::Content, ContentSchemaEnum::Hero);
+        CapellAdmin::registerSchema(SchemaTypeEnum::Widget, WidgetSchemaEnum::Hero);
 
         return $this;
     }

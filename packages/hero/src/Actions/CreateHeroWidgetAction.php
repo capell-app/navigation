@@ -31,13 +31,18 @@ class CreateHeroWidgetAction
         /** @var class-string<Type> */
         $typeModel = CapellCore::getModel(CoreModelEnum::Type->name);
 
+        $type = $typeModel::query()->firstOrCreate([
+            'key' => WidgetTypeEnum::Assets,
+            'type' => LayoutTypeEnum::Widget,
+        ], [
+            'name' => 'Assets Widget',
+        ]);
+
         return $widgetModel::firstOrCreate([
             'key' => 'hero',
         ], [
             'name' => __('capell-hero::generic.hero'),
-            'type_id' => $typeModel::query()
-                ->where(['key' => WidgetTypeEnum::Assets, 'type' => LayoutTypeEnum::Widget])
-                ->value('id'),
+            'type_id' => $type->id,
             'meta' => [
                 'component' => WidgetComponentEnum::Hero->value,
                 'heading_size' => 'h1',

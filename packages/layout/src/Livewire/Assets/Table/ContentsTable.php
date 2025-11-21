@@ -52,7 +52,7 @@ class ContentsTable extends AbstractAssetsTable
         $model = CapellCore::getModel(ModelEnum::Content->name);
 
         return $model::with([
-            'ancestors',
+            'ancestors.type',
             'translations.language',
             'image',
             'type',

@@ -13,6 +13,7 @@ use Capell\Blog\Commands\DemoCommand; // new dedicated command
 use Capell\Blog\Commands\InstallCommand; // retained
 use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Enums\WidgetComponentEnum;
+use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Listeners\AddBlogPagesToNavigation;
 use Capell\Blog\Models\Tag;
@@ -30,6 +31,7 @@ use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\FrontendServiceProvider;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
+use Capell\Layout\Enums\SchemaTypeEnum as LayoutSchemaEnum;
 use Capell\Layout\Models\Content;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -234,7 +236,12 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         Page::resolveRelationUsing(
             'tags',
-            fn (Page $model): MorphToMany => $model->morphToMany(Tag::class, 'taggable', 'taggables'),
+            fn (Page $model): MorphToMany => $model->morphToMany(
+                Tag::class,
+                'taggable',
+                'taggables'
+            )
+                ->ordered()
         );
 
         Site::resolveRelationUsing(
@@ -280,8 +287,9 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     private function registerSchemas(): self
     {
         CapellAdmin::registerSchema(SchemaTypeEnum::Page, ArticlePageSchema::class);
-        foreach (\Capell\Layout\Enums\SchemaTypeEnum::getAllSchemas() as $type => $schemas) {
-            CapellAdmin::registerSchemas($type, $schemas, defaultSchemas: true);
+
+        foreach (WidgetSchemaEnum::cases() as $schemas) {
+            CapellAdmin::registerSchema(LayoutSchemaEnum::Widget, $schemas->value);
         }
 
         return $this;

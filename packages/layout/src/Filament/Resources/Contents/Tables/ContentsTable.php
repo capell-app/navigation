@@ -57,7 +57,7 @@ class ContentsTable implements TableConfigurator
             ->modifyQueryUsing(
                 fn (Builder $query): Builder => $query
                     ->with([
-                        'ancestors',
+                        'ancestors.type',
                         'creator',
                         'editor',
                         'image',

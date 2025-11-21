@@ -99,6 +99,12 @@ class TagResource extends Resource
 
     public static function getTranslatableLocales(): array
     {
-        return Language::getLanguageLocales();
+        $locales = Language::getLanguageLocales();
+
+        if ($locales) {
+            return $locales;
+        }
+
+        throw new \RuntimeException('At least one language must be defined to use translatable features.');
     }
 }
