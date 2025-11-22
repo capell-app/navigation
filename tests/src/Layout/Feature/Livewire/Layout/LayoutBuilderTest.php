@@ -36,7 +36,7 @@ test('Render layout builder', function (): void {
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name . ' Layout');
+        ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
 });
 
 test('can edit layouts', function (LayoutEnum $layoutEnum): void {
@@ -57,7 +57,7 @@ test('can edit layouts', function (LayoutEnum $layoutEnum): void {
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name . ' Layout');
+        ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
 })->with(LayoutEnum::cases());
 
 test('Render layout builder with page', function (): void {
@@ -69,7 +69,7 @@ test('Render layout builder with page', function (): void {
         'page_id' => $page->id,
     ])
         ->assertSuccessful()
-        ->assertSeeText($layout->name . ' Layout');
+        ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
 });
 
 test('Render layout without containers', function (): void {
@@ -79,7 +79,7 @@ test('Render layout without containers', function (): void {
         'layout_id' => $layout->id,
     ])
         ->assertSuccessful()
-        ->assertSeeHtml('Layout is empty. Add a container and widget(s) to get started');
+        ->assertSeeHtml(__('capell-layout::message.layout_empty'));
 });
 
 test('Render layout with widget and assets', function (AssetEnum|Capell\Core\Enums\AssetEnum $assetType): void {

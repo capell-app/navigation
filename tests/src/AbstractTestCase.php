@@ -14,8 +14,6 @@ use BladeUI\Icons\BladeIconsServiceProvider;
 use Camya\Filament\FilamentTitleWithSlugServiceProvider;
 use Capell\Core\CapellCoreManager;
 use Capell\Core\CapellServiceProvider;
-use Capell\Core\Data\PackageData;
-use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Tests\Fixtures\Models\User;
@@ -90,23 +88,22 @@ abstract class AbstractTestCase extends TestCase
             $path = realpath(__DIR__ . '/../../vendor/capell-app/core/packages/core/database/migrations');
         }
 
-        if (! $path) {
-            throw new RuntimeException('Could not find core migrations path.');
-        }
+        throw_unless($path, RuntimeException::class, 'Could not find core migrations path.');
 
         array_walk($migrations, fn (&$migration): string => $migration = sprintf('%s/%s.php', $path, $migration));
 
         $this->loadMigrationsFrom($migrations);
 
-        // Automatically discover package migrations if not manually set.
-        if ($this->getPackageName() === 'packages') {
-            $this->packageMigrations = $this->discoverPackagesMigrations();
-        } elseif ($this->packageMigrations === []) {
-            $this->packageMigrations = $this->discoverPackageMigrations($this->getPackageName());
+        // Load migrations for any explicitly required dependent packages.
+        foreach ($this->requiredPackages() as $requiredPackage) {
+            $this->packageMigrations = [
+                ...$this->packageMigrations,
+                ...$this->discoverPackageMigrations($requiredPackage),
+            ];
         }
 
         if ($this->packageMigrations !== []) {
-            $this->loadMigrationsFrom($this->packageMigrations);
+            $this->loadMigrationsFrom(array_values(array_unique($this->packageMigrations)));
         }
 
         Http::preventStrayRequests();
@@ -124,7 +121,16 @@ abstract class AbstractTestCase extends TestCase
         $this->withoutVite();
     }
 
-    abstract protected function getPackageName(): string;
+    /**
+     * Packages whose migrations are required in addition to the primary package.
+     * Override in package test cases as needed (e.g. blog requires layout).
+     *
+     * @return string[]
+     */
+    protected function requiredPackages(): array
+    {
+        return [];
+    }
 
     /**
      * @param  Application  $app
@@ -302,13 +308,6 @@ abstract class AbstractTestCase extends TestCase
 
             config()->set(sprintf('%s.%s', $package, $key), $value);
         }
-    }
-
-    private function discoverPackagesMigrations(): array
-    {
-        return CapellCore::getPackages()->map(fn (PackageData $package): array => $this->discoverPackageMigrations($package->key))
-            ->flatten()
-            ->all();
     }
 
     private function discoverPackageMigrations(string $package): array

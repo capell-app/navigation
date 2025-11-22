@@ -6,8 +6,11 @@ namespace Capell\Tests\Blog;
 
 use Capell\Admin\AdminServiceProvider;
 use Capell\Blog\BlogServiceProvider;
+use Capell\Core\Facades\CapellCore;
+use Capell\Layout\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Override;
 
 class BlogTestCase extends AbstractTestCase
 {
@@ -15,14 +18,25 @@ class BlogTestCase extends AbstractTestCase
     {
         return [
             ...parent::getPackageProviders($app),
+            LayoutServiceProvider::class,
             BlogServiceProvider::class,
             AdminServiceProvider::class,
             AdminPanelProvider::class,
         ];
     }
 
-    protected function getPackageName(): string
+    #[Override]
+    protected function getEnvironmentSetUp($app): void
     {
-        return 'blog';
+        parent::getEnvironmentSetUp($app);
+
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(LayoutServiceProvider::$packageName);
+    }
+
+    protected function requiredPackages(): array
+    {
+        return ['layout', 'blog'];
     }
 }

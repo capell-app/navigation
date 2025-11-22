@@ -26,8 +26,8 @@ class PackagesTestCase extends AbstractTestCase
         ];
     }
 
-    protected function getPackageName(): string
+    protected function requiredPackages(): array
     {
-        return 'packages';
+        return ['address', 'layout', 'blog'];
     }
 }

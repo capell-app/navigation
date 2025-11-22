@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-use Capell\Blog\Filament\Resources\Tags\TagResource;
+use Capell\Address\Filament\Resources\Countries\CountryResource;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 
 uses(CreatesAdminUser::class)
-    ->group('tag');
+    ->group('country');
 
-test('admin can see tags', function (): void {
+test('admin can see countries', function (): void {
     test()->actingAsAdmin();
 
-    get(TagResource::getUrl())
+    get(CountryResource::getUrl())
         ->assertOk();
-})->todo();
+});
 
-test('cannot see tags', function (): void {
+test('cannot see countries', function (): void {
     test()->actingAsUser();
 
-    get(TagResource::getUrl())
+    get(CountryResource::getUrl())
         ->assertForbidden();
 });

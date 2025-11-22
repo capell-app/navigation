@@ -6,8 +6,10 @@ namespace Capell\Tests\Address;
 
 use Capell\Address\AddressServiceProvider;
 use Capell\Admin\AdminServiceProvider;
+use Capell\Core\Facades\CapellCore;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Override;
 
 class AddressTestCase extends AbstractTestCase
 {
@@ -16,13 +18,22 @@ class AddressTestCase extends AbstractTestCase
         return [
             ...parent::getPackageProviders($app),
             AddressServiceProvider::class,
-            AdminServiceProvider::class,
             AdminPanelProvider::class,
+            AdminServiceProvider::class,
         ];
     }
 
-    protected function getPackageName(): string
+    #[Override]
+    protected function getEnvironmentSetUp($app): void
     {
-        return 'address';
+        parent::getEnvironmentSetUp($app);
+
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
+    }
+
+    protected function requiredPackages(): array
+    {
+        return ['address'];
     }
 }
