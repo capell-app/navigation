@@ -36,81 +36,16 @@
             }
         },
         {
-            "type": "package",
-            "package": {
-                "name": "capell-app/admin",
-                "version": "4.x-dev",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/capell-app/capell.git",
-                    "reference": "4.x"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Capell\\Admin\\": "packages/admin/src"
-                    }
-                },
-                "extra": {
-                    "laravel": {
-                        "providers": [
-                            "Capell\\Admin\\AdminServiceProvider"
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "capell-app/core",
-                "version": "4.x-dev",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/capell-app/capell.git",
-                    "reference": "4.x"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Capell\\Core\\": "packages/core/src",
-                        "Capell\\Core\\Database\\Factories\\": "packages/core/database/factories"
-                    }
-                },
-                "extra": {
-                    "laravel": {
-                        "providers": [
-                            "Capell\\Core\\CapellServiceProvider"
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "capell-app/frontend",
-                "version": "4.x-dev",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/capell-app/capell.git",
-                    "reference": "4.x"
-                },
-                "autoload": {
-                    "psr-4": {
-                        "Capell\\Frontend\\": "packages/frontend/src/"
-                    }
-                },
-                "extra": {
-                    "laravel": {
-                        "providers": [
-                            "Capell\\Frontend\\FrontendServiceProvider"
-                        ]
-                    }
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/capell-app/admin"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/capell-app/capell"
+            "url": "https://github.com/capell-app/core"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/capell-app/frontend"
         },
         {
             "type": "vcs",
@@ -137,9 +72,9 @@
         "bkwld/cloner": "^3.11",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blendbyte/filament-title-with-slug": "dev-fila4",
-        "capell-app/admin": "^4.0",
-        "capell-app/core": "^4.0",
-        "capell-app/frontend": "^4.0",
+        "capell-app/admin": "^2.0",
+        "capell-app/core": "^2.0",
+        "capell-app/frontend": "^2.0",
         "codewithdennis/filament-select-tree": "^4.0",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
@@ -165,7 +100,7 @@
         "spatie/laravel-package-tools": "^1.14.1",
         "staudenmeir/eloquent-has-many-deep": "^1.1",
         "staudenmeir/eloquent-json-relations": "^1.1",
-        "stijnvanouplines/blade-country-flags": "^1.0|dev-l12-compatibility",
+        "stijnvanouplines/blade-country-flags": "^1.0",
         "symfony/filesystem": "^7.2",
         "symfony/process": "^7.2",
         "symplify/monorepo-builder": "^10.3.3",
