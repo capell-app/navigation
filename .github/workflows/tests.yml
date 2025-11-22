@@ -69,7 +69,7 @@ jobs:
 
       - name: Install PHP dependencies
         if: steps.php-cache.outputs.cache-hit != 'true'
-        run: composer install --no-progress --no-suggest --optimize-autoloader
+        run: composer update --no-progress --optimize-autoloader
 
       - name: Configure environment
         run: |

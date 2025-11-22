@@ -114,15 +114,15 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/howdu/filament-title-with-slug"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/lara-zeus/translatable"
         },
         {
             "type": "vcs",
             "url": "https://github.com/TappNetwork/activitylog"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/howdu/filament-title-with-slug"
         }
     ],
     "require": {
@@ -137,9 +137,9 @@
         "bkwld/cloner": "^3.11",
         "blade-ui-kit/blade-heroicons": "^2.5",
         "blendbyte/filament-title-with-slug": "dev-fila4",
-        "capell-app/admin": "4.x-dev",
-        "capell-app/core": "4.x-dev",
-        "capell-app/frontend": "4.x-dev",
+        "capell-app/admin": "^4.0",
+        "capell-app/core": "^4.0",
+        "capell-app/frontend": "^4.0",
         "codewithdennis/filament-select-tree": "^4.0",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",

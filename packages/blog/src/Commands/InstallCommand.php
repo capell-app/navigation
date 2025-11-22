@@ -10,6 +10,7 @@ use Capell\Blog\BlogModelRegistrar;
 use Capell\Blog\Enums\ResourceEnum;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
+use Spatie\Tags\TagsServiceProvider;
 
 class InstallCommand extends Command
 {
@@ -52,6 +53,8 @@ class InstallCommand extends Command
                 '--path' => __DIR__ . '/../database/migrations',
             ],
         );
+
+        $this->call('vendor:publish', ['--provider' => TagsServiceProvider::class, '--tag' => 'tags-migrations']);
 
         $this->info('Publishing Capell Blog...');
         $this->call('vendor:publish', ['--tag' => 'capell-blog-config']);
