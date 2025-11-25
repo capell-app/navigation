@@ -248,7 +248,7 @@ class ContentsTable implements TableConfigurator
                         }),
 
                     Select::make('parent_id')
-                        ->label(__('capell-layout::form.parent'))
+                        ->label(__('capell-admin::form.parent'))
                         ->allowHtml()
                         ->options(function (HasTable $livewire, Get $get) {
                             $siteId = static::getSiteId($livewire);

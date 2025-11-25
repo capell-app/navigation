@@ -16,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Ramsey\Uuid\UuidInterface;
@@ -26,14 +27,18 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
     use InteractsWithForms;
     use InteractsWithTable;
 
+    #[Locked]
     public string $actionModalId;
 
+    #[Locked]
     public array $arguments = [];
 
     public array $existingRecords = [];
 
+    #[Locked]
     public string $type;
 
+    #[Locked]
     public int $widgetIndex;
 
     #[Url(as: 'tab')]
@@ -60,11 +65,7 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
 
     public function render(): string
     {
-        return <<<'blade'
-            <div>
-                {{ $this->table }}
-            </div>
-        blade;
+        return '{{ $this->table }}';
     }
 
     public function table(Table $table): Table
@@ -105,7 +106,7 @@ abstract class AbstractAssetsTable extends Component implements HasActions, HasF
         $selectedRecords = $livewire->getSelectedTableRecordsQuery(shouldFetchSelectedRecords: false);
 
         $this->dispatch(
-            'sync-selected-assets',
+            'add-assets-to-widget',
             arguments: $this->arguments,
             type: $this->type,
             assets: $selectedRecords->pluck('id')->toArray(),

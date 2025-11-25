@@ -6,12 +6,12 @@ namespace Capell\Layout\Providers;
 
 use Capell\Admin\Actions\CreatedModelAction;
 use Capell\Admin\Actions\DeletedModelAction;
-use Capell\Admin\AdminServiceProvider;
 use Capell\Admin\Data\AdminAssetData;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Data\TypeData;
 use Capell\Core\Facades\CapellCore;
@@ -22,7 +22,7 @@ use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Facades\CapellFrontend;
-use Capell\Frontend\FrontendServiceProvider;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Commands\DemoCommand;
 use Capell\Layout\Commands\InstallCommand;
@@ -456,7 +456,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             fn (Layout $model): BelongsToJson => $model->belongsToJson(
                 ModelEnum::Widget->value,
                 'widgets',
-                'key'
+                'key',
             ),
         );
 

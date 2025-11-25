@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Hero\Providers;
 
-use Capell\Admin\AdminServiceProvider;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
-use Capell\Frontend\FrontendServiceProvider;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Hero\Commands\DemoCommand;
 use Capell\Hero\Commands\InstallCommand;
 use Capell\Hero\Enums\ContentSchemaEnum;
@@ -17,7 +17,7 @@ use Capell\Hero\Enums\WidgetSchemaEnum;
 use Capell\Hero\Filament\Extenders\Page\HeroPageSchemaExtender;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\SchemaTypeEnum;
-use Capell\Layout\LayoutServiceProvider;
+use Capell\Layout\Providers\LayoutServiceProvider;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\Blade;
 use Spatie\LaravelPackageTools\Package;

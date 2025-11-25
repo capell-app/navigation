@@ -10,7 +10,7 @@ enum WidgetComponentEnum: string
 
     case BannerImage = 'capell-layout::widget.banner-image';
 
-    case LivewirePages = 'capell-layout::livewire.widget.pages';
+    case LivewirePages = 'capell.layout.livewire.widget.pages';
 
     case Navigation = 'capell-layout::widget.navigation';
 

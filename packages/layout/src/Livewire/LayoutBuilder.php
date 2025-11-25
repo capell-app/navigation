@@ -12,7 +12,6 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Core\Actions\GetResourceFromTypeAction;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
-use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
@@ -20,7 +19,6 @@ use Capell\Core\Models\Site;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Exceptions\MissingWidgetAssetException;
-use Capell\Layout\Filament\Components\Forms\LayoutBuilder\LayoutBuilderAddWidgetSchema;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Containers\DefaultLayoutContainerSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetAssetForm;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetForm;
@@ -172,11 +170,37 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
     }
 
-    #[On('sync-selected-assets')]
-    public function syncSelectedAssets(array $arguments, string $type, array $assets): void
+    #[On('add-widgets-to-container')]
+    public function addWidgetsToContainer(string $containerKey, array $widgets): void
     {
-        if (! property_exists($this, 'layoutRecord')) {
-            return;
+        if (! isset($this->layoutRecord)) {
+            $this->loadFromStore();
+        }
+
+        foreach ($widgets as $widgetId) {
+            $widget = $this->getWidget($widgetId);
+
+            $widgetIndex = $this->addWidgetToContainer($widget, $containerKey);
+
+            $widget = $this->loadWidget($containerKey, $widgetIndex);
+
+            $this->assets[$containerKey][$widgetIndex] = $this->mapWidgetAssets($widget, $containerKey);
+
+            $this->updatePageAssets($containerKey, $widgetIndex);
+        }
+
+        session(['layout-builder.container' => $containerKey]);
+
+        $this->setupSelectedAssets();
+
+        $this->layoutUpdated();
+    }
+
+    #[On('add-assets-to-widget')]
+    public function addAssetsToWidget(array $arguments, string $type, array $assets): void
+    {
+        if (! isset($this->layoutRecord)) {
+            $this->loadFromStore();
         }
 
         $containerKey = $arguments['containerKey'];
@@ -399,54 +423,41 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         return Action::make('addWidget')
             ->label(__('capell-layout::button.widget'))
             ->modalHeading(__('capell-layout::heading.add_widget_to_container'))
-            ->modalSubmitActionLabel(__('capell-layout::button.add_widget'))
             ->icon('heroicon-c-plus')
             ->size(Size::Small)
-            ->modalWidth(Width::ExtraLarge)
             ->color('gray')
             ->outlined()
-            ->closeModalByClickingAway(false)
             ->visible(fn (): bool => (bool) $this->containers)
-            ->schema(
-                fn (array $arguments, Schema $schema): Schema => $schema->operation('createOption')
-                    ->schema(
-                        LayoutBuilderAddWidgetSchema::schema(
-                            empty($arguments['containerKey']) ? self::getContainerOptions() : null,
-                        ),
-                    ),
-            )
-            ->fillForm(function (self $livewire, array $arguments): array {
-                $model = CapellCore::getModel(ModelEnum::Widget->name);
+            ->modalWidth(Width::SixExtraLarge)
+            ->extraModalWindowAttributes([
+                'class' => 'capell-layout-builder-assets-table',
+            ])
+            ->modalContent(function (Action $action, array $arguments): HtmlString {
+                /** @var self $livewire */
+                $livewire = $action->getLivewire();
 
-                return [
-                    'container' => $arguments['containerKey'] ?? session('layout-builder.container'),
-                    'filter_groups' => collect($model::getTypeGroups()->reject(fn (string $group): bool => $group === TypeGroupEnum::System->value))
-                        ->toArray(),
-                ];
+                return new HtmlString(Blade::render(
+                    <<<'blade'
+                       @livewire('capell.layout.livewire.widgets-table-select', [
+                           'actionModalId' => $actionModalId,
+                           'containerKey' => $containerKey,
+                           'containers' => $containers,
+                       ], key($livewireKey))
+                   blade,
+                    [
+                        'actionModalId' => sprintf('fi-%s-action-%s', $livewire->getId(), $action->getNestingIndex()),
+                        'containerKey' => $arguments['containerKey'] ?? '',
+                        'livewireKey' => sprintf('fi-%s-action-%s-widgets-table', $livewire->getId(), $action->getNestingIndex()),
+                        'containers' => self::getContainerOptions(),
+                    ],
+                ));
             })
-            ->action(function (Action $action, self $livewire, array $arguments, array $data): void {
-                $containerKey = $data['container'] ?? $arguments['containerKey'];
-
-                session(['layout-builder.container' => $containerKey]);
-
-                foreach ($data['widgets'] as $widgetId) {
-                    $widget = $this->getWidget($widgetId);
-
-                    $widgetIndex = $livewire->addWidgetToContainer($widget, $containerKey);
-
-                    $widget = $this->loadWidget($containerKey, $widgetIndex);
-
-                    $this->assets[$containerKey][$widgetIndex] = $this->mapWidgetAssets($widget, $containerKey);
-
-                    $this->updatePageAssets($containerKey, $widgetIndex);
-                }
-
-                $this->setupSelectedAssets();
-
-                $this->layoutUpdated();
-
-                $action->success();
-            });
+            ->formWrapper(false)
+            ->closeModalByClickingAway(false)
+            ->modalSubmitAction(false)
+            ->modalCancelAction(false)
+            ->action(null)
+            ->submit(null);
     }
 
     public function editWidgetAction(): Action
@@ -561,7 +572,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 /** @var self $livewire */
                 $livewire = $action->getLivewire();
 
-                $componentName = 'capell-layout::livewire.assets.table.' . $arguments['type'];
+                $componentName = 'capell.layout.livewire.assets.table.' . $arguments['type'];
 
                 $totalAssets = $livewire->countWidgetAssets($arguments['containerKey'], $arguments['widgetIndex']);
 
@@ -597,6 +608,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     'hasPageAssets' => $hasPageAssets,
                 ]));
             })
+            ->closeModalByClickingAway(false)
             ->submit(null)
             ->modalSubmitAction(false)
             ->modalCancelAction(false);
@@ -967,6 +979,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
     protected function addAssetFromAction(Action $action, Schema $schema, array $arguments, array $data): void
     {
+        $this->loadFromStore();
+
         $containerKey = $arguments['containerKey'];
         $widgetIndex = $arguments['widgetIndex'];
         $type = $arguments['type'];
@@ -1028,6 +1042,8 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         $widget->assets->add($widgetAsset);
 
         $this->layoutUpdated();
+
+        $action->success();
 
         $this->dispatch(
             'refresh-assets',
@@ -1329,10 +1345,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
 
         foreach (array_keys($this->containers) as $containerKey) {
-            if (isset($this->containerWidgets[$containerKey])) {
-                continue;
-            }
-
             $this->setupContainerWidgets($containerKey, $widgets, $containerWidgetAssets);
         }
     }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Providers;
 
-use Capell\Admin\AdminServiceProvider;
 use Capell\Admin\Enums\ResourceEnum as AdminResourceEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Blog\BlogModelRegistrar;
 use Capell\Blog\Commands\CreateBlogPagesCommand;
 use Capell\Blog\Commands\DemoCommand;
@@ -29,7 +29,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Core\Packages\AbstractPackageServiceProvider;
-use Capell\Frontend\FrontendServiceProvider;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\SchemaTypeEnum as LayoutSchemaEnum;
@@ -243,9 +243,9 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             fn (Page $model): MorphToMany => $model->morphToMany(
                 Tag::class,
                 'taggable',
-                'taggables'
+                'taggables',
             )
-                ->ordered()
+                ->ordered(),
         );
 
         Site::resolveRelationUsing(
