@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.0.1 - 2025-11-22
+
+### What's Changed
+
+* Update update-changelog.yml by @howdu in https://github.com/capell-app/packages/pull/14
+* Update update-changelog.yml by @howdu in https://github.com/capell-app/packages/pull/15
+* Refactor Address Package Model Registration and Schema Handling; Modernize Blog Package and Composer Tooling by @howdu in https://github.com/capell-app/packages/pull/16
+* Updates by @howdu in https://github.com/capell-app/packages/pull/17
+* Updates by @howdu in https://github.com/capell-app/packages/pull/18
+
+**Full Changelog**: https://github.com/capell-app/packages/compare/v2.0.0...v2.0.1
+
 ## v.1.0.1 - 2025-06-10
 
 **Full Changelog**: https://github.com/capell-app/capell/compare/v1.0.0...v.1.0.1
