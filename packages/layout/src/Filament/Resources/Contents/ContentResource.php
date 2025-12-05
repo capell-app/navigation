@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Contents;
 
 use BackedEnum;
+use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
@@ -22,6 +23,7 @@ use Capell\Layout\Filament\Resources\Contents\RelationManagers\WidgetsRelationMa
 use Capell\Layout\Filament\Resources\Contents\Schemas\ContentForm;
 use Capell\Layout\Filament\Resources\Contents\Tables\ContentsTable;
 use Capell\Layout\Filament\Resources\Contents\Widgets\ContentAlertsWidget;
+use Capell\Layout\Providers\LayoutServiceProvider;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -51,6 +53,11 @@ class ContentResource extends Resource
     public static function table(Table $table): Table
     {
         return static::getTableConfigurator()::configure($table);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return CapellCore::getPackage(LayoutServiceProvider::$packageName)->isInstalled();
     }
 
     public static function getResourceType(): string

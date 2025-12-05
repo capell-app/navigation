@@ -10,11 +10,13 @@ use Capell\Address\Filament\Resources\Addresses\Pages\ManageAddresses;
 use Capell\Address\Filament\Resources\Addresses\Schemas\AddressForm;
 use Capell\Address\Filament\Resources\Addresses\Tables\AddressesTable;
 use Capell\Address\Models\Address;
+use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
+use Capell\Blog\Providers\BlogServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -73,7 +75,7 @@ class AddressResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return CapellCore::getPackage('capell-app/address')->isInstalled();
+        return CapellCore::getPackage(AddressServiceProvider::$packageName)->isInstalled();
     }
 
     #[Override]

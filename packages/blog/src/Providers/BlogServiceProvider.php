@@ -84,6 +84,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         parent::registeringPackage();
 
         $this->registerPackageMetadata()
+            ->registerModels()
             ->registerResources();
     }
 
@@ -95,7 +96,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     private function registerAll(): self
     {
         return $this
-            ->registerModels()
             ->registerModelRelations()
             ->registerBladeComponents()
             ->registerLivewireComponents()

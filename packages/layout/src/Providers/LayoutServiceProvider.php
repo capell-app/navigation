@@ -100,6 +100,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         parent::registeringPackage();
 
         $this->registerPackageMetadata()
+            ->registerModels()
             ->registerResources();
     }
 
@@ -121,7 +122,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         return $this
             ->registerListeners()
-            ->registerModels()
             ->registerRelationships()
             ->registerSchemas()
             ->registerManager()

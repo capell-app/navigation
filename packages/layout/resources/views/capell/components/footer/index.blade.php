@@ -148,7 +148,7 @@ $page = FrontendLoader::getPage();
                 />
             @endif
 
-            <x-capell::footer.pages
+            <x-capell-layout::footer.pages
                 :$headingClass
                 :$pages
                 class="shrink-0 xl:w-[20%]"

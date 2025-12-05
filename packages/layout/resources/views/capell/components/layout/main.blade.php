@@ -59,7 +59,7 @@
                                                 }
             @endphp
 
-            <x-capell::layout.container
+            <x-capell-layout::layout.container
                 :$container
                 :$containerKey
                 :$layout
