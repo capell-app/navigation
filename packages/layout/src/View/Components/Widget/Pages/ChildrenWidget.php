@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Capell\Layout\View\Components\Widget\Pages;
 
-use Capell\Frontend\Facades\FrontendLoader;
+use Capell\Frontend\Facades\ActiveContext;
 use Capell\Frontend\Services\Loader\PageLoader;
 
 class ChildrenWidget extends AbstractPagesWidget
 {
     protected function mountWidget(): void
     {
-        if (! empty(FrontendLoader::getPage()->type->meta['hidden'])) {
+        if (! empty(ActiveContext::page()->type->meta['hidden'])) {
             $this->skipRender = true;
 
             return;
         }
 
         $this->pages = PageLoader::getPages(
-            site: FrontendLoader::getSite(),
-            language: FrontendLoader::getLanguage(),
-            page: FrontendLoader::getPage(),
+            site: ActiveContext::site(),
+            language: ActiveContext::language(),
+            page: ActiveContext::page(),
             type: 'children',
             ordering: 'alphabetical',
             withChildrenCount: $this->widget->meta['with_children_count'] ?? false,

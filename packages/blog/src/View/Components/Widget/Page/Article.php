@@ -7,7 +7,7 @@ namespace Capell\Blog\View\Components\Widget\Page;
 use App\Models\User;
 use Capell\Blog\Services\Loader\TagLoader;
 use Capell\Core\Models\Page;
-use Capell\Frontend\Facades\FrontendLoader;
+use Capell\Frontend\Facades\ActiveContext;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 
@@ -40,9 +40,9 @@ class Article extends AbstractWidget
 
     protected function mountWidget(): void
     {
-        $page = FrontendLoader::getPage();
-        $language = FrontendLoader::getLanguage();
-        $site = FrontendLoader::getSite();
+        $page = ActiveContext::page();
+        $language = ActiveContext::language();
+        $site = ActiveContext::site();
 
         if (empty($page->type->meta['hidden']) && ! empty($this->widget->meta['with_next_prev'])) {
             $this->previousPage = PageLoader::getPreviousPage($page, $site, $language);

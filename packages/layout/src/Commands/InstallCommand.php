@@ -70,8 +70,8 @@ class InstallCommand extends Command
                     [
                         'resources/css/capell-layout.css',
                         'resources/js/capell-layout.js',
-                    ]
-                )
+                    ],
+                ),
             );
     }
 }

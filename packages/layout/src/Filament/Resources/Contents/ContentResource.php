@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Resources\Contents;
 
 use BackedEnum;
-use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;

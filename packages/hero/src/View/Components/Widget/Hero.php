@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Hero\View\Components\Widget;
 
-use Capell\Frontend\Facades\FrontendLoader;
+use Capell\Frontend\Facades\ActiveContext;
 use Capell\Hero\Actions\HeroWidgetHasPrimaryHeadingAction;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 use Illuminate\Database\Eloquent\Collection;
@@ -28,7 +28,7 @@ class Hero extends AbstractWidget
 
     protected function mountWidget(): void
     {
-        $page = FrontendLoader::getPage();
+        $page = ActiveContext::page();
 
         $this->backgroundImage = $page->translation?->backgroundImage ?? $this->widget->backgroundImage;
 

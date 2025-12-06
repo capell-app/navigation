@@ -82,7 +82,10 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         parent::registeringPackage();
 
-        $this->registerPackageMetadata();
+        $this
+            ->registerResources()
+            ->registerModels()
+            ->registerPackageMetadata();
     }
 
     private function isPackageInstalled(): bool
@@ -93,8 +96,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     private function registerAll(): self
     {
         return $this
-            ->registerResources()
-            ->registerModels()
             ->registerModelRelations()
             ->registerPublishCommands()
             ->registerBladeComponents()

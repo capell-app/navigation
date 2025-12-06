@@ -96,7 +96,10 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         parent::registeringPackage();
 
-        $this->registerPackageMetadata();
+        $this
+            ->registerResources()
+            ->registerModels()
+            ->registerPackageMetadata();
     }
 
     protected function getPublishedDirectory(): string
@@ -116,8 +119,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     private function registerAll(): self
     {
         return $this
-            ->registerResources()
-            ->registerModels()
             ->registerListeners()
             ->registerRelationships()
             ->registerSchemas()

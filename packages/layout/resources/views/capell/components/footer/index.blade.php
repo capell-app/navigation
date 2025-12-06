@@ -2,21 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Blog\Providers\BlogServiceProvider;
-use Capell\Core\Actions\ColorConverterAction;
-use Capell\Core\Enums\NavigationHandle;
-use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Page;
-use Capell\Frontend\Facades\FrontendLoader;
-use Capell\Frontend\Services\Loader\NavigationItemsLoader;
-use Capell\Frontend\Services\Loader\NavigationLoader;
-use Capell\Frontend\Services\Loader\PageLoader;
-use Capell\Frontend\Services\Loader\SiteLoader;
-
-$language = FrontendLoader::getLanguage();
-$site = FrontendLoader::getSite();
-$page = FrontendLoader::getPage();
-
 ?>
 
 @props([
@@ -25,109 +10,113 @@ $page = FrontendLoader::getPage();
 'headingClass' => 'font-heading tracking-right font-medium uppercase leading-tight text-gray-400',
 ])
 @php
-    $getMenu = function (string $key) use ($site, $language) {
-        $menu = NavigationLoader::getNavigation($key, $site, $language);
-        if (! $menu) {
-            $menu = NavigationLoader::getNavigation($key, $site);
-        }
+    $language = \Capell\Frontend\Facades\ActiveContext::language();
+            $site = \Capell\Frontend\Facades\ActiveContext::site();
+            $page = \Capell\Frontend\Facades\ActiveContext::page();
 
-        $items = [];
+                $getMenu = function (string $key) use ($site, $language) {
+                        $menu = \Capell\Frontend\Services\Loader\NavigationLoader::getNavigation($key, $site, $language);
+                        if (! $menu) {
+                            $menu = \Capell\Frontend\Services\Loader\NavigationLoader::getNavigation($key, $site);
+                        }
 
-        if ($menu) {
-            $navigationLoader = new NavigationItemsLoader(
-                navigation: $menu,
-                site: $site,
-                language: $language,
-                siteDomain: $site->siteDomain,
-            );
+                        $items = [];
 
-            $items = $navigationLoader->fetchMenuItems();
+                        if ($menu) {
+                            $navigationLoader = new \Capell\Frontend\Services\Loader\NavigationItemsLoader(
+                                navigation: $menu,
+                                site: $site,
+                                language: $language,
+                                siteDomain: $site->siteDomain,
+                            );
 
-            if ($items) {
-                $navigationLoader->activeMenuItems($items);
-            }
-        }
+                            $items = $navigationLoader->fetchMenuItems();
 
-        return [$menu, $items];
-    };
+                            if ($items) {
+                                $navigationLoader->activeMenuItems($items);
+                            }
+                        }
 
-    [$footerMenu, $footerMenuItems] = $getMenu(NavigationHandle::Footer->value);
-    [$subFooterMenu, $subFooterMenuItems] = $getMenu(NavigationHandle::SubFooter->value);
+                        return [$menu, $items];
+                    };
 
-    $contactPage = Page::getFirstPageByTypeForSite('contact', $site, $language);
+                    [$footerMenu, $footerMenuItems] = $getMenu(\Capell\Core\Enums\NavigationHandle::Footer->value);
+                    [$subFooterMenu, $subFooterMenuItems] = $getMenu(\Capell\Core\Enums\NavigationHandle::SubFooter->value);
 
-    $siteLanguages = SiteLoader::pageLanguages($site, $language, $page);
+                    $contactPage = \Capell\Core\Models\Page::getFirstPageByTypeForSite('contact', $site, $language);
 
-    $pages = PageLoader::getPages(
-        $site,
-        $language,
-        limit: 3,
-        withImage: true,
-        pageGroup: CapellCore::hasPackage(BlogServiceProvider::$packageName) ? 'blog' : '',
-    );
+                    $siteLanguages = \Capell\Frontend\Services\Loader\SiteLoader::pageLanguages($site, $language, $page);
+
+                    $pages = \Capell\Frontend\Services\Loader\PageLoader::getPages(
+                        $site,
+                        $language,
+                        limit: 3,
+                        withImage: true,
+                        pageGroup: \Capell\Core\Facades\CapellCore::hasPackage(\Capell\Blog\Providers\BlogServiceProvider::$packageName) ? 'blog' : '',
+                    );
 @endphp
 
 <style>
     :root {
-        --color-footer: {{ ColorConverterAction::run($theme->meta['footer_color'] ?? '245,245,245') }};
-        --bg-color-footer: {{ ColorConverterAction::run($theme->meta['footer_background_color'] ?? '69,69,72') }};
+        --color-footer: {{ \Capell\Core\Actions\ColorConverterAction::run($theme->meta['footer_color'] ?? '245,245,245') }};
+        --bg-color-footer: {{ \Capell\Core\Actions\ColorConverterAction::run($theme->meta['footer_background_color'] ?? '69,69,72') }};
     }
 
     .dark:root {
-        --color-footer: {{ ColorConverterAction::run($theme->meta['footer_dark_color'] ?? '233,233,233') }};
-        --bg-color-footer: {{ ColorConverterAction::run($theme->meta['footer_dark_background_color'] ?? '32,31,40') }};
+        --color-footer: {{ \Capell\Core\Actions\ColorConverterAction::run($theme->meta['footer_dark_color'] ?? '233,233,233') }};
+        --bg-color-footer: {{ \Capell\Core\Actions\ColorConverterAction::run($theme->meta['footer_dark_background_color'] ?? '32,31,40') }};
     }
 </style>
 
 <a
-        href="javascript:void(0)"
-        class="scroll-top hover:bg-primary focus:bg-primary text-primary z-999 sticky bottom-0 left-full hidden h-10 w-10 -translate-x-6 items-center justify-center rounded-t-sm bg-gray-200 transition hover:text-white focus:text-white dark:bg-gray-600/75"
-        title="{{ __('Scroll to top') }}"
+    href="javascript:void(0)"
+    class="scroll-top hover:bg-primary focus:bg-primary text-primary z-999 sticky bottom-0 left-full hidden h-10 w-10 -translate-x-6 items-center justify-center rounded-t-sm bg-gray-200 transition hover:text-white focus:text-white dark:bg-gray-600/75"
+    title="{{ __('Scroll to top') }}"
 >
     @svg('heroicon-o-chevron-up', 'h-6 w-6')
 </a>
 <footer
-        id="footer"
-        class="z-0 bg-[var(--bg-color-footer)] text-[var(--color-footer)]"
+    id="footer"
+    class="z-0 bg-[var(--bg-color-footer)] text-[var(--color-footer)]"
 >
     <div
-            @class([
-            '@container flex-wrap px-8 py-14 lg:pt-16',
-            match ($theme->meta['container'] ?? null) {
-            'sm' => 'sm:container',
-            'md' => 'md:container',
-            'lg' => 'lg:container',
-            default => 'container',
-            },
-            ])
+        @class([
+        '@container flex-wrap px-8 py-14 lg:pt-16',
+        match ($theme->meta['container'] ?? null) {
+        'sm' => 'sm:container',
+        'md' => 'md:container',
+        'lg' => 'lg:container',
+        default => 'container',
+        },
+        ])
     >
         <div
-                class="@2xl:grid-cols-2 @4xl:grid-cols-3 grid gap-x-8 gap-y-10 xl:flex xl:flex-row xl:gap-x-10"
+            class="@2xl:grid-cols-2 @4xl:grid-cols-3 grid gap-x-8 gap-y-10 xl:flex xl:flex-row xl:gap-x-10"
         >
             <div
-                    class="shrink-0 space-y-6 text-center md:text-left xl:max-w-[30%]"
+                class="shrink-0 space-y-6 text-center md:text-left xl:max-w-[30%]"
             >
                 <a
-                        href="{{ $site->siteDomain->url }}"
-                        class="mb-6 inline-block"
+                    href="{{ $site->siteDomain->url }}"
+                    class="mb-6 inline-block"
                 >
                     @if ($site->logo || $site->logoInverted)
                         @if ($site->logoInverted)
                             <x-capell::logo
-                                    :media="$site->logoInverted"
-                                    :class="'footer-logo object-top-left max-h-[32vh] object-contain' . ($site->logo ? ' hidden dark:block' : '')"
+                                :media="$site->logoInverted"
+                                :class="'footer-logo object-top-left max-h-[32vh] object-contain' . ($site->logo ? ' hidden dark:block' : '')"
                             />
                         @endif
 
                         @if ($site->logo)
                             <x-capell::logo
-                                    :media="$site->logo"
-                                    :class="'footer-logo object-top-left max-h-[32vh] object-contain' . ($site->logoInverted ? ' dark:hidden' : '')"
+                                :media="$site->logo"
+                                :class="'footer-logo object-top-left max-h-[32vh] object-contain' . ($site->logoInverted ? ' dark:hidden' : '')"
                             />
                         @endif
                     @else
                         <span
-                                class="footer-logo-text text-2xl font-semibold leading-tight text-gray-300 dark:text-gray-100"
+                            class="footer-logo-text text-2xl font-semibold leading-tight text-gray-300 dark:text-gray-100"
                         >
                             {!! $site->translation->title !!}
                         </span>
@@ -135,7 +124,7 @@ $page = FrontendLoader::getPage();
                 </a>
                 @if (! empty($site->translation->meta['tagline']))
                     <p
-                            class="footer-tagline text-sm font-medium dark:text-gray-400"
+                        class="footer-tagline text-sm font-medium dark:text-gray-400"
                     >
                         {{ $site->translation->meta['tagline'] }}
                     </p>
@@ -143,8 +132,8 @@ $page = FrontendLoader::getPage();
 
                 @if (count($siteLanguages) > 1)
                     <x-capell::languages
-                            :$siteLanguages
-                            class="mx-auto"
+                        :$siteLanguages
+                        class="mx-auto"
                     />
                 @endif
             </div>
@@ -160,14 +149,14 @@ $page = FrontendLoader::getPage();
             @endif
 
             <x-capell-layout::footer.pages
-                    :$headingClass
-                    :$pages
-                    class="shrink-0 xl:w-[20%]"
+                :$headingClass
+                :$pages
+                class="shrink-0 xl:w-[20%]"
             />
 
             <x-capell::footer.contact
-                    :$headingClass
-                    class="@4xl:col-span-2 shrink-0 xl:w-[20%]"
+                :$headingClass
+                class="@4xl:col-span-2 shrink-0 xl:w-[20%]"
             />
 
             @stack('footer.components')
@@ -176,11 +165,11 @@ $page = FrontendLoader::getPage();
 
     @if (! empty($subFooterMenuItems) || ! empty($site->translation->meta['footer_copy']))
         <x-capell::footer.sub-footer
-                :items="$subFooterMenuItems"
-                class="sub-footer border-t border-white/10"
+            :items="$subFooterMenuItems"
+            class="sub-footer border-t border-white/10"
         >
             {!!
-                Illuminate\Support\Facades\Lang::get($site->translation->meta['footer_copy'] ?? '', [
+                \Illuminate\Support\Facades\Lang::get($site->translation->meta['footer_copy'] ?? '', [
                 'name' => $site->name,
                 'year' => date('Y'),
                 ])

@@ -7,8 +7,8 @@ namespace Capell\Blog\Livewire\Page;
 use Capell\Blog\Enums\ModelEnum;
 use Capell\Blog\Models\Tag;
 use Capell\Core\Facades\CapellCore;
+use Capell\Frontend\Facades\ActiveContext;
 use Capell\Frontend\Facades\CapellFrontend;
-use Capell\Frontend\Facades\FrontendLoader;
 use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Services\Loader\PageLoader;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -36,17 +36,18 @@ class TagPage extends AbstractPage
 
     protected function loadPage(): void
     {
-        $this->tagSlug = FrontendLoader::getPageSlug();
+        $params = ActiveContext::pageParams();
+        $this->tagSlug = is_array($params) ? ($params['slug'] ?? null) : null;
 
-        if ($this->tagSlug === '' || $this->tagSlug === '0') {
-            CapellFrontend::throwErrorPage();
+        if (in_array($this->tagSlug, ['', '0', null], true)) {
+            CapellFrontend::throwErrorPage(request());
 
             return;
         }
 
-        $language = FrontendLoader::getLanguage();
-        $page = FrontendLoader::getPage();
-        $site = FrontendLoader::getSite();
+        $language = ActiveContext::language();
+        $page = ActiveContext::page();
+        $site = ActiveContext::site();
 
         /** @var class-string<Tag> $model */
         $model = CapellCore::getModel(ModelEnum::Tag);
@@ -56,7 +57,7 @@ class TagPage extends AbstractPage
             ->first();
 
         if (! $tag) {
-            CapellFrontend::throwErrorPage();
+            CapellFrontend::throwErrorPage(request());
 
             return;
         }
@@ -88,6 +89,6 @@ class TagPage extends AbstractPage
 
         $this->pageParams = $this->getViewData();
 
-        FrontendLoader::setPageParams($this->pageParams);
+        ActiveContext::setPageParams($this->pageParams);
     }
 }

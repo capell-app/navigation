@@ -7,7 +7,6 @@ namespace Capell\Layout\Filament\Components\Forms;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Component;
 
 class AssetTypeSelect extends Select
 {
@@ -21,6 +20,6 @@ class AssetTypeSelect extends Select
                     ->mapWithKeys(static fn (AssetData $asset): array => [$asset->getKey() => $asset->getLabel()])
                     ->all(),
             )
-            ->default(fn (AssetTypeSelect $component) => array_key_first($component->getOptions()));
+            ->default(fn (AssetTypeSelect $component): int|string|null => array_key_first($component->getOptions()));
     }
 }

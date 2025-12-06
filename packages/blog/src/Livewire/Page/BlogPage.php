@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Livewire\Page;
 
-use Capell\Frontend\Facades\FrontendLoader;
+use Capell\Frontend\Facades\ActiveContext;
 use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Services\Loader\PageLoader;
 
@@ -14,13 +14,13 @@ class BlogPage extends AbstractPage
 
     protected function loadPage(): void
     {
-        $page = FrontendLoader::getPage();
+        $page = ActiveContext::page();
 
         $paginationKey = config('capell-admin.page_query', 'pageQuery');
 
         $this->results = PageLoader::getPages(
-            site: FrontendLoader::getSite(),
-            language: FrontendLoader::getLanguage(),
+            site: ActiveContext::site(),
+            language: ActiveContext::language(),
             limit: $page->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
             paginationPage: $this->getPage($paginationKey),
             pageGroup: $page->type->meta['page_group'] ?? null,

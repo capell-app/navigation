@@ -21,7 +21,6 @@ use Capell\Blog\Services\Loader\BlogLoader;
 use Capell\Core\Actions\GetNameFromTranslationsAction;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Providers\LayoutServiceProvider;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Htmlable;
 use Override;
