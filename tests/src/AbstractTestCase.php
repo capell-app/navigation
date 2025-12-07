@@ -22,6 +22,7 @@ use CodeWithDennis\FilamentSelectTree\FilamentSelectTreeServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
+use Filament\Infolists\InfolistsServiceProvider;
 use Filament\Notifications\NotificationsServiceProvider;
 use Filament\Schemas\SchemasServiceProvider;
 use Filament\SpatieLaravelSettingsPluginServiceProvider;
@@ -168,6 +169,8 @@ abstract class AbstractTestCase extends TestCase
             SpatieTranslatableServiceProvider::class,
             SpatieLaravelSettingsPluginServiceProvider::class,
             TinyeditorServiceProvider::class,
+            FilamentServiceProvider::class,
+            InfolistsServiceProvider::class,
             FilamentAuthenticationLogServiceProvider::class,
             FilamentServiceProvider::class,
             FilamentAdjacencyListServiceProvider::class,

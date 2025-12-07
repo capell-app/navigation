@@ -11,9 +11,13 @@
         }
     ],
     "scripts": {
-        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "CACHE_STORE=array php ./vendor/bin/testbench package:discover --ansi"
+        ],
         "rector": "rector",
-        "lint": "pint --diff=4.x --parallel",
+        "lint": "pint --parallel",
         "analyze": "phpstan analyse --memory-limit=-1 --configuration=phpstan.neon",
         "prettier": "npx prettier --write \"packages/**/*.{css,js,yml,json,md,blade.php}\"",
         "preflight": [
@@ -25,6 +29,14 @@
         "test:unit": "php -d memory_limit=-1 vendor/bin/pest --colors=always --parallel --configuration=phpunit.xml",
         "test": [
             "@test:unit"
+        ],
+        "clear": "CACHE_STORE=array php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "CACHE_STORE=array php vendor/bin/testbench package:discover --ansi",
+        "build": "CACHE_STORE=array php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "CACHE_STORE=array php vendor/bin/testbench serve --ansi"
         ]
     },
     "repositories": [

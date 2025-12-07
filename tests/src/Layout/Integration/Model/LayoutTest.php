@@ -33,9 +33,9 @@ it('returns layoutWidgets via BelongsToJson relation', function (): void {
                     ['widget_key' => 'widget-b'],
                 ],
             ],
-        ]
+        ],
     ])
-    ->create();
+        ->create();
 
     $fetched = $layout->layoutWidgets;
 

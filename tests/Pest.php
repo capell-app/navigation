@@ -2,31 +2,25 @@
 
 declare(strict_types=1);
 
+use Capell\Tests\Address\AddressTestCase;
+use Capell\Tests\Blog\BlogTestCase;
+use Capell\Tests\Hero\HeroTestCase;
+use Capell\Tests\Layout\LayoutTestCase;
+use Capell\Tests\Packages\PackagesTestCase;
+
 $testsRoot = __DIR__ . DIRECTORY_SEPARATOR . 'src';
 
-// Safety: ensure root exists before iterating
-if (is_dir($testsRoot)) {
-    foreach (new DirectoryIterator($testsRoot) as $info) {
-        if (! $info->isDir()) {
-            continue;
-        }
+pest()->extends(PackagesTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Packages');
 
-        if ($info->isDot()) {
-            continue;
-        }
+pest()->extends(AddressTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Address');
 
-        $name = $info->getBasename();
+pest()->extends(BlogTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Blog');
 
-        // Skip non test suite directories
-        if ($name === 'Fixtures') {
-            continue;
-        }
+pest()->extends(HeroTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Hero');
 
-        $testCaseClass = sprintf('Capell\Tests\%s\%sTestCase', $name, $name); // Convention: Capell\Tests\{Dir}\{Dir}TestCase
-
-        if (class_exists($testCaseClass)) {
-            pest()->extends($testCaseClass)
-                ->in($testsRoot . DIRECTORY_SEPARATOR . $name);
-        }
-    }
-}
+pest()->extends(LayoutTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Layout');

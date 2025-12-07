@@ -12,7 +12,6 @@ declare(strict_types=1);
  *   php scripts/fix_missing_admin_translations.php          # dry run
  *   php scripts/fix_missing_admin_translations.php --write  # perform replacements
  */
-
 $projectRoot = dirname(__DIR__);
 $packagesPath = $projectRoot . '/packages';
 $adminLangPath = $projectRoot . '/vendor/capell-app/admin/packages/admin/resources/lang/en';
@@ -20,7 +19,7 @@ $doWrite = in_array('--write', $argv, true);
 $debug = in_array('--debug', $argv, true);
 
 if (! is_dir($packagesPath)) {
-    fwrite(STDERR, "Packages directory not found: $packagesPath\n");
+    fwrite(STDERR, "Packages directory not found: {$packagesPath}\n");
     exit(1);
 }
 
@@ -31,8 +30,10 @@ $availableKeys = collectAvailableAdminLanguageKeys($adminLangPath);
 $usedKeys = array_filter($usedKeys, function ($key) {
     if (preg_match('/^capell-admin::generic\.$/', $key)) {
         fwrite(STDERR, "Warning: Found usage of capell-admin::generic. (empty key) in code. This is not a valid translation key.\n");
+
         return false;
     }
+
     return true;
 });
 $usedKeys = array_values($usedKeys);
@@ -41,11 +42,17 @@ $missingKeys = array_diff($usedKeys, $availableKeys);
 
 if ($debug) {
     echo "\n--- Used keys ---\n";
-    foreach ($usedKeys as $k) echo $k . "\n";
+    foreach ($usedKeys as $k) {
+        echo $k . "\n";
+    }
     echo "\n--- Available keys ---\n";
-    foreach ($availableKeys as $k) echo $k . "\n";
+    foreach ($availableKeys as $k) {
+        echo $k . "\n";
+    }
     echo "\n--- Missing keys ---\n";
-    foreach ($missingKeys as $k) echo $k . "\n";
+    foreach ($missingKeys as $k) {
+        echo $k . "\n";
+    }
 }
 
 if (empty($missingKeys)) {
@@ -87,15 +94,15 @@ if (! $doWrite) {
     exit(0);
 }
 
-if (!empty($replacedKeys)) {
+if (! empty($replacedKeys)) {
     echo "Replaced translation keys:\n";
     foreach ($replacedKeys as $old => $new) {
-        echo "$new\n";
+        echo "{$new}\n";
     }
     echo "\n";
 }
 
-echo "Replaced namespace for " . count($missingKeys) . " missing keys in " . count($filesModified) . " file(s).\n";
+echo 'Replaced namespace for ' . count($missingKeys) . ' missing keys in ' . count($filesModified) . " file(s).\n";
 exit(0);
 
 /** @return array<int,string> */
@@ -112,6 +119,7 @@ function collectUsedTranslationKeys(string $root): array
             $keys[$key] = true;
         }
     }
+
     return array_keys($keys);
 }
 
@@ -137,6 +145,7 @@ function collectAvailableAdminLanguageKeys(string $langPath): array
             $keys["capell-admin::{$group}.{$dotKey}"] = true;
         }
     }
+
     return array_keys($keys);
 }
 
@@ -152,6 +161,7 @@ function flattenArray(array $array, string $prefix = ''): array
             $result[$fullKey] = $value;
         }
     }
+
     return $result;
 }
 

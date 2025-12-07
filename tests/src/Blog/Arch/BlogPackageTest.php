@@ -7,6 +7,7 @@ use Capell\Admin\Commands\InstallCommand;
 use Capell\Admin\Services\Creator\DemoCreator;
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
+use Capell\Frontend\Http\Middleware\ResolveFrontend;
 use Capell\Frontend\Livewire\Page\SitemapPage;
 use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
@@ -34,6 +35,7 @@ arch()
 
 arch()->preset()->security()
     ->ignoring([
+        ResolveFrontend::class,
         HasRelationship::class,
     ]);
 

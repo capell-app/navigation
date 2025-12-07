@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Frontend\Http\Middleware\ResolveFrontend;
 use Capell\Frontend\Livewire\Page\SitemapPage;
 
 arch()
@@ -24,7 +25,10 @@ arch()
         SitemapPage::class,
     ]);
 
-arch()->preset()->security();
+arch()->preset()->security()
+    ->ignoring([
+        ResolveFrontend::class,
+    ]);
 
 it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])

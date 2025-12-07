@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
+use Capell\Frontend\Http\Middleware\ResolveFrontend;
 use Capell\Frontend\Livewire\Page\SitemapPage;
 use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
@@ -27,6 +28,7 @@ arch()
     ->preset()
     ->security()
     ->ignoring([
+        ResolveFrontend::class,
         HasRelationship::class,
     ]);
 

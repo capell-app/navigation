@@ -7,6 +7,8 @@ namespace Capell\Tests\Packages;
 use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Blog\Providers\BlogServiceProvider;
+use Capell\Core\Providers\CapellServiceProvider;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
@@ -21,6 +23,8 @@ class PackagesTestCase extends AbstractTestCase
             BlogServiceProvider::class,
             LayoutServiceProvider::class,
             BlogServiceProvider::class,
+            FrontendServiceProvider::class,
+            CapellServiceProvider::class,
             AdminPanelProvider::class,
             AdminServiceProvider::class,
         ];
@@ -28,6 +32,6 @@ class PackagesTestCase extends AbstractTestCase
 
     protected function requiredPackages(): array
     {
-        return ['address', 'layout', 'blog'];
+        return ['address', 'layout', 'blog', 'hero', 'frontend', 'admin'];
     }
 }

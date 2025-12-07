@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Hero\Actions;
 
 use Capell\Core\Models\Page;
-use Capell\Frontend\Facades\CapellFrontend;
+use Capell\Frontend\Facades\Frontend;
 use Capell\Layout\Models\Widget;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -39,7 +39,7 @@ class HeroWidgetHasPrimaryHeadingAction
         }
 
         if ($hasPrimaryHeading) {
-            CapellFrontend::setFrontendData('has_primary_heading', true);
+            Frontend::setFrontendData('has_primary_heading', true);
         }
 
         return $hasPrimaryHeading;
