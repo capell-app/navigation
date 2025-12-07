@@ -37,7 +37,7 @@ jobs:
             php: 8.2
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Cache Dependencies PHP
         id: php-cache
@@ -69,7 +69,7 @@ jobs:
 
       - name: Install PHP dependencies
         if: steps.php-cache.outputs.cache-hit != 'true'
-        run: composer update --no-progress --optimize-autoloader
+        run: composer update --no-interaction --no-progress --ansi --optimize-autoloader
 
       - name: Configure environment
         run: |
