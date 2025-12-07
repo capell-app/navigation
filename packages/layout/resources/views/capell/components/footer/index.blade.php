@@ -168,12 +168,10 @@ declare(strict_types=1);
             :items="$subFooterMenuItems"
             class="sub-footer border-t border-white/10"
         >
-            {!!
-                \Illuminate\Support\Facades\Lang::get($site->translation->meta['footer_copy'] ?? '', [
+            {!! \Illuminate\Support\Facades\Lang::get($site->translation->meta['footer_copy'] ?? '', [
                 'name' => $site->name,
                 'year' => date('Y'),
-                ])
-            !!}
+                ]) !!}
         </x-capell::footer.sub-footer>
     @endif
 </footer>
