@@ -28,16 +28,13 @@ declare(strict_types=1);
 'height' => '',
 ])
 <div
-    {{
-        $attributes->class([
+    {{ $attributes->class([
         'swiper-slide',
         'swiper-slide-selected' => $first,
-        ])
-    }}
+        ]) }}
 >
     <div
-        {{
-            $attributes->class([
+        {{ $attributes->class([
             'swiper-slide-inner relative flex min-h-full',
             ...(
             ! $backgroundColor && $colorScheme
@@ -51,8 +48,7 @@ declare(strict_types=1);
             ])
             ->style([
             "background-color: {$backgroundColor}" => $backgroundColor,
-            ])
-        }}
+            ]) }}
     >
         @if ($backgroundImage)
             <x-capell::media
