@@ -5,50 +5,50 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Frontend\Facades\FrontendLoader;
+    use Capell\Frontend\Facades\Frontend;
 @endphp
 
 @aware([
-    'carouselArrows' => '',
+'carouselArrows' => '',
 ])
 
 @props([
-    'backgroundColor' => '',
-    'backgroundImage' => null,
-    'backgroundPosition' => 'center',
-    'backgroundSize' => 'cover',
-    'backgroundAttachment' => '',
-    'backgroundRepeat' => 'no-repeat',
-    'backgroundOverlay' => null,
-    'carouselType' => 'slide',
-    'colorScheme' => 'dark',
-    'container_class' => 'container',
-    'slideBgImgClass' => '',
-    'first' => false,
-    'height' => '',
+'backgroundColor' => '',
+'backgroundImage' => null,
+'backgroundPosition' => 'center',
+'backgroundSize' => 'cover',
+'backgroundAttachment' => '',
+'backgroundRepeat' => 'no-repeat',
+'backgroundOverlay' => null,
+'carouselType' => 'slide',
+'colorScheme' => 'dark',
+'container_class' => 'container',
+'slideBgImgClass' => '',
+'first' => false,
+'height' => '',
 ])
 <div
     {{ $attributes->class([
-            'swiper-slide',
-            'swiper-slide-selected' => $first,
+        'swiper-slide',
+        'swiper-slide-selected' => $first,
         ]) }}
 >
     <div
         {{ $attributes->class([
-                'swiper-slide-inner relative flex min-h-full',
-                ...(
-                    ! $backgroundColor && $colorScheme
-                ? [
-                    'bg-gradient-to-t',
-                    'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
-                    'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
-                ]
-                : []
-                ),
+            'swiper-slide-inner relative flex min-h-full',
+            ...(
+            ! $backgroundColor && $colorScheme
+            ? [
+            'bg-gradient-to-t',
+            'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
+            'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
+            ]
+            : []
+            ),
             ])
-                ->style([
-                    "background-color: {$backgroundColor}" => $backgroundColor,
-                ]) }}
+            ->style([
+            "background-color: {$backgroundColor}" => $backgroundColor,
+            ]) }}
     >
         @if ($backgroundImage)
             <x-capell::media

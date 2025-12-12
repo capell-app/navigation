@@ -11,7 +11,7 @@ use function Pest\Livewire\livewire;
 
 it('can list pages for a tag', function (): void {
     $tag = Tag::factory()
-        ->has(Page::factory()->count(5), 'pages')
+        ->has(Page::factory()->withTranslations()->count(5), 'pages')
         ->create();
 
     $page = $tag->pages->first();
@@ -28,7 +28,7 @@ it('can list pages for a tag', function (): void {
 
 it('can search pages for a tag', function (): void {
     $tag = Tag::factory()
-        ->has(Page::factory()->count(5), 'pages')
+        ->has(Page::factory()->withTranslations()->count(5), 'pages')
         ->create();
 
     $page = $tag->pages->random();

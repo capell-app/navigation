@@ -1,7 +1,8 @@
 includes:
-    - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-    - vendor/pestphp/pest/extension.neon
+    - ./vendor/larastan/larastan/extension.neon
+    - ./vendor/nesbot/carbon/extension.neon
+    - ./vendor/pestphp/pest/extension.neon
+    - ./vendor/tomasvotruba/bladestan/config/extension.neon
 
 parameters:
     level: 1
@@ -30,6 +31,7 @@ parameters:
         - packages/hero/resources/lang
         - packages/layout/resources/lang
     viewDirectories:
+        - packages/address/resources/views
         - packages/blog/resources/views
         - packages/hero/resources/views
         - packages/layout/resources/views

@@ -6,49 +6,49 @@ declare(strict_types=1);
 
 @php
     use Capell\Frontend\Actions\ReplacePageDataAction;
-    use Capell\Frontend\Facades\CapellFrontend;
-    use Capell\Frontend\Facades\FrontendLoader;
-    use Capell\Frontend\Services\Loader\PageLoader;
-    use Spatie\MediaLibrary\MediaCollections\Models\Media;
+        use Capell\Frontend\Facades\CapellFrontend;
+        use Capell\Frontend\Facades\Frontend;
+        use Capell\Frontend\Services\Loader\PageLoader;
+        use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-    $page = FrontendLoader::getPage();
-    $pageParams = FrontendLoader::getPageParams();
-    $theme = FrontendLoader::getTheme();
+        $page = Frontend::page();
+        $pageParams = Frontend::params();
+        $theme = Frontend::theme();
 @endphp
 
 @props([
-    'backgroundColor' => $widget->meta['background_color'] ?? null,
-    'backgroundImage' => ! empty($widget->meta['background_image']) ? Media::find($widget->meta['background_image']) : null,
-    'containerKey',
-    'containerIndex',
-    'colorScheme' => $widget->meta['color_scheme'] ?? $theme->meta['color_scheme'] ?? null,
-    'heroContent' => null,
-    'loop',
-    'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
-    'slideClass' => '',
-    'widget',
-    'widgetIndex',
+'backgroundColor' => $widget->meta['background_color'] ?? null,
+'backgroundImage' => ! empty($widget->meta['background_image']) ? Media::find($widget->meta['background_image']) : null,
+'containerKey',
+'containerIndex',
+'colorScheme' => $widget->meta['color_scheme'] ?? $theme->meta['color_scheme'] ?? null,
+'heroContent' => null,
+'loop',
+'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
+'slideClass' => '',
+'widget',
+'widgetIndex',
 ])
 
 @php
     if ($containerIndex === 0 && ($theme->meta['header_position'] ?? null) === 'fixed') {
-        $slideClass .= ' pt-20 lg:pt-32';
-    }
+            $slideClass .= ' pt-20 lg:pt-32';
+        }
 
-    $height = $widget->meta['height'] ?? null;
+        $height = $widget->meta['height'] ?? null;
 @endphp
 
 <section
     @class([
-        'widget-hero relative z-10 grid w-full',
-        'mb-10' => ! $loop->last,
-        'mt-10' => ! $loop->first,
-        'bg-gray-50 dark:bg-gray-900' => $colorScheme === 'light',
-        'bg-gray-800 dark:bg-gray-900' => $colorScheme === 'dark',
-        'h-[calc(100vh-var(--header-height))]' => $height === 'full',
-        'h-[calc(100vh-var(--header-height))] lg:max-h-[60vh]' => $height === 'large',
-        'h-[calc(100vh-var(--header-height))] md:max-h-[40vh]' => $height === 'medium',
-        'h-[calc(100vh-var(--header-height))] sm:max-h-[24rem]' => $height === 'small',
+    'widget-hero relative z-10 grid w-full',
+    'mb-10' => ! $loop->last,
+    'mt-10' => ! $loop->first,
+    'bg-gray-50 dark:bg-gray-900' => $colorScheme === 'light',
+    'bg-gray-800 dark:bg-gray-900' => $colorScheme === 'dark',
+    'h-[calc(100vh-var(--header-height))]' => $height === 'full',
+    'h-[calc(100vh-var(--header-height))] lg:max-h-[60vh]' => $height === 'large',
+    'h-[calc(100vh-var(--header-height))] md:max-h-[40vh]' => $height === 'medium',
+    'h-[calc(100vh-var(--header-height))] sm:max-h-[24rem]' => $height === 'small',
     ])
 >
     <x-capell-hero::hero.wrapper
@@ -97,37 +97,37 @@ declare(strict_types=1);
             @foreach ($widget->assets as $widgetAsset)
                 @php
                     $asset = $widgetAsset->asset;
-                    if (! $asset) {
-                        continue;
-                    }
+                                        if (! $asset) {
+                                            continue;
+                                        }
 
-                    $slideColorScheme = $asset->meta['color_scheme'] ?? $colorScheme;
+                                        $slideColorScheme = $asset->meta['color_scheme'] ?? $colorScheme;
 
-                    $url = null;
-                    if ($asset->linkedPage) {
-                        $pageUrl = PageLoader::getPageUrlById(
-                            pageId: $asset->linkedPage->id,
-                            site: $asset->linkedPage->site,
-                            language: $language,
-                        );
+                                        $url = null;
+                                        if ($asset->linkedPage) {
+                                            $pageUrl = PageLoader::getPageUrlById(
+                                                pageId: $asset->linkedPage->id,
+                                                site: $asset->linkedPage->site,
+                                                language: $language,
+                                            );
 
-                        $url = $pageUrl?->full_url;
-                    }
+                                            $url = $pageUrl?->full_url;
+                                        }
 
-                    if ($asset instanceof Media) {
-                        $bgImage = $asset;
-                        $images = null;
-                    } else {
-                        $bgImage = ! empty($asset->meta['background_image_id'])
-                            ? Media::find($asset->meta['background_image_id'])
-                            : ($asset->image ?: $backgroundImage);
+                                        if ($asset instanceof Media) {
+                                            $bgImage = $asset;
+                                            $images = null;
+                                        } else {
+                                            $bgImage = ! empty($asset->meta['background_image_id'])
+                                                ? Media::find($asset->meta['background_image_id'])
+                                                : ($asset->image ?: $backgroundImage);
 
-                        $images = $asset->media;
-                    }
+                                            $images = $asset->media;
+                                        }
 
-                    if (! $bgImage && ! $images?->isNotEmpty() && ! $asset->translation) {
-                        continue;
-                    }
+                                        if (! $bgImage && ! $images?->isNotEmpty() && ! $asset->translation) {
+                                            continue;
+                                        }
                 @endphp
 
                 <x-capell-hero::hero.slide
@@ -158,16 +158,16 @@ declare(strict_types=1);
                 >
                     <div
                         @class([
-                            '@container grid select-text gap-4 gap-x-10 gap-y-8 py-14 lg:gap-x-16 lg:py-24',
-                            'lg:grid-cols-12' => $images?->isNotEmpty(),
+                        '@container grid select-text gap-4 gap-x-10 gap-y-8 py-14 lg:gap-x-16 lg:py-24',
+                        'lg:grid-cols-12' => $images?->isNotEmpty(),
                         ])
                     >
                         <div
                             @class([
-                                'flex flex-col justify-center',
-                                'items-center text-center' => ! $images?->isNotEmpty(),
-                                'lg:col-span-5 xl:col-span-7' => $images?->isNotEmpty(),
-                                'py-[4vh]' => ! $asset->image && ! $bgImage,
+                            'flex flex-col justify-center',
+                            'items-center text-center' => ! $images?->isNotEmpty(),
+                            'lg:col-span-5 xl:col-span-7' => $images?->isNotEmpty(),
+                            'py-[4vh]' => ! $asset->image && ! $bgImage,
                             ])
                         >
                             @if ($asset->translation)

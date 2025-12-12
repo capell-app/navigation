@@ -12,7 +12,7 @@ use Capell\Layout\Models\WidgetAsset;
 use function Pest\Livewire\livewire;
 
 it('can list pages for a content model', function (): void {
-    $page = Page::factory()->create();
+    $page = Page::factory()->withTranslations()->create();
     $content = Content::factory()->create();
 
     $widget = Widget::factory()
@@ -44,7 +44,7 @@ it('can list pages for a content model', function (): void {
 });
 
 it('can search pages for a content model', function (): void {
-    $page = Page::factory()->create();
+    $page = Page::factory()->withTranslations()->create();
     $content = Content::factory()->create();
     Widget::factory()
         ->has(

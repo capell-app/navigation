@@ -62,7 +62,7 @@ it('can create', function (string $type): void {
     ->with(['default', 'with deleted site']);
 
 test('create with translations', function (string $mode): void {
-    $languages = Language::factory()->count(3)->create();
+    $languages = Language::factory()->count(3)->create(['name' => "Cote d'Ivoire"]);
     $site = Site::factory()->state(['language_id' => $languages->first()->id])->withTranslations($languages)->create();
 
     $type = (new ContentTypeFactory)->default()->create();
@@ -113,7 +113,7 @@ test('create with translations', function (string $mode): void {
         fn (Language $language) => assertDatabaseHas(Translation::class, [
             'language_id' => $language->getKey(),
             'title' => $newData->name . ' - ' . $language->name,
-            'content' => '<p>' . $newData->name . ' - ' . $language->name . '</p>',
+            'content' => '<p>' . htmlspecialchars($newData->name . ' - ' . $language->name, ENT_QUOTES, 'UTF-8') . '</p>',
             'translatable_type' => 'content',
         ]),
     );

@@ -641,7 +641,7 @@ test('can remove widget assets', function (): void {
         ->toBeFalse();
 });
 
-test('can remove page assets', function (): void {
+test('can remove all assets', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 

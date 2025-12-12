@@ -139,7 +139,8 @@
         "pestphp/pest-plugin-livewire": "^3.0|^4.0",
         "pestphp/pest-plugin-type-coverage": "^3.0|^4.0",
         "rector/rector": "^2.0",
-        "spatie/laravel-ray": "^1.36"
+        "spatie/laravel-ray": "^1.36",
+        "tomasvotruba/bladestan": "^0.11.3"
     },
     "autoload": {
         "psr-4": {

@@ -15,9 +15,9 @@ uses(CreatesAdminUser::class)
 it('renders the pages widget', function (): void {
     test()->actingAsAdmin();
 
-    Page::factory(5)->create();
+    Page::factory(5)->withTranslations()->create();
 
-    (new ArticlePageFactory)->count(5)->create();
+    (new ArticlePageFactory)->withTranslations()->count(5)->create();
 
     livewire(LatestPagesWidget::class)
         ->assertOk()
