@@ -1087,8 +1087,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         }
 
         $this->setupSelectedAssets();
-
-        ray($this->assets['main']);
     }
 
     protected function loadFromStore(): void
