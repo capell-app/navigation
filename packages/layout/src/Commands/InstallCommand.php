@@ -65,22 +65,27 @@ class InstallCommand extends Command
             ->lazy()
             ->each(
                 function (Theme $theme) use ($path): void {
-                    if (isset($theme->meta['vendor_assets']) && is_array($theme->meta['vendor_assets'])) {
-                        $removeAssets = [
-                            [
-                                'path' => 'vendor/capell-frontend',
-                                'file' => 'resources/css/capell-frontend.css',
-                            ],
-                        ];
+                    $vendorAssets = $theme->meta['vendor_assets'] ?? [];
+                    $removeAssets = [
+                        [
+                            'path' => 'vendor/capell-frontend',
+                            'file' => 'resources/css/capell-frontend.css',
+                        ],
+                    ];
 
-                        $theme->meta['vendor_assets'] = array_filter(
-                            $theme->meta['vendor_assets'],
-                            fn ($asset): bool => ! collect($removeAssets)->contains(
-                                fn (array $removeAsset): bool => $asset['path'] === $removeAsset['path'] &&
-                                    $asset['file'] === $removeAsset['file'],
+                    $filteredAssets = array_filter(
+                        $vendorAssets,
+                        static fn (array $asset): bool => ! collect($removeAssets)
+                            ->contains(
+                                static fn (array $removeAsset): bool => $asset['path'] === $removeAsset['path']
+                                && $asset['file'] === $removeAsset['file'],
                             ),
-                        );
-                    }
+                    );
+
+                    $theme->setAttribute('meta', array_replace(
+                        $theme->meta,
+                        ['vendor_assets' => array_values($filteredAssets)],
+                    ));
 
                     AddVendorAssetToThemeAction::run(
                         $theme,
