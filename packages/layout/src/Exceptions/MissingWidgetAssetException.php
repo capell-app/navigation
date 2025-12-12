@@ -13,20 +13,20 @@ class MissingWidgetAssetException extends Exception
 
     public function __construct(Widget $widget, string $assetType, mixed $assetIdentifier = null, array $context = [])
     {
-        $widgetClass = get_class($widget);
+        $widgetClass = $widget::class;
         $message = sprintf(
             "Missing required '%s' asset for widget %s (key: '%s').",
             $assetType,
             $widgetClass,
-            $widget->key
+            $widget->key,
         );
 
         if ($assetIdentifier !== null) {
             $message .= sprintf(
-                " Asset identifier: %s.",
+                ' Asset identifier: %s.',
                 is_scalar($assetIdentifier)
                     ? "'" . $assetIdentifier . "'"
-                    : json_encode($assetIdentifier, JSON_UNESCAPED_SLASHES)
+                    : json_encode($assetIdentifier, JSON_UNESCAPED_SLASHES),
             );
         }
 

@@ -6,15 +6,15 @@ $language = \Capell\Frontend\Facades\Frontend::language();
 $site = \Capell\Frontend\Facades\Frontend::site();
 $page = \Capell\Frontend\Facades\Frontend::page();
 
-$getMenu = function (string $key) use ($site, $language) {
+$getMenu = function (string $key) use ($site, $language): array {
     $menu = \Capell\Frontend\Services\Loader\NavigationLoader::getNavigation($key, $site, $language);
-    if (! $menu) {
+    if (!$menu instanceof \Capell\Core\Models\Navigation) {
         $menu = \Capell\Frontend\Services\Loader\NavigationLoader::getNavigation($key, $site);
     }
 
     $items = [];
 
-    if ($menu) {
+    if ($menu instanceof \Capell\Core\Models\Navigation) {
         $navigationLoader = new \Capell\Frontend\Services\Loader\NavigationItemsLoader(
             navigation: $menu,
             site: $site,
@@ -43,8 +43,8 @@ $pages = \Capell\Frontend\Services\Loader\PageLoader::getPages(
 $site,
 $language,
 limit: 3,
-withImage: true,
 pageGroup: \Capell\Core\Facades\CapellCore::hasPackage(\Capell\Blog\Providers\BlogServiceProvider::$packageName) ? 'blog' : '',
+withImage: true,
 );
 
 ?>

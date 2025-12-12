@@ -21,6 +21,7 @@ use Capell\Layout\Enums\SchemaTypeEnum;
 use Capell\Layout\Exceptions\MissingWidgetAssetException;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Containers\DefaultLayoutContainerSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetAssetForm;
+use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetForm;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Closure;
@@ -46,6 +47,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Enumerable;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Computed;
@@ -986,8 +989,6 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     {
         return view('capell-admin::components.placeholder', $params);
     }
-
-
 
     public function render(): View
     {
@@ -2070,7 +2071,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
         $allAssets = (new $model)->newCollection(array_merge($existingAssets->all(), $newAssetsCollection->all()));
 
-        $eloquentCollection = new \Illuminate\Database\Eloquent\Collection($allAssets->all());
+        $eloquentCollection = new Collection($allAssets->all());
 
         return $eloquentCollection->load(['asset' => fn (BuilderContract $query) => $query->morphWith($this->getAssetRelations())])
             ->map(function (WidgetAsset $widgetAsset): WidgetAsset {
@@ -2082,7 +2083,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             });
     }
 
-    protected function filterContainerWidgetAssets(Collection $assets, string $containerKey, int $widgetOccurrence): SupportCollection|\Illuminate\Support\Enumerable
+    protected function filterContainerWidgetAssets(Collection $assets, string $containerKey, int $widgetOccurrence): SupportCollection|Enumerable
     {
         return $assets->filter(function (WidgetAsset $widgetAsset) use ($containerKey, $widgetOccurrence): bool {
             if ($widgetAsset->container === null) {
@@ -2261,6 +2262,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     if (is_int($searchIndex)) {
                         $widget->assets->forget([$searchIndex]);
                     }
+
                     $this->removeAsset($containerKey, $widgetIndex, $widgetAsset->asset_id, $widgetAsset->asset_type);
 
                     $widgetAsset->delete();

@@ -7,19 +7,19 @@ declare(strict_types=1);
 @php
     use Capell\Frontend\Facades\Frontend;
 
-    $language = Frontend::language();
-    $site = Frontend::site();
-    $page = Frontend::page();
+        $language = Frontend::language();
+        $site = Frontend::site();
+        $page = Frontend::page();
 @endphp
 
 @props([
-    'container',
-    'containerKey',
-    'containerWidth' => null,
-    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
-    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
-    'loop',
-    'widget',
+'container',
+'containerKey',
+'containerWidth' => null,
+'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
+'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
+'loop',
+'widget',
 ])
 <x-capell-layout::widget.wrapper
     class="widget-tags"

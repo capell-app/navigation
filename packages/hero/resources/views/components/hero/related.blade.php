@@ -5,9 +5,9 @@ declare(strict_types=1);
 ?>
 
 @props([
-    'language' => Capell\Frontend\Facades\Frontend::language(),
-    'features',
-    'key',
+'language' => Capell\Frontend\Facades\Frontend::language(),
+'features',
+'key',
 ])
 
 <div
@@ -21,17 +21,17 @@ declare(strict_types=1);
     @foreach ($features as $feature)
         @php
             $url = null;
-            if ($feature->linkedPage) {
-                $pageUrl = Capell\Frontend\Services\Loader\PageLoader::getPageUrlById(
-                    pageId: $feature->linkedPage->id,
-                    site: $feature->linkedPage->site,
-                    language: $language,
-                );
+                        if ($feature->linkedPage) {
+                            $pageUrl = Capell\Frontend\Services\Loader\PageLoader::getPageUrlById(
+                                pageId: $feature->linkedPage->id,
+                                site: $feature->linkedPage->site,
+                                language: $language,
+                            );
 
-                if ($pageUrl) {
-                    $url = $pageUrl->full_url;
-                }
-            }
+                            if ($pageUrl) {
+                                $url = $pageUrl->full_url;
+                            }
+                        }
         @endphp
 
         <div
@@ -43,7 +43,7 @@ declare(strict_types=1);
                 @if ($feature->image)
                     @php
                         $width = 200;
-                        $height = floor($width * ($feature->image->height / $feature->image->width));
+                                                $height = floor($width * ($feature->image->height / $feature->image->width));
                     @endphp
                 @endif
 

@@ -7,17 +7,17 @@ declare(strict_types=1);
 @php
     use Capell\Frontend\Facades\Frontend;
 
-    $language = Frontend::language();
+        $language = Frontend::language();
 @endphp
 
 @props([
-    'asset',
-    'componentItem',
-    'loop',
-    'withImage' => false,
-    'withLinkText' => false,
-    'withSummary' => false,
-    'withUrl' => true,
+'asset',
+'componentItem',
+'loop',
+'withImage' => false,
+'withLinkText' => false,
+'withSummary' => false,
+'withUrl' => true,
 ])
 
 <x-dynamic-component

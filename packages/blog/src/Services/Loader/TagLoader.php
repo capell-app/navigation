@@ -34,7 +34,7 @@ class TagLoader
 
         if ($fromCache) {
             $tags->each(function (Tag $tag): void {
-                app(ModelServingInterface::class)->track($tag);
+                resolve(ModelServingInterface::class)->track($tag);
             });
         }
 
@@ -57,7 +57,7 @@ class TagLoader
         }) ?: null;
 
         if ($fromCache && $page) {
-            app(ModelServingInterface::class)->track($page);
+            resolve(ModelServingInterface::class)->track($page);
         }
 
         return $page;
@@ -114,7 +114,7 @@ class TagLoader
 
         if ($fromCache) {
             $tags->each(function (Tag $tag): void {
-                app(ModelServingInterface::class)->track($tag);
+                resolve(ModelServingInterface::class)->track($tag);
             });
         }
 
@@ -139,7 +139,7 @@ class TagLoader
         }) ?: null;
 
         if ($fromCache && $tag) {
-            app(ModelServingInterface::class)->track($tag);
+            resolve(ModelServingInterface::class)->track($tag);
         }
 
         return $tag;

@@ -33,7 +33,7 @@ class BlogLoader
         }) ?: null;
 
         if ($fromCache && $page) {
-            app(ModelServingInterface::class)->track($page);
+            resolve(ModelServingInterface::class)->track($page);
         }
 
         return $page;

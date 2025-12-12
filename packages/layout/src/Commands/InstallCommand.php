@@ -75,8 +75,8 @@ class InstallCommand extends Command
 
                     $filteredAssets = array_filter(
                         $vendorAssets,
-                        static fn (array $asset): bool => ! collect($removeAssets)
-                            ->contains(
+                        static fn (array $asset): bool => collect($removeAssets)
+                            ->doesntContain(
                                 static fn (array $removeAsset): bool => $asset['path'] === $removeAsset['path']
                                 && $asset['file'] === $removeAsset['file'],
                             ),

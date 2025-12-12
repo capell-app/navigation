@@ -198,7 +198,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             $view->getFactory()->startPush(
                 'footer.components',
                 // @phpstan-ignore-next-line
-                view('capell-blog::components.footer.tags')->render()
+                view('capell-blog::components.footer.tags')->render(),
             );
         });
 

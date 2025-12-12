@@ -8,8 +8,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
-use Capell\Core\Models\Translation;
-use Capell\Frontend\Services\ModelServing\ModelServingInterface;
+use Capell\Frontend\Contracts\ModelServingInterface;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -32,10 +31,10 @@ class LayoutLoader
         }) ?: null;
 
         if ($fromCache && $layout) {
-            app(ModelServingInterface::class)->track($layout);
+            resolve(ModelServingInterface::class)->track($layout);
 
             $layout->layoutWidgets->each(function (Widget $widget): void {
-                app(ModelServingInterface::class)->track($widget);
+                resolve(ModelServingInterface::class)->track($widget);
             });
         }
 
@@ -114,15 +113,15 @@ class LayoutLoader
         ) ?: null;
 
         if ($fromCache && $widget) {
-            app(ModelServingInterface::class)->track($widget);
+            resolve(ModelServingInterface::class)->track($widget);
 
             $widget->assets->each(function (WidgetAsset $resource): void {
-                app(ModelServingInterface::class)->track($resource);
+                resolve(ModelServingInterface::class)->track($resource);
             });
 
             if ($widget->translation) {
-                app(ModelServingInterface::class)->track($widget->translation);
-                app(ModelServingInterface::class)->track($widget->translation->language);
+                resolve(ModelServingInterface::class)->track($widget->translation);
+                resolve(ModelServingInterface::class)->track($widget->translation->language);
             }
         }
 
