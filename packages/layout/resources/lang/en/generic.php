@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'assets' => 'Assets',
     'breadcrumbs' => 'Breadcrumbs',
     'page_children' => 'Page Children',
     'gallery' => 'Gallery',
@@ -18,6 +19,7 @@ return [
     'auto' => 'Auto',
     'light' => 'Light',
     'dark' => 'Dark',
+    'no_pages_found' => 'No pages found.',
     'default_value' => 'Default: :value',
     'content' => 'Content',
     'widget' => 'Widget',

@@ -46,7 +46,7 @@ class WidgetCreator
 
         $this->breadcrumbWidget($systemWidgetType);
         $this->childrenWidget($pageResultsWidgetType, $languages);
-        $this->contentsWidgets($contentsWidgetType);
+        $this->assetsWidget($contentsWidgetType);
         $this->galleryWidget($mediaWidgetType, $languages);
         $this->latestPagesWidget($pageResultsWidgetType, $languages);
         $this->mediaCarouselWidget($mediaWidgetType);
@@ -104,14 +104,14 @@ class WidgetCreator
         return $widget;
     }
 
-    public function contentsWidgets(?Type $type = null): Widget
+    public function assetsWidget(?Type $type = null): Widget
     {
         $type ??= resolve(TypeCreator::class)->contentsWidgetType();
 
         return $this->widgetModel::query()->firstOrCreate([
-            'key' => 'contents-assets',
+            'key' => 'assets',
         ], [
-            'name' => __('capell-admin::generic.contents'),
+            'name' => __('capell-layout::generic.assets'),
             'type_id' => $type->id,
             'meta' => [
                 'limit' => 6,

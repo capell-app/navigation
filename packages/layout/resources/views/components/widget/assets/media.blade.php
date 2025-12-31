@@ -57,14 +57,15 @@ declare(strict_types=1);
             ])
         >
             @foreach ($widget->assets as $widgetAsset)
+                {{-- format-ignore-start --}}
                 @php
                     $asset = $widgetAsset->asset;
-                                                                                $media = $asset->image;
-                                                                                if (! $media) {
-                                                                                    throw new RuntimeException('Media not found for asset ID ' . $asset->id);
-                                                                                }
+                    $media = $asset->image;
+                    if (! $media) {
+                        throw new RuntimeException('Media not found for asset ID ' . $asset->id);
+                    }
                 @endphp
-
+                {{-- format-ignore-end --}}
                 <div
                     @class([
                     'widget-media-item group relative h-full cursor-pointer overflow-hidden text-center',

@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
+use Capell\Layout\Database\Factories\LayoutFactory;
+use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+
+use function Pest\Laravel\get;
+
+use Sinnbeck\DomAssertions\Asserts\AssertElement;
+
+uses(TestingFrontend::class);
+
+test('breadcrumbs widget', function (): void {
+    $site = Site::factory()->withTranslations()->create();
+
+    $widgetCreator = resolve(WidgetCreator::class);
+    $widget = $widgetCreator->breadcrumbWidget();
+
+    $layout = (new LayoutFactory)->widgets([$widget])->create();
+
+    $home = Page::factory()->site($site)->home()->withTranslations()->create();
+    $parent = Page::factory()->site($site)->withTranslations()->create();
+    $page = Page::factory()->site($site)->layout($layout)->parent($parent)->withTranslations()->create();
+
+    $page->load('pageUrl', 'parent.pageUrl');
+
+    get($page->pageUrl->full_url)
+        ->assertOk()
+        ->assertElementExists(
+            'nav.breadcrumbs',
+            fn (AssertElement $elm) => $elm->containsText($home->translation->label)
+                ->containsText($parent->translation->title)
+                ->containsText($page->translation->title),
+        );
+});
+
+test('breadcrumbs are hidden on root page', function (): void {
+    $site = Site::factory()->withTranslations()->create();
+
+    $widgetCreator = resolve(WidgetCreator::class);
+    $widget = $widgetCreator->breadcrumbWidget();
+
+    $layout = (new LayoutFactory)->widgets([$widget])->create();
+
+    $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
+
+    get($page->pageUrl->full_url)
+        ->assertOk()
+        ->assertElementExists('main', fn (AssertElement $assert) => $assert->doesntContain('nav.breadcrumbs'));
+});

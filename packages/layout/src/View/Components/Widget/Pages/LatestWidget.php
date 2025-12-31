@@ -27,6 +27,8 @@ class LatestWidget extends AbstractPagesWidget
             modifyQuery: fn (Builder $query) => $query->whereKeyNot(Frontend::page()->id),
         );
 
-        $this->skipRender = $this->pages->isEmpty();
+        if ($this->pages->isEmpty() && config('capell-layout.widget.skip_render_empty', true)) {
+            $this->skipRender = true;
+        }
     }
 }

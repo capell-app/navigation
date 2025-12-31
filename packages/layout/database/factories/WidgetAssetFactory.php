@@ -36,8 +36,8 @@ class WidgetAssetFactory extends Factory
             'page_id' => null,
             'asset_type' => $assetType->value,
             'asset_id' => fn (): string => match ($assetType) {
-                LayoutAssetEnum::Content => (string) Content::factory()->create()->id,
-                AssetEnum::Page => (string) Page::factory()->create()->id,
+                LayoutAssetEnum::Content => (string) Content::factory()->withTranslations()->create()->id,
+                AssetEnum::Page => (string) Page::factory()->withTranslations()->create()->id,
             },
             'occurrence' => 1,
             'order' => fake()->randomNumber(1),

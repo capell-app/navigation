@@ -7,7 +7,7 @@ declare(strict_types=1);
 @php
     use Capell\Frontend\Facades\Frontend;
 
-            $language = Frontend::language();
+                $language = Frontend::language();
 @endphp
 
 @props([
@@ -20,10 +20,17 @@ declare(strict_types=1);
 'withUrl' => true,
 ])
 
+@php
+    $image = null;
+        if ($withImage) {
+            $image = $asset->relationLoaded('image') ? $asset->image : $asset->media->first();
+        }
+@endphp
+
 <x-dynamic-component
     :component="$componentItem"
     :$loop
-    :image="$withImage ? $asset->image : null"
+    :image="$image"
     :icon="$asset->meta['icon'] ?? null"
     :color="$asset->meta['color'] ?? null"
     :meta="$asset->meta"

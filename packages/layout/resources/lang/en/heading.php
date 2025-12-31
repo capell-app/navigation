@@ -17,7 +17,7 @@ return [
     'content_type' => 'Content Type: :type',
     'related_pages' => 'Related Pages',
     'faq' => 'FAQ',
-    'page_children' => 'Page Children',
+    'page_children' => 'Subpages',
     'gallery' => 'Gallery',
     'page_siblings' => 'Page Siblings',
     'edit_tag_record' => 'Edit Tag: :name',
