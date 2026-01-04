@@ -11,8 +11,6 @@ use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
 
-use Sinnbeck\DomAssertions\Asserts\AssertElement;
-
 uses(TestingFrontend::class);
 
 it('creates page slot widget with expected meta', function (): void {
@@ -39,5 +37,7 @@ it('renders page slot widget on page', function (): void {
 
     get($page->pageUrl->full_url)
         ->assertOk()
-        ->assertElementExists('.widget-page-slot', fn (AssertElement $elm) => $elm);
+        ->assertElementExists('.widget-page-slot');
 });
+
+todo('test page slot content rendering');

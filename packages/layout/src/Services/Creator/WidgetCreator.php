@@ -202,7 +202,7 @@ class WidgetCreator
             'name' => __('capell-admin::generic.media_carousel'),
             'type_id' => $type->id,
             'meta' => [
-                'component' => WidgetComponentEnum::AssetCarousel->value,
+                'component' => WidgetComponentEnum::AssetCarousel,
                 'limit' => 20,
                 'container' => 'full',
                 'background_color' => 'light-gray',
@@ -262,7 +262,7 @@ class WidgetCreator
             'name' => __('capell-admin::generic.page_slot'),
             'type_id' => $type->id,
             'meta' => [
-                'component' => 'capell-layout::widget.slot',
+                'component' => WidgetComponentEnum::PageSlot,
                 'type' => 'slot',
             ],
         ]);

@@ -85,6 +85,7 @@ declare(strict_types=1);
                     :with-image="$withImage"
                     :with-parent="$withParent"
                     :with-summary="$withSummary"
+                    class="widget-asset"
                 />
             @endforeach
         </div>

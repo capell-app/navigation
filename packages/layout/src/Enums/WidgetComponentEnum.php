@@ -46,6 +46,8 @@ enum WidgetComponentEnum: string
 
     case AssetTestimonials = 'capell-layout::widget.assets.testimonials';
 
+    case PageSlot = 'capell-layout::widget.slot';
+
     public static function getComponents(): array
     {
         $components = [];

@@ -46,7 +46,7 @@ it('create hero widget', function (): void {
             'key' => 'hero',
             'type_id' => $type->id,
             'meta' => [
-                'component' => WidgetComponentEnum::Hero->value,
+                'component' => WidgetComponentEnum::Hero,
             ],
         ])
         ->call('create')

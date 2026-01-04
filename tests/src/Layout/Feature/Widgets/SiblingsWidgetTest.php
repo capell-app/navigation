@@ -9,7 +9,6 @@ use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Services\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
-use Illuminate\Support\Collection;
 
 use function Pest\Laravel\get;
 
@@ -19,19 +18,30 @@ uses(TestingFrontend::class);
 
 it('renders siblings widget on page', function (): void {
     $site = Site::factory()->withTranslations()->create();
-
     $creator = resolve(WidgetCreator::class);
-
-    /** @var Collection<int, mixed> $languages */
     $languages = CapellCore::getModel(CoreModelEnum::Language)::query()->get();
-
     $widget = $creator->siblingsWidget(null, $languages);
-
     $layout = (new LayoutFactory)->widgets([$widget])->create();
-
-    $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
-
+    $parent = Page::factory()->site($site)->withTranslations()->create();
+    $pages = Page::factory()->count(3)->site($site)->parent($parent)->layout($layout)->withTranslations()->create();
+    $page = $pages->random();
+    $siblings = $pages->where('id', '!=', $page->id)->values();
     get($page->pageUrl->full_url)
         ->assertOk()
-        ->assertElementExists('.widget-siblings', fn (AssertElement $elm) => $elm);
+        ->assertElementExists(
+            '.widget-siblings',
+            fn (AssertElement $elm) => $elm->containsText($widget->translation->title)
+                ->contains('.siblings-page-item', 2)
+                ->each(
+                    '.siblings-page-item',
+                    fn (AssertElement $asset, int $index) => $asset->containsText($siblings[$index]->translation->title)
+                        ->find(
+                            'a',
+                            fn (AssertElement $aElm) => $aElm->has(
+                                'href',
+                                $siblings[$index]->pageUrl->full_url,
+                            ),
+                        ),
+                ),
+        );
 });

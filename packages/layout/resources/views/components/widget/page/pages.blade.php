@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Enums\AssetComponentEnum;
-                        use Capell\Frontend\Facades\Frontend;
+                            use Capell\Frontend\Facades\Frontend;
 
-                        $language = Frontend::language();
+        $language = Frontend::language();
 @endphp
 
 @props([
@@ -90,6 +90,7 @@ declare(strict_types=1);
                     :title="$item->translation->title"
                     :url="$item->pageUrl->full_url"
                     :with-summary="$withSummary"
+                    :class="$widget->key . '-page-item'"
                 />
             @endforeach
         </div>

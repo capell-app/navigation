@@ -44,7 +44,7 @@ class CreateHeroWidgetAction
             'name' => __('capell-hero::generic.hero'),
             'type_id' => $type->id,
             'meta' => [
-                'component' => WidgetComponentEnum::Hero->value,
+                'component' => WidgetComponentEnum::Hero,
                 'heading_size' => 'h1',
                 'height' => 'large',
                 'carousel_fade' => true,

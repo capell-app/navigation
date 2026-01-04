@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\Frontend\Facades\Frontend;
 
 $page = Frontend::page();
+$layout = Frontend::layout();
 ?>
 
 @props([
@@ -19,17 +20,18 @@ $page = Frontend::page();
 'widget',
 'widgetData',
 ])
+{{-- format-ignore-start --}}
 @php
     $hasPrimaryHeading = Frontend::getFrontendData('has_primary_heading');
 
-                    $hasContent = collect(['content', 'title'])
-                        ->contains(fn ($item): bool => in_array($item, $pageContents, true) && ! empty($page->translation->{$item}));
+    $hasContent = collect(['content', 'title'])
+        ->contains(fn ($item): bool => in_array($item, $pageContents, true) && ! empty($page->translation->{$item}));
 
-                    if (! $headingTag) {
-                        $headingTag = ($hasPrimaryHeading ? 'h2' : 'h1');
-                    }
+    if (! $headingTag) {
+        $headingTag = ($hasPrimaryHeading ? 'h2' : 'h1');
+    }
 @endphp
-
+{{-- format-ignore-end --}}
 @if ($hasContent)
     <x-capell-layout::widget.wrapper
         :$container
