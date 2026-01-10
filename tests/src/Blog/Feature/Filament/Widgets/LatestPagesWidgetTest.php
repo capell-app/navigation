@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use Capell\Admin\Filament\Widgets\LatestPagesWidget;
 use Capell\Blog\Database\Factories\ArticleFactory;
+use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
@@ -15,9 +17,12 @@ uses(CreatesAdminUser::class)
 it('renders the pages widget', function (): void {
     test()->actingAsAdmin();
 
-    Page::factory(5)->withTranslations()->create();
+    $language = Language::factory()->create();
+    $site = Site::factory()->language($language)->withTranslations()->create();
 
-    (new ArticleFactory)->withTranslations()->count(5)->create();
+    Page::factory(5)->site($site)->withTranslations()->create();
+
+    (new ArticleFactory)->site($site)->withTranslations()->count(5)->create();
 
     livewire(LatestPagesWidget::class)
         ->assertOk()

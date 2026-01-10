@@ -101,6 +101,7 @@ $theme = Frontend::theme();
                             :heading-size="$headingSize"
                             :title="$title"
                             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
+                            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
                         />
                     @endif
 

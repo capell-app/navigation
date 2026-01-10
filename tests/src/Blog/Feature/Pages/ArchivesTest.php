@@ -12,6 +12,9 @@ use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
 
+use Sinnbeck\DomAssertions\Asserts\AssertElement;
+use Sinnbeck\DomAssertions\Asserts\BaseAssert;
+
 uses(TestingFrontend::class);
 
 test('archives page list articles archives by month/year', function (): void {
@@ -94,7 +97,12 @@ test('archive page list articles by month/year', function (): void {
 
     get($archiveUrl)
         ->assertOk()
-        ->assertSeeHtml('<title>' . __($archivePage->title, ['archive_month' => $publishDate->format('F'), 'archive_year' => $publishDate->year]))
+        ->assertElementExists(
+            'title',
+            fn (AssertElement $elm): BaseAssert => $elm->containsText(
+                __($archivePage->title, ['archive_month' => $publishDate->format('F'), 'archive_year' => $publishDate->year]),
+            ),
+        )
         ->assertDontSeeText('no-results');
 });
 

@@ -38,7 +38,6 @@ class ThemeFactory extends \Capell\Core\Database\Factories\ThemeFactory
                 ),
         );
 
-        $state['meta']['footer_file'] = 'capell-layout::footer';
         $state['meta']['vendor_assets'] = array_values($filteredAssets);
 
         return $state;

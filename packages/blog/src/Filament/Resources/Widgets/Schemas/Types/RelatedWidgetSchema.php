@@ -20,7 +20,6 @@ use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\DefaultWidgetSchema;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs;
@@ -91,11 +90,7 @@ class RelatedWidgetSchema extends DefaultWidgetSchema
                                         ->default(true),
                                     CacheFrequencySelect::make('cache_frequency'),
                                 ]),
-                            Fieldset::make(__('capell-admin::generic.display_settings'))
-                                ->statePath('meta')
-                                ->columns(['default' => 1, 'md' => 2, 'lg' => 3, 'xl' => 4])
-                                ->columnSpanFull()
-                                ->schema(WidgetResultsSchema::make()),
+                            ...WidgetResultsSchema::make(),
                         ]),
                         WidgetComponentFilesSection::make()
                             ->statePath('meta'),

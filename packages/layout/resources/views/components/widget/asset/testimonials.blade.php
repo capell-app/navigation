@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 @props([
     'align' => $widget->meta['align'] ?? $widget->type->meta['align'] ?? 'center',
-    'colorScheme' => $widget->meta['color_scheme'] ?? $widget->type->meta['color_scheme'] ?? 'light',
+    'color' => $widget->meta['color'] ?? $widget->type->meta['color'] ?? 'light',
     'containerKey',
     'containerIndex',
     'containerWidth',
@@ -39,10 +39,12 @@ declare(strict_types=1);
             :compact="true"
             :content="$widget->translation->content"
             :content-type="$widget->type->content_structure"
-            :color-scheme="$colorScheme"
+            :color="$color"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :title="$widget->translation->title"
             heading-weight="semibold"
             :text-align="$align"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
             class="mt-4"
         />
     @endif

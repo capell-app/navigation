@@ -10,7 +10,7 @@ use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\RequiredFields;
 use Capell\Admin\Filament\Components\Forms\SchemaSelect;
 use Capell\Admin\Filament\Resources\Types\Schemas\Types\DefaultTypeSchema;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Enums\WidgetTypeGroupEnum;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
@@ -59,7 +59,7 @@ class WidgetTypeSchema extends DefaultTypeSchema
             ->schema([
                 SchemaSelect::make('schema')
                     ->default(fn (): string => WidgetSchemaEnum::Default->name)
-                    ->setupOptions(SchemaTypeEnum::Widget),
+                    ->setupOptions(TypeSchemaEnum::Widget),
                 IconPicker::make('icon')
                     ->label(__('capell-admin::form.admin_icon')),
                 AssetTypeSelect::make('asset_types')

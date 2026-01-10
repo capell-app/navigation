@@ -32,15 +32,6 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
 
     public static string $description = 'Address and country field components for forms.';
 
-    public function bootingPackage(): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->registerAll();
-    }
-
     public function configurePackage(Package $package): void
     {
         $package->name(self::$name)
@@ -60,6 +51,14 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
             ->registerRelationships()
             ->registerResources()
             ->registerPackageMetadata();
+
+        $this->booted(function (): void {
+            if (! $this->isPackageInstalled()) {
+                return;
+            }
+
+            $this->bootInstalledPackage();
+        });
     }
 
     private function isPackageInstalled(): bool
@@ -67,7 +66,7 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
         return CapellCore::getPackage(static::$packageName)->isInstalled();
     }
 
-    private function registerAll(): self
+    private function bootInstalledPackage(): self
     {
         return $this
             ->registerSchemas()
@@ -80,6 +79,7 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerPackage(
             static::$packageName,
             type: static::getType(),
+            serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             sort: 10,
             description: static::getDescription(),

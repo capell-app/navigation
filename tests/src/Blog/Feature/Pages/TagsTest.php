@@ -84,10 +84,13 @@ test('tag page list articles by tag', function (): void {
     get($tag->getPageUrl($tagPage, $language))
         ->assertOk()
         ->assertDontSeeText(':Tag_name Articles')
-        ->assertSeeHtml('<title>' . e($title) . ' | ' . e($site->title) . '</title>')
+        ->assertElementExists(
+            'title',
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($title . ' | ' . $site->title),
+        )
         ->assertElementExists(
             'h1',
-            fn (AssertElement $elm): BaseAssert => $elm->containsText(e($title)),
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($title),
         )
         ->assertSeeInOrder($articles->map(fn (Page $page) => $page->translation->title)->all());
 });

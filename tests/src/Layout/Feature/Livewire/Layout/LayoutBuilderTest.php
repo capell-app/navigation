@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Enums\LayoutEnum;
-use Capell\Admin\Support\Creator\LayoutCreator as AdminLayoutCreator;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
+use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
 use Capell\Layout\Enums\AssetEnum;
@@ -42,7 +42,7 @@ test('Render layout builder', function (): void {
 test('can edit layouts', function (LayoutEnum $layoutEnum): void {
     $language = Language::factory()->create();
 
-    $layout = resolve(AdminLayoutCreator::class)->create($layoutEnum->value);
+    $layout = resolve(LayoutCreator::class)->create($layoutEnum->value);
 
     $widgetTypeCreator = resolve(TypeCreator::class);
     $widgetTypeCreator->createWidgetTypes();

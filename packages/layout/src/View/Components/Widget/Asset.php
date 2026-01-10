@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Layout\View\Components\Widget;
 
-class Assets extends AbstractWidget
+class Asset extends AbstractWidget
 {
-    protected static string $defaultView = 'capell-layout::components.widget.assets.index';
+    protected static string $defaultView = 'capell-layout::components.widget.asset.index';
 
     protected function mountWidget(): void
     {

@@ -28,7 +28,7 @@ it('creates asset banner widget with expected meta', function (): void {
         ->toBeInstanceOf(Widget::class)
         ->key->toBe('assets-banner')
         ->meta->scoped(
-            fn (Expectation $meta) => $meta->view_file->toBe('capell-layout::components.widget.assets.banners'),
+            fn (Expectation $meta) => $meta->view_file->toBe('capell-layout::components.widget.asset.banners'),
         )
         ->assets->toHaveCount(3);
 });

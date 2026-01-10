@@ -21,6 +21,7 @@ return [
     'lightbox' => 'Lightbox',
     'carousel_auto' => 'Carousel Auto',
     'heading_size' => 'Heading Size',
+    'heading_style' => 'Heading Style',
     'margin' => 'Margin',
     'align' => 'Align',
     'widget_type' => 'Widget Type',

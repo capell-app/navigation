@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Frontend\Facades\Frontend;
 
 $page = Frontend::page();
-$pageParams = Frontend::params();
+$urlParams = Frontend::params();
 $theme = Frontend::theme();
 ?>
 
@@ -13,7 +13,7 @@ $theme = Frontend::theme();
     'backgroundColor' => $widget->meta['background_color'] ?? null,
     'containerKey',
     'containerIndex',
-    'colorScheme' => $widget->meta['color_scheme'] ?? $theme->meta['color_scheme'] ?? null,
+    'color' => $widget->meta['color'] ?? $theme->meta['color'] ?? null,
     'heroContent' => null,
     'loop',
     'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
@@ -35,8 +35,8 @@ $theme = Frontend::theme();
         'widget-hero relative z-10 grid w-full',
         'mb-10' => ! $loop->last,
         'mt-10' => ! $loop->first,
-        'bg-gray-50 dark:bg-gray-900' => $colorScheme === 'light',
-        'bg-gray-800 dark:bg-gray-900' => $colorScheme === 'dark',
+        'bg-gray-50 dark:bg-gray-900' => $color === 'light',
+        'bg-gray-800 dark:bg-gray-900' => $color === 'dark',
         'h-[calc(100vh-var(--header-height))]' => $height === 'full',
         'h-[calc(100vh-var(--header-height))] lg:max-h-[60vh]' => $height === 'large',
         'h-[calc(100vh-var(--header-height))] md:max-h-[40vh]' => $height === 'medium',
@@ -68,21 +68,21 @@ $theme = Frontend::theme();
                 :carousel-type="$widget->meta['carousel_type'] ?? null"
                 :first="true"
                 :total="1"
-                :color-scheme="$colorScheme"
+                :color="$color"
                 container-class="container"
             >
                 <div class="@lg:py-16 flex select-text py-20">
                     <x-capell-hero::hero.content
                         :title="
                             $widget->translation
-                            ? __($widget->translation->title, $pageParams)
+                            ? __($widget->translation->title, $urlParams)
                             : null
                         "
-                        :color-scheme="$colorScheme"
+                        :color="$color"
                         size="lg"
                         class="hero-page-content"
                     >
-                        {!! __($content, $pageParams) !!}
+                        {!! __($content, $urlParams) !!}
                     </x-capell-hero::hero.content>
                 </div>
             </x-capell-hero::hero.slide>
@@ -91,7 +91,7 @@ $theme = Frontend::theme();
                 {{-- format-ignore-start --}}
                 @php
                     /** @var \Capell\Layout\Models\WidgetAsset $widgetAsset */
-                    $slideColorScheme = $widgetAsset->asset->meta['color_scheme'] ?? $colorScheme;
+                    $slideColorScheme = $widgetAsset->asset->meta['color'] ?? $color;
 
                     $linkedPage = $widgetAsset->asset instanceof \Capell\Core\Models\Page ? $widgetAsset->asset : $widgetAsset->asset->linkedPage;
 
@@ -135,11 +135,11 @@ $theme = Frontend::theme();
                         ($widgetAsset->asset->meta['background_repeat'] ?? null)
                         ?: ($widget->meta['background_repeat'] ?? 'no-repeat')
                     "
-                    :background-overlay="$bgImage && $widgetAsset->asset->translation ? $colorScheme : ''"
+                    :background-overlay="$bgImage && $widgetAsset->asset->translation ? $color : ''"
                     :first="$loop->first"
                     :total="$total"
                     :title="$widgetAsset->asset->translation->title"
-                    :color-scheme="$slideColorScheme"
+                    :color="$slideColorScheme"
                     :class="$slideClass"
                     container-class="container"
                 >
@@ -162,7 +162,7 @@ $theme = Frontend::theme();
                                     :title="$widgetAsset->asset->translation->title"
                                     :heading-size="$loop->first ? 'h1' : 'h2'"
                                     :$url
-                                    :color-scheme="$slideColorScheme"
+                                    :color="$slideColorScheme"
                                     :size="! $images?->isNotEmpty() ? 'lg' : 'md'"
                                 >
                                     {!! $widgetAsset->asset->translation->content !!}
@@ -196,7 +196,7 @@ $theme = Frontend::theme();
                                 <x-capell::actions
                                     class="hero-actions mt-8 w-full"
                                     :actions="$widgetAsset->asset->meta['actions']"
-                                    :color-scheme="$slideColorScheme"
+                                    :color="$slideColorScheme"
                                     action-item-class="hero-action-item"
                                 />
                             @endif

@@ -15,7 +15,7 @@ use Capell\Admin\Filament\Components\Forms\PublishSchema;
 use Capell\Admin\Filament\Components\Forms\PublishSection;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
 use Capell\Layout\Enums\SchemaExtenderEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Filament\Components\Forms\Content\ContentDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Content\ContentTranslationsRepeater;
@@ -31,7 +31,7 @@ class DefaultContentSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static SchemaTypeEnumInterface $schemaType = SchemaTypeEnum::Content;
+    public static SchemaTypeEnumInterface $schemaType = TypeSchemaEnum::Content;
 
     public static function getExtenders(): iterable
     {

@@ -16,7 +16,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Override;
@@ -69,10 +68,7 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
                                 ->label(__('capell-layout::form.pagination'))
                                 ->default(true),
                             CacheFrequencySelect::make('cache_frequency'),
-                            Fieldset::make(__('capell-admin::generic.display_settings'))
-                                ->columns(['default' => 1, 'md' => 2, 'lg' => 3, 'xl' => 4])
-                                ->columnSpanFull()
-                                ->schema(WidgetResultsSchema::make()),
+                            ...WidgetResultsSchema::make(),
                         ]),
                         WidgetComponentFilesSection::make()
                             ->statePath('meta'),

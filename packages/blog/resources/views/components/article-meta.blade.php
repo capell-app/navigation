@@ -1,4 +1,4 @@
-<div class="mb-4 flex items-end justify-between">
+<div class="article-meta mb-4 flex items-end justify-between">
     @if ($withAuthor && $author)
         <x-capell::page.author :$author />
     @endif

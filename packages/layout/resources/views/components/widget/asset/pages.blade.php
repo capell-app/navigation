@@ -2,18 +2,15 @@
 
 declare(strict_types=1);
 
+use Capell\Frontend\Facades\Frontend;
+
+$language = Frontend::language();
+$theme = Frontend::theme();
 ?>
-
-@php
-    use Capell\Core\Enums\AssetComponentEnum;
-    use Capell\Frontend\Facades\Frontend;
-
-    $language = Frontend::language();
-@endphp
 
 @props([
     'columns' => $container['meta']['override_columns'] ?? ($widget->meta['columns'] ?? 3),
-    'componentItem' => ($widget->meta['component_item'] ?? AssetComponentEnum::Card->value),
+    'componentItem' => ($widget->meta['component_item'] ?? \Capell\Core\Enums\AssetComponentEnum::Card->value),
     'container',
     'containerKey',
     'containerWidth' => null,
@@ -46,8 +43,10 @@ declare(strict_types=1);
             :compact="true"
             :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
             :content-type="$widget->translation->content ? $widget->type->content_structure : ($showPageContent ? $page->type->content_structure : null)"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
         />
     @endif
 
@@ -68,8 +67,8 @@ declare(strict_types=1);
                     '[&>*:not(:first-child)]:pt-4 [&>*:not(:last-child)]:pb-4' => $spacing === 'lg' && (! $columns && $columns !== 0),
                     '[&>*:not(:first-child)]:pt-6 [&>*:not(:last-child)]:pb-6' => $spacing === 'md' && (! $columns && $columns !== 0),
                     '@lg:gap-x-4 @lg:gap-y-4 gap-2' => $spacing === 'sm' && $columns,
-                    '@lg:gap-x-6 @lg:gap-y-6 gap-4' => $spacing === 'md' && $columns,
-                    '@lg:gap-x-8 @lg:gap-y-8 gap-6' => $spacing === 'lg' && $columns,
+                    '@lg:gap-x-8 @lg:gap-y-8 gap-6' => $spacing === 'md' && $columns,
+                    '@lg:gap-x-10 @lg:gap-y-10 gap-8' => $spacing === 'lg' && $columns,
                     '@3xl:grid-cols-2' => $columns > 1 && count($pages) >= 2,
                     '@8xl:grid-cols-3' => $columns > 2 && count($pages) >= 3,
                 ],
@@ -86,7 +85,7 @@ declare(strict_types=1);
                     :image="$withImage ? $item->image : null"
                     :parent="$withParent ? $item->loadParent($language) : null"
                     :publish-date="$withDate ? $item->getPublishDate() : null"
-                    :size="$size"
+                    :$size
                     :summary="$withSummary ? $item->translation->summary : null"
                     :title="$item->translation->title"
                     :url="$item->pageUrl->full_url"

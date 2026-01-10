@@ -21,10 +21,14 @@ use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\BlogModelRegistrar;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Blog\Support\Loader\BlogLoader;
-use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Blog\Support\Sitemap\ArchivePageSitemap;
 use Capell\Blog\Support\Sitemap\TagPageSitemap;
 use Capell\Blog\Support\StaticSite\BlogStaticSiteExtension;
+use Capell\Blog\View\Components\ArticleMeta;
+use Capell\Blog\View\Components\AssetAfterTitle;
+use Capell\Blog\View\Components\Footer\Pages;
+use Capell\Blog\View\Components\Footer\Tags;
+use Capell\Blog\View\Components\Page\BeforeContentTags;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Events\NavigationCreating;
 use Capell\Core\Facades\CapellCore;
@@ -35,12 +39,11 @@ use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Core\Support\StaticSiteExtensionRegistry;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
-use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Frontend\Support\RenderHookRegistry;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Enums\SchemaTypeEnum as LayoutSchemaEnum;
+use Capell\Layout\Enums\TypeSchemaEnum as LayoutSchemaEnum;
 use Capell\Layout\Models\Content;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use Illuminate\View\View;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 
@@ -58,17 +62,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     public static string $packageName = 'capell-app/blog';
 
     public static string $description = 'Article page type with blog archives.';
-
-    public function bootingPackage(): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->registerAll();
-
-        $this->registerStaticSiteExtensions();
-    }
 
     public function configurePackage(Package $package): void
     {
@@ -92,6 +85,14 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ->registerModels()
             ->registerRelationships()
             ->registerPackageMetadata();
+
+        $this->booted(function (): void {
+            if (! $this->isPackageInstalled()) {
+                return;
+            }
+
+            $this->bootInstalledPackage();
+        });
     }
 
     private function isPackageInstalled(): bool
@@ -99,7 +100,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         return CapellCore::getPackage(static::$packageName)->isInstalled();
     }
 
-    private function registerAll(): self
+    private function bootInstalledPackage(): self
     {
         return $this
             ->registerModelRelations()
@@ -113,7 +114,8 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ->registerDefaultPages()
             ->registerBladeComponents()
             ->registerLivewireComponents()
-            ->registerRenderHooks();
+            ->registerRenderHooks()
+            ->registerStaticSiteExtensions();
     }
 
     private function registerLayouts(): self
@@ -154,6 +156,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerPackage(
             static::$packageName,
             type: static::getType(),
+            serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             sort: 9,
             description: static::getDescription(),
@@ -247,59 +250,49 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         resolve(RenderHookRegistry::class)->register(
             RenderHookLocation::Footer,
-            fn (RenderHookContext $context) => view('capell-blog::components.footer.tags', $context->item)->render(),
+            fn (RenderHookContext $context): ?View => app(Tags::class, [
+                'item' => $context->item,
+            ])
+                ?->render() ?: null,
+            target: 'footer.index',
+        );
+
+        resolve(RenderHookRegistry::class)->register(
+            RenderHookLocation::Footer,
+            fn (RenderHookContext $context): ?View => app(Pages::class, [
+                'item' => $context->item,
+            ])
+                ?->render() ?: null,
             target: 'footer.index',
         );
 
         resolve(RenderHookRegistry::class)->register(
             RenderHookLocation::ArticleMeta,
-            function ($context) {
-                $page = Frontend::page();
-                $tags = TagLoader::getPageTags($page);
-                $tagPage = $tags->isNotEmpty() ? TagLoader::getTagResultsPage(Frontend::site(), Frontend::language()) : null;
-
-                return view('capell-blog::hooks.article-meta', [
-                    'withAuthor' => $context->withAuthor ?? false,
-                    'author' => $context->author ?? null,
-                    'page' => $page,
-                    'tags' => $tags,
-                    'tagPage' => $tagPage,
-                ])->render();
-            },
+            fn (RenderHookContext $context): ?View => app(ArticleMeta::class, [
+                'withAuthor' => $context->withAuthor ?? false,
+                'author' => $context->author ?? null,
+            ])
+                ?->render() ?: null,
         );
 
         resolve(RenderHookRegistry::class)->register(
             RenderHookLocation::BeforeContent,
-            function ($context): ?string {
-                $tags = $context->item->tags ?? null;
-                if (! $tags || $tags->isEmpty()) {
-                    return null;
-                }
-
-                return view('capell-blog::page.tags', [
-                    'item' => $context->item ?? null,
-                    'tags' => $tags,
-                ])->render();
-            },
+            fn (RenderHookContext $context): ?View => app(BeforeContentTags::class, [
+                'item' => $context->item ?? null,
+                'tags' => $context->item->tags ?? null,
+            ])
+                ?->render() ?: null,
         );
 
         resolve(RenderHookRegistry::class)->register(
             RenderHookLocation::AfterTitle,
-            function ($context): ?string {
-                if (
-                    (! ($context->publishDate ?? null) || ($context->publishDatePosition ?? null) !== 'bottom')
-                    && (empty($context->tags) || $context->tags->isEmpty())
-                ) {
-                    return null;
-                }
-
-                return view('capell-blog::hooks.asset-after-title', [
-                    'publishDate' => $context->publishDate ?? null,
-                    'publishDatePosition' => $context->publishDatePosition ?? null,
-                    'tags' => $context->tags ?? null,
-                    'publishDateOutput' => $context->publishDateOutput ?? null,
-                ])->render();
-            },
+            fn (RenderHookContext $context): ?View => app(AssetAfterTitle::class, [
+                'publishDate' => $context->publishDate ?? null,
+                'publishDatePosition' => $context->publishDatePosition ?? null,
+                'tags' => $context->tags ?? null,
+                'publishDateOutput' => $context->publishDateOutput ?? null,
+            ])
+                ?->render() ?: null,
         );
 
         return $this;
@@ -420,12 +413,14 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
-    private function registerStaticSiteExtensions(): void
+    private function registerStaticSiteExtensions(): self
     {
         $registry = resolve(StaticSiteExtensionRegistry::class);
 
         if (! $registry->has('blog-tags-archives')) {
             $registry->register('blog-tags-archives', resolve(BlogStaticSiteExtension::class));
         }
+
+        return $this;
     }
 }

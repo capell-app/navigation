@@ -6,6 +6,7 @@ use Capell\Frontend\Facades\Frontend;
 
 $page = Frontend::page();
 $layout = Frontend::layout();
+$theme = Frontend::theme();
 ?>
 
 @props([
@@ -46,8 +47,9 @@ $layout = Frontend::layout();
             @if ($page->type->content_structure === \Capell\Core\Enums\ContentStructure::Blocks)
                 <x-capell::blocks
                     :blocks="$page->translation->content"
-                    :layout="$layout"
-                    :page="$page"
+                    :$layout
+                    :$containerKey
+                    :$page
                 />
             @else
                 <x-capell::content
@@ -55,6 +57,8 @@ $layout = Frontend::layout();
                     :content-type="$page->type->content_structure"
                     :heading-size="$headingSize"
                     :heading-tag="$headingTag"
+                    :muted="in_array($containerKey, $theme->secondary_containers)"
+                    :image="$page->image"
                     :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
                     :title="in_array('title', $pageContents, true) && ! (empty($widgetData['meta']['show_page_title']) && $hasPrimaryHeading) ? $page->translation->title : null"
                 />

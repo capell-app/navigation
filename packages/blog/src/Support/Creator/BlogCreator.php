@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Capell\Blog\Support\Creator;
 
 use Capell\Admin\Actions\AddPageToNavigationAction;
-use Capell\Admin\Enums\LayoutEnum;
 use Capell\Admin\Enums\PageTypeEnum;
 use Capell\Admin\Filament\Resources\Pages\Schemas\Types\ResultsPageSchema;
 use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
-use Capell\Admin\Support\Creator\LayoutCreator;
 use Capell\Admin\Support\Creator\TypeCreator;
 use Capell\Blog\Enums\BlogLayoutEnum;
 use Capell\Blog\Enums\BlogPageTypeEnum;
@@ -20,6 +18,7 @@ use Capell\Blog\Enums\WidgetComponentEnum as BlogWidgetComponentEnum;
 use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Filament\Resources\Widgets\Schemas\Types\ArticleWidgetSchema;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\LayoutGroupEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Enums\TypeEnum;
@@ -31,6 +30,7 @@ use Capell\Core\Models\Navigation;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
+use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\LivewireComponentsEnum;
 use Capell\Layout\Enums\ModelEnum;
@@ -63,12 +63,13 @@ class BlogCreator
             ],
             'meta' => [
                 'accessible' => false,
-                'listable' => false,
                 'component' => PageComponentEnum::TagPage,
                 'limit' => 10,
+                'listable' => false,
                 'pagination' => true,
-                'with_image' => true,
+                'url_params' => ['tag' => 'string'],
                 'with_date' => true,
+                'with_image' => true,
                 'with_summary' => true,
             ],
         ]);
@@ -103,10 +104,6 @@ class BlogCreator
             ], [
                 'slug' => '*',
                 'title' => __('capell-blog::generic.tag_page_title'),
-            ]);
-
-            $pageTranslation->pageUrl->update([
-                'params' => ['tag' => 'string'],
             ]);
         });
 
@@ -216,14 +213,10 @@ class BlogCreator
             ], [
                 'slug' => '*',
                 'title' => __('capell-blog::generic.blog_archive_title'),
-                'content' => 'Blog posts from the archive',
+                'content' => '<p>Blog posts from the archives</p>',
                 'meta' => [
                     'description' => __('capell-blog::generic.archive'),
                 ],
-            ]);
-
-            $pageTranslation->pageUrl->update([
-                'params' => ['date' => 'string'],
             ]);
         });
 
@@ -246,13 +239,14 @@ class BlogCreator
             ],
             'meta' => [
                 'accessible' => false,
-                'listable' => false,
-                'hidden_from_selection' => true,
                 'component' => PageComponentEnum::ArchivePage,
+                'hidden_from_selection' => true,
                 'limit' => 10,
+                'listable' => false,
                 'pagination' => true,
-                'with_image' => true,
+                'url_params' => ['date' => 'string'],
                 'with_date' => true,
+                'with_image' => true,
                 'with_summary' => true,
             ],
         ]);
@@ -270,6 +264,7 @@ class BlogCreator
                     ],
                     'widgets' => [
                         ['widget_key' => 'breadcrumbs'],
+                        ['widget_key' => 'page-content'],
                         ['widget_key' => 'archives', 'meta' => ['show_page_content' => true]],
                     ],
                 ],
@@ -279,7 +274,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10',
+                        'html_class' => 'sidebar-sticky space-y-8',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-articles'],
@@ -312,7 +307,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10',
+                        'html_class' => 'sidebar-sticky space-y-8',
                     ],
                     'widgets' => [
                         ['widget_key' => 'tags'],
@@ -334,6 +329,7 @@ class BlogCreator
                         'colspan' => 9,
                     ],
                     'widgets' => [
+                        ['widget_key' => 'page-content'],
                         ['widget_key' => 'tags', 'meta' => ['show_page_title' => true]],
                     ],
                 ],
@@ -343,7 +339,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10',
+                        'html_class' => 'sidebar-sticky space-y-8',
                     ],
                     'widgets' => [
                         ['widget_key' => 'latest-pages'],
@@ -413,7 +409,7 @@ class BlogCreator
                 'language_id' => $language->id,
             ], [
                 'title' => __('capell-blog::generic.tags'),
-                'content' => 'Browse by tag to explore related topics and content.',
+                'content' => '<p>Browse by tag to explore related topics and content.</p>',
             ]);
         });
     }
@@ -512,7 +508,7 @@ class BlogCreator
                         'override_columns' => 1,
                         'container' => 'full',
                         'padding' => ['md'],
-                        'html_class' => 'sidebar-sticky space-y-10',
+                        'html_class' => 'sidebar-sticky space-y-8',
                     ],
                     'widgets' => [
                         ['widget_key' => 'related-pages'],
@@ -557,8 +553,17 @@ class BlogCreator
         ]);
     }
 
-    public function relatedPagesWidget(Type $type, \Illuminate\Support\Collection $languages): void
+    public function relatedPagesWidget(?Type $type = null, ?\Illuminate\Support\Collection $languages = null): Widget
     {
+        if (! $type) {
+            $typeCreator = resolve(\Capell\Layout\Support\Creator\TypeCreator::class);
+            $type = $typeCreator->pageResultsWidgetType();
+        }
+
+        if (! $languages instanceof \Illuminate\Support\Collection) {
+            $languages = Language::all();
+        }
+
         $widget = Widget::query()->firstOrCreate([
             'key' => 'related-pages',
         ], [
@@ -578,7 +583,7 @@ class BlogCreator
             'admin' => [
                 'icon' => 'heroicon-c-link',
                 'type_schema' => WidgetTypeSchema::getKey(),
-                'schema' => WidgetSchemaEnum::Related->value,
+                'schema' => WidgetSchemaEnum::Related->name,
             ],
         ]);
 
@@ -589,6 +594,8 @@ class BlogCreator
                 'title' => __('capell-layout::heading.related_pages'),
             ]);
         });
+
+        return $widget;
     }
 
     public function createArticleWidgetType(): Type
@@ -654,10 +661,6 @@ class BlogCreator
                     'no_results' => __('capell-blog::messages.no_articles_found'),
                 ],
             ]);
-
-            $pageTranslation->pageUrl->update([
-                'params' => ['page' => 'int'],
-            ]);
         });
 
         return $page;
@@ -680,14 +683,15 @@ class BlogCreator
             ],
             'meta' => [
                 'component' => PageComponentEnum::BlogPage,
-                'page_group' => strtolower(ResourceEnum::Article->name),
-                'limit' => 10,
-                'pagination' => true,
-                'listable' => false,
-                'sitemap' => true,
                 'exclude_parent' => true,
-                'with_image' => true,
+                'limit' => 10,
+                'listable' => false,
+                'page_group' => strtolower(ResourceEnum::Article->name),
+                'pagination' => true,
+                'sitemap' => true,
+                'url_params' => ['page' => 'int'],
                 'with_date' => true,
+                'with_image' => true,
                 'with_summary' => true,
             ],
         ]);

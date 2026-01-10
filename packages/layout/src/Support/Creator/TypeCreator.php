@@ -154,7 +154,7 @@ class TypeCreator
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,
                 'component_item' => CapellAssetComponentEnum::Media,
-                'view_file' => 'capell-layout::components.widget.assets.media',
+                'view_file' => 'capell-layout::components.widget.asset.media',
             ],
         ]);
     }

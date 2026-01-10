@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Blog;
 
-use Capell\Admin\CapellAdminManager;
 use Capell\Admin\Providers\AdminServiceProvider;
+use Capell\Admin\Support\CapellAdminManager;
 use Capell\Blog\Providers\BlogServiceProvider;
-use Capell\Core\CapellCoreManager;
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Support\CapellCoreManager;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;

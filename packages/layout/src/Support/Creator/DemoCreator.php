@@ -488,19 +488,19 @@ class DemoCreator
         $features = [
             [
                 'title' => 'Empower Your Vision',
-                'content' => 'Step into a world where your ideas become reality. Experience innovation and growth with us.',
+                'content' => '<p>Step into a world where your ideas become reality. Experience innovation and growth with us.</p>',
             ],
             [
                 'title' => 'Start Your Journey',
-                'content' => 'Begin your adventure today and unlock new opportunities for success.',
+                'content' => '<p>Begin your adventure today and unlock new opportunities for success.</p>',
             ],
             [
                 'title' => 'Explore Our Achievements',
-                'content' => 'Discover the groundbreaking projects and milestones that define our excellence.',
+                'content' => '<p>Discover the groundbreaking projects and milestones that define our excellence.</p>',
             ],
             [
                 'title' => 'See Our Story Unfold',
-                'content' => 'Watch our journey and learn how we create impact through passion and expertise.',
+                'content' => '<p>Watch our journey and learn how we create impact through passion and expertise.</p>',
             ],
         ];
 
@@ -618,7 +618,7 @@ class DemoCreator
             'meta' => [
                 'align' => 'center',
                 'margin' => ['lg'],
-                'view_file' => 'capell-layout::components.widget.assets.features',
+                'view_file' => 'capell-layout::components.widget.asset.features',
             ],
         ]);
 
@@ -711,7 +711,7 @@ class DemoCreator
             'type_id' => $this->typeModel::query()->firstWhere(['key' => WidgetTypeEnum::Assets, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'component_item' => 'capell-layout::content.block',
-                'view_file' => 'capell-layout::components.widget.assets.blocks',
+                'view_file' => 'capell-layout::components.widget.asset.blocks',
                 'spacing' => 'none',
                 'columns' => 0,
                 'margin' => '',
@@ -967,17 +967,17 @@ class DemoCreator
             [
                 'name' => 'John Doe',
                 'position' => 'CEO of Example Corp',
-                'content' => 'Capell has transformed our business with their innovative solutions and exceptional service.',
+                'content' => '<p>Capell has transformed our business with their innovative solutions and exceptional service.</p>',
             ],
             [
                 'name' => 'Jane Smith',
                 'position' => 'CTO of Tech Innovations',
-                'content' => 'The team at Capell is incredibly knowledgeable and always goes the extra mile for us.',
+                'content' => '<p>The team at Capell is incredibly knowledgeable and always goes the extra mile for us.</p>',
             ],
             [
                 'name' => 'Jeff Wilson',
                 'position' => 'Marketing Director at Creative Agency',
-                'content' => 'We have seen significant growth since partnering with Capell. Their expertise is unmatched.',
+                'content' => '<p>We have seen significant growth since partnering with Capell. Their expertise is unmatched.</p>',
             ],
         ];
 

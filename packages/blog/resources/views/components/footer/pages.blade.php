@@ -9,11 +9,11 @@ declare(strict_types=1);
     'pages',
 ])
 
-<div {{ $attributes->class(['footer-pages']) }}>
+<div {{ $attributes->class(['footer-pages xl:w-[20%]']) }}>
     <h3 class="{{ $headingClass }} mb-4 dark:text-gray-100">
         {{ __('Recent Articles') }}
     </h3>
-    <div class="space-y-4 lg:space-y-6">
+    <div class="space-y-3 lg:space-y-4">
         @forelse ($pages as $page)
             @php
                 $publishDate = $page->getPublishDate();

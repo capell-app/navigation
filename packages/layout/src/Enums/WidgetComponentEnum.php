@@ -10,14 +10,14 @@ use Capell\Layout\View\Components\Widget\Page\SiblingsWidget;
 
 enum WidgetComponentEnum: string
 {
-    case AssetAccordion = 'capell-layout::widget.assets.accordion';
-    case AssetBanner = 'capell-layout::widget.assets.banners';
-    case AssetBlock = 'capell-layout::widget.assets.blocks';
-    case AssetCarousel = 'capell-layout::widget.assets.carousel';
-    case AssetFeatures = 'capell-layout::widget.assets.features';
-    case AssetMedia = 'capell-layout::widget.assets.media';
-    case AssetTestimonials = 'capell-layout::widget.assets.testimonials';
-    case Assets = 'capell-layout::widget.assets';
+    case AssetAccordion = 'capell-layout::widget.asset.accordion';
+    case AssetBanner = 'capell-layout::widget.asset.banners';
+    case AssetBlock = 'capell-layout::widget.asset.blocks';
+    case AssetCarousel = 'capell-layout::widget.asset.carousel';
+    case AssetFeatures = 'capell-layout::widget.asset.features';
+    case AssetMedia = 'capell-layout::widget.asset.media';
+    case AssetTestimonials = 'capell-layout::widget.asset.testimonials';
+    case Assets = 'capell-layout::widget.asset';
     case BannerImage = 'capell-layout::widget.banner-image';
     case Default = 'capell-layout::widget.default';
     case Navigation = 'capell-layout::widget.navigation';
@@ -28,7 +28,7 @@ enum WidgetComponentEnum: string
     case PageLatest = 'capell-layout::widget.page.latest';
     case PageSiblings = 'capell-layout::widget.page.siblings';
     case PageSlot = 'capell-layout::widget.slot';
-    case Pages = 'capell-layout::widget.page.pages';
+    case Pages = 'capell-layout::widget.asset.pages';
 
     public static function getComponents(): array
     {

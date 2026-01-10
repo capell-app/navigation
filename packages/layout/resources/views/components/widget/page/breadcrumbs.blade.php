@@ -10,7 +10,6 @@ declare(strict_types=1);
     use Capell\Frontend\Support\Loader\PageLoader;
 
     $page = Frontend::page();
-    $pageParams = Frontend::params();
     $site = Frontend::site();
     $language = Frontend::language();
 @endphp
@@ -23,7 +22,7 @@ declare(strict_types=1);
     'widget',
 ])
 @php
-    $currentPageLabel = __($page->translation->label, $pageParams);
+    $currentPageLabel = __($page->translation->label, \Capell\Frontend\Actions\GetPageVariablesAction::run());
 
     $ancestors = PageLoader::getPageAncestors($page, $language, $site);
 

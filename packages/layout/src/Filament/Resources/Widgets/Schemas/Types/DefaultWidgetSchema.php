@@ -10,7 +10,7 @@ use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
 use Capell\Layout\Enums\SchemaExtenderEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Filament\Components\Forms\ActionsRepeater;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
@@ -31,7 +31,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static SchemaTypeEnumInterface $schemaType = SchemaTypeEnum::Widget;
+    public static SchemaTypeEnumInterface $schemaType = TypeSchemaEnum::Widget;
 
     public static function getExtenders(): iterable
     {
@@ -103,7 +103,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
     {
         return WidgetDisplayTab::make([
             WidgetDisplaySection::make([
-                ColorSchemeComponent::make('color_scheme'),
+                ColorSchemeComponent::make('color'),
             ]),
             WidgetComponentFilesSection::make()
                 ->statePath('meta'),

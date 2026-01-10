@@ -20,7 +20,7 @@ use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\PageContentWidgetSche
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\ResultsWidgetSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\SystemWidgetSchema;
 
-enum SchemaTypeEnum: string implements SchemaTypeEnumInterface
+enum TypeSchemaEnum: string implements SchemaTypeEnumInterface
 {
     use HasSchemaTypes;
 

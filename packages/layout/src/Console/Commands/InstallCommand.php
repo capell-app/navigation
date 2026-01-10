@@ -93,7 +93,6 @@ class InstallCommand extends Command
                         $theme->meta,
                         [
                             'vendor_assets' => array_values($filteredAssets),
-                            'footer_file' => 'capell-layout::footer',
                         ],
                     ));
 

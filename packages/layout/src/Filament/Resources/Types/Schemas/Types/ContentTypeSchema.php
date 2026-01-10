@@ -10,7 +10,7 @@ use Capell\Admin\Filament\Components\Forms\RequiredFields;
 use Capell\Admin\Filament\Components\Forms\SchemaSelect;
 use Capell\Admin\Filament\Resources\Types\Schemas\Types\DefaultTypeSchema;
 use Capell\Layout\Enums\ContentSchemaEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Tabs;
@@ -44,7 +44,7 @@ class ContentTypeSchema extends DefaultTypeSchema
             ->schema([
                 SchemaSelect::make('schema')
                     ->default(fn (): string => ContentSchemaEnum::Default->name)
-                    ->setupOptions(SchemaTypeEnum::Content),
+                    ->setupOptions(TypeSchemaEnum::Content),
                 IconPicker::make('icon')
                     ->label(__('capell-admin::form.admin_icon')),
                 ContentStructureSelect::make('content_structure'),

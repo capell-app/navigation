@@ -46,7 +46,7 @@ class CreateHeroWidgetAction
                 'carousel_loop' => true,
                 'carousel_auto' => true,
                 'carousel_auto_delay' => 50000,
-                'color_scheme' => 'dark',
+                'color' => 'dark',
                 'extra_relations' => [
                     'assets.asset.translation',
                 ],

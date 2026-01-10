@@ -6,21 +6,22 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Facades\CapellCore;
-                use Capell\Core\Models\Page;use Capell\Frontend\Facades\Frontend;
-                use Spatie\MediaLibrary\MediaCollections\Models\Media;
+    use Capell\Core\Models\Page;
+    use Capell\Frontend\Facades\Frontend;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-                $page = Frontend::page();
-                $theme = Frontend::theme();
+    $page = Frontend::page();
+    $theme = Frontend::theme();
 @endphp
 
 @props([
-'containerKey',
-'containerIndex',
-'backgroundOverlay' => $widget->meta['background_overlay'] ?? false,
-'loop',
-'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
-'widget',
-'widgetIndex',
+    'containerKey',
+    'containerIndex',
+    'backgroundOverlay' => $widget->meta['background_overlay'] ?? false,
+    'loop',
+    'total' => $widget->assets->isNotEmpty() ? $widget->assets->count() : 1,
+    'widget',
+    'widgetIndex',
 ])
 
 <section
@@ -48,8 +49,8 @@ declare(strict_types=1);
                 {{-- format-ignore-end --}}
                 <div
                     @class([
-                    'swiper-slide widget-banner-item relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center',
-                    'swiper-slide-active' => $loop->first,
+                        'swiper-slide widget-banner-item relative flex min-h-[20rem] w-full shrink-0 basis-full items-center justify-center',
+                        'swiper-slide-active' => $loop->first,
                     ])
                 >
                     @if ($image)

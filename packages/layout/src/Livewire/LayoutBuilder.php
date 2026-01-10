@@ -17,7 +17,7 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Exceptions\MissingWidgetAssetException;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Containers\DefaultLayoutContainerSchema;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\WidgetAssetForm;
@@ -361,7 +361,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
             ->modalWidth(Width::ScreenSmall)
             ->schema(function (array $arguments, self $livewire, Schema $schema): Schema {
                 $adminSchema = CapellAdmin::getSchema(
-                    SchemaTypeEnum::LayoutWidget->value,
+                    TypeSchemaEnum::LayoutWidget->value,
                     $livewire->getContainerWidgetSchema($arguments['containerKey'], $arguments['widgetIndex']),
                 );
 
@@ -1821,7 +1821,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
         $containerKey = $arguments['containerKey'] ?? null;
 
         $adminSchema = CapellAdmin::getSchema(
-            SchemaTypeEnum::LayoutContainer->value,
+            TypeSchemaEnum::LayoutContainer->value,
             $this->layoutRecord->admin['container_schema'][$containerKey] ?? DefaultLayoutContainerSchema::getKey(),
         );
 

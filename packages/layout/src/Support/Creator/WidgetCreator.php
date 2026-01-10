@@ -100,6 +100,7 @@ class WidgetCreator
                 'with_children_count' => true,
                 'with_summary' => true,
                 'with_image' => true,
+                'heading_style' => 'secondary',
                 'margin' => ['b-lg'],
             ],
             'admin' => [
@@ -296,6 +297,7 @@ class WidgetCreator
                 'component' => WidgetComponentEnum::PageSiblings,
                 'with_children_count' => true,
                 'with_summary' => true,
+                'heading_style' => 'secondary',
                 'margin' => ['b-lg'],
             ],
             'admin' => [
@@ -356,7 +358,7 @@ class WidgetCreator
             'meta' => [
                 'align' => 'center',
                 'background_overlay' => true,
-                'view_file' => 'capell-layout::components.widget.assets.banners',
+                'view_file' => 'capell-layout::components.widget.asset.banners',
             ],
         ]);
     }
@@ -370,7 +372,7 @@ class WidgetCreator
             'type_id' => $type->id,
             'meta' => [
                 'component_item' => 'capell-layout::content.block',
-                'view_file' => 'capell-layout::components.widget.assets.blocks',
+                'view_file' => 'capell-layout::components.widget.asset.blocks',
                 'spacing' => 'none',
                 'columns' => 0,
                 'margin' => '',
@@ -392,7 +394,7 @@ class WidgetCreator
             'meta' => [
                 'align' => 'center',
                 'margin' => ['lg'],
-                'view_file' => 'capell-layout::components.widget.assets.features',
+                'view_file' => 'capell-layout::components.widget.asset.features',
             ],
         ]);
     }
@@ -408,7 +410,7 @@ class WidgetCreator
                 'align' => 'center',
                 'background_overlay' => true,
                 'background_color' => DefaultColorEnum::Gray->value,
-                'view_file' => 'capell-layout::components.widget.assets.testimonials',
+                'view_file' => 'capell-layout::components.widget.asset.testimonials',
             ],
         ]);
     }

@@ -21,7 +21,7 @@ declare(strict_types=1);
     'backgroundRepeat' => 'no-repeat',
     'backgroundSize' => 'cover',
     'carouselType' => 'slide',
-    'colorScheme' => 'dark',
+    'color' => 'dark',
     'container_class' => 'container',
     'first' => false,
     'height' => '',
@@ -42,11 +42,11 @@ declare(strict_types=1);
             $attributes->class([
                 'swiper-slide-inner relative flex min-h-full',
                 ...(
-                    ! $backgroundColor && $colorScheme
+                    ! $backgroundColor && $color
                     ? [
                         'bg-gradient-to-t',
-                        'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
-                        'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
+                        'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $color === 'dark',
+                        'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $color === 'light',
                     ]
                     : []
                 ),

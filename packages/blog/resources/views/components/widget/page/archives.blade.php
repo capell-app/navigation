@@ -6,7 +6,8 @@ use Capell\Frontend\Facades\Frontend;
 
 $site = Frontend::site();
 $page = Frontend::page();
-$pageParams = Frontend::params();
+$theme = Frontend::theme();
+$urlParams = Frontend::params();
 ?>
 
 @props([
@@ -18,7 +19,7 @@ $pageParams = Frontend::params();
     'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'loop',
     'results',
-    'archiveDate' => $pageParams['archive_date'] ?? null,
+    'archiveDate' => $urlParams['archive_date'] ?? null,
     'widget',
 ])
 <x-capell-layout::widget.wrapper
@@ -37,8 +38,10 @@ $pageParams = Frontend::params();
             :compact="true"
             :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
             :content-type="$widget->type->content_structure"
-            :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
+            :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
         />
     @endif
 

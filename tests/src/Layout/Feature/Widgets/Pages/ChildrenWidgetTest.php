@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Frontend\Actions\GetPageVariablesAction;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
@@ -26,16 +27,27 @@ test('children widget', function (): void {
     $parent = Page::factory()->site($site)->withTranslations()->create();
     $page = Page::factory()->site($site)->layout($layout)->parent($parent)->withTranslations()->children(2)->create();
 
-    $page->load('children.translation', 'pageUrl');
+    $page->load('children.translation', 'children.pageUrl.siteDomain');
 
-    expect($page)->children->toHaveCount(2);
+    $children = $page->children;
 
     get($page->pageUrl->full_url)
         ->assertOk()
         ->assertElementExists(
             '.widget-children',
-            fn (AssertElement $elm): BaseAssert => $elm->containsText($page->children[0]->translation->title)
-                ->containsText($page->children[1]->translation->title),
+            fn (AssertElement $elm): BaseAssert => $elm->containsText(__($widget->translation->title, GetPageVariablesAction::run($page)))
+                ->contains('.children-page-item', 2)
+                ->each(
+                    '.children-page-item',
+                    fn (AssertElement $asset, int $index): BaseAssert => $asset->containsText($children[$index]->translation->title)
+                        ->find(
+                            'a',
+                            fn (AssertElement $aElm): BaseAssert => $aElm->has(
+                                'href',
+                                $children[$index]->pageUrl->full_url,
+                            ),
+                        ),
+                ),
         );
 });
 

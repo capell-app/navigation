@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Hero;
 
-use Capell\Admin\CapellAdminManager;
 use Capell\Admin\Providers\AdminServiceProvider;
-use Capell\Core\CapellCoreManager;
+use Capell\Admin\Support\CapellAdminManager;
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Support\CapellCoreManager;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Hero\Providers\HeroServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;

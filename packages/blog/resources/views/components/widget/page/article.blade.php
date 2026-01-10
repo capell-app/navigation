@@ -8,6 +8,7 @@ declare(strict_types=1);
     use Capell\Frontend\Facades\Frontend;
 
     $page = Frontend::page();
+    $theme = Frontend::theme();
 @endphp
 
 @props([
@@ -37,22 +38,19 @@ declare(strict_types=1);
             :heading-size="$headingSize"
             :content="$page->translation->content"
             :content-type="$page->type->content_structure"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
+            :title="$page->translation->title"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
         >
-            <div>
-                <x-capell::page.title
-                    :$containerKey
-                    :heading-size="$headingSize"
-                    :title="$page->translation->title"
-                />
-
-                @if ($withDate)
-                    <x-capell::page.published_date
+            @if ($withDate)
+                <div class="text-right">
+                    <x-capell::page.published-date
                         class="mt-4 whitespace-nowrap"
                         :date="$page->publish_from ?: $page->created_at"
                     />
-                @endif
-            </div>
+                </div>
+            @endif
         </x-capell::content>
     </div>
 

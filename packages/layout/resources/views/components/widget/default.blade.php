@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Capell\Frontend\Facades\Frontend;
+
+$theme = Frontend::theme();
+
 ?>
 
 @props([
@@ -47,6 +51,8 @@ declare(strict_types=1);
                 :content="$content"
                 :content-type="$widget->type->content_structure"
                 :heading-size="$headingSize"
+                :muted="in_array($containerKey, $theme->secondary_containers)"
+                :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
                 :title="$title"
                 :text-align="$align"
             />

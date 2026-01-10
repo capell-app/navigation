@@ -8,7 +8,7 @@ use Capell\Admin\Contracts\SchemaTypeEnumInterface;
 use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
 use Capell\Layout\Enums\SchemaExtenderEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Filament\Components\Forms\HtmlClassInput;
 use Filament\Forms\Components\Checkbox;
 use Filament\Schemas\Schema;
@@ -17,7 +17,7 @@ class DefaultLayoutWidgetSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static SchemaTypeEnumInterface $schemaType = SchemaTypeEnum::LayoutWidget;
+    public static SchemaTypeEnumInterface $schemaType = TypeSchemaEnum::LayoutWidget;
 
     public static function getExtenders(): iterable
     {

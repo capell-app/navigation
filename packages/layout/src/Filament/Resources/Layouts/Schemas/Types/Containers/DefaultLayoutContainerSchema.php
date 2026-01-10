@@ -8,7 +8,7 @@ use Capell\Admin\Contracts\SchemaTypeEnumInterface;
 use Capell\Admin\Contracts\TypeSchemaInterface;
 use Capell\Admin\Filament\Concerns\HasTypeSchema;
 use Capell\Layout\Enums\SchemaExtenderEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Filament\Components\Forms\BackgroundSchema;
 use Capell\Layout\Filament\Components\Forms\ColumnInput;
 use Capell\Layout\Filament\Components\Forms\ContainerWidthSelect;
@@ -26,7 +26,7 @@ class DefaultLayoutContainerSchema implements TypeSchemaInterface
 {
     use HasTypeSchema;
 
-    public static SchemaTypeEnumInterface $schemaType = SchemaTypeEnum::LayoutContainer;
+    public static SchemaTypeEnumInterface $schemaType = TypeSchemaEnum::LayoutContainer;
 
     public static function getExtenders(): iterable
     {

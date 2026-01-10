@@ -14,7 +14,7 @@ declare(strict_types=1);
 @endphp
 
 @props([
-    'colorScheme' => $widget->meta['color_scheme'] ?? 'dark',
+    'color' => $widget->meta['color'] ?? 'dark',
     'columns' => $container['meta']['override_columns'] ?? ($widget->meta['columns'] ?? 4),
     'container',
     'containerKey',
@@ -42,9 +42,11 @@ declare(strict_types=1);
             align="center"
             :content="$widget->translation->content"
             :content-type="$widget->type->content_structure"
-            :color-scheme="$colorScheme"
+            :color="$color"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :title="$widget->translation->title"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? 'center'"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
         />
     @endif
 

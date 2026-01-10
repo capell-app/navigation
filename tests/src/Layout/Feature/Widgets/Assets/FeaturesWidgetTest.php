@@ -28,7 +28,7 @@ it('creates asset features widget with expected meta', function (): void {
         ->toBeInstanceOf(Widget::class)
         ->key->toBe('asset-features')
         ->meta->scoped(
-            fn (Expectation $meta) => $meta->view_file->toBe('capell-layout::components.widget.assets.features'),
+            fn (Expectation $meta) => $meta->view_file->toBe('capell-layout::components.widget.asset.features'),
         )
         ->assets->toHaveCount(3);
 });

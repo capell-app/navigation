@@ -8,7 +8,7 @@ use Capell\Admin\Filament\Components\Forms\Type\TypeSchema;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Filament\Resources\Contents\Schemas\Types\DefaultContentSchema;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -44,7 +44,7 @@ class ContentForm implements FormConfigurator
 
                         $name = $type->admin['schema'] ?? DefaultContentSchema::getKey();
 
-                        return $component->getTypeSchema($schema, SchemaTypeEnum::Content, $name);
+                        return $component->getTypeSchema($schema, TypeSchemaEnum::Content, $name);
                     },
                 ),
         ];

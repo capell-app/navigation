@@ -9,7 +9,7 @@ use Capell\Frontend\Support\Loader\PageLoader;
 
 class ChildrenWidget extends AbstractPagesWidget
 {
-    protected static string $defaultView = 'capell-layout::components.widget.page.pages';
+    protected static string $defaultView = 'capell-layout::components.widget.asset.pages';
 
     protected function mountWidget(): void
     {

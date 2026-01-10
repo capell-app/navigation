@@ -98,7 +98,7 @@ abstract class AbstractWidget extends Component
             'index' => $this->loop->index,
             'language' => Frontend::language(),
             'pageRecord' => Frontend::page(),
-            'pageParams' => Frontend::params(),
+            'urlParams' => Frontend::params(),
             'site' => Frontend::site(),
             'theme' => Frontend::theme(),
             'widget' => $this->widget,

@@ -22,7 +22,7 @@ declare(strict_types=1);
     'carouselLoop' => true,
     'carouselPagination' => false,
     'carouselWheel' => true,
-    'colorScheme' => $widget->meta['color_scheme'] ?? 'dark',
+    'color' => $widget->meta['color'] ?? 'dark',
     'container',
     'containerKey',
     'containerWidth' => null,
@@ -49,9 +49,11 @@ declare(strict_types=1);
                 :compact="true"
                 :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
                 :content-type="$widget->translation->content ? $widget->type->content_structure : ($showPageContent ? $page->type->content_structure : null)"
-                :color-scheme="$colorScheme"
+                :color="$color"
+                :muted="in_array($containerKey, $theme->secondary_containers)"
                 :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
                 :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
+                :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
             />
         </div>
     @endif

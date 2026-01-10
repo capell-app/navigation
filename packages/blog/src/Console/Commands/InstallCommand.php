@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Capell\Blog\Console\Commands;
 
 use Capell\Admin\Actions\AssignPermissionsToRole;
-use Capell\Blog\Actions\InstallBlogPackageAction;
+use Capell\Blog\Actions\InstallPackageAction;
 use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Support\BlogModelRegistrar;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
-use Spatie\Tags\TagsServiceProvider;
 
 class InstallCommand extends Command
 {
@@ -42,33 +41,48 @@ class InstallCommand extends Command
 
         AssignPermissionsToRole::run(resources: ResourceEnum::cases());
 
-        InstallBlogPackageAction::run();
-
-        $migrations = __DIR__ . '/../../../database/migrations';
-        if (! is_dir($migrations)) {
-            $this->error('Migrations directory does not exist.');
+        if (! $this->publishMigrations('create_tag_tables', base_path('vendor/spatie/laravel-tags/database/migrations'))) {
+            $this->error('Failed to publish create_tag_tables migration.');
 
             return Command::FAILURE;
         }
 
-        $this->call(
-            'capell:publish-migrations',
-            [
-                '--items' => [
-                    'alter_tags_table',
-                ],
-                '--path' => $migrations,
-            ],
-        );
+        // Ensure the alter tags has a greater timestamp than the create tags migration
+        sleep(1);
 
-        $this->call('vendor:publish', ['--provider' => TagsServiceProvider::class, '--tag' => 'tags-migrations']);
+        if (! $this->publishMigrations('alter_tags_table', __DIR__ . '/../../../database/migrations')) {
+            $this->error('Failed to publish alter_tags_table migration.');
+
+            return Command::FAILURE;
+        }
 
         $this->call('migrate');
+
+        InstallPackageAction::run();
 
         $this->call('filament:assets');
 
         $this->info('Capell Blog installation complete.');
 
         return self::SUCCESS;
+    }
+
+    private function publishMigrations(string $migration, string $path): bool
+    {
+        if (! is_dir($path)) {
+            $this->error('Migrations directory does not exist.');
+
+            return false;
+        }
+
+        $this->call(
+            'capell:publish-migrations',
+            [
+                '--items' => [$migration],
+                '--path' => $path,
+            ],
+        );
+
+        return true;
     }
 }

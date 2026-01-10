@@ -6,6 +6,7 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Frontend\Actions\GetPageVariablesAction;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
@@ -31,7 +32,7 @@ it('renders siblings widget on page', function (): void {
         ->assertOk()
         ->assertElementExists(
             '.widget-siblings',
-            fn (AssertElement $elm): BaseAssert => $elm->containsText($widget->translation->title)
+            fn (AssertElement $elm): BaseAssert => $elm->containsText(__($widget->translation->title, GetPageVariablesAction::run($page)))
                 ->contains('.siblings-page-item', 2)
                 ->each(
                     '.siblings-page-item',

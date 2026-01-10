@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Actions;
 
-use Capell\Admin\Support\Creator\LayoutCreator;
 use Capell\Core\Models\Language;
+use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Support\Creator\TypeCreator;
 use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Layout\Support\LayoutModelRegistrar;

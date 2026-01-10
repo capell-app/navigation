@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Enums\LayoutEnum;
-use Capell\Admin\Support\Creator\LayoutCreator;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Database\Factories\ThemeFactory;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
@@ -27,7 +27,10 @@ test('home page with layout', function (): void {
 
     get($page->pageUrl->full_url)
         ->assertOk()
-        ->assertSeeHtml('<title>' . e($page->translation->title) . ' | ' . e($site->title) . '</title>')
+        ->assertElementExists(
+            'title',
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($page->translation->title . ' | ' . $site->title),
+        )
         ->assertElementExists(
             'h1',
             fn (AssertElement $elm): BaseAssert => $elm->containsText($page->translation->title),
@@ -35,6 +38,5 @@ test('home page with layout', function (): void {
         ->assertElementExists(
             '.widget-page-content',
             fn (AssertElement $elm): BaseAssert => $elm->containsText(strip_tags((string) $page->translation->content)),
-        )
-        ->assertElementExists('.capell-layout-footer');
+        );
 });

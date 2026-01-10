@@ -7,6 +7,7 @@ namespace Capell\Layout\Filament\Components\Forms\Widget;
 use Capell\Layout\Filament\Components\Forms\AlignSelect;
 use Capell\Layout\Filament\Components\Forms\BackgroundSchema;
 use Capell\Layout\Filament\Components\Forms\ContainerWidthSelect;
+use Capell\Layout\Filament\Components\Forms\HeadingStyleSelect;
 use Capell\Layout\Filament\Components\Forms\MarginSelect;
 use Capell\Layout\Filament\Components\Forms\PaddingSelect;
 use Capell\Layout\Filament\Components\Forms\SizeSelect;
@@ -48,6 +49,7 @@ class WidgetDisplaySection
                             ]),
                         ContainerWidthSelect::make(),
                         AlignSelect::make('align'),
+                        HeadingStyleSelect::make('heading_style'),
                     ]),
                 Fieldset::make(__('capell-admin::generic.background_settings'))
                     ->columns(3)

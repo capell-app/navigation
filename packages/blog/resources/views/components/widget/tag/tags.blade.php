@@ -9,6 +9,7 @@ declare(strict_types=1);
 
     $language = Frontend::language();
     $site = Frontend::site();
+    $theme = Frontend::theme();
     $page = Frontend::page();
 @endphp
 
@@ -38,8 +39,10 @@ declare(strict_types=1);
             :compact="true"
             :content="$widget->translation->content ?? ($showPageContent ? $page->translation->content : null)"
             :content-type="$widget->translation->content ? $widget->type->content_structure : ($showPageContent ? $page->type->content_structure : null)"
+            :muted="in_array($containerKey, $theme->secondary_containers)"
             :text-align="$widget->meta['align'] ?? $widget->type->meta['align'] ?? null"
             :title="$widget->translation->title ?? ($showPageTitle ? $page->translation->title : null)"
+            :heading-style="($widget->meta['heading_style'] ?? null) ?: $widget->type->meta['heading_style'] ?? null"
         />
     @endif
 
@@ -48,16 +51,16 @@ declare(strict_types=1);
             {{ __('capell-blog::messages.no_tags_found') }}
         </x-capell::no-results>
     @else
-        <ul class="@sm:grid-cols-2 @md:grid-cols-3 grid gap-x-6 gap-y-2">
+        <ul class="flex flex-wrap gap-2">
             @foreach ($tags as $tag)
                 @php($url = $tag->getPageUrl($tagPage, $language))
                 <li>
-                    <x-capell::badge
-                        :$url
-                        :count="$tag->pages_count"
-                    >
+                    <x-capell-blog::tag :$url>
                         {{ $tag->getTranslation('name', $language->code) }}
-                    </x-capell::badge>
+                        <x-slot:count>
+                            ({{ $tag->pages_count }})
+                        </x-slot>
+                    </x-capell-blog::tag>
                 </li>
             @endforeach
         </ul>

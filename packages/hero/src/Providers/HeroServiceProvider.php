@@ -16,7 +16,7 @@ use Capell\Hero\Enums\WidgetComponentEnum;
 use Capell\Hero\Enums\WidgetSchemaEnum;
 use Capell\Hero\Filament\Extenders\Page\HeroPageSchemaExtender;
 use Capell\Layout\Enums\ComponentTypeEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\Blade;
@@ -29,15 +29,6 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
     public static string $packageName = 'capell-app/hero';
 
     public static string $description = 'Hero section component for layout builder.';
-
-    public function bootingPackage(): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->registerAll();
-    }
 
     public function configurePackage(Package $package): void
     {
@@ -57,6 +48,14 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         $this
             ->registerSchemas()
             ->registerPackageMetadata();
+
+        $this->booted(function (): void {
+            if (! $this->isPackageInstalled()) {
+                return;
+            }
+
+            $this->bootInstalledPackage();
+        });
     }
 
     private function isPackageInstalled(): bool
@@ -64,7 +63,7 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         return CapellCore::getPackage(static::$packageName)->isInstalled();
     }
 
-    private function registerAll(): self
+    private function bootInstalledPackage(): self
     {
         return $this
             ->registerComponents()
@@ -77,6 +76,7 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerPackage(
             static::$packageName,
             type: static::getType(),
+            serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             sort: 10,
             description: static::getDescription(),
@@ -117,8 +117,8 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemas(): self
     {
-        CapellAdmin::registerSchema(SchemaTypeEnum::Content, ContentSchemaEnum::Hero);
-        CapellAdmin::registerSchema(SchemaTypeEnum::Widget, WidgetSchemaEnum::Hero);
+        CapellAdmin::registerSchema(TypeSchemaEnum::Content, ContentSchemaEnum::Hero);
+        CapellAdmin::registerSchema(TypeSchemaEnum::Widget, WidgetSchemaEnum::Hero);
 
         return $this;
     }

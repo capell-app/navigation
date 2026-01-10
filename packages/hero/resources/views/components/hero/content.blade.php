@@ -7,13 +7,13 @@ declare(strict_types=1);
 @aware(['carouselArrows'])
 
 @props([
-'colorScheme',
-'content_class' => 'hero-content prose xl:prose-lg max-w-none tracking-wider',
-'headingSize' => 'h1',
-'linkClass' => 'text-link hover:text-primary focus:text-primary font-medium focus:underline',
-'size' => 'md',
-'title' => '',
-'url' => '',
+    'color',
+    'content_class' => 'hero-content prose xl:prose-lg max-w-none tracking-wider',
+    'headingSize' => 'h1',
+    'linkClass' => 'text-link hover:text-primary focus:text-primary font-medium focus:underline',
+    'size' => 'md',
+    'title' => '',
+    'url' => '',
 ])
 {{-- format-ignore-start --}}
 <div
@@ -25,7 +25,7 @@ declare(strict_types=1);
                     [$content_class],
                     array_keys(
                         array_filter([
-                            'prose-invert' => $colorScheme === 'dark',
+                            'prose-invert' => $color === 'dark',
                             'ml-10' => $carouselArrows,
                         ]),
                     ),
@@ -33,7 +33,7 @@ declare(strict_types=1);
             ),
         ])
     }}
-    @if ($colorScheme === 'dark') style="--tw-prose-invert-body: #fff;" @endif
+    @if ($color === 'dark') style="--tw-prose-invert-body: #fff;" @endif
 >
     @if ($title)
         <{{ $headingSize }}

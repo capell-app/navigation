@@ -7,7 +7,6 @@ namespace Capell\Layout\Providers;
 use Capell\Admin\Actions\CreatedModelAction;
 use Capell\Admin\Actions\DeletedModelAction;
 use Capell\Admin\Data\AdminAssetData;
-use Capell\Admin\Enums\LayoutEnum as AdminLayoutEnum;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
@@ -15,6 +14,7 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Data\TypeData;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
@@ -76,15 +76,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     public static string $description = 'Managing content and widgets.';
 
-    public function bootingPackage(): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->registerAll();
-    }
-
     public function configurePackage(Package $package): void
     {
         $package->name(self::$name)
@@ -108,7 +99,13 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerRelationships()
             ->registerPackageMetadata();
 
-        $this->registerLayouts();
+        $this->booted(function (): void {
+            if (! $this->isPackageInstalled()) {
+                return;
+            }
+
+            $this->bootInstalledPackage();
+        });
     }
 
     protected function getPublishedDirectory(): string
@@ -125,7 +122,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         return CapellCore::getPackage(static::$packageName)->isInstalled();
     }
 
-    private function registerAll(): self
+    private function bootInstalledPackage(): self
     {
         return $this
             ->registerListeners()
@@ -147,9 +144,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLayouts(): self
     {
-        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Default, DefaultInterceptor::class);
-        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Home, HomeInterceptor::class);
-        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Results, ResultsInterceptor::class);
+        CapellCore::registerLayoutInterceptor(LayoutEnum::Default, DefaultInterceptor::class);
+        CapellCore::registerLayoutInterceptor(LayoutEnum::Home, HomeInterceptor::class);
+        CapellCore::registerLayoutInterceptor(LayoutEnum::Results, ResultsInterceptor::class);
 
         return $this;
     }
@@ -159,6 +156,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerPackage(
             static::$packageName,
             type: static::getType(),
+            serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             description: static::getDescription(),
             permissions: $this->getPackagePermissions(),
@@ -410,7 +408,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerSchemas(): self
     {
-        foreach (Enums\SchemaTypeEnum::getAllSchemas() as $type => $schemas) {
+        foreach (Enums\TypeSchemaEnum::getAllSchemas() as $type => $schemas) {
             CapellAdmin::registerSchemas($type, $schemas, defaultSchemas: true);
         }
 

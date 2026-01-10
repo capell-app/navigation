@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Actions;
 
-use Capell\Admin\Enums\LayoutEnum;
 use Capell\Blog\Support\Creator\BlogCreator;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
@@ -17,7 +17,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
 /**
  * @method static void run()
  */
-class InstallBlogPackageAction
+class InstallPackageAction
 {
     use AsObject;
 
