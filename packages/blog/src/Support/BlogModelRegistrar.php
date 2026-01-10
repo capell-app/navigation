@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout;
+namespace Capell\Blog\Support;
 
+use Capell\Blog\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Enums\ModelEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 
-class LayoutModelRegistrar
+class BlogModelRegistrar
 {
     public static function register(): void
     {

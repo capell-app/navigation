@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\StaticSite;
+namespace Capell\Blog\Support\StaticSite;
 
 use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
-use Capell\Blog\Services\Loader\BlogLoader;
-use Capell\Blog\Services\Loader\TagLoader;
+use Capell\Blog\Support\Loader\BlogLoader;
+use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;

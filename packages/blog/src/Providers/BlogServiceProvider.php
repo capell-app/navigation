@@ -8,7 +8,6 @@ use Capell\Admin\Enums\ResourceEnum as AdminResourceEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
-use Capell\Blog\BlogModelRegistrar;
 use Capell\Blog\Console\Commands\CreateBlogPagesCommand;
 use Capell\Blog\Console\Commands\DemoCommand;
 use Capell\Blog\Console\Commands\InstallCommand;
@@ -19,24 +18,26 @@ use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Listeners\AddBlogPagesToNavigation;
 use Capell\Blog\Models\Tag;
-use Capell\Blog\Services\Creator\BlogCreator;
-use Capell\Blog\Services\Loader\BlogLoader;
-use Capell\Blog\Services\Loader\TagLoader;
-use Capell\Blog\Services\Sitemap\ArchivePageSitemap;
-use Capell\Blog\Services\Sitemap\TagPageSitemap;
-use Capell\Blog\Services\StaticSite\BlogStaticSiteExtension;
+use Capell\Blog\Support\BlogModelRegistrar;
+use Capell\Blog\Support\Creator\BlogCreator;
+use Capell\Blog\Support\Loader\BlogLoader;
+use Capell\Blog\Support\Loader\TagLoader;
+use Capell\Blog\Support\Sitemap\ArchivePageSitemap;
+use Capell\Blog\Support\Sitemap\TagPageSitemap;
+use Capell\Blog\Support\StaticSite\BlogStaticSiteExtension;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Events\NavigationCreating;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
-use Capell\Core\Packages\AbstractPackageServiceProvider;
-use Capell\Core\Services\StaticSiteExtensionRegistry;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\StaticSiteExtensionRegistry;
+use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Providers\FrontendServiceProvider;
-use Capell\Frontend\Services\RenderHookRegistry;
+use Capell\Frontend\Support\RenderHookRegistry;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\SchemaTypeEnum as LayoutSchemaEnum;
@@ -108,10 +109,44 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ->registerWidgetComponents()
             ->registerSchemas()
             ->registerSitemapPages()
+            ->registerLayouts()
             ->registerDefaultPages()
             ->registerBladeComponents()
             ->registerLivewireComponents()
             ->registerRenderHooks();
+    }
+
+    private function registerLayouts(): self
+    {
+        /* CapellAdmin::registerLayout(new LayoutData(
+             key: BlogLayoutEnum::Archives->value,
+             name: __('capell-blog::generic.archives_page'),
+             group: LayoutGroupEnum::System->value,
+             setupCallback: fn (Layout $layout, bool $createWidgets = false) => resolve(BlogCreator::class)->setupArchivesLayout($layout, $createWidgets),
+         ));
+
+         CapellAdmin::registerLayout(new LayoutData(
+             key: BlogLayoutEnum::BlogPage->value,
+             name: __('capell-blog::generic.blog_page'),
+             group: LayoutGroupEnum::System->value,
+             setupCallback: fn (Layout $layout, bool $createWidgets = false) => resolve(BlogCreator::class)->setupBlogPageLayout($layout, $createWidgets),
+         ));
+
+         CapellAdmin::registerLayout(new LayoutData(
+             key: BlogLayoutEnum::Tags->value,
+             name: __('capell-blog::generic.tags'),
+             group: LayoutGroupEnum::System->value,
+             setupCallback: fn (Layout $layout, bool $createWidgets = false) => resolve(BlogCreator::class)->setupTagsLayout($layout, $createWidgets),
+         ));
+
+         CapellAdmin::registerLayout(new LayoutData(
+             key: BlogLayoutEnum::Article->value,
+             name: __('capell-blog::generic.article'),
+             group: LayoutGroupEnum::Default->value,
+             setupCallback: fn (Layout $layout, bool $createWidgets = false) => resolve(BlogCreator::class)->setupArticleLayout($layout, $createWidgets),
+         ));*/
+
+        return $this;
     }
 
     private function registerPackageMetadata(): self
@@ -212,7 +247,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         resolve(RenderHookRegistry::class)->register(
             RenderHookLocation::Footer,
-            fn ($context) => view('capell-blog::components.footer.tags')->render(),
+            fn (RenderHookContext $context) => view('capell-blog::components.footer.tags', $context->item)->render(),
             target: 'footer.index',
         );
 

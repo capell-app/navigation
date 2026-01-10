@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Actions;
 
-use Capell\Admin\Services\Creator\LayoutCreator as AdminLayoutCreator;
+use Capell\Admin\Support\Creator\LayoutCreator;
 use Capell\Core\Models\Language;
-use Capell\Layout\LayoutModelRegistrar;
-use Capell\Layout\Services\Creator\LayoutCreator;
-use Capell\Layout\Services\Creator\TypeCreator;
-use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Layout\Support\Creator\TypeCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
+use Capell\Layout\Support\LayoutModelRegistrar;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -32,10 +31,7 @@ class InstallPackageAction
         $widgetCreator = resolve(WidgetCreator::class);
         $widgetCreator->createWidgets(Language::all());
 
-        $layoutCreator = resolve(AdminLayoutCreator::class);
+        $layoutCreator = resolve(LayoutCreator::class);
         $layoutCreator->setup();
-
-        $layoutUpdater = resolve(LayoutCreator::class);
-        $layoutUpdater->setup();
     }
 }

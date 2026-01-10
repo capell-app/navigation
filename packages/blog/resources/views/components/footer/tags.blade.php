@@ -10,7 +10,8 @@ declare(strict_types=1);
 ])
 
 <?php
-use Capell\Blog\Services\Loader\TagLoader;
+
+use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Frontend\Facades\Frontend;
 
 $language = Frontend::language();

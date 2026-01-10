@@ -6,7 +6,7 @@ use Capell\Admin\Filament\Actions\Page\CreatePageAction;
 use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
-use Capell\Blog\Services\Creator\BlogCreator;
+use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;

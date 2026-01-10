@@ -75,13 +75,14 @@ $theme = Frontend::theme();
                     <x-capell-hero::hero.content
                         :title="
                             $widget->translation
-                            ? \Capell\Frontend\Actions\ReplacePageDataAction::run($widget->translation->title, $pageParams)
+                            ? __($widget->translation->title, $pageParams)
                             : null
                         "
                         :color-scheme="$colorScheme"
                         size="lg"
+                        class="hero-page-content"
                     >
-                        {!! \Capell\Frontend\Actions\ReplacePageDataAction::run($content, $pageParams) !!}
+                        {!! __($content, $pageParams) !!}
                     </x-capell-hero::hero.content>
                 </div>
             </x-capell-hero::hero.slide>
@@ -89,7 +90,7 @@ $theme = Frontend::theme();
             @foreach ($widget->assets as $widgetAsset)
                 {{-- format-ignore-start --}}
                 @php
-                    /** @var WidgetAsset $widgetAsset */
+                    /** @var \Capell\Layout\Models\WidgetAsset $widgetAsset */
                     $slideColorScheme = $widgetAsset->asset->meta['color_scheme'] ?? $colorScheme;
 
                     $linkedPage = $widgetAsset->asset instanceof \Capell\Core\Models\Page ? $widgetAsset->asset : $widgetAsset->asset->linkedPage;

@@ -8,7 +8,7 @@ use Capell\Admin\Filament\Components\Forms\ContentEditor;
 use Capell\Admin\Filament\Components\Forms\RepeaterTabs;
 use Capell\Admin\Filament\Components\Forms\TranslationLanguageSelect;
 use Capell\Admin\Filament\Components\Forms\TranslationsRepeater;
-use Capell\Core\CapellCoreHelper;
+use Capell\Core\Support\CapellCoreHelper;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Forms;
+namespace Capell\Layout\Filament\Components\Forms;
 
 use Capell\Layout\Livewire\Layout\WidgetTableSelect;
 use Filament\Forms\Components\Select;

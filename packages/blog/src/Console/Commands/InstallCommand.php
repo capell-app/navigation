@@ -6,8 +6,8 @@ namespace Capell\Blog\Console\Commands;
 
 use Capell\Admin\Actions\AssignPermissionsToRole;
 use Capell\Blog\Actions\InstallBlogPackageAction;
-use Capell\Blog\BlogModelRegistrar;
 use Capell\Blog\Enums\ResourceEnum;
+use Capell\Blog\Support\BlogModelRegistrar;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
 use Spatie\Tags\TagsServiceProvider;

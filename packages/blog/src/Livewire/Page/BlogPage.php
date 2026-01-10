@@ -6,7 +6,7 @@ namespace Capell\Blog\Livewire\Page;
 
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Livewire\Page\AbstractPage;
-use Capell\Frontend\Services\Loader\PageLoader;
+use Capell\Frontend\Support\Loader\PageLoader;
 use Illuminate\Database\Eloquent\Builder;
 
 class BlogPage extends AbstractPage

@@ -10,9 +10,9 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Enums\ListenerEnum;
 use Capell\Frontend\Facades\Frontend;
-use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Loader\LayoutLoader;
+use Capell\Layout\Support\CapellLayoutManager;
+use Capell\Layout\Support\Loader\LayoutLoader;
 
 class LayoutLoaded implements EventSubscriber
 {
@@ -38,7 +38,8 @@ class LayoutLoaded implements EventSubscriber
         CapellLayoutManager::clearContainerWidgets();
 
         // Preload all widgets/assets once to minimize queries during iteration
-        LayoutLoader::preloadLayoutWidgets($layout, $language, $page);
+        $loader = new LayoutLoader;
+        $loader->preloadLayoutWidgets($layout, $language, $page);
 
         $containers = $layout->containers ?? [];
 
@@ -59,7 +60,7 @@ class LayoutLoaded implements EventSubscriber
                 $widgetKey = $widgetData['widget_key'];
                 $occurrence = $widgetData['occurrence'] ?? 1;
 
-                $widget = LayoutLoader::getLayoutWidget(
+                $widget = $loader->getLayoutWidget(
                     $layout,
                     $widgetKey,
                     $language,

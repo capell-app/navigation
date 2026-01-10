@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 ?>
 
+{{-- format-ignore-start --}}
 @php
-    use Capell\Frontend\Actions\ReplacePageDataAction;
-                    use Capell\Frontend\Facades\Frontend;
-                    use Capell\Frontend\Services\Loader\PageLoader;
+    use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Support\Loader\PageLoader;
 
-                    $page = Frontend::page();
-                    $pageParams = Frontend::params();
-                    $site = Frontend::site();
-                    $language = Frontend::language();
+    $page = Frontend::page();
+    $pageParams = Frontend::params();
+    $site = Frontend::site();
+    $language = Frontend::language();
 @endphp
 
 @props([
-'container',
-'containerKey',
-'containerWidth' => null,
-'loop',
-'widget',
+    'container',
+    'containerKey',
+    'containerWidth' => null,
+    'loop',
+    'widget',
 ])
 @php
-    $currentPageLabel = ReplacePageDataAction::run($page->translation->label, $pageParams);
+    $currentPageLabel = __($page->translation->label, $pageParams);
 
-        $ancestors = PageLoader::getPageAncestors($page, $language, $site);
+    $ancestors = PageLoader::getPageAncestors($page, $language, $site);
 
-        if (! $ancestors) {
-            return;
-        }
+    if (! $ancestors) {
+        return;
+    }
 
-        $home = $site->homePage($language);
+    $home = $site->homePage($language);
 @endphp
-
+{{-- format-ignore-end --}}
 <nav
     class="breadcrumbs my-4 text-gray-800"
     aria-label="{{ __('capell-frontend::generic.breadcrumbs') }}"

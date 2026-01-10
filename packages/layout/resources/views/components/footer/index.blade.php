@@ -10,12 +10,12 @@ $page = \Capell\Frontend\Facades\Frontend::page();
 $theme = \Capell\Frontend\Facades\Frontend::theme();
 
 $getMenu = function (string $key) use ($site, $language, $page): array {
-    $menu = \Capell\Frontend\Services\Loader\NavigationLoader::getNavigation($key, $site, $language);
+    $menu = \Capell\Frontend\Support\Loader\NavigationLoader::getNavigation($key, $site, $language);
 
     $items = [];
 
     if ($menu instanceof \Capell\Core\Models\Navigation) {
-        $navigationLoader = new \Capell\Frontend\Services\Loader\NavigationItemsLoader(
+        $navigationLoader = new \Capell\Frontend\Support\Loader\NavigationItemsLoader(
             navigation: $menu,
             page: $page,
             site: $site,
@@ -38,9 +38,9 @@ $getMenu = function (string $key) use ($site, $language, $page): array {
 
 $contactPage = \Capell\Core\Models\Page::getFirstPageByTypeForSite('contact', $site, $language);
 
-$siteLanguages = \Capell\Frontend\Services\Loader\SiteLoader::pageLanguages($site, $language, $page);
+$siteLanguages = \Capell\Frontend\Support\Loader\SiteLoader::pageLanguages($site, $language, $page);
 
-$pages = \Capell\Frontend\Services\Loader\PageLoader::getPages(
+$pages = \Capell\Frontend\Support\Loader\PageLoader::getPages(
     language: $language,
     site: $site,
     limit: 3,
@@ -155,7 +155,7 @@ $pages = \Capell\Frontend\Services\Loader\PageLoader::getPages(
             />
 
             {!!
-                app(\Capell\Frontend\Services\RenderHookRegistry::class)->renderAll(
+                app(\Capell\Frontend\Support\RenderHookRegistry::class)->renderAll(
                     \Capell\Frontend\Enums\RenderHookLocation::Footer,
                     item: ['headingClass' => $headingClass],
                     target: 'footer.index',

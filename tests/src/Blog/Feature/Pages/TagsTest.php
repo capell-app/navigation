@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Blog\Enums\TagTypeEnum;
 use Capell\Blog\Models\Article;
 use Capell\Blog\Models\Tag;
-use Capell\Blog\Services\Creator\BlogCreator;
+use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
@@ -77,8 +77,13 @@ test('tag page list articles by tag', function (): void {
 
     $title = trans($tagPage->translation->title, ['tag_name' => $tag->translate('name', $language->code)]);
 
+    expect($tagPage)
+        ->translation->title->toBe(':Tag_name Articles')
+        ->layout->getContainerWidgets()->toContain('breadcrumbs');
+
     get($tag->getPageUrl($tagPage, $language))
         ->assertOk()
+        ->assertDontSeeText(':Tag_name Articles')
         ->assertSeeHtml('<title>' . e($title) . ' | ' . e($site->title) . '</title>')
         ->assertElementExists(
             'h1',

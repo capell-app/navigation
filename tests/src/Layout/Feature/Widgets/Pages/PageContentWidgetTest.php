@@ -10,7 +10,7 @@ use Capell\Frontend\Actions\RenderContentAction;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;

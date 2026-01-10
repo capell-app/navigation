@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Address\Providers;
 
-use Capell\Address\AddressModelRegistrar;
 use Capell\Address\Console\Commands\DemoCommand;
 use Capell\Address\Console\Commands\InstallCommand;
 use Capell\Address\Enums\ResourceEnum;
@@ -12,12 +11,13 @@ use Capell\Address\Enums\SchemaTypeEnum;
 use Capell\Address\Filament\Resources\Sites\Schemas\Extenders\SiteSchemaExtender;
 use Capell\Address\Models\Address;
 use Capell\Address\Models\Country;
+use Capell\Address\Support\AddressModelRegistrar;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
-use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;

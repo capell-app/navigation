@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\Loader;
+namespace Capell\Blog\Support\Loader;
 
 use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Enums\BlogPageTypeEnum;
-use Capell\Blog\Services\PageArchiveService;
+use Capell\Blog\Support\PageArchiveService;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Console\Commands;
 
-use Capell\Admin\Services\Creator\DemoCreator;
+use Capell\Admin\Support\Creator\DemoCreator;
 use Capell\Blog\Actions\CreateBlogPagesAction;
 use Capell\Blog\Enums\ModelEnum as BlogModelEnum;
 use Capell\Blog\Enums\ResourceEnum;
-use Capell\Blog\Services\Loader\BlogLoader;
+use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;

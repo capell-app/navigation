@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Admin\Enums\LayoutEnum;
-use Capell\Admin\Services\Creator\LayoutCreator as AdminLayoutCreator;
+use Capell\Admin\Support\Creator\LayoutCreator as AdminLayoutCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
@@ -15,9 +15,8 @@ use Capell\Layout\Livewire\Layout\WidgetTableSelect;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Capell\Layout\Services\Creator\LayoutCreator;
-use Capell\Layout\Services\Creator\TypeCreator;
-use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Layout\Support\Creator\TypeCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 use Pest\Expectation;
@@ -50,9 +49,6 @@ test('can edit layouts', function (LayoutEnum $layoutEnum): void {
 
     $widgetCreator = resolve(WidgetCreator::class);
     $widgetCreator->createWidgets(collect([$language]));
-
-    $layoutUpdater = resolve(LayoutCreator::class);
-    $layoutUpdater->setup($layout->key);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,

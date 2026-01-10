@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\View\Components\Widget\Page;
 
 use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\Services\Loader\PageLoader;
+use Capell\Frontend\Support\Loader\PageLoader;
 
 class ChildrenWidget extends AbstractPagesWidget
 {

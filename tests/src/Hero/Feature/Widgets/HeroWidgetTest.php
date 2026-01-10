@@ -82,6 +82,7 @@ it('renders hero widget with assets', function (callable $factory, string $media
                 'type',
                 'translation',
                 'related.translation',
+                'related.type',
             ])
                 ->morphWith([
                     Content::class => ['linkedPage.pageUrl.siteDomain'],

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Capell\Admin\Enums\LayoutEnum;
+use Capell\Admin\Support\Creator\LayoutCreator;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\ThemeFactory;
-use Capell\Layout\Services\Creator\LayoutCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
@@ -21,7 +21,7 @@ test('home page with layout', function (): void {
     $site = Site::factory()->theme($theme)->withTranslations()->create();
 
     $layoutCreator = resolve(LayoutCreator::class);
-    $layout = $layoutCreator->createWithContainers(LayoutEnum::Default->value, createWidgets: true);
+    $layout = $layoutCreator->create(LayoutEnum::Default);
 
     $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
 

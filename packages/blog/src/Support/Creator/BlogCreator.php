@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\Creator;
+namespace Capell\Blog\Support\Creator;
 
 use Capell\Admin\Actions\AddPageToNavigationAction;
 use Capell\Admin\Enums\LayoutEnum;
 use Capell\Admin\Enums\PageTypeEnum;
 use Capell\Admin\Filament\Resources\Pages\Schemas\Types\ResultsPageSchema;
 use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
-use Capell\Admin\Services\Creator\LayoutCreator;
-use Capell\Admin\Services\Creator\TypeCreator;
+use Capell\Admin\Support\Creator\LayoutCreator;
+use Capell\Admin\Support\Creator\TypeCreator;
 use Capell\Blog\Enums\BlogLayoutEnum;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
@@ -37,8 +37,8 @@ use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\TypeCreator as LayoutTypeCreator;
-use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Layout\Support\Creator\TypeCreator as LayoutTypeCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -188,7 +188,7 @@ class BlogCreator
         }
 
         if (! $layout instanceof Layout) {
-            $layout = Layout::query()->firstWhere('key', 'results') ?? resolve(LayoutCreator::class)->resultsLayout();
+            $layout = Layout::query()->firstWhere('key', 'results') ?? resolve(LayoutCreator::class)->create(LayoutEnum::Results);
         }
 
         if (! $languages instanceof Collection) {
@@ -391,7 +391,7 @@ class BlogCreator
     {
         $widgetModel = CapellCore::getModel(ModelEnum::Widget);
 
-        $typeCreator = resolve(\Capell\Layout\Services\Creator\TypeCreator::class);
+        $typeCreator = resolve(\Capell\Layout\Support\Creator\TypeCreator::class);
         $type = $typeCreator->systemWidgetType();
 
         $widget = $widgetModel::query()->firstOrCreate([
@@ -477,7 +477,7 @@ class BlogCreator
         if ($createWidgets) {
             $languages = Language::all();
             $widgetCreator = resolve(WidgetCreator::class);
-            $typeCreator = resolve(\Capell\Layout\Services\Creator\TypeCreator::class);
+            $typeCreator = resolve(\Capell\Layout\Support\Creator\TypeCreator::class);
             $systemWidgetType = $typeCreator->systemWidgetType();
             $pageContentWidgetType = $typeCreator->pageContentWidgetType();
 

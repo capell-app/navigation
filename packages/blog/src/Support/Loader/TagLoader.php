@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\Loader;
+namespace Capell\Blog\Support\Loader;
 
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\CacheEnum;

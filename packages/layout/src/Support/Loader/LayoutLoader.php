@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Services\Loader;
+namespace Capell\Layout\Support\Loader;
 
 use Capell\Core\Actions\GetComponentClassAction;
 use Capell\Core\Facades\CapellCore;
@@ -22,9 +22,9 @@ class LayoutLoader
      * Preloaded widgets per [layoutId][languageId][pageIdOr0] => [containerKey][widgetKey][occurrence] => Widget
      * Used to avoid N+1 queries when resolving multiple widgets for a layout.
      */
-    private static array $preloaded = [];
+    private array $preloaded = [];
 
-    public static function getLayout(int $id): ?Layout
+    public function getLayout(int $id): ?Layout
     {
         $key = 'layout-' . $id;
 
@@ -52,10 +52,10 @@ class LayoutLoader
      * Preload all widgets and their assets for a layout for the given language and page.
      * Results are stored in-memory only for the current request lifecycle.
      */
-    public static function preloadLayoutWidgets(Layout $layout, Language $language, ?Page $page): void
+    public function preloadLayoutWidgets(Layout $layout, Language $language, ?Page $page): void
     {
-        $cacheKey = self::preloadedKey($layout, $language, $page);
-        if (isset(self::$preloaded[$cacheKey])) {
+        $cacheKey = $this->preloadedKey($layout, $language, $page);
+        if (isset($this->preloaded[$cacheKey])) {
             return;
         }
 
@@ -148,9 +148,11 @@ class LayoutLoader
             if (! isset($container['widgets'])) {
                 continue;
             }
+
             if (! is_array($container['widgets'])) {
                 continue;
             }
+
             foreach ($container['widgets'] as $widgetData) {
                 if (! isset($widgetData['widget_key'])) {
                     continue;
@@ -179,10 +181,10 @@ class LayoutLoader
             }
         }
 
-        self::$preloaded[$cacheKey] = $result;
+        $this->preloaded[$cacheKey] = $result;
     }
 
-    public static function getLayoutWidget(
+    public function getLayoutWidget(
         Layout $layout,
         string $widgetKey,
         Language $language,
@@ -203,14 +205,14 @@ class LayoutLoader
         $fromCache = true;
 
         // Ensure preloading is done once per layout/language/page
-        self::preloadLayoutWidgets($layout, $language, $page);
+        $this->preloadLayoutWidgets($layout, $language, $page);
 
         $widget = CapellCore::rememberCache(
             $key,
             function () use ($layout, $widgetKey, $language, $page, $containerKey, $occurrence, &$fromCache): ?Widget {
                 $fromCache = false;
 
-                return self::getPreloadedWidget($layout, $language, $page, $containerKey, $widgetKey, $occurrence);
+                return $this->getPreloadedWidget($layout, $language, $page, $containerKey, $widgetKey, $occurrence);
             },
         ) ?: null;
 
@@ -230,12 +232,12 @@ class LayoutLoader
         return $widget;
     }
 
-    private static function preloadedKey(Layout $layout, Language $language, ?Page $page): string
+    private function preloadedKey(Layout $layout, Language $language, ?Page $page): string
     {
         return 'layout:' . $layout->id . ':lang:' . $language->id . ':page:' . ($page instanceof Page ? $page->id : 0);
     }
 
-    private static function getPreloadedWidget(
+    private function getPreloadedWidget(
         Layout $layout,
         Language $language,
         ?Page $page,
@@ -243,8 +245,8 @@ class LayoutLoader
         string $widgetKey,
         int $occurrence,
     ): ?Widget {
-        $cacheKey = self::preloadedKey($layout, $language, $page);
-        $map = self::$preloaded[$cacheKey] ?? null;
+        $cacheKey = $this->preloadedKey($layout, $language, $page);
+        $map = $this->preloaded[$cacheKey] ?? null;
         if ($map === null) {
             return null;
         }

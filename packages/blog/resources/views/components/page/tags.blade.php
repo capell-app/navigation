@@ -5,24 +5,24 @@ declare(strict_types=1);
 ?>
 
 @php
-    use Capell\Blog\Services\Loader\TagLoader;
-                use Capell\Frontend\Facades\Frontend;
-                use Filament\Support\Icons\Heroicon;
+    use Capell\Blog\Support\Loader\TagLoader;
+    use Capell\Frontend\Facades\Frontend;
+    use Filament\Support\Icons\Heroicon;
 
-        $language = Frontend::language();
-        $site = Frontend::site();
+    $language = Frontend::language();
+    $site = Frontend::site();
 @endphp
 
 @props([
-'linkClass' => '',
-'tagPage' => null,
-'tags',
-'tagIcon' => 'heroicon-' . Heroicon::OutlinedTag->value,
+    'linkClass' => '',
+    'tagPage' => null,
+    'tags',
+    'tagIcon' => 'heroicon-' . Heroicon::OutlinedTag->value,
 ])
 @php
     if (! $tagPage) {
-            $tagPage = TagLoader::getTagResultsPage($site, $language);
-        }
+        $tagPage = TagLoader::getTagResultsPage($site, $language);
+    }
 @endphp
 
 @if ($tags && $tagPage)

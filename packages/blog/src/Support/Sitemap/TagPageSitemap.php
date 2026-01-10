@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\Sitemap;
+namespace Capell\Blog\Support\Sitemap;
 
 use Capell\Blog\Models\Tag;
-use Capell\Blog\Services\Loader\TagLoader;
+use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Core\Services\Sitemap\AbstractSitemapPages;
+use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Support\Collection;
 

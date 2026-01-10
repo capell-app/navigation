@@ -7,6 +7,7 @@ namespace Capell\Layout\Providers;
 use Capell\Admin\Actions\CreatedModelAction;
 use Capell\Admin\Actions\DeletedModelAction;
 use Capell\Admin\Data\AdminAssetData;
+use Capell\Admin\Enums\LayoutEnum as AdminLayoutEnum;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Enums\SchemaTypeEnum;
@@ -19,11 +20,10 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
-use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Providers\FrontendServiceProvider;
-use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Console\Commands\DemoCommand;
 use Capell\Layout\Console\Commands\InstallCommand;
 use Capell\Layout\Console\Commands\UpgradeCommand;
@@ -40,12 +40,16 @@ use Capell\Layout\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExten
 use Capell\Layout\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\ContentTypeSchema;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
-use Capell\Layout\LayoutModelRegistrar;
 use Capell\Layout\Listeners\AfterRecordSaved;
 use Capell\Layout\Listeners\LayoutLoaded;
 use Capell\Layout\Listeners\SiteTreeRebuilt;
 use Capell\Layout\Listeners\TypeValidated;
 use Capell\Layout\Models\Content;
+use Capell\Layout\Support\CapellLayoutManager;
+use Capell\Layout\Support\Interceptors\Layouts\DefaultInterceptor;
+use Capell\Layout\Support\Interceptors\Layouts\HomeInterceptor;
+use Capell\Layout\Support\Interceptors\Layouts\ResultsInterceptor;
+use Capell\Layout\Support\LayoutModelRegistrar;
 use Composer\InstalledVersions;
 use Exception;
 use Filament\Facades\Filament;
@@ -103,6 +107,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerModels()
             ->registerRelationships()
             ->registerPackageMetadata();
+
+        $this->registerLayouts();
     }
 
     protected function getPublishedDirectory(): string
@@ -128,6 +134,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentServing()
             ->registerTypes()
             ->registerComponents()
+            ->registerLayouts()
             ->registerAssets()
             ->registerSchemaExtenders()
             ->registerCloneableAndDraftableRelations()
@@ -136,6 +143,15 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerPublishCommands()
             ->registerLivewireComponents()
             ->registerBladeComponents();
+    }
+
+    private function registerLayouts(): self
+    {
+        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Default, DefaultInterceptor::class);
+        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Home, HomeInterceptor::class);
+        CapellAdmin::registerLayoutInterceptor(AdminLayoutEnum::Results, ResultsInterceptor::class);
+
+        return $this;
     }
 
     private function registerPackageMetadata(): self

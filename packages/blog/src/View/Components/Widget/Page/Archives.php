@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\View\Components\Widget\Page;
 
 use Capell\Blog\Enums\BlogTypeGroupEnum;
-use Capell\Blog\Services\Loader\BlogLoader;
+use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Layout\View\Components\Widget\AbstractWidget;

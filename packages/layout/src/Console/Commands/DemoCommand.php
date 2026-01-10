@@ -12,9 +12,9 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Models\Content;
-use Capell\Layout\Services\Creator\ContentCreator;
-use Capell\Layout\Services\Creator\DemoCreator;
-use Capell\Layout\Services\Creator\TypeCreator;
+use Capell\Layout\Support\Creator\ContentCreator;
+use Capell\Layout\Support\Creator\DemoCreator;
+use Capell\Layout\Support\Creator\TypeCreator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
@@ -231,7 +231,7 @@ class DemoCommand extends Command
 
         $this->line('Adding background media to split container');
         if ($layout->getMedia('split-two-background')->isEmpty()) {
-            resolve(\Capell\Admin\Services\Creator\DemoCreator::class)->createMedia($layout, collection: 'split-two-background');
+            resolve(\Capell\Admin\Support\Creator\DemoCreator::class)->createMedia($layout, collection: 'split-two-background');
         }
 
         $layout->containers = $containers;

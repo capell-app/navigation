@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Facades;
 
-use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Models\Widget;
+use Capell\Layout\Support\CapellLayoutManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 

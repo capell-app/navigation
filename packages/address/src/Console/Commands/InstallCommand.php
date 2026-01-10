@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Address\Console\Commands;
 
-use Capell\Address\AddressModelRegistrar;
 use Capell\Address\Enums\ResourceEnum;
+use Capell\Address\Support\AddressModelRegistrar;
 use Capell\Admin\Actions\AssignPermissionsToRole;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;

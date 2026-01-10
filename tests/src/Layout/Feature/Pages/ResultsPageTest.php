@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Capell\Admin\Enums\LayoutEnum;
+use Capell\Admin\Support\Creator\LayoutCreator;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Layout\Services\Creator\LayoutCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
@@ -19,7 +19,7 @@ test('results page with layout', function (): void {
     $site = Site::factory()->withTranslations()->create();
 
     $layoutCreator = resolve(LayoutCreator::class);
-    $layout = $layoutCreator->createWithContainers(LayoutEnum::Results->value, createWidgets: true);
+    $layout = $layoutCreator->create(LayoutEnum::Results);
 
     $page = Page::factory()->site($site)->layout($layout)->home()->withTranslations()->create();
 

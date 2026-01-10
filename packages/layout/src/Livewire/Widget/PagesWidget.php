@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Livewire\Widget;
 
 use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\Services\Loader\PageLoader;
+use Capell\Frontend\Support\Loader\PageLoader;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;

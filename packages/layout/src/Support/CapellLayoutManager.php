@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout;
+namespace Capell\Layout\Support;
 
 use Capell\Layout\Models\Widget;
 use Illuminate\Support\Collection;

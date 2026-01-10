@@ -9,7 +9,7 @@ use Capell\Layout\Filament\Actions\CreateWidgetAction;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\TypeCreator;
+use Capell\Layout\Support\Creator\TypeCreator;
 use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 

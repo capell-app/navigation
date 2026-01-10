@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Services\Creator;
+namespace Capell\Layout\Support\Creator;
 
 use Capell\Core\Enums\DefaultColorEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;

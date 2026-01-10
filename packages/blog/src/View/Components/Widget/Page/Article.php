@@ -7,7 +7,7 @@ namespace Capell\Blog\View\Components\Widget\Page;
 use App\Models\User;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\Services\Loader\PageLoader;
+use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 
 class Article extends AbstractWidget

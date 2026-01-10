@@ -10,9 +10,9 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Theme;
 use Capell\Layout\Actions\InstallPackageAction;
-use Capell\Layout\CapellLayoutManager;
 use Capell\Layout\Enums\ResourceEnum;
-use Capell\Layout\LayoutModelRegistrar;
+use Capell\Layout\Support\CapellLayoutManager;
+use Capell\Layout\Support\LayoutModelRegistrar;
 use Filament\Facades\Filament;
 use Illuminate\Console\Command;
 

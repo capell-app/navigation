@@ -14,7 +14,7 @@ use Capell\Admin\Filament\Components\Forms\Page\ParentPageSelect;
 use Capell\Admin\Filament\Components\Forms\PublishSchema;
 use Capell\Admin\Filament\Resources\Pages\Schemas\Types\DefaultPageSchema;
 use Capell\Blog\Filament\Components\Forms\Page\PageTagsInput;
-use Capell\Blog\Services\Loader\BlogLoader;
+use Capell\Blog\Support\Loader\BlogLoader;
 use Closure;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;

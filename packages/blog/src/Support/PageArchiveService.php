@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services;
+namespace Capell\Blog\Support;
 
 use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Core\Models\Language;

@@ -12,7 +12,7 @@ use Capell\Core\Models\Site;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Capell\Hero\Actions\CreateHeroContentTypeAction;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
-use Capell\Layout\Services\Creator\DemoCreator;
+use Capell\Layout\Support\Creator\DemoCreator;
 use Illuminate\Console\Command;
 
 class DemoCommand extends Command

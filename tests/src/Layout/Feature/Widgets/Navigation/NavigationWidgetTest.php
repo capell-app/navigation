@@ -6,7 +6,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\WidgetCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
 use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
 use Pest\Expectation;
 
@@ -33,7 +33,7 @@ it('renders navigation widget on page', function (): void {
     $layout = (new LayoutFactory)->create();
     $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
     $home = Page::factory()->site($site)->home()->withTranslations()->create();
-    $services = Page::factory()->site($site)->withTranslations()->children(3)->state(['name' => 'Services'])->create();
+    $services = Page::factory()->site($site)->withTranslations()->children(3)->state(['name' => 'Support'])->create();
     $anotherSiteHome = Page::factory()->home()->withTranslations()->create();
     $externalUrl = 'https://example.com/external';
     $items = [

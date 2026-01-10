@@ -6,8 +6,8 @@ namespace Capell\Layout\View\Components\Widget;
 
 use Capell\Core\Models;
 use Capell\Frontend\Facades\Frontend;
-use Capell\Frontend\Services\Loader\NavigationItemsLoader;
-use Capell\Frontend\Services\Loader\NavigationLoader;
+use Capell\Frontend\Support\Loader\NavigationItemsLoader;
+use Capell\Frontend\Support\Loader\NavigationLoader;
 
 class Navigation extends AbstractWidget
 {

@@ -7,7 +7,7 @@ namespace Capell\Hero\Providers;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Hero\Console\Commands\DemoCommand;
 use Capell\Hero\Console\Commands\InstallCommand;

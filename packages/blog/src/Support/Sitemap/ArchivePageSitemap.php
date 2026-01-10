@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Capell\Blog\Services\Sitemap;
+namespace Capell\Blog\Support\Sitemap;
 
 use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Core\Services\Sitemap\AbstractSitemapPages;
+use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Illuminate\Support\Collection;
 
 class ArchivePageSitemap extends AbstractSitemapPages

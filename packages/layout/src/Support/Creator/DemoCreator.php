@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Services\Creator;
+namespace Capell\Layout\Support\Creator;
 
 use BackedEnum;
-use Capell\Admin\Services\Creator\DemoCreator as AdminDemoCreator;
-use Capell\Admin\Services\Creator\NavigationCreator;
+use Capell\Admin\Support\Creator\DemoCreator as AdminDemoCreator;
+use Capell\Admin\Support\Creator\NavigationCreator;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
