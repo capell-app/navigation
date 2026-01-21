@@ -9,6 +9,7 @@ use Capell\Address\Models\Address;
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Site;
 use Illuminate\Console\Command;
 
 class DemoCommand extends Command
@@ -42,7 +43,10 @@ class DemoCommand extends Command
             $siteOptions = $this->getDemoSites();
         }
 
-        $sites = CapellCore::getModel(ModelEnum::Site)::query()->with(['language', 'languages'])->whereIn('name', $siteOptions)->get();
+        $sites = CapellCore::getModel(ModelEnum::Site)::query()
+            ->with(['language', 'languages'])
+            ->whereIn('name', $siteOptions)
+            ->get();
 
         if ($sites->isEmpty()) {
             $this->error('Unable to find any sites for: ' . implode(', ', (array) $siteOptions));
@@ -50,7 +54,7 @@ class DemoCommand extends Command
             return Command::FAILURE;
         }
 
-        foreach ($sites as $site) {
+        $sites->each(function (Site $site): void {
             $this->newLine();
             $this->line(sprintf('Selected site: %s', $site->name));
 
@@ -58,14 +62,19 @@ class DemoCommand extends Command
 
             $address = $this->setupAddress();
 
-            $meta['address_id'] = $address->id;
+            // Ensure meta is always an array and not null or a casted object
+            if (! is_array($meta)) {
+                $meta = (array) $meta;
+            }
 
-            $site->update(['meta' => $meta]);
+            $meta['address_id'] = $address->id;
+            $site->meta = $meta;
+            $site->save();
 
             $this->line('Demo address content has been successfully created for site: ' . $site->name);
-        }
+        });
 
-        $this->line('Hero demo content inserted successfully.');
+        $this->line('Address demo content inserted successfully.');
 
         return Command::SUCCESS;
     }
@@ -84,7 +93,8 @@ class DemoCommand extends Command
 
     private function setupAddress(): Address
     {
-        return CapellCore::getModel(AddressModelEnum::Address)::query()->firstOrCreate([
+        /** @var Address $address */
+        $address = CapellCore::getModel(AddressModelEnum::Address)::query()->firstOrCreate([
             'line1' => '123 Main St',
             'city' => 'Anytown',
             'postal_code' => '12345',
@@ -98,5 +108,7 @@ class DemoCommand extends Command
                 'longitude' => -118.2437,
             ],
         ]);
+
+        return $address;
     }
 }

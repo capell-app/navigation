@@ -106,11 +106,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         });
     }
 
-    public function bootingPackage(): void
-    {
-        $this->registerBladeComponents();
-    }
-
     protected function getPublishedDirectory(): string
     {
         $dir = $this->package->basePath('/../publishes/');

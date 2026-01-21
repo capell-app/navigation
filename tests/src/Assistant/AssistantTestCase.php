@@ -15,6 +15,8 @@ use Override;
 
 class AssistantTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-assistant';
+
     #[Override]
     protected function setUp(): void
     {

@@ -17,6 +17,8 @@ use Override;
 
 class HeroTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-hero';
+
     #[Override]
     protected function setUp(): void
     {

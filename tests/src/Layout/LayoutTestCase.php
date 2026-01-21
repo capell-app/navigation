@@ -16,6 +16,8 @@ use Override;
 
 class LayoutTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-layout';
+
     #[Override]
     protected function setUp(): void
     {

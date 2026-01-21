@@ -19,6 +19,8 @@ use Livewire\LivewireServiceProvider;
 
 class PackagesTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-packages';
+
     protected function getPackageProviders($app): array
     {
         return [

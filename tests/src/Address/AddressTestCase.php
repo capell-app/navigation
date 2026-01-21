@@ -14,6 +14,8 @@ use Override;
 
 class AddressTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-address';
+
     protected function getPackageProviders($app): array
     {
         return [

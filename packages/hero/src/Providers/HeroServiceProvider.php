@@ -54,11 +54,6 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         });
     }
 
-    public function bootingPackage(): void
-    {
-        $this->registerBladeComponents();
-    }
-
     private function isPackageInstalled(): bool
     {
         return CapellCore::getPackage(static::$packageName)->isInstalled();

@@ -87,6 +87,15 @@ class Address extends Model implements Defaultable
 
     protected static string $factory = AddressFactory::class;
 
+    public static function findAddress(string $line1, string $postalCode, int $countryId): ?self
+    {
+        return self::query()
+            ->where('line1', $line1)
+            ->where('postal_code', $postalCode)
+            ->where('country_id', $countryId)
+            ->first();
+    }
+
     /**
      * Get the country for the address.
      */

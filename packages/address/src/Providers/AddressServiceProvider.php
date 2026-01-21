@@ -42,11 +42,6 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
             ->hasTranslations();
     }
 
-    public function bootingPackage(): void
-    {
-        $this->registerBladeComponents();
-    }
-
     public function registeringPackage(): void
     {
         $this
@@ -72,6 +67,7 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
     private function bootInstalledPackage(): self
     {
         return $this
+            ->registerBladeComponents()
             ->registerSchemas()
             ->registerSchemaExtenders();
     }

@@ -74,10 +74,12 @@ abstract class AbstractTestCase extends TestCase
     use WithFaker;
     use WithWorkbench;
 
+    protected string $packageName;
+
     protected function setUp(): void
     {
         if (getenv('TEST_TOKEN')) {
-            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-' . getenv('TEST_TOKEN'));
+            putenv('VIEW_COMPILED_PATH=storage/framework/views/' . $this->packageName . '-phpunit-parallel-' . getenv('TEST_TOKEN'));
         }
 
         parent::setUp();
@@ -85,13 +87,6 @@ abstract class AbstractTestCase extends TestCase
         // Hacky fix for running in parallel causing Blade namespaces to not always be registered
         Blade::componentNamespace('Capell\\Blog\\View\\Components', 'capell-blog');
         Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
-
-        // Isolate compiled views per process
-        $processToken = getenv('TEST_TOKEN') ?: getmypid();
-        $compiledPath = storage_path("framework/views/test-{$processToken}");
-        config(['view.compiled' => $compiledPath]);
-        config(['view.cache' => false]);
-        $this->app['view.finder']->flush();
 
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
@@ -216,16 +211,8 @@ abstract class AbstractTestCase extends TestCase
 
         Config::set('auth.providers.users.model', User::class);
 
-        Config::set('filesystems.disks.page_cache', [
-            'driver' => 'local',
-            'root' => public_path('page-cache'),
-            'throw' => false,
-        ]);
-
         // Spatie Permission testing flag for sqlite compatibility
         Config::set('permission.testing', true);
-
-        Config::set('view.cache', false);
     }
 
     protected function getDefaultPackages(): array

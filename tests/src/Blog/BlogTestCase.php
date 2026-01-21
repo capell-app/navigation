@@ -18,6 +18,8 @@ use Override;
 
 class BlogTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-blog';
+
     #[Override]
     protected function setUp(): void
     {
