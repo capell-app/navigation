@@ -75,8 +75,8 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
             path: realpath(__DIR__ . '/../..'),
             sort: 10,
             description: static::getDescription(),
-            setupCommand: SetupCommand::class,
-            demoCommand: DemoCommand::class,
+            setupCommand: 'capell:hero-setup',
+            demoCommand: 'capell:hero-demo',
             demoParams: ['sites'],
             requirements: [
                 AdminServiceProvider::$packageName,

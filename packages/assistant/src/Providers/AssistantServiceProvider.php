@@ -170,7 +170,7 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
             serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             description: static::getDescription(),
-            installCommand: InstallCommand::class,
+            installCommand: 'capell:assistant-install',
             setting: AssistantSettings::class,
             requirements: [
                 AdminServiceProvider::$packageName,

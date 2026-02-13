@@ -81,8 +81,8 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
             path: realpath(__DIR__ . '/../..'),
             sort: 10,
             description: static::getDescription(),
-            installCommand: InstallCommand::class,
-            demoCommand: DemoCommand::class,
+            installCommand: 'capell:address-install',
+            demoCommand: 'capell:address-demo',
             demoParams: ['sites'],
             requirements: [
                 AdminServiceProvider::$packageName,

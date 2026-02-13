@@ -20,18 +20,8 @@ class DemoCommand extends Command
 {
     use HasSitesOption;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Inserts demo hero content into the selected site(s).';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'capell:hero-demo {--sites=}';
 
     private DemoCreator $demoCreator;

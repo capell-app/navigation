@@ -128,9 +128,9 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             sort: 9,
             description: static::getDescription(),
             permissions: $this->getPackagePermissions(),
-            installCommand: InstallCommand::class,
-            setupCommand: SetupCommand::class,
-            demoCommand: DemoCommand::class,
+            installCommand: 'capell:blog-install',
+            setupCommand: 'capell:blog-setup',
+            demoCommand: 'capell:blog-demo',
             demoParams: ['user', 'sites'],
             requirements: [
                 AdminServiceProvider::$packageName,

@@ -17,23 +17,10 @@ class DemoCommand extends Command
 {
     use HasSitesOption;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Inserts demo address content into the selected site(s).';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'capell:address-demo {--sites=}';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         if ($this->option('sites')) {

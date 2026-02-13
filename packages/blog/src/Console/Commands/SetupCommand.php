@@ -9,18 +9,8 @@ use Illuminate\Console\Command;
 
 class SetupCommand extends Command
 {
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Setup blog package';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'capell:blog-setup';
 
     /**

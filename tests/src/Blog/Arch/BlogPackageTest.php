@@ -6,8 +6,6 @@ use Capell\Admin\Console\Commands\DemoCommand;
 use Capell\Admin\Console\Commands\InstallCommand;
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Core\Support\Creator\DemoCreator;
-use Capell\Frontend\Http\Middleware\ResolveFrontend;
-use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
 arch()
     ->expect('Capell\Blog')
@@ -31,11 +29,7 @@ arch()
     ->laravel()
     ->ignoring('exit');
 
-arch()->preset()->security()
-    ->ignoring([
-        ResolveFrontend::class,
-        HasRelationship::class,
-    ]);
+arch()->preset()->security();
 
 it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])

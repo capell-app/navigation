@@ -27,16 +27,8 @@ class DemoCommand extends Command
 {
     use HasSitesOption;
 
-    /**
-     * The name and signature of the console command.
-     *
-     * Sites can be provided as comma-separated list: --sites=site1,site2
-     */
     protected $signature = 'capell:blog-demo {--sites=} {--user=} {--limit=}';
 
-    /**
-     * The console command description.
-     */
     protected $description = 'Setup demo blog pages, tags and sample articles for selected sites.';
 
     private BlogCreator $blogCreator;

@@ -28,7 +28,6 @@ use Capell\Frontend\Support\Interceptors\Themes\DefaultThemeInterceptor;
 use Capell\Layout\Console\Commands\DemoCommand;
 use Capell\Layout\Console\Commands\InstallCommand;
 use Capell\Layout\Console\Commands\SetupCommand;
-use Capell\Layout\Console\Commands\UpgradeCommand;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
@@ -85,7 +84,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->hasTranslations()
             ->hasCommands([
                 DemoCommand::class,
-                UpgradeCommand::class,
                 InstallCommand::class,
                 SetupCommand::class,
             ]);
@@ -137,7 +135,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerCloneableAndDraftableRelations()
             ->registerThemeViewPath()
             ->registerFilamentAssets()
-            ->registerPublishCommands()
             ->registerLivewireComponents()
             ->registerBladeComponents();
     }
@@ -164,10 +161,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             path: realpath(__DIR__ . '/../..'),
             description: static::getDescription(),
             permissions: $this->getPackagePermissions(),
-            installCommand: InstallCommand::class,
-            setupCommand: SetupCommand::class,
-            demoCommand: DemoCommand::class,
-            upgradeCommand: UpgradeCommand::class,
+            installCommand: 'capell:layout-install',
+            setupCommand: 'capell:layout-setup',
+            demoCommand: 'capell:layout-demo',
             demoParams: ['user', 'sites'],
             requirements: [
                 AdminServiceProvider::$packageName,
@@ -178,11 +174,14 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             tailwindPlugins: ['@tailwindcss/typography'],
             tailwindImports: [
                 'tippy.js/dist/tippy.css',
-                './capell-layout-base.css',
+                'resources/css/capell-layout.css',
             ],
             tailwindSources: [
                 'resources/views/**/*.blade.php',
                 '../../../laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+            ],
+            npmDependencies: [
+                'tippy.js' => '^6.3.7',
             ],
         );
 
@@ -399,15 +398,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                 DeletedModelAction::run($model);
             });
         }
-
-        return $this;
-    }
-
-    private function registerPublishCommands(): self
-    {
-        $this->publishes([
-            $this->package->basePath('/../publishes/build') => public_path('vendor/capell-layout'),
-        ], 'capell-layout-assets');
 
         return $this;
     }

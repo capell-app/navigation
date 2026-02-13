@@ -75,7 +75,7 @@ afterEach(function (): void {
 it('runs install command and does not publish files for capell:publish-migrations', function (): void {
     $theme = Theme::factory()->create();
 
-    $this->artisan('capell-address:install')
+    $this->artisan('capell:address-install')
         ->expectsOutput('Installing Capell Address...')
         ->doesntExpectOutput('Publishing migrations')
         ->doesntExpectOutput('Migrating')

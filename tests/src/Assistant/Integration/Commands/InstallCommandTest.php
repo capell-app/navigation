@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Console\Commands\InstallCommand;
 use Capell\Core\Support\Migration\MigrationFileManagerInterface;
 use Illuminate\Console\Command;
 
@@ -43,7 +42,7 @@ afterEach(function (): void {
 });
 
 it('runs assistant install command successfully', function (): void {
-    $this->artisan(InstallCommand::class)
+    $this->artisan('capell:assistant-install')
         ->expectsOutput('Assistant package installed successfully.')
         ->assertExitCode(Command::SUCCESS);
 

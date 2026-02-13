@@ -24,18 +24,8 @@ class DemoCommand extends Command
 {
     use HasSitesOption;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Inserts demo layout widgets';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'capell:layout-demo {--user} {--sites=}';
 
     protected DemoCreator $demoCreator;

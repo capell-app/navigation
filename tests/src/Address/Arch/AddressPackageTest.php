@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Blog\Console\Commands\InstallCommand;
-use Capell\Frontend\Http\Middleware\ResolveFrontend;
-
 arch()
     ->expect('Capell\\Address')
     ->toOnlyBeUsedIn('Capell\\Address');
@@ -21,18 +18,13 @@ arch()
     ->preset()
     ->laravel();
 
-arch()->preset()->security()
-    ->ignoring([
-        ResolveFrontend::class,
-    ]);
+arch()->preset()->security();
 
 it('does not allow debug functions')
     ->expect(['dd', 'dump', 'print_r', 'die', 'ray', 'rd', 'var_dump'])
     ->toBeUsedInNothing();
 
-arch()->expect(['env', 'sleep', 'usleep'])->toBeUsedInNothing()->ignoring([
-    InstallCommand::class,
-]);
+arch()->expect(['env', 'sleep', 'usleep'])->toBeUsedInNothing();
 
 arch()
     ->expect([
