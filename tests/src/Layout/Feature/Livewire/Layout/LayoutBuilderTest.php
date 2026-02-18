@@ -17,7 +17,7 @@ use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Capell\Layout\Support\Creator\TypeCreator;
 use Capell\Layout\Support\Creator\WidgetCreator;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 use Pest\Expectation;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\Livewire\Page;
 
 use Capell\Blog\Enums\ModelEnum;
-use Capell\Blog\Models\Tag;
+use Capell\Blog\Models\Tag as TagModel;
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Livewire\Page\AbstractPage;
@@ -15,13 +15,13 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Override;
 
-class TagPage extends AbstractPage
+class Tag extends AbstractPage
 {
     public ?string $tagSlug = null;
 
     protected static string $defaultView = 'capell::livewire.page.results';
 
-    protected Tag $tag;
+    protected TagModel $tag;
 
     protected ?string $tagName = null;
 
@@ -45,7 +45,7 @@ class TagPage extends AbstractPage
         $page = Frontend::page();
         $site = Frontend::site();
 
-        /** @var class-string<Tag> $model */
+        /** @var class-string<TagModel> $model */
         $model = CapellCore::getModel(ModelEnum::Tag);
 
         $tag = $model::query()->where('type', 'page')

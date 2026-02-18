@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
 use Capell\Core\Models\Page;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 

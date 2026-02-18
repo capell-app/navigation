@@ -12,7 +12,7 @@ use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 use Illuminate\Support\Facades\Storage;
 use Pest\Expectation;
 

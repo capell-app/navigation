@@ -82,7 +82,6 @@ class InstallPackageAction
                         $theme,
                         $path,
                         [
-                            'resources/css/capell-layout.css',
                             'resources/js/capell-layout.js',
                         ],
                     );

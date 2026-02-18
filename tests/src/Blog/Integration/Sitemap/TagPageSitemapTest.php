@@ -10,7 +10,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 use Illuminate\Support\Collection;
 
 uses(TestingFrontend::class);
@@ -25,7 +25,7 @@ it('builds recursive sitemap for tag results page with parent chain and tag chil
     $tagsPage = $blogCreator->createTagsPage($site, $blogPage, $site->languages, createWidgets: false);
     $tagPage = $blogCreator->createTagPage($site, $tagsPage, $site->languages);
 
-    // Create a parent chain: Home -> Section -> TagsPage -> TagPage
+    // Create a parent chain: Home -> Section -> TagsPage -> Tag
     $home = Page::factory()->for($site)->withTranslations()->create();
     $section = Page::factory()->for($site)->withTranslations()->create();
 
@@ -48,7 +48,7 @@ it('builds recursive sitemap for tag results page with parent chain and tag chil
     $root = $result->first();
     expect($root)->toBeInstanceOf(SitemapPageData::class);
 
-    // Root should be Home, then Section, then TagsPage (children populated), then TagPage not present as separate level (TagPage is content page for tag links)
+    // Root should be Home, then Section, then TagsPage (children populated), then Tag not present as separate level (Tag is content page for tag links)
     expect($root->label)->toBe($home->translation->label);
     expect($root->children)->toBeInstanceOf(Collection::class);
     /** @var SitemapPageData $sectionNode */

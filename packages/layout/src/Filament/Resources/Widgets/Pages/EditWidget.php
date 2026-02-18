@@ -23,7 +23,6 @@ use Howdu\FilamentRecordSwitcher\Filament\Concerns\HasRecordSwitcher;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Rmsramos\Activitylog\Actions\ActivityLogTimelineSimpleAction;
 
 /**
  * @property Widget $record
@@ -117,7 +116,6 @@ class EditWidget extends EditRecord implements PageCacheNotifiable
                     ->redirectAfterCreate(),
                 ReplicateAction::make()
                     ->hidden($this->record->trashed()),
-                ActivityLogTimelineSimpleAction::make(),
             ]),
         ];
     }

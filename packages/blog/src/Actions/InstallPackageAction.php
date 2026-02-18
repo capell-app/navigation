@@ -29,6 +29,7 @@ class InstallPackageAction
 
         // Widgets
         $blogCreator->createArticleWidget($blogCreator->createArticleWidgetType());
+
         $latestArticlesWidget = $blogCreator->createLatestArticlesWidget();
         $archivesWidget = $blogCreator->createArchivesWidget();
 

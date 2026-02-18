@@ -7,7 +7,7 @@ use Capell\Blog\Filament\Resources\Articles\ArticleResource;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 

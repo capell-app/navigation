@@ -34,16 +34,16 @@ class ArticlesSitemap extends AbstractSitemapPages
 
         // Collect Article-group children recursively
         $children = $page->children
-            ->filter(function (Page $child): bool {
+            ->filter(
                 // Only include pages in the Article group
-                return ($child->type_group ?? null) === BlogTypeGroupEnum::Article->value;
-            })
+                fn (Page $child): bool => ($child->type_group ?? null) === BlogTypeGroupEnum::Article->value,
+            )
             ->map(fn (Page $child): array => $this->formatRecursive($child)->toArray())
             ->values()
             ->all();
 
         // Attach children on the data object
-        $data->children = collect(array_map(static fn (array $item) => SitemapPageData::from($item), $children));
+        $data->children = collect(array_map(SitemapPageData::from(...), $children));
 
         return $data;
     }

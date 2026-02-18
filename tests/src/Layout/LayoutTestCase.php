@@ -10,25 +10,21 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
-use Override;
 
 class LayoutTestCase extends AbstractTestCase
 {
     protected string $packageServiceName = 'capell-layout';
 
-    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->registerAndMigrateSettings(
             CapellCore::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/core/database/settings',
         );
-
         $this->registerAndMigrateSettings(
             CapellAdmin::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
@@ -51,7 +47,9 @@ class LayoutTestCase extends AbstractTestCase
         ];
     }
 
-    #[Override]
+    /**
+     * @param  Application  $app
+     */
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);

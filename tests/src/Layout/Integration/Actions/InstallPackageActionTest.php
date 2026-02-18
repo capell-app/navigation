@@ -80,7 +80,7 @@ it('installs layout package: creates types, widgets, layouts, and registers morp
         'siblings',
     ];
 
-    $widgetKeys = \Capell\Layout\Models\Widget::query()->pluck('key')->all();
+    $widgetKeys = Widget::query()->pluck('key')->all();
 
     foreach ($expectedWidgetKeys as $key) {
         expect($widgetKeys)->toContain($key);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Blog\Filament\Resources\Tags\TagResource;
 use Capell\Core\Models\Language;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 

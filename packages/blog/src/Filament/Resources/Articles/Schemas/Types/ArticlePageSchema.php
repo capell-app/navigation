@@ -36,7 +36,7 @@ class ArticlePageSchema extends DefaultPageSchema
             /** @var class-string<Site> $model */
             $model = CapellCore::getModel(ModelEnum::Site);
 
-            $site = $model::find($schema->getRawState()['site_id']);
+            $site = $model::query()->find($schema->getRawState()['site_id']);
 
             $blogPage = $site ? BlogLoader::getBlogPage($site) : null;
 

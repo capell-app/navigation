@@ -1,0 +1,43 @@
+name: Coverage Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  pest-coverage-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [8.4]
+        laravel: [11.*]
+        db: [sqlite]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, dom, fileinfo, intl, json, libxml, mbstring, simplexml, zip, pcov
+          tools: composer:v2
+          coverage: pcov
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --ansi --optimize-autoloader
+
+      - name: Configure environment
+        run: |
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=:memory:" >> .env
+
+      - name: Run Pest Coverage (Clover via pipelines config)
+        run: php -d memory_limit=-1 -d pcov.enabled=1 -d pcov.directory=packages vendor/bin/pest --coverage --coverage-clover=coverage/clover.xml --colors=always --configuration=phpunit-pipelines.xml
+
+      - name: Upload Clover XML for codecov
+        uses: actions/upload-artifact@v6
+        with:
+          name: pest-coverage-clover
+          path: coverage/clover.xml

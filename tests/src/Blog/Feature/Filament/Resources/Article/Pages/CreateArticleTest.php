@@ -13,7 +13,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Support\Str;
 
 use function Pest\Laravel\assertDatabaseHas;

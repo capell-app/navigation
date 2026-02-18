@@ -26,7 +26,7 @@ describe('capell:address-demo command', function (): void {
             ->expectsOutputToContain('Demo address content has been successfully created for site: ' . $site->name)
             ->assertExitCode(0);
 
-        $country = Country::firstWhere('iso2', 'US');
+        $country = Country::query()->firstWhere('iso2', 'US');
 
         $address = Address::findAddress(
             line1: '123 Main St',

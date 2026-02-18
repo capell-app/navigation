@@ -18,6 +18,7 @@ use Capell\Core\Models\PageTranslation;
 use Capell\Core\Providers\CapellServiceProvider;
 use Capell\Tests\Fixtures\Models\User;
 use Capell\Tests\Fixtures\Policies\RolePolicy;
+use CmsMulti\FilamentClearCache\FilamentClearCacheServiceProvider;
 use CodeWithDennis\FilamentSelectTree\FilamentSelectTreeServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
@@ -48,12 +49,12 @@ use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
-use Rmsramos\Activitylog\ActivitylogServiceProvider;
 use RuntimeException;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
 use Sinnbeck\DomAssertions\DomAssertionsServiceProvider;
+use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
@@ -78,7 +79,7 @@ abstract class AbstractTestCase extends TestCase
     protected function setUp(): void
     {
         if (getenv('TEST_TOKEN')) {
-            putenv('VIEW_COMPILED_PATH=storage/framework/views/' . $this->packageName . '-phpunit-parallel-' . getenv('TEST_TOKEN'));
+            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-' . getenv('TEST_TOKEN'));
         }
 
         parent::setUp();
@@ -167,9 +168,9 @@ abstract class AbstractTestCase extends TestCase
             FilamentAdjacencyListServiceProvider::class,
             FilamentShieldServiceProvider::class,
             FilamentSelectTreeServiceProvider::class,
-            ActivitylogServiceProvider::class,
+            FilamentClearCacheServiceProvider::class,
             FormsServiceProvider::class,
-            \Spatie\Activitylog\ActivitylogServiceProvider::class,
+            ActivitylogServiceProvider::class,
             LaravelDataServiceProvider::class,
             NestedSetServiceProvider::class,
             LaravelServiceProvider::class,

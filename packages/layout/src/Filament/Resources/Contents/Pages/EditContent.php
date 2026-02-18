@@ -26,7 +26,6 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Override;
-use Rmsramos\Activitylog\Actions\ActivityLogTimelineSimpleAction;
 
 /**
  * @property Content $record
@@ -94,7 +93,6 @@ class EditContent extends EditRecord
                 ReplicateAction::make()
                     ->replicaModelAction(ReplicateContentAction::class)
                     ->hidden($this->record->trashed()),
-                ActivityLogTimelineSimpleAction::make(),
             ]),
         ];
     }

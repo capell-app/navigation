@@ -6,7 +6,7 @@ use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\Creator\LayoutCreator;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
 

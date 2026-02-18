@@ -6,7 +6,7 @@ use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Type;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Models\Widget;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 

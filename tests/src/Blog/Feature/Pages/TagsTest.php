@@ -9,7 +9,7 @@ use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
 

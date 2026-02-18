@@ -9,7 +9,7 @@ use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Illuminate\Database\Eloquent\Builder;
 
-class BlogPage extends AbstractPage
+class Blog extends AbstractPage
 {
     protected static string $defaultView = 'capell::livewire.page.results';
 

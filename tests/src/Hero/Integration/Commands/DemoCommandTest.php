@@ -6,7 +6,6 @@ use Capell\Blog\Providers\BlogServiceProvider;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Capell\Layout\Models\Widget;
@@ -15,6 +14,7 @@ use Illuminate\Console\Command;
 it('adds hero meta to blog and article pages when blog package is installed', function (): void {
     $mock = AddHeroToLayoutAction::mock();
     $mock->shouldReceive('handle');
+
     app()->instance(AddHeroToLayoutAction::class, $mock);
 
     // Simulate blog package installed
@@ -38,5 +38,5 @@ it('adds hero meta to blog and article pages when blog package is installed', fu
         ->expectsOutput('Hero demo content inserted successfully.')
         ->assertExitCode(Command::SUCCESS);
 
-    expect(Widget::firstWhere('key', 'hero'))->not()->toBeNull();
+    expect(Widget::query()->firstWhere('key', 'hero'))->not()->toBeNull();
 });

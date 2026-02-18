@@ -11,89 +11,54 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.ACCESS_TOKEN }}"} }'
     strategy:
       fail-fast: true
       matrix:
         php: [8.4]
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+      - name: Cache Dependencies PHP
+        id: php-cache
+        uses: actions/cache@v5
         with:
-          ref: ${{ github.head_ref }}
-
+          path: vendor
+          key: dependencies-php-composer-${{ hashFiles('composer.lock') }}
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
           extensions: curl, dom, fileinfo, intl, json, libxml, mbstring, simplexml, zip
           tools: composer:v2, pint
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
-
-      - name: Run Laravel Pint (PSR-12)
+      - name: Install dependencies
+        if: steps.php-cache.outputs.cache-hit != 'true'
+        run: composer install --no-interaction --no-progress --ansi --optimize-autoloader
+      - name: Run Pint (Code Style)
         run: composer lint
-
       - name: Run PHPStan (Static Analysis)
         run: composer analyze
-
       - name: Run Rector (Code Refactoring)
         run: composer rector
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Fix styling [CI]
 
   prettier:
     name: Prettier Code Styling
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.ACCESS_TOKEN }}"} }'
-    strategy:
-      fail-fast: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '18.18.0'
-
       - name: Configure npm caching
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
             ${{ runner.os }}-
-
       - name: Install dependencies
         run: npm install
-
       - name: Prettify code
         run: npx prettier --write 'packages/**/*.{css,js,yml,blade.php}' '!packages/**/node_modules/**'
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: Prettier code styling fixes 🎨

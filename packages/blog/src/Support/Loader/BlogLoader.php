@@ -8,7 +8,6 @@ use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\CacheEnum;
 use Capell\Blog\Support\PageArchiveService;
-use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
@@ -30,7 +29,7 @@ class BlogLoader
             $fromCache = false;
 
             /** @var class-string<Page> $model */
-            $model = CapellCore::getModel(ModelEnum::Page);
+            $model = CapellCore::getModel(CoreModelEnum::Page);
 
             return $model::getFirstPageByTypeForSite(BlogPageTypeEnum::Archive->value, site: $site, language: $language);
         }) ?: null;

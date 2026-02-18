@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
-class ArchivePage extends AbstractPage
+class Archive extends AbstractPage
 {
     public ?int $month = null;
 

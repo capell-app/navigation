@@ -26,13 +26,16 @@ class ContentObserver
             throw_unless($content->type_id, InvalidArgumentException::class, 'Unable to create content without a type.');
         }
 
-        // Initialize drafts/nested-set defaults
         $this->initializeNewModel($content);
     }
 
     public function saving(Content $content): void
     {
         $this->beforeSaving($content);
+
+        if ($content->publish_from?->isNowOrFuture()) {
+            $content->is_published = true;
+        }
     }
 
     public function deleting(Content $content): void

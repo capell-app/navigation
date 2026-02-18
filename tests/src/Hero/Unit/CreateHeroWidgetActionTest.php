@@ -33,7 +33,7 @@ describe('CreateHeroWidgetAction', function (): void {
     it('creates type with correct attributes', function (): void {
         // Act
         $widget = CreateHeroWidgetAction::run();
-        $type = Type::find($widget->type_id);
+        $type = Type::query()->find($widget->type_id);
 
         // Assert
         expect($type)

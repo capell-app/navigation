@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
 use Capell\Layout\Models\Content;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 

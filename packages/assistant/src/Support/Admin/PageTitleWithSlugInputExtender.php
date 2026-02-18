@@ -29,7 +29,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 
 class PageTitleWithSlugInputExtender
 {
-    private SuggestPageTitlesAction $suggestPageTitlesAction;
+    private readonly SuggestPageTitlesAction $suggestPageTitlesAction;
 
     private string $titleSuggestionsActionName = 'generate';
 

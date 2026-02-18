@@ -8,6 +8,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
+use Capell\Layout\Models\Widget;
 
 it('installs blog package: creates widgets, layouts, updates containers, and seeds site content', function (): void {
     $site = Site::factory()->create();
@@ -51,7 +52,7 @@ it('installs blog package: creates widgets, layouts, updates containers, and see
     $widgetKeys = ['article', 'latest-articles', 'archives', 'tags', 'related-pages'];
 
     foreach ($widgetKeys as $key) {
-        expect(\Capell\Layout\Models\Widget::query()->where('key', $key)->exists())
+        expect(Widget::query()->where('key', $key)->exists())
             ->toBeTrue();
     }
 

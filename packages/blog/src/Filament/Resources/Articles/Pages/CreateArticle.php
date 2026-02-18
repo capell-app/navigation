@@ -31,6 +31,6 @@ class CreateArticle extends CreatePage
         /** @var class-string<Type> $model */
         $model = CapellCore::getModel(ModelEnum::Type);
 
-        $this->data['type_id'] = $model::pageType()->where('key', 'article')->value('id');
+        $this->data['type_id'] = $model::query()->pageType()->where('key', 'article')->value('id');
     }
 }

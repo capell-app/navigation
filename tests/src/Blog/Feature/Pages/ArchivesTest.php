@@ -8,7 +8,7 @@ use Capell\Blog\Models\Article;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\SiteDomain;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 
 use function Pest\Laravel\get;
 
@@ -28,6 +28,8 @@ test('archives page list articles archives by month/year', function (): void {
     $archivePage = $blogCreator->createArchivePage($archivesPage);
     $articleType = $blogCreator->createArticlePageType();
     $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $tagsPage = $blogCreator->createTagsPage($site, $blogPage, $site->languages);
+    $blogCreator->createTagPage($site, $tagsPage, $site->languages);
 
     $articles = Article::factory()
         ->count(3)

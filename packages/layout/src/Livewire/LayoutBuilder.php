@@ -1379,7 +1379,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     /** @var class-string<Layout> $model */
                     $model = CapellCore::getModel(CoreModelEnum::Layout);
 
-                    return $model::default()->first(['id'])?->id;
+                    return $model::query()->default()->first(['id'])?->id;
                 })
                 ->reactive()
                 ->helperText(

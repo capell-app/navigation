@@ -7,13 +7,12 @@ on:
 jobs:
   split-monorepo:
     runs-on: ubuntu-latest
-    env:
-      COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.ACCESS_TOKEN }}"} }'
     strategy:
       fail-fast: false
       matrix:
         package:
           - address
+          - assistant
           - blog
           - hero
           - layout
@@ -22,7 +21,7 @@ jobs:
       - id: previous-tag
         uses: 'WyriHaximus/github-action-get-previous-tag@master'
       - name: Monorepo Split of ${{ matrix.package }}
-        uses: danharrin/monorepo-split-github-action@v2.4.0
+        uses: danharrin/monorepo-split-github-action@v2.4.2
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         with:

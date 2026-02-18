@@ -20,8 +20,10 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class DemoCommand extends Command
 {
@@ -35,6 +37,9 @@ class DemoCommand extends Command
 
     private DemoCreator $demoCreator;
 
+    // Add progress bar support mirroring layout demo
+    private ?ProgressBar $progress = null;
+
     /**
      * Execute the console command.
      */
@@ -42,7 +47,7 @@ class DemoCommand extends Command
     {
         $siteNames = $this->parseSitesOption();
 
-        if (empty($siteNames)) {
+        if ($siteNames === []) {
             $this->error('No sites selected or provided.');
 
             return self::FAILURE;
@@ -83,7 +88,7 @@ class DemoCommand extends Command
 
         if ($sitesOption) {
             return is_string($sitesOption)
-                ? array_filter(array_map('trim', explode(',', $sitesOption)))
+                ? array_filter(array_map(trim(...), explode(',', $sitesOption)))
                 : (is_array($sitesOption) ? $sitesOption : []);
         }
 
@@ -115,7 +120,7 @@ class DemoCommand extends Command
         $userOption = $this->option('user');
 
         if ($userOption) {
-            /** @var class-string<\Illuminate\Foundation\Auth\User> $model */
+            /** @var class-string<User> $model */
             $model = CapellCore::getModel('User');
 
             return $model::query()->find($userOption);
@@ -158,32 +163,60 @@ class DemoCommand extends Command
         $this->newLine();
 
         $this->demoCreator = new DemoCreator(author: $user);
-
         $this->blogCreator = resolve(BlogCreator::class);
 
-        $this->line('Ensuring required blog and ancillary pages exist...');
-        CreateBlogPagesAction::run($site);
-        $this->newLine();
+        // Prepare total progress steps: pages to create + pages to tag + pages to associate
+        $pagesTree = (array) (config('capell-demo.pages', []));
+        $totalPagesAvailable = 0;
+        foreach ($pagesTree as $node) {
+            $totalPagesAvailable += $this->countContentNodes($node);
+        }
 
-        $this->line('Creating demo pages...');
+        $pagesToCreate = $limit !== null ? min($totalPagesAvailable, $limit) : $totalPagesAvailable;
+
+        /** @var class-string<Page> $pageModel */
+        $pageModel = CapellCore::getModel(CoreModelEnum::Page);
+        $pagesForTagsCount = $pageModel::query()
+            ->where('site_id', $site->id)
+            ->whereHas('children')
+            ->whereRelation('type', 'key', 'article')
+            ->limit(50)
+            ->count();
+
+        $pagesForAssociationCount = $pageModel::query()
+            ->where('site_id', $site->id)
+            ->notHomePage()
+            ->whereHas('type', fn (BuilderContract $query): BuilderContract => $query->whereIn('key', ['default', 'article']))
+            ->limit(50)
+            ->count();
+
+        $totalSteps = $pagesToCreate + $pagesForTagsCount + $pagesForAssociationCount + 1; // +1 for CreateBlogPagesAction
+        $this->startProgress($totalSteps);
+
+        $this->setProgressMessage('Ensuring required blog and ancillary pages exist');
+        CreateBlogPagesAction::run($site);
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating demo pages');
         $created = $this->createDemoArticlesWithLimit($site, $user, $limit);
 
         if ($created) {
-            $this->info('Demo pages created.');
+            $this->setProgressMessage('Demo pages created');
         } else {
-            $this->warn('Demo pages not created.');
+            $this->setProgressMessage('Demo pages not created');
         }
 
-        $this->newLine();
-
-        $this->line('Creating tags for site pages...');
+        // Tag creation
+        $this->setProgressMessage('Creating tags for site pages');
         $this->createTags($site, $site->languages);
-        $this->info('Tags created/updated.');
-        $this->newLine();
+        $this->setProgressMessage('Tags created/updated');
 
-        $this->line('Associating tags with pages...');
+        // Tag association
+        $this->setProgressMessage('Associating tags with pages');
         $this->associatePageTags($site);
-        $this->info('Tags associated with pages.');
+        $this->setProgressMessage('Tags associated with pages');
+
+        $this->finishProgress();
         $this->newLine();
     }
 
@@ -204,7 +237,7 @@ class DemoCommand extends Command
             return false;
         }
 
-        $demo = config('capell-demo.pages');
+        $demo = (array) (config('capell-demo.pages', []));
         $createdCount = 0;
 
         $type = $this->blogCreator->createArticlePageType();
@@ -228,8 +261,6 @@ class DemoCommand extends Command
             );
         }
 
-        $this->info(sprintf('%d demo articles created for site: %s', $createdCount, $site->name));
-
         return true;
     }
 
@@ -242,8 +273,8 @@ class DemoCommand extends Command
         Site $site,
         Collection $languages,
         Language $defaultLanguage,
-        $parent,
-        $parentName,
+        Page|bool $parent,
+        string $parentName,
         Type $type,
         $author,
         ?int $limit,
@@ -259,7 +290,7 @@ class DemoCommand extends Command
             ? $name
             : sprintf('%s » %s', $parentName, $name);
 
-        $this->line('Creating page: ' . $full_name);
+        $this->setProgressMessage('Creating page: ' . $full_name);
 
         $variations = [
             'The Ultimate Guide to',
@@ -277,15 +308,13 @@ class DemoCommand extends Command
 
         $page = $this->demoCreator->createPage($data, $site, $languages, $parent, $type);
 
-        $this->line(sprintf('Created page: %s (ID: ', $full_name) . ($page?->id ?? 'n/a') . ')');
+        $this->advanceProgress();
 
         $created = 1;
 
         if (! isset($data['children']) || ($limit !== null && $createdSoFar + $created >= $limit)) {
             return $created;
         }
-
-        $this->line('Recursing into children of: ' . $full_name);
 
         foreach ($data['children'] as $child) {
             if ($limit !== null && $createdSoFar + $created >= $limit) {
@@ -321,7 +350,9 @@ class DemoCommand extends Command
             ->with(['translations'])
             ->limit(50)
             ->get();
+
         $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
+
         $pages->each(function (Page $page) use ($tagModel, $languages): void {
             $tag_names = [];
             $tag_slugs = [];
@@ -350,6 +381,9 @@ class DemoCommand extends Command
                     'slug' => $tag_slugs,
                 ]);
             }
+
+            // Advance progress per processed page
+            $this->advanceProgress();
         });
     }
 
@@ -386,6 +420,55 @@ class DemoCommand extends Command
                     $childPage->tags()->syncWithoutDetaching($tag);
                 });
             }
+
+            // Advance progress per processed page
+            $this->advanceProgress();
         }
+    }
+
+    // Progress bar helpers mirroring layout demo
+    private function startProgress(int $max): void
+    {
+        $this->progress = $this->output->createProgressBar($max);
+        $this->progress->setFormat(' [%bar%] %percent:3s%% | %message%');
+        $this->progress->setMessage('');
+        $this->progress->start();
+    }
+
+    private function setProgressMessage(string $message): void
+    {
+        if ($this->progress instanceof ProgressBar) {
+            $this->progress->setMessage($message);
+        }
+    }
+
+    private function advanceProgress(int $step = 1): void
+    {
+        if ($this->progress instanceof ProgressBar) {
+            $this->progress->advance($step);
+        }
+    }
+
+    private function finishProgress(): void
+    {
+        if ($this->progress instanceof ProgressBar) {
+            $this->progress->finish();
+            $this->newLine();
+        }
+
+        $this->progress = null;
+    }
+
+    // Count total demo content nodes (pages) recursively
+    private function countContentNodes(array $data): int
+    {
+        $count = 1;
+        if (isset($data['children']) && is_array($data['children'])) {
+            foreach ($data['children'] as $child) {
+                $count += $this->countContentNodes($child);
+            }
+        }
+
+        return $count;
     }
 }

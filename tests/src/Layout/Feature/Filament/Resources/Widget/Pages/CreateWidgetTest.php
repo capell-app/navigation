@@ -10,7 +10,7 @@ use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Support\Creator\TypeCreator;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 
 use function Pest\Laravel\assertDatabaseHas;

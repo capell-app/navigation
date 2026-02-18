@@ -11,7 +11,7 @@ use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Hero\Providers\HeroServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
@@ -20,16 +20,13 @@ class HeroTestCase extends AbstractTestCase
 {
     protected string $packageServiceName = 'capell-hero';
 
-    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->registerAndMigrateSettings(
             CapellCore::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/core/database/settings',
         );
-
         $this->registerAndMigrateSettings(
             CapellAdmin::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
@@ -53,6 +50,9 @@ class HeroTestCase extends AbstractTestCase
         ];
     }
 
+    /**
+     * @param  Application  $app
+     */
     #[Override]
     protected function getEnvironmentSetUp($app): void
     {

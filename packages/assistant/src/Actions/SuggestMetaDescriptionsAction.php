@@ -48,13 +48,13 @@ class SuggestMetaDescriptionsAction
             Event::dispatch(new AiGenerationCompleted(static::class, $result, []));
 
             return $result;
-        } catch (Throwable $e) {
+        } catch (Throwable $throwable) {
             Log::error('AI Action failed', [
                 'action' => static::class,
-                'error' => $e->getMessage(),
+                'error' => $throwable->getMessage(),
             ]);
-            Event::dispatch(new AiGenerationFailed(static::class, $e));
-            throw $e;
+            Event::dispatch(new AiGenerationFailed(static::class, $throwable));
+            throw $throwable;
         }
     }
 }

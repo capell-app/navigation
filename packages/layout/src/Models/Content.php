@@ -46,7 +46,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 use Kalnoy\Nestedset\NodeTrait;
-use Kalnoy\Nestedset\QueryBuilder;
+use Kalnoy\Nestedset\QueryBuilder as NestedQueryBuilder;
 use Oddvalue\LaravelDrafts\Concerns\HasDrafts;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -189,6 +189,8 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
         NodeTrait::bootNodeTrait as protected;
         NodeTrait::parent as nodeTraitParent;
         NodeTrait::applyNestedSetScope as applyNestedSetScopeParent;
+        NodeTrait::newScopedQuery as nodeTraitNewScopedQuery;
+        NodeTrait::setParentIdAttribute as nodeTraitSetParentIdAttribute;
     }
     use SoftDeletes;
 
@@ -387,7 +389,7 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
     /**
      * Public bridge to NodeTrait's protected restoreDescendants.
      */
-    public function nodeRestoreDescendants(mixed $deletedAt): void
+    public function restoreDescendants(mixed $deletedAt): void
     {
         $this->restoreDescendants($deletedAt);
     }
@@ -398,6 +400,28 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
     public function nodeGetDeletedAtValue(): mixed
     {
         return $this->getAttribute($this->getDeletedAtColumn());
+    }
+
+    protected static function bootNodeTrait(): void
+    {
+        // Handled in observer
+    }
+
+    protected static function bootHasDrafts(): void
+    {
+        // Handled in observer
+    }
+
+    /**
+     * Ensure nested set operations include drafts when resolving parents/ancestors.
+     */
+    protected function newScopedQuery(): NestedQueryBuilder
+    {
+        /** @var NestedQueryBuilder $query */
+        $query = $this->nodeTraitNewScopedQuery();
+
+        /** @phpstan-ignore-next-line provided by Oddvalue\LaravelDrafts */
+        return $query->withDrafts();
     }
 
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void

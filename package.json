@@ -1,7 +1,7 @@
 {
     "name": "capell-packages-app",
     "scripts": {
-        "prettier": "./scripts/prettier-js.sh",
+        "prettier": "npx prettier --write 'packages/**/*.{css,js,yml,json,md,blade.php}'",
         "eslint": "npx eslint 'packages/*/resources/js/**/*.js' --max-warnings=0"
     },
     "devDependencies": {

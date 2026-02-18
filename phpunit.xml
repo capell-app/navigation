@@ -2,10 +2,11 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     backupGlobals="false"
+    backupStaticProperties="false"
+    beStrictAboutOutputDuringTests="false"
     beStrictAboutTestsThatDoNotTestAnything="true"
-    beStrictAboutOutputDuringTests="true"
     bootstrap="vendor/autoload.php"
-    cacheResult="false"
+    cacheResult="true"
     colors="true"
     failOnRisky="true"
     failOnWarning="true"
@@ -13,13 +14,6 @@
     stopOnError="false"
     stopOnFailure="false"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-    backupStaticProperties="false"
-    displayDetailsOnIncompleteTests="true"
-    displayDetailsOnSkippedTests="true"
-    displayDetailsOnTestsThatTriggerDeprecations="true"
-    displayDetailsOnTestsThatTriggerErrors="true"
-    displayDetailsOnTestsThatTriggerNotices="true"
-    displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <testsuites>
         <testsuite name="Architecture">
@@ -41,7 +35,7 @@
         </include>
     </source>
     <php>
-        <ini name="memory_limit" value="-1"/>
+        <ini name="memory_limit" value="1024M"/>
         <server name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="12345678901234567890123456789012"/>
         <env name="BCRYPT_ROUNDS" value="12"/>
@@ -54,13 +48,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="SETTINGS_CACHE_ENABLED" value="true"/>
-        <env name="CAPELL_FRONTEND_DEBUG" value="true"/>
-        <env name="CAPELL_FRONTEND_DEBUG_LOGGING" value="true"/>
-        <env name="FRONTEND_MINIFY_HTML" value="false"/>
         <env name="FRONTEND_HTML_CACHE" value="false"/>
+        <env name="SETTINGS_CACHE_ENABLED" value="true"/>
     </php>
-    <logging>
-        <junit outputFile="build/report.junit.xml"/>
-    </logging>
 </phpunit>

@@ -1,12 +1,11 @@
 includes:
-    - ./vendor/larastan/larastan/extension.neon
-    - ./vendor/nesbot/carbon/extension.neon
-    - ./vendor/pestphp/pest/extension.neon
+    - ./phpstan-ignore-errors.neon
 
 parameters:
     level: 1
     paths:
         - packages
+        - tests
     checkAuthCallsWhenInRequestScope: true
     checkConfigTypes: true
     checkExplicitMixedMissingReturn: true
@@ -16,7 +15,14 @@ parameters:
     checkModelProperties: true
     checkOctaneCompatibility: true
     checkUnusedViews: true
+    enableMigrationCache: true
+    generalizeEnvReturnType: true
     noUnnecessaryEnumerableToArrayCalls: true
+    parseModelCastsMethod: true
+    strictRules:
+        # TODO remove when https://github.com/phpstan/phpstan-strict-rules/issues/140 is resolved
+        # See also: https://github.com/larastan/larastan/issues/1272
+        dynamicCallOnStaticMethod: false
     databaseMigrationsPath:
         - packages/address/database/migrations
         - packages/blog/database/migrations
@@ -35,5 +41,3 @@ parameters:
         - packages/hero/resources/views
         - packages/layout/resources/views
     tmpDir: /tmp/phpstan
-    stubFiles:
-        - packages/layout/phpstan/blueprint-macros.stub

@@ -18,6 +18,7 @@ use Capell\Layout\Support\Creator\TypeCreator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\User;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class DemoCommand extends Command
@@ -45,7 +46,7 @@ class DemoCommand extends Command
         $sites = $model::query()->with(['languages'])->whereIn('name', $siteOptions)->get();
 
         if ($sites->isEmpty()) {
-            $this->error('Unable to find any sites for: ' . implode(', ', (array) $siteOptions));
+            $this->error('Unable to find any sites for: ' . implode(', ', $siteOptions));
 
             return Command::FAILURE;
         }
@@ -58,8 +59,9 @@ class DemoCommand extends Command
         $typeCreator->createDefaultContentType();
         $typeCreator->createBuilderContentType();
 
-        foreach ($sites as $site) {
-            $this->setProgressMessage('Setting up content');
+        $sites->each(function (Site $site) use ($data): void {
+            $this->newLine();
+            $this->comment('Creating demo content for site: ' . $site->name);
 
             /** @var ContentCreator $contentCreator */
             $contentCreator = resolve(ContentCreator::class);
@@ -69,12 +71,11 @@ class DemoCommand extends Command
             $this->createSiteContents($contentCreator, $data[0], $site);
             $this->finishProgress();
 
-            if (! $this->createDemoLayouts($site)) {
-                $this->error('Failed to create demo pages for the selected site.');
+            $this->newLine();
+            $this->comment('Creating demo layouts');
 
-                return Command::FAILURE;
-            }
-        }
+            $this->createDemoLayouts($site);
+        });
 
         $this->newLine();
         $this->info('Demo layouts have been successfully created.');
@@ -113,7 +114,7 @@ class DemoCommand extends Command
 
         $containers = $layout->containers ?? [];
 
-        $this->populateMainContainer($containers, $page, $languages);
+        $this->populateMainContainer($containers, $page);
         $this->populateFaqContainers($containers, $languages, $page);
         $this->populateSecondaryContainer($containers, $languages, $page);
         $this->populateSplitTwoContainer($containers, $languages);
@@ -129,10 +130,11 @@ class DemoCommand extends Command
         if ($this->option('sites')) {
             $sitesOption = $this->option('sites');
             if (is_string($sitesOption)) {
-                return array_values(array_filter(array_map('trim', explode(',', $sitesOption)), fn ($v) => $v !== ''));
+                return array_values(array_filter(array_map(trim(...), explode(',', $sitesOption)), fn ($v): bool => $v !== ''));
             }
+
             if (is_array($sitesOption)) {
-                return array_values(array_filter(array_map('trim', $sitesOption), fn ($v) => $v !== ''));
+                return array_values(array_filter(array_map(trim(...), $sitesOption), fn ($v): bool => $v !== ''));
             }
 
             return [];
@@ -144,7 +146,7 @@ class DemoCommand extends Command
     private function resolveUser(): ?object
     {
         if ($this->option('user')) {
-            /** @var class-string<\Illuminate\Foundation\Auth\User> $model */
+            /** @var class-string<User> $model */
             $model = CapellCore::getModel('User');
 
             return $model::query()->first();
@@ -157,7 +159,7 @@ class DemoCommand extends Command
         return null;
     }
 
-    private function populateMainContainer(array &$containers, Page $page, Collection $languages): void
+    private function populateMainContainer(array &$containers, Page $page): void
     {
         $this->setProgressMessage('Creating page cards widget');
         $pageCardsWidget = $this->demoCreator->createPageCardsWidget($page);
@@ -296,12 +298,15 @@ class DemoCommand extends Command
         if ($layout->getMedia('split-two-background')->isEmpty()) {
             resolve(\Capell\Core\Support\Creator\DemoCreator::class)->createMedia($layout, collection: 'split-two-background');
         }
+
         $this->advanceProgress();
     }
 
     private function createSiteContents(ContentCreator $contentCreator, array $data, Site $site, ?Collection $languages = null, ?Content $parent = null): void
     {
         if ($site->contents()->count() > 28) {
+            $this->setProgressMessage('Content limit reached.');
+
             return;
         }
 
@@ -387,6 +392,7 @@ class DemoCommand extends Command
             $this->progress->finish();
             $this->newLine();
         }
+
         $this->progress = null;
     }
 }

@@ -22,7 +22,7 @@ class RecordAiGenerationAction
     /**
      * Accepts a plain array payload and records a history entry. Falls back to context/options if not array.
      *
-     * @param  array|Capell\Assistant\Contracts\AiActionContextInterface  $input
+     * @param  array|AiActionContextInterface  $input
      */
     public function handle($input, array $options = []): AIGenerationHistory
     {
@@ -44,9 +44,7 @@ class RecordAiGenerationAction
                 return $history;
             }
 
-            if (! $input instanceof AiActionContextInterface) {
-                throw new InvalidArgumentException('Invalid input for RecordAiGenerationAction');
-            }
+            throw_unless($input instanceof AiActionContextInterface, InvalidArgumentException::class, 'Invalid input for RecordAiGenerationAction');
 
             // Fallback: create with minimal/default data
             $history = AIGenerationHistory::query()->create([]);
@@ -58,13 +56,13 @@ class RecordAiGenerationAction
             Event::dispatch(new AiGenerationCompleted(static::class, $history, []));
 
             return $history;
-        } catch (Throwable $e) {
+        } catch (Throwable $throwable) {
             Log::error('AI Action failed', [
                 'action' => static::class,
-                'error' => $e->getMessage(),
+                'error' => $throwable->getMessage(),
             ]);
-            Event::dispatch(new AiGenerationFailed(static::class, $e));
-            throw $e;
+            Event::dispatch(new AiGenerationFailed(static::class, $throwable));
+            throw $throwable;
         }
     }
 }

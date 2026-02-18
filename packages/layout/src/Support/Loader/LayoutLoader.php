@@ -93,7 +93,8 @@ class LayoutLoader
         ];
         foreach ($layoutWidgets as $widget) {
             $component = $widget->getComponent();
-            $componentClass = GetComponentClassAction::run($component);
+            $livewire = $widget->type->meta['livewire'] ?? false;
+            $componentClass = GetComponentClassAction::run($component, $livewire);
             if (method_exists($componentClass, 'loadWidgetAssets')) {
                 $componentClass::loadWidgetAssets($with, $language);
             }

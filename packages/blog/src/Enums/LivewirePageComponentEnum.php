@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Enums;
 
-use Capell\Blog\Livewire\Page\ArchivePage;
-use Capell\Blog\Livewire\Page\BlogPage;
-use Capell\Blog\Livewire\Page\TagPage;
+use Capell\Blog\Livewire\Page\Archive;
+use Capell\Blog\Livewire\Page\Blog;
+use Capell\Blog\Livewire\Page\Tag;
 use Capell\Core\Enums\Attribute\Component;
 use Capell\Core\Enums\Attribute\EnumAttributeHelper;
 use Capell\Core\Enums\Attribute\EnumAttributeInterface;
 
-enum PageComponentEnum: string implements EnumAttributeInterface
+enum LivewirePageComponentEnum: string implements EnumAttributeInterface
 {
     use EnumAttributeHelper;
 
-    #[Component(ArchivePage::class)]
-    case ArchivePage = 'capell-blog::livewire.page.archive';
+    #[Component(Archive::class)]
+    case ArchivePage = 'capell-blog::page.archive';
 
-    #[Component(BlogPage::class)]
-    case BlogPage = 'capell-blog::livewire.page.blog';
+    #[Component(Blog::class)]
+    case BlogPage = 'capell-blog::page.blog';
 
-    #[Component(TagPage::class)]
-    case TagPage = 'capell-blog::livewire.page.tag';
+    #[Component(Tag::class)]
+    case TagPage = 'capell-blog::page.tag';
 
     public static function getComponents(): array
     {

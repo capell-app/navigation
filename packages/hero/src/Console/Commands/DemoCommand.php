@@ -12,6 +12,7 @@ use Capell\Core\Models\Site;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Capell\Hero\Actions\CreateHeroContentTypeAction;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
+use Capell\Layout\Models\Widget;
 use Capell\Layout\Support\Creator\DemoCreator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
@@ -35,7 +36,7 @@ class DemoCommand extends Command
         $sites = $this->getSitesByNames($siteOptions);
 
         if ($sites->isEmpty()) {
-            $this->error('Unable to find any sites for: ' . implode(', ', (array) $siteOptions));
+            $this->error('Unable to find any sites for: ' . implode(', ', $siteOptions));
 
             return Command::FAILURE;
         }
@@ -59,6 +60,7 @@ class DemoCommand extends Command
             if (is_string($sitesOption)) {
                 return explode(',', $sitesOption);
             }
+
             if (is_array($sitesOption)) {
                 return $sitesOption;
             }
@@ -83,7 +85,7 @@ class DemoCommand extends Command
             ->get();
     }
 
-    private function createDemoContentForSite(Site $site, $heroWidget): bool
+    private function createDemoContentForSite(Site $site, Widget $heroWidget): bool
     {
         $this->newLine();
         $this->line(sprintf('Selected site: %s', $site->name));

@@ -8,7 +8,7 @@ use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Support\Creator\TypeCreator;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 
 use function Pest\Laravel\assertSoftDeleted;

@@ -23,7 +23,7 @@ it('creates all required blog pages and links them for a site', function (): voi
 
     // --- Assertions ---
     $blogPage = $site->pages()->where('type_id', $blogPageType->id)->first();
-    $blogPageLayout = $blogPage ? Layout::find($blogPage->layout_id) : null;
+    $blogPageLayout = $blogPage ? Layout::query()->find($blogPage->layout_id) : null;
     $archivesPage = $blogPage ? $site->pages()->where('type_id', $systemPageType->id)->where('parent_id', $blogPage->id)->first() : null;
     $archivePage = $archivesPage ? $site->pages()->where('type_id', $archivePageType->id)->where('parent_id', $archivesPage->id)->first() : null;
     $tagsPage = $site->pages()->where('type_id', $systemPageType->id)->whereNull('parent_id')->where('name', 'like', '%tags%')->first();

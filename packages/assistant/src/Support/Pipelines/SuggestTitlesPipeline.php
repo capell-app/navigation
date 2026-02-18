@@ -106,7 +106,7 @@ class SuggestTitlesPipeline
     {
         /** @var AiResponse $response */
         $response = $payload['ai_response'] ?? null;
-        /** @var Capell\Assistant\Contracts\AiActionContextInterface $context */
+        /** @var AiActionContextInterface $context */
         $context = $payload['context'];
         if ($response !== null) {
             AIGenerationHistory::query()->create([

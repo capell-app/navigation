@@ -10,7 +10,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 use Illuminate\Support\Collection;
 
 uses(TestingFrontend::class);
@@ -58,7 +58,7 @@ it('returns blog page with all Article children recursively', function (): void 
 
     // Recursion: articleA should have nestedArticle as child
     /** @var SitemapPageData $articleANode */
-    $articleANode = $root->children->firstWhere(fn (SitemapPageData $d) => $d->page_id === $articleA->id);
+    $articleANode = $root->children->firstWhere(fn (SitemapPageData $d): bool => $d->page_id === $articleA->id);
     expect($articleANode)->not()->toBeNull();
     expect($articleANode->children->map(fn (SitemapPageData $d) => $d->page_id)->all())->toContain($nestedArticle->id);
 });

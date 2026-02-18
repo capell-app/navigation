@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Core\Models\Page;
 use Capell\Layout\Livewire\LayoutBuilder;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 

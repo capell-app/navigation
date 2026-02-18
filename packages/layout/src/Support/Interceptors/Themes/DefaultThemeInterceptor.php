@@ -17,11 +17,6 @@ final class DefaultThemeInterceptor implements ThemeInterceptorInterface
 
         $data['vendor_assets'][] = [
             'path' => 'vendor/capell-layout/frontend',
-            'file' => 'resources/css/capell-layout.css',
-        ];
-
-        $data['vendor_assets'][] = [
-            'path' => 'vendor/capell-layout/frontend',
             'file' => 'resources/js/capell-layout.js',
         ];
 

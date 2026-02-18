@@ -9,7 +9,7 @@ use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
 use Capell\Blog\Enums\BlogLayoutEnum;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
-use Capell\Blog\Enums\PageComponentEnum;
+use Capell\Blog\Enums\LivewirePageComponentEnum;
 use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Enums\WidgetComponentEnum as BlogWidgetComponentEnum;
 use Capell\Blog\Enums\WidgetSchemaEnum;
@@ -106,7 +106,8 @@ class BlogCreator
             ],
             'meta' => [
                 'accessible' => false,
-                'component' => PageComponentEnum::TagPage,
+                'component' => LivewirePageComponentEnum::TagPage,
+                'livewire' => true,
                 'limit' => 10,
                 'listable' => false,
                 'pagination' => true,
@@ -285,7 +286,8 @@ class BlogCreator
             ],
             'meta' => [
                 'accessible' => false,
-                'component' => PageComponentEnum::ArchivePage,
+                'component' => LivewirePageComponentEnum::ArchivePage,
+                'livewire' => true,
                 'hidden_from_selection' => true,
                 'limit' => 10,
                 'listable' => false,
@@ -734,7 +736,8 @@ class BlogCreator
                 'required_fields' => ['title'],
             ],
             'meta' => [
-                'component' => PageComponentEnum::BlogPage,
+                'component' => LivewirePageComponentEnum::BlogPage,
+                'livewire' => true,
                 'exclude_parent' => true,
                 'limit' => 10,
                 'listable' => false,
@@ -765,6 +768,7 @@ class BlogCreator
             'type_id' => $type->id,
             'meta' => [
                 'component' => LivewireComponentsEnum::PagesWidget,
+                'livewire' => true,
                 'limit' => 5,
                 'page_group' => strtolower(ResourceEnum::Article->name),
                 'pagination' => false,

@@ -8,7 +8,7 @@ use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
@@ -32,6 +32,9 @@ class AddressTestCase extends AbstractTestCase
         ];
     }
 
+    /**
+     * @param  Application  $app
+     */
     #[Override]
     protected function getEnvironmentSetUp($app): void
     {

@@ -24,7 +24,6 @@ use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Providers\FrontendServiceProvider;
-use Capell\Frontend\Support\Interceptors\Themes\DefaultThemeInterceptor;
 use Capell\Layout\Console\Commands\DemoCommand;
 use Capell\Layout\Console\Commands\InstallCommand;
 use Capell\Layout\Console\Commands\SetupCommand;
@@ -49,6 +48,7 @@ use Capell\Layout\Support\CapellLayoutManager;
 use Capell\Layout\Support\Interceptors\Layouts\DefaultLayoutInterceptor;
 use Capell\Layout\Support\Interceptors\Layouts\HomeLayoutInterceptor;
 use Capell\Layout\Support\Interceptors\Layouts\ResultsLayoutInterceptor;
+use Capell\Layout\Support\Interceptors\Themes\DefaultThemeInterceptor;
 use Capell\Layout\Support\LayoutModelRegistrar;
 use Composer\InstalledVersions;
 use Exception;
@@ -135,6 +135,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerCloneableAndDraftableRelations()
             ->registerThemeViewPath()
             ->registerFilamentAssets()
+            ->registerPublishCommands()
             ->registerLivewireComponents()
             ->registerBladeComponents();
     }
@@ -147,7 +148,11 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerModelInterceptor($layoutModel, LayoutEnum::Home, HomeLayoutInterceptor::class);
         CapellCore::registerModelInterceptor($layoutModel, LayoutEnum::Results, ResultsLayoutInterceptor::class);
 
-        CapellCore::registerModelInterceptor(CapellCore::getModel(\Capell\Core\Enums\ModelEnum::Theme), key: 'default', interceptorClass: DefaultThemeInterceptor::class);
+        CapellCore::registerModelInterceptor(
+            CapellCore::getModel(\Capell\Core\Enums\ModelEnum::Theme),
+            key: 'default',
+            interceptorClass: DefaultThemeInterceptor::class,
+        );
 
         return $this;
     }
@@ -171,15 +176,15 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ],
             version: $this->getVersion(),
             url: 'https://capell.app',
-            tailwindPlugins: ['@tailwindcss/typography'],
-            tailwindImports: [
-                'tippy.js/dist/tippy.css',
-                'resources/css/capell-layout.css',
-            ],
             tailwindSources: [
                 'resources/views/**/*.blade.php',
                 '../../../laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
             ],
+            tailwindImports: [
+                'tippy.js/dist/tippy.css',
+                'resources/css/capell-layout.css',
+            ],
+            tailwindPlugins: ['@tailwindcss/typography'],
             npmDependencies: [
                 'tippy.js' => '^6.3.7',
             ],
@@ -398,6 +403,15 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                 DeletedModelAction::run($model);
             });
         }
+
+        return $this;
+    }
+
+    private function registerPublishCommands(): self
+    {
+        $this->publishes([
+            $this->package->basePath('/../publishes/build') => public_path('vendor/capell-layout'),
+        ], 'capell-layout-assets');
 
         return $this;
     }

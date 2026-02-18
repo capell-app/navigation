@@ -64,7 +64,8 @@ declare(strict_types=1);
                 @php
                     $image = $widgetAsset->media->first() ?: $widgetAsset->asset->image;
                     if (! $image) {
-                        throw new RuntimeException('Image not found for WidgetAsset: ' . $widgetAsset->asset_type . ' ' . $widgetAsset->id);
+                        report('Image not found for WidgetAsset: ' . $widgetAsset->asset_type . ' ' . $widgetAsset->id);
+                        continue;
                     }
                 @endphp
                 {{-- format-ignore-end --}}

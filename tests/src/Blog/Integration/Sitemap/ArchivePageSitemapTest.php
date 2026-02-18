@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Blog\Support\Sitemap\ArchivesSitemap;
 use Capell\Core\Data\SitemapPageData;
@@ -10,7 +9,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
-use Capell\Tests\Fixtures\Support\Concerns\TestingFrontend;
+use Capell\Tests\Support\Concerns\TestingFrontend;
 use Illuminate\Support\Collection;
 
 uses(TestingFrontend::class);
@@ -25,7 +24,7 @@ it('builds recursive sitemap for archive page with parent chain and month childr
     $blogPage = $blogCreator->createBlogPage($site, languages: $site->languages);
     $archivePage = $blogCreator->createArchivePage($site, $blogPage, $site->languages, createWidgets: false);
 
-    // Parent chain: Home -> Section -> BlogPage -> ArchivePage
+    // Parent chain: Home -> Section -> BlogPage -> Archive
     $home = Page::factory()->for($site)->withTranslations()->create();
     $section = Page::factory()->for($site)->withTranslations()->create();
 

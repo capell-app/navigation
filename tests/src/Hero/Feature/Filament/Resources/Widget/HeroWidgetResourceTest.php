@@ -10,7 +10,7 @@ use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Widgets\Pages\CreateWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Models\Widget;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Pest\Expectation;
 
 use function Pest\Livewire\livewire;

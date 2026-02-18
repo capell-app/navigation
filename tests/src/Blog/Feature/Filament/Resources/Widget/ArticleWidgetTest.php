@@ -7,7 +7,7 @@ use Capell\Layout\Filament\Actions\CreateWidgetAction;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

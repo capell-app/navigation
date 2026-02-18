@@ -6,57 +6,34 @@ use Capell\Blog\Actions\InstallPackageAction;
 use Capell\Core\Console\Commands\PublishMigrationsCommand;
 use Capell\Core\Support\Dataset\DatasetPublisher;
 use Capell\Core\Support\Migration\MigrationFileManagerInterface;
+use Capell\Tests\Fixtures\FakeMigrationFileManager;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Migrations\Migrator;
 
 beforeEach(function (): void {
-    $this->fakeFileManager = new class implements MigrationFileManagerInterface
-    {
-        public array $calls = [];
+    $this->fakeFileManager = new FakeMigrationFileManager([
+        'fileExists' => [],
+        'isDir' => [],
+    ]);
 
-        public function fileExists(string $path): bool
-        {
-            $this->calls[] = ['fileExists', $path];
-
-            return false;
-        }
-
-        public function isDir(string $path): bool
-        {
-            $this->calls[] = ['isDir', $path];
-
-            return true;
-        }
-
-        public function makeDir(string $path): void
-        {
-            $this->calls[] = ['makeDir', $path];
-        }
-
-        public function copy(string $from, string $to): void
-        {
-            $this->calls[] = ['copy', $from, $to];
-        }
-    };
-
-    $fakeDatasetPublisher = \Mockery::mock(DatasetPublisher::class);
+    $fakeDatasetPublisher = Mockery::mock(DatasetPublisher::class);
 
     // Ensure calls to publish migrations are no-ops and counted (called twice in Blog install)
     $this->instance(
         PublishMigrationsCommand::class,
-        \Mockery::mock(new PublishMigrationsCommand($fakeDatasetPublisher, $this->fakeFileManager))
+        Mockery::mock(new PublishMigrationsCommand($fakeDatasetPublisher, $this->fakeFileManager))
             ->makePartial()
             ->shouldReceive('run')->twice()->andReturn(0)->getMock(),
     );
 
     // Ensure migrate command is a no-op
-    $fakeMigrator = \Mockery::mock(Migrator::class);
-    $fakeDispatcher = \Mockery::mock(Dispatcher::class);
+    $fakeMigrator = Mockery::mock(Migrator::class);
+    $fakeDispatcher = Mockery::mock(Dispatcher::class);
     $this->instance(
         MigrateCommand::class,
-        \Mockery::mock(new MigrateCommand($fakeMigrator, $fakeDispatcher))
+        Mockery::mock(new MigrateCommand($fakeMigrator, $fakeDispatcher))
             ->makePartial()
             ->shouldReceive('run')->once()->andReturn(0)->getMock(),
     );
@@ -65,7 +42,7 @@ beforeEach(function (): void {
     if (class_exists('Filament\\Commands\\AssetsCommand')) {
         $this->instance(
             'Filament\\Commands\\AssetsCommand',
-            \Mockery::mock('Filament\\Commands\\AssetsCommand', [])->makePartial()
+            Mockery::mock('Filament\\Commands\\AssetsCommand', [])->makePartial()
                 ->shouldReceive('run')->once()->andReturn(0)->getMock(),
         );
     }
@@ -74,7 +51,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
-    \Mockery::close();
+    Mockery::close();
 });
 
 it('runs blog install command successfully without publishing files', function (): void {

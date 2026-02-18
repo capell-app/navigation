@@ -8,7 +8,7 @@ use Capell\Blog\Filament\Resources\Articles\ArticleResource;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 

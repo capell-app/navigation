@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Tests\Fixtures\Support\Concerns;
+namespace Capell\Tests\Support\Concerns;
 
 use Illuminate\Support\Facades\App;
 

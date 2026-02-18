@@ -12,7 +12,7 @@ use Capell\Blog\Console\Commands\CreateBlogPagesCommand;
 use Capell\Blog\Console\Commands\DemoCommand;
 use Capell\Blog\Console\Commands\InstallCommand;
 use Capell\Blog\Console\Commands\SetupCommand;
-use Capell\Blog\Enums\PageComponentEnum;
+use Capell\Blog\Enums\LivewirePageComponentEnum;
 use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Enums\WidgetComponentEnum;
 use Capell\Blog\Enums\WidgetSchemaEnum;
@@ -198,7 +198,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLivewireComponents(): self
     {
-        foreach (PageComponentEnum::getComponents() as $name => $component) {
+        foreach (LivewirePageComponentEnum::getComponents() as $name => $component) {
             if (! $component) {
                 continue;
             }

@@ -10,6 +10,8 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Language;
+use Capell\Core\Models\Layout;
+use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
@@ -100,17 +102,20 @@ class DemoCreator
         $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => 'Example Content',
-                'content' => [
-                    [
-                        'type' => 'content',
-                        'data' => [
-                            'content' => config('capell-demo.contents')[$language->code],
+            $widget->translations()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => 'Example Content',
+                    'content' => [
+                        [
+                            'type' => 'content',
+                            'data' => [
+                                'content' => config('capell-demo.contents')[$language->code],
+                            ],
                         ],
                     ],
                 ],
-            ]);
+            );
         }
 
         return $widget;
@@ -148,17 +153,20 @@ class DemoCreator
         $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => 'Example Content',
-                'content' => [
-                    [
-                        'type' => 'content',
-                        'data' => [
-                            'content' => str(config('capell-demo.contents')[$language->code])->limit(200)->toString(),
+            $widget->translations()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => 'Example Content',
+                    'content' => [
+                        [
+                            'type' => 'content',
+                            'data' => [
+                                'content' => str(config('capell-demo.contents')[$language->code])->limit(200)->toString(),
+                            ],
                         ],
                     ],
                 ],
-            ]);
+            );
         }
 
         return $widget;
@@ -190,20 +198,30 @@ class DemoCreator
             ],
         ]);
 
-        $this->createWidgetMedia($widget);
+        $media = $this->createWidgetMedia($widget);
 
         foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => 'Example Content',
-                'content' => [
-                    [
-                        'type' => 'content',
-                        'data' => [
-                            'content' => config('capell-demo.contents')[$language->code],
+            $widget->translations()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => 'Example Banner',
+                    'content' => [
+                        [
+                            'type' => 'image',
+                            'data' => [
+                                'src' => $media->full_url,
+                                'alt' => 'Banner',
+                            ],
+                        ],
+                        [
+                            'type' => 'content',
+                            'data' => [
+                                'content' => config('capell-demo.contents')[$language->code],
+                            ],
                         ],
                     ],
                 ],
-            ]);
+            );
         }
 
         return $widget;
@@ -236,6 +254,7 @@ class DemoCreator
                 'type_id' => $type->id,
                 'meta' => [
                     'component' => LivewireComponentsEnum::PagesWidget,
+                    'livewire' => true,
                     'columns' => 4,
                     'with_image' => true,
                     'with_summary' => true,
@@ -302,10 +321,13 @@ class DemoCreator
         ]);
 
         foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => __('capell-layout::heading.faq'),
-                'content' => '<p>You can find answers for commonly asked questions</p>',
-            ]);
+            $widget->translations()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => __('capell-layout::heading.faq'),
+                    'content' => '<p>You can find answers for commonly asked questions</p>',
+                ],
+            );
         }
 
         $contentType = $this->typeModel::query()
@@ -377,17 +399,20 @@ class DemoCreator
             foreach ($languages as $language) {
                 $desc_content = config('capell-demo.contents')[$language->code] ?? '';
 
-                $content->translations()->firstOrCreate(['language_id' => $language->id], [
-                    'title' => Str::title($questions[$language->code][$i]),
-                    'content' => [
-                        [
-                            'type' => 'content',
-                            'data' => [
-                                'content' => $desc_content,
+                $content->translations()->updateOrCreate(
+                    ['language_id' => $language->id],
+                    [
+                        'title' => Str::title($questions[$language->code][$i]),
+                        'content' => [
+                            [
+                                'type' => 'content',
+                                'data' => [
+                                    'content' => $desc_content,
+                                ],
                             ],
                         ],
                     ],
-                ]);
+                );
             }
         }
 
@@ -459,9 +484,12 @@ class DemoCreator
         ]);
 
         foreach ($languages as $language) {
-            $widget->translations()->firstOrCreate(['language_id' => $language->id], [
-                'title' => 'Example Navigation',
-            ]);
+            $widget->translations()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => 'Example Navigation',
+                ],
+            );
         }
 
         return $widget;
@@ -542,7 +570,7 @@ class DemoCreator
                             'type' => 'link',
                             'url' => 'https://example.com',
                             'label' => 'External',
-                            'hidden_label' => true,
+                            'hide_label' => true,
                             'icon' => 'heroicon-o-arrow-top-right-on-square',
                             'color' => 'default',
                         ],
@@ -551,12 +579,13 @@ class DemoCreator
             ]);
 
             foreach ($page->site->languages as $language) {
-                $content->translations()->updateOrCreate([
-                    'language_id' => $language->id,
-                ], [
-                    'title' => $feature['title'],
-                    'content' => sprintf('<p>%s</p>', $feature['content']),
-                ]);
+                $content->translations()->updateOrCreate(
+                    ['language_id' => $language->id],
+                    [
+                        'title' => $feature['title'],
+                        'content' => sprintf('<p>%s</p>', $feature['content']),
+                    ],
+                );
             }
 
             $this->createMedia($content);
@@ -630,7 +659,7 @@ class DemoCreator
         $content = '<p>We combine innovation, efficiency, and deep expertise to deliver exceptional results. Our adaptable, client-focused approach ensures measurable value and lasting impact.</p>';
 
         $site->languages->each(function (Language $language) use ($widget, $title, $content): void {
-            $widget->translations()->firstOrCreate([
+            $widget->translations()->updateOrCreate([
                 'language_id' => $language->id,
             ], [
                 'title' => $title,
@@ -887,11 +916,9 @@ class DemoCreator
             ],
         ];
 
-        $layout = Models\Layout::query()->default()->first();
+        $layout = Layout::query()->default()->first();
 
-        if (! $layout instanceof Models\Layout) {
-            throw new Exception('Default layout not found');
-        }
+        throw_unless($layout instanceof Layout, Exception::class, 'Default layout not found');
 
         $parentPage = Page::query()->updateOrCreate([
             'site_id' => $site->id,
@@ -976,17 +1003,17 @@ class DemoCreator
             [
                 'name' => 'John Doe',
                 'position' => 'CEO of Example Corp',
-                'content' => '<p>Capell has transformed our business with their innovative solutions and exceptional service.</p>',
+                'content' => 'Capell has transformed our business with their innovative solutions and exceptional service.',
             ],
             [
                 'name' => 'Jane Smith',
                 'position' => 'CTO of Tech Innovations',
-                'content' => '<p>The team at Capell is incredibly knowledgeable and always goes the extra mile for us.</p>',
+                'content' => 'The team at Capell is incredibly knowledgeable and always goes the extra mile for us.',
             ],
             [
                 'name' => 'Jeff Wilson',
                 'position' => 'Marketing Director at Creative Agency',
-                'content' => '<p>We have seen significant growth since partnering with Capell. Their expertise is unmatched.</p>',
+                'content' => 'We have seen significant growth since partnering with Capell. Their expertise is unmatched.',
             ],
         ];
 
@@ -1161,14 +1188,30 @@ class DemoCreator
 
     private function createMedia(HasMedia $model, ?string $name = null, string $type = 'image', BackedEnum|string $collection = MediaCollectionEnum::Image): void
     {
+        $collectionName = $collection instanceof BackedEnum ? $collection->value : $collection;
+
+        // Build an optional filter to match existing media by inferred filename when a name is provided
+        $filters = [];
+        if (! in_array($name, [null, '', '0'], true)) {
+            $base = pathinfo(Str::slug($name), PATHINFO_FILENAME);
+            $filters = [
+                /** @param \Spatie\MediaLibrary\MediaCollections\Models\Media $media */
+                fn ($media): bool => str($media->file_name)->contains($base),
+            ];
+        }
+
+        if ($model->hasMedia($collectionName, $filters)) {
+            return;
+        }
+
         resolve(AdminDemoCreator::class)->createMedia($model, $name, $type, $collection);
     }
 
-    private function createWidgetMedia(HasMedia $model, ?string $name = null, string $type = 'image', BackedEnum|string $collection = MediaCollectionEnum::Image): void
+    private function createWidgetMedia(HasMedia $model, ?string $name = null, string $type = 'image', BackedEnum|string $collection = MediaCollectionEnum::Image): Media
     {
         // Normalize input name and derive extension if provided
-        $inputName = in_array($name, [null, '', '0'], true) ? null : (string) $name;
-        $inputExt = $inputName !== null ? (string) pathinfo($inputName, PATHINFO_EXTENSION) : '';
+        $inputName = in_array($name, [null, '', '0'], true) ? null : $name;
+        $inputExt = $inputName !== null ? pathinfo($inputName, PATHINFO_EXTENSION) : '';
 
         // Decide base demo path and defaults per type
         $isVideo = $type === 'video';
@@ -1176,7 +1219,7 @@ class DemoCreator
 
         // Determine filename (without extension) and extension
         $filenameBase = $inputName !== null
-            ? (string) pathinfo($inputName, PATHINFO_FILENAME)
+            ? pathinfo($inputName, PATHINFO_FILENAME)
             : ($isVideo ? 'SampleVideo_1280x720_1mb' : null);
 
         $ext = $inputExt !== ''
@@ -1198,14 +1241,14 @@ class DemoCreator
                 // Attempt video default file first
                 $filenameBase = 'SampleVideo_1280x720_1mb';
                 $ext = $inputExt !== '' ? strtolower($inputExt) : 'mp4';
-                $demoFile = sprintf('%s/%s.%s', $demoPath, $filenameBase, $ext);
             } else {
                 // For images: pick a random demo image and set explicit jpg (demo images are jpg)
                 $demoPath = AdminDemoCreator::getDemoResourcePath('img');
-                $filenameBase = $this->getRandomDemoImage($demoPath);
+                $filenameBase = $this->getRandomDemoImage($demoPath, 'jpg');
                 $ext = 'jpg';
-                $demoFile = sprintf('%s/%s.%s', $demoPath, $filenameBase, $ext);
             }
+
+            $demoFile = sprintf('%s/%s.%s', $demoPath, $filenameBase, $ext);
         }
 
         // Create content and link via WidgetAsset
@@ -1224,7 +1267,7 @@ class DemoCreator
             $image = Image::load($demoFile);
         }
 
-        $content->addMedia($demoFile)
+        $media = $content->addMedia($demoFile)
             ->preservingOriginal()
             ->withCustomProperties([
                 ...($image instanceof Image ? ['width' => $image->getWidth(), 'height' => $image->getHeight()] : []),
@@ -1232,25 +1275,27 @@ class DemoCreator
             ->toMediaCollection($collection instanceof BackedEnum ? $collection->value : $collection);
 
         // For videos, also attach a jpg poster image
-        if ($isVideo) {
-            $posterPath = AdminDemoCreator::getDemoResourcePath('img');
-            $posterBase = $this->getRandomDemoImage($posterPath);
-            $posterFile = sprintf('%s/%s.jpg', $posterPath, $posterBase);
-
-            $posterImage = Image::load($posterFile);
-
-            $content->addMedia($posterFile)
-                ->preservingOriginal()
-                ->withCustomProperties([
-                    'width' => $posterImage->getWidth(),
-                    'height' => $posterImage->getHeight(),
-                ])
-                ->toMediaCollection(MediaCollectionEnum::Image->value);
+        if (! $isVideo) {
+            return $media;
         }
+
+        $posterPath = AdminDemoCreator::getDemoResourcePath('img');
+        $posterBase = $this->getRandomDemoImage($posterPath);
+        $posterFile = sprintf('%s/%s.jpg', $posterPath, $posterBase);
+
+        $posterImage = Image::load($posterFile);
+
+        return $content->addMedia($posterFile)
+            ->preservingOriginal()
+            ->withCustomProperties([
+                'width' => $posterImage->getWidth(),
+                'height' => $posterImage->getHeight(),
+            ])
+            ->toMediaCollection(MediaCollectionEnum::Image->value);
     }
 
-    private function getRandomDemoImage(string $demo_path): string
+    private function getRandomDemoImage(string $demo_path, string $extension = 'jpg'): string
     {
-        return resolve(AdminDemoCreator::class)->getRandomDemoImage($demo_path);
+        return resolve(AdminDemoCreator::class)->getRandomDemoImage($demo_path, $extension);
     }
 }

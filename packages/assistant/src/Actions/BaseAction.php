@@ -27,7 +27,7 @@ abstract class BaseAction implements ActionContract
 
     protected float $startTime = 0.0;
 
-    public static function __callStatic($method, $arguments)
+    public static function __callStatic(string $method, array $arguments)
     {
         if ($method === 'run') {
             $instance = App::make(static::class);
@@ -35,7 +35,7 @@ abstract class BaseAction implements ActionContract
             return $instance->run(...$arguments);
         }
 
-        throw new BadMethodCallException("Method {$method} does not exist on " . static::class);
+        throw new BadMethodCallException(sprintf('Method %s does not exist on ', $method) . static::class);
     }
 
     /** Implement in child actions */
@@ -43,7 +43,7 @@ abstract class BaseAction implements ActionContract
 
     public function handle(...$args): mixed
     {
-        /** @var Capell\Assistant\Contracts\AiActionContextInterface|null $context */
+        /** @var AiActionContextInterface|null $context */
         $context = $args[0] ?? null;
         $options = is_array($args[1] ?? null) ? $args[1] : [];
 

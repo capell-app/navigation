@@ -32,7 +32,7 @@ it('runs demo command and creates articles and tags for the site', function (): 
         '--sites' => $site->name,
         '--limit' => 2,
     ])
-        ->expectsOutput("Setting up demo blog for site: {$site->name}")
+        ->expectsOutput('Setting up demo blog for site: ' . $site->name)
         ->assertExitCode(Command::SUCCESS);
 
     // Verify that article pages were created under the blog page for the site
