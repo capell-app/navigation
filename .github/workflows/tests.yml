@@ -13,6 +13,8 @@ jobs:
     if: github.event.pull_request.draft == false
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }} - DB${{ matrix.db }}
     runs-on: ${{ matrix.os }}
+    env:
+      COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.ACCESS_TOKEN }}"} }'
     strategy:
       fail-fast: true
       matrix:
