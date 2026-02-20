@@ -4,40 +4,39 @@ declare(strict_types=1);
 
 namespace Capell\Hero\View\Components\Widget;
 
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Hero\Actions\HeroWidgetHasPrimaryHeadingAction;
+use Capell\Layout\Models\Content;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
-use Illuminate\Database\Eloquent\Collection;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 
 class Hero extends AbstractWidget
 {
-    protected ?Media $backgroundImage = null;
-
-    protected ?Collection $contents = null;
-
     protected static string $defaultView = 'capell-hero::components.widget.hero';
 
-    public function render(array $data = [])
+    public static function loadWidgetAssets(array &$morphRelations, ?Language $language = null): void
     {
-        return parent::render([
-            ...$data,
-            'backgroundImage' => $this->backgroundImage,
-        ]);
+        $morphRelations[Content::class]['related'] = fn (BuilderContract $query): BuilderContract => $query->with(Content::getMorphRelations($language))
+            ->withWhereHas('translation', fn (BuilderContract $query): BuilderContract => $query->with('language'));
+
+        $morphRelations[Page::class]['related'] = fn (BuilderContract $query): BuilderContract => $query->with(Page::getMorphRelations($language))
+            ->withWhereHas('translation', fn (BuilderContract $query): BuilderContract => $query->with('language'));
     }
 
     protected function mountWidget(): void
     {
         $page = Frontend::page();
 
-        $this->backgroundImage = $page->translation?->backgroundImage ?? $this->widget->backgroundImage;
-
-        if (! $this->backgroundImage instanceof Media &&
-            ! $this->widget->translation?->content &&
+        if (
             empty($page->translation->meta['hero']) &&
+            ! $this->widget->translation?->content &&
             $this->widget->assets->isEmpty()
         ) {
             $this->skipRender = true;
+
+            return;
         }
 
         HeroWidgetHasPrimaryHeadingAction::run($this->widget, $page);

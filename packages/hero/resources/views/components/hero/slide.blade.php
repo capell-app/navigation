@@ -9,57 +9,63 @@ declare(strict_types=1);
 @endphp
 
 @aware([
-'carouselArrows' => '',
+    'carouselArrows' => '',
 ])
 
 @props([
-'backgroundColor' => '',
-'backgroundImage' => null,
-'backgroundPosition' => 'center',
-'backgroundSize' => 'cover',
-'backgroundAttachment' => '',
-'backgroundRepeat' => 'no-repeat',
-'backgroundOverlay' => null,
-'carouselType' => 'slide',
-'colorScheme' => 'dark',
-'container_class' => 'container',
-'slideBgImgClass' => '',
-'first' => false,
-'height' => '',
+    'backgroundAttachment' => '',
+    'backgroundColor' => '',
+    'backgroundImage' => null,
+    'backgroundOverlay' => null,
+    'backgroundPosition' => 'center',
+    'backgroundRepeat' => 'no-repeat',
+    'backgroundSize' => 'cover',
+    'carouselType' => 'slide',
+    'color' => 'dark',
+    'container_class' => 'container',
+    'first' => false,
+    'height' => '',
+    'slideBgImgClass' => '',
+    'title' => null,
 ])
+{{-- format-ignore-start --}}
 <div
-    {{ $attributes->class([
-        'swiper-slide',
+    {{
+        $attributes->class([
+        'swiper-slide hero-item',
         'swiper-slide-selected' => $first,
-        ]) }}
+        ])
+    }}
 >
     <div
-        {{ $attributes->class([
-            'swiper-slide-inner relative flex min-h-full',
-            ...(
-            ! $backgroundColor && $colorScheme
-            ? [
-            'bg-gradient-to-t',
-            'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'dark',
-            'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $colorScheme === 'light',
-            ]
-            : []
-            ),
+        {{
+            $attributes->class([
+                'swiper-slide-inner relative flex min-h-full',
+                ...(
+                    ! $backgroundColor && $color
+                    ? [
+                        'bg-gradient-to-t',
+                        'from-gray-600/60 to-gray-800/70 dark:from-gray-800/80 dark:to-gray-900/80' => $color === 'dark',
+                        'from-black/10 to-gray-100/60 dark:from-gray-800/80 dark:to-gray-900/80' => $color === 'light',
+                    ]
+                    : []
+                ),
             ])
             ->style([
-            "background-color: {$backgroundColor}" => $backgroundColor,
-            ]) }}
+              "background-color: {$backgroundColor}" => $backgroundColor,
+            ])
+        }}
     >
         @if ($backgroundImage)
             <x-capell::media
                 format="webp"
                 :media="$backgroundImage"
+                :alt="$title"
                 height="auto"
                 :loading="$first ? 'eager' : 'lazy'"
-                {{-- format-ignore-start --}}
                 :class="
                     Illuminate\Support\Arr::toCssClasses([
-                        'inset-0 h-full w-full pointer-events-none mix-blend-exclusion',
+                        'hero-bg-img inset-0 h-full w-full pointer-events-none mix-blend-exclusion',
                         $slideBgImgClass ?? '',
                         $backgroundAttachment !== 'fixed' ? 'absolute' : '',
                         $backgroundAttachment === 'fixed' ? 'object-fixed' : '',
@@ -72,7 +78,6 @@ declare(strict_types=1);
                         $backgroundPosition === 'left' ? 'object-left' : '',
                     ])
                 "
-                {{-- format-ignore-end --}}
             />
         @endif
 
@@ -89,5 +94,6 @@ declare(strict_types=1);
         @endif
     </div>
 </div>
+{{-- format-ignore-end --}}
 
 <?php

@@ -56,5 +56,6 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         PostIncDecToPreIncDecRector::class,
+        __DIR__ . '/tests/.pest',
     ])
     ->withPhpSets();

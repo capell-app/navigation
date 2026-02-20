@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use Capell\Address\Filament\Resources\Countries\Pages\ManageCountries;
 use Capell\Address\Models\Country;
-use Capell\Admin\Filament\Actions\CreateModalAction;
+use Capell\Admin\Filament\Actions\CreateAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -98,7 +98,7 @@ test('can create country', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(0)
         ->callAction(
-            CreateModalAction::class,
+            CreateAction::class,
             [
                 'name' => $country->name,
                 'iso2' => $country->iso2,
@@ -122,7 +122,7 @@ test('can not create country', function (): void {
     livewire(ManageCountries::class)
         ->assertSuccessful()
         ->callAction(
-            CreateModalAction::class,
+            CreateAction::class,
             data: [
                 'name' => '',
                 'iso2' => '',

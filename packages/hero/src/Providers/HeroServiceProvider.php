@@ -7,16 +7,14 @@ namespace Capell\Hero\Providers;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Providers\FrontendServiceProvider;
-use Capell\Hero\Commands\DemoCommand;
-use Capell\Hero\Commands\InstallCommand;
+use Capell\Hero\Console\Commands\DemoCommand;
+use Capell\Hero\Console\Commands\SetupCommand;
 use Capell\Hero\Enums\ContentSchemaEnum;
-use Capell\Hero\Enums\WidgetComponentEnum;
 use Capell\Hero\Enums\WidgetSchemaEnum;
 use Capell\Hero\Filament\Extenders\Page\HeroPageSchemaExtender;
-use Capell\Layout\Enums\ComponentTypeEnum;
-use Capell\Layout\Enums\SchemaTypeEnum;
+use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\Blade;
@@ -30,33 +28,30 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
 
     public static string $description = 'Hero section component for layout builder.';
 
-    public function bootingPackage(): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->registerAll();
-    }
-
     public function configurePackage(Package $package): void
     {
         $package->name(self::$name)
             ->hasViews(self::$name)
             ->hasCommands([
                 DemoCommand::class,
-                InstallCommand::class,
+                SetupCommand::class,
             ])
             ->hasTranslations();
     }
 
     public function registeringPackage(): void
     {
-        parent::registeringPackage();
-
         $this
             ->registerSchemas()
             ->registerPackageMetadata();
+
+        $this->booted(function (): void {
+            if (! $this->isPackageInstalled()) {
+                return;
+            }
+
+            $this->bootInstalledPackage();
+        });
     }
 
     private function isPackageInstalled(): bool
@@ -64,10 +59,9 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         return CapellCore::getPackage(static::$packageName)->isInstalled();
     }
 
-    private function registerAll(): self
+    private function bootInstalledPackage(): self
     {
         return $this
-            ->registerComponents()
             ->registerSchemaExtenders()
             ->registerBladeComponents();
     }
@@ -77,11 +71,12 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerPackage(
             static::$packageName,
             type: static::getType(),
-            path: __DIR__,
+            serviceProviderClass: static::class,
+            path: realpath(__DIR__ . '/../..'),
             sort: 10,
             description: static::getDescription(),
-            installCommand: 'capell-hero:install',
-            demoCommand: 'capell-hero:demo',
+            setupCommand: 'capell:hero-setup',
+            demoCommand: 'capell:hero-demo',
             demoParams: ['sites'],
             requirements: [
                 AdminServiceProvider::$packageName,
@@ -90,6 +85,9 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
             ],
             version: $this->getVersion(),
             url: 'https://capell.app',
+            tailwindSources: [
+                'resources/views/**/*.blade.php',
+            ],
         );
 
         return $this;
@@ -108,17 +106,10 @@ class HeroServiceProvider extends AbstractPackageServiceProvider
         return InstalledVersions::getPrettyVersion(static::$packageName) ?? 'dev';
     }
 
-    private function registerComponents(): self
-    {
-        CapellCore::registerComponents(ComponentTypeEnum::Widget->value, WidgetComponentEnum::cases());
-
-        return $this;
-    }
-
     private function registerSchemas(): self
     {
-        CapellAdmin::registerSchema(SchemaTypeEnum::Content, ContentSchemaEnum::Hero);
-        CapellAdmin::registerSchema(SchemaTypeEnum::Widget, WidgetSchemaEnum::Hero);
+        CapellAdmin::registerSchema(TypeSchemaEnum::Content, ContentSchemaEnum::Hero);
+        CapellAdmin::registerSchema(TypeSchemaEnum::Widget, WidgetSchemaEnum::Hero);
 
         return $this;
     }

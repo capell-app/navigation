@@ -77,3 +77,12 @@ it('has many pages', function (): void {
         ->toHaveCount(1)
         ->and($content->pages->first()->page_id)->toBe($page->id);
 });
+
+it('creates a content with parent', function (): void {
+    $parent = Content::factory()->create();
+    $content = Content::factory()->parent($parent)->create();
+
+    expect($content)
+        ->parent_id->toBe($parent->id)
+        ->parent->toBeInstanceOf(Content::class);
+});

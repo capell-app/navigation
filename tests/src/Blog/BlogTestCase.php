@@ -4,43 +4,60 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Blog;
 
-use Capell\Admin\CapellAdminManager;
+use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Blog\Providers\BlogServiceProvider;
-use Capell\Core\CapellCoreManager;
 use Capell\Core\Facades\CapellCore;
+use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
+use Illuminate\Foundation\Application;
+use Livewire\LivewireServiceProvider;
 use Override;
 
 class BlogTestCase extends AbstractTestCase
 {
-    #[Override]
+    protected string $packageServiceName = 'capell-blog';
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->registerAndMigrateSettings([
-            ...CapellCoreManager::getSettingMigrations(),
-        ], __DIR__ . '/../../../vendor/capell-app/core/database/settings');
-
-        $this->registerAndMigrateSettings([
-            ...CapellAdminManager::getSettingMigrations(),
-        ], __DIR__ . '/../../../vendor/capell-app/admin/database/settings');
+        $this->registerAndMigrateSettings(
+            CapellCore::getSettingMigrations(),
+            __DIR__ . '/../../../vendor/capell-app/core/database/settings',
+        );
+        $this->registerAndMigrateSettings(
+            CapellAdmin::getSettingMigrations(),
+            __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
+        );
+        $this->registerAndMigrateSettings(
+            resolve(SettingsMigrationProviderInterface::class)->getSettingMigrations(),
+            __DIR__ . '/../../../vendor/capell-app/frontend/database/settings',
+        );
     }
 
+    /**
+     * @param  Application  $app
+     * @return class-string[]
+     */
     protected function getPackageProviders($app): array
     {
         return [
             ...parent::getPackageProviders($app),
             LayoutServiceProvider::class,
-            BlogServiceProvider::class,
             AdminServiceProvider::class,
+            FrontendServiceProvider::class,
+            BlogServiceProvider::class,
             AdminPanelProvider::class,
+            LivewireServiceProvider::class,
         ];
     }
 
+    /**
+     * @param  Application  $app
+     */
     #[Override]
     protected function getEnvironmentSetUp($app): void
     {
@@ -48,11 +65,7 @@ class BlogTestCase extends AbstractTestCase
 
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(LayoutServiceProvider::$packageName);
-    }
-
-    protected function requiredPackages(): array
-    {
-        return ['layout', 'blog'];
     }
 }

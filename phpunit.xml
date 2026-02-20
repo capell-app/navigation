@@ -2,10 +2,11 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     backupGlobals="false"
+    backupStaticProperties="false"
+    beStrictAboutOutputDuringTests="false"
     beStrictAboutTestsThatDoNotTestAnything="true"
-    beStrictAboutOutputDuringTests="true"
     bootstrap="vendor/autoload.php"
-    cacheResult="false"
+    cacheResult="true"
     colors="true"
     failOnRisky="true"
     failOnWarning="true"
@@ -13,37 +14,28 @@
     stopOnError="false"
     stopOnFailure="false"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-    backupStaticProperties="false"
-    displayDetailsOnIncompleteTests="true"
-    displayDetailsOnSkippedTests="true"
-    displayDetailsOnTestsThatTriggerDeprecations="true"
-    displayDetailsOnTestsThatTriggerErrors="true"
-    displayDetailsOnTestsThatTriggerNotices="true"
-    displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <testsuites>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/src/Blog/Feature</directory>
-            <directory suffix="Test.php">./tests/src/Layout/Feature</directory>
+        <testsuite name="Architecture">
+            <directory suffix="Test.php">./tests/src/*/Arch</directory>
         </testsuite>
-        <testsuite name="Arch">
-            <directory suffix="Test.php">./tests/src/Blog/Arch</directory>
-            <directory suffix="Test.php">./tests/src/Layout/Arch</directory>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">./tests/src/*/Feature</directory>
         </testsuite>
         <testsuite name="Integration">
-            <directory suffix="Test.php">./tests/src/Address/Integration</directory>
-            <directory suffix="Test.php">./tests/src/Blog/Integration</directory>
-            <directory suffix="Test.php">./tests/src/Layout/Integration</directory>
-            <directory suffix="Test.php">./tests/src/Packages/Integration</directory>
+            <directory suffix="Test.php">./tests/src/*/Integration</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">./tests/src/*/Unit</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
-            <directory suffix=".php">./packages</directory>
+            <directory suffix=".php">./packages/*/src</directory>
         </include>
     </source>
     <php>
-        <ini name="memory_limit" value="-1"/>
+        <ini name="memory_limit" value="1024M"/>
         <server name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="12345678901234567890123456789012"/>
         <env name="BCRYPT_ROUNDS" value="12"/>
@@ -56,8 +48,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="FRONTEND_HTML_CACHE" value="false"/>
+        <env name="SETTINGS_CACHE_ENABLED" value="true"/>
     </php>
-    <logging>
-        <junit outputFile="build/report.junit.xml"/>
-    </logging>
 </phpunit>

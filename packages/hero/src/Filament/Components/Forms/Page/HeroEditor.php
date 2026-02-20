@@ -13,6 +13,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Layout\Enums\ModelEnum;
+use Capell\Layout\Models\WidgetAsset;
 use Filament\Schemas\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -50,9 +51,14 @@ class HeroEditor extends Group
     {
         return cache()->driver('array')->rememberForever(
             sprintf('page-%d-has-hero-widget-assets', $page->id),
-            fn (): bool => CapellCore::getModel(ModelEnum::WidgetAsset)::query()->where('page_id', $page->id)
-                ->whereHas('widget', fn (Builder $query): Builder => $query->where('key', 'hero'))
-                ->exists(),
+            function () use ($page): bool {
+                /** @var class-string<WidgetAsset> $model */
+                $model = CapellCore::getModel(ModelEnum::WidgetAsset);
+
+                return $model::query()->where('page_id', $page->id)
+                    ->whereHas('widget', fn (Builder $query): Builder => $query->where('key', 'hero'))
+                    ->exists();
+            },
         );
     }
 }

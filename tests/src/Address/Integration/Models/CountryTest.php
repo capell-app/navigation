@@ -20,7 +20,7 @@ describe('Country model', function (): void {
     it('can relate to a language', function (): void {
         $language = Language::factory()->create(['name' => 'English']);
         $country = Country::factory()->create(['language_id' => $language->id]);
-        expect($country->language)->not->toBeNull();
+        expect($country->language)->not()->toBeNull();
         expect($country->language->name)->toBe('English');
     });
 

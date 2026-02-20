@@ -35,7 +35,7 @@ class HeroWidgetHasPrimaryHeadingAction
         }
 
         if (! $hasPrimaryHeading && ! empty($content)) {
-            $hasPrimaryHeading = $content && preg_match('/<h1\b[^>]*>/i', (string) $content) === 1;
+            $hasPrimaryHeading = preg_match('/<h1\b[^>]*>/i', (string) $content) === 1;
         }
 
         if ($hasPrimaryHeading) {

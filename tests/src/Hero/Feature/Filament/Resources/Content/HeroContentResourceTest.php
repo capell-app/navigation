@@ -8,7 +8,7 @@ use Capell\Hero\Enums\ContentSchemaEnum;
 use Capell\Layout\Filament\Resources\Contents\Pages\CreateContent;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Models\Content;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Pest\Expectation;
 
 use function Pest\Livewire\livewire;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Enums\LayoutEnum;
-use Capell\Admin\Services\Creator\LayoutCreator;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
+use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
 use Capell\Layout\Enums\AssetEnum;
@@ -15,10 +15,9 @@ use Capell\Layout\Livewire\Layout\WidgetTableSelect;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Capell\Layout\Services\Creator\LayoutUpdater;
-use Capell\Layout\Services\Creator\TypeCreator;
-use Capell\Layout\Services\Creator\WidgetCreator;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Layout\Support\Creator\TypeCreator;
+use Capell\Layout\Support\Creator\WidgetCreator;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 use Pest\Expectation;
 
@@ -50,9 +49,6 @@ test('can edit layouts', function (LayoutEnum $layoutEnum): void {
 
     $widgetCreator = resolve(WidgetCreator::class);
     $widgetCreator->createWidgets(collect([$language]));
-
-    $layoutUpdater = resolve(LayoutUpdater::class);
-    $layoutUpdater->setup($layout->key);
 
     livewire(LayoutBuilder::class, [
         'layout_id' => $layout->id,
@@ -208,13 +204,13 @@ test('Can clone layout', function (): void {
         ->assertHasNoFormErrors()
         ->call('saveLayout');
 
-    $clonedLayout = Layout::query()->where('name', $layout->name . ' 1')
-        ->where('key', $layout->key . '-1')
+    $clonedLayout = Layout::query()->where('name', $layout->name . ' (2)')
+        ->where('key', $layout->key . ' (2)')
         ->first();
 
     expect($clonedLayout)
         ->toBeInstanceOf(Layout::class)
-        ->not->toBe($layout)
+        ->not()->toBe($layout)
         ->containers->toEqual($layout->containers);
 });
 
@@ -235,7 +231,7 @@ test('removeContainer action', function (): void {
     $layout->refresh();
 
     expect($layout->containers)
-        ->not->toHaveKey($containerKey);
+        ->not()->toHaveKey($containerKey);
 });
 
 test('Can save layout without editing container', function (): void {
@@ -475,7 +471,7 @@ test('Can edit container widget', function (): void {
     $widget = Widget::factory()
         ->for((new WidgetTypeFactory)->state([
             'admin' => [
-                'layout_container_widget_schema' => DefaultLayoutWidgetSchema::getKey(),
+                'layout_widget_schema' => DefaultLayoutWidgetSchema::getKey(),
             ],
         ]), 'type')
         ->create();
@@ -500,7 +496,7 @@ test('Can edit container widget', function (): void {
         )
         ->callMountedAction()
         ->mountAction(
-            TestAction::make('editContainerWidget')
+            TestAction::make('editLayoutWidget')
                 ->arguments([
                     'containerKey' => $containerKey,
                     'widgetIndex' => $widgetIndex,

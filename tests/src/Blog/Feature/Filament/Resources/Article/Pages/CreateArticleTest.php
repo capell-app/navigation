@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Actions\Page\CreatePageModalAction;
-use Capell\Blog\Database\Factories\ArticlePageFactory;
+use Capell\Admin\Filament\Actions\Page\CreatePageAction;
+use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
-use Capell\Blog\Services\BlogCreator;
+use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Support\Str;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -29,14 +29,14 @@ beforeEach(function (): void {
 
 describe('from edit article', function (): void {
     test('can create new article', function (): void {
-        $page = (new ArticlePageFactory)->create();
-        $newData = (new ArticlePageFactory)->recycle($page->site)->make();
+        $page = (new ArticleFactory)->create();
+        $newData = (new ArticleFactory)->recycle($page->site)->make();
 
         $slug = str($newData->name)->slug()->toString();
 
         livewire(EditArticle::class, ['record' => $page->getRouteKey()])
             ->assertSuccessful()
-            ->mountAction(CreatePageModalAction::class)
+            ->mountAction(CreatePageAction::class)
             ->fillForm([
                 'type_id' => $newData->type_id,
                 'site_id' => $newData->site_id,
@@ -68,11 +68,11 @@ describe('from edit article', function (): void {
     });
 
     test('required fields are required', function (): void {
-        $page = (new ArticlePageFactory)->create();
+        $page = (new ArticleFactory)->create();
 
         livewire(EditArticle::class, ['record' => $page->getRouteKey()])
             ->assertSuccessful()
-            ->callAction(CreatePageModalAction::class, [
+            ->callAction(CreatePageAction::class, [
                 'translations' => [
                     'abc' => [
                         'language_id' => $page->site->language_id,
@@ -148,7 +148,7 @@ describe('from list article', function (): void {
         $language = Language::factory()->create();
         $site = Site::factory()->recycle($language)->hasSiteDomains()->create();
 
-        $newData = (new ArticlePageFactory)->make();
+        $newData = (new ArticleFactory)->make();
 
         livewire(ListArticles::class)
             ->assertSuccessful()
@@ -198,7 +198,7 @@ describe('from list article', function (): void {
 
         livewire(ListArticles::class)
             ->assertSuccessful()
-            ->callAction(CreatePageModalAction::class, [
+            ->callAction(CreatePageAction::class, [
                 'name' => '',
             ])
             ->assertHasFormErrors([

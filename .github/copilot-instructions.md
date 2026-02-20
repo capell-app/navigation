@@ -22,14 +22,14 @@ These guidelines define how AI tools (like GitHub Copilot or other code assistan
 
 - Never use one-letter or terse variable names like `$q`, `$r`, `$x` in production code. Prefer descriptive names: `$query`, `$request`, `$payload`, `$collection`.
 - All new closures MUST declare parameter types and (where supported) return types explicitly. Example:
-  ```php
-  $users->filter(function (User $user): bool {
-      return $user->isActive();
-  });
-  $builder->whereHas('sites', function (Builder $query): void {
-      $query->whereKey($siteId);
-  });
-  ```
+    ```php
+    $users->filter(function (User $user): bool {
+        return $user->isActive();
+    });
+    $builder->whereHas('sites', function (Builder $query): void {
+        $query->whereKey($siteId);
+    });
+    ```
 - Arrow functions MAY be used only when parameter typing remains clear and a return type would be redundant. Prefer full closures if adding a return type improves clarity.
 - Do not abbreviate `$query` to `$q` or `$builder` to `$b`—optimize for readability over keystroke savings.
 - When a closure mutates a passed-in object (e.g., an Eloquent query), declare a `: void` return type.
@@ -60,50 +60,61 @@ All contributed code MUST be fully analyzable by PHPStan at the configured max l
 Follow these rules for all new and existing Enums:
 
 1. Namespace Organization
-   - Place all Enums under a dedicated namespace, e.g. `App\Enums` (in packages: `Capell\Core\Enums`).
-   - Group related Enums by domain (e.g. `Orders`, `Billing`) to avoid catch-all buckets.
+
+    - Place all Enums under a dedicated namespace, e.g. `App\Enums` (in packages: `Capell\Core\Enums`).
+    - Group related Enums by domain (e.g. `Orders`, `Billing`) to avoid catch-all buckets.
 
 2. Backed vs Pure Enums
-   - Use backed (string or int) Enums when persisting values to the database or interacting with external systems.
-   - Prefer string-backed for readability unless integer semantics are domain-critical.
+
+    - Use backed (string or int) Enums when persisting values to the database or interacting with external systems.
+    - Prefer string-backed for readability unless integer semantics are domain-critical.
 
 3. Case Naming
-   - Prefer PascalCase for multi-word cases (e.g. `LanguageLocales`, `TotalSites`) where readability benefits and mirrors existing code.
-   - Use UPPER_SNAKE_CASE only for domain state or constant-like flags (e.g. `DRAFT`, `ARCHIVED`, `CANCELLED`) to signal status semantics.
-   - Remain consistent within a single Enum: do not mix styles arbitrarily—choose PascalCase OR UPPER_SNAKE_CASE based on semantic category.
+
+    - Prefer PascalCase for multi-word cases (e.g. `LanguageLocales`, `TotalSites`) where readability benefits and mirrors existing code.
+    - Use UPPER_SNAKE_CASE only for domain state or constant-like flags (e.g. `DRAFT`, `ARCHIVED`, `CANCELLED`) to signal status semantics.
+    - Remain consistent within a single Enum: do not mix styles arbitrarily—choose PascalCase OR UPPER_SNAKE_CASE based on semantic category.
 
 4. Helpful Methods
-   - Provide concise helpers (`label()`, `isTerminal()`, `options()`) to reduce duplication and keep calling code expressive.
+
+    - Provide concise helpers (`label()`, `isTerminal()`, `options()`) to reduce duplication and keep calling code expressive.
 
 5. Documentation
-   - Document each case with a short description via a docblock above the Enum or inline comments when non-obvious.
-   - Explain transitional / deprecated cases clearly (`@deprecated` with planned removal version).
+
+    - Document each case with a short description via a docblock above the Enum or inline comments when non-obvious.
+    - Explain transitional / deprecated cases clearly (`@deprecated` with planned removal version).
 
 6. Single Responsibility
-   - If an Enum accumulates many cross-cutting helpers, split into multiple Enums or introduce a dedicated service.
+
+    - If an Enum accumulates many cross-cutting helpers, split into multiple Enums or introduce a dedicated service.
 
 7. Type Safety in Signatures
-   - Always type-hint Enum parameters and return types:
-     ```php
-     public function updateOrderStatus(Order $order, OrderStatus $newStatus): void
-     {
-         // $newStatus is guaranteed to be an OrderStatus
-     }
-     ```
-   - Avoid passing raw scalar values around once an Enum exists.
+
+    - Always type-hint Enum parameters and return types:
+        ```php
+        public function updateOrderStatus(Order $order, OrderStatus $newStatus): void
+        {
+            // $newStatus is guaranteed to be an OrderStatus
+        }
+        ```
+    - Avoid passing raw scalar values around once an Enum exists.
 
 8. Performance Considerations
-   - Backed Enums add negligible overhead; optimize only if profiling identifies a hotspot.
-   - Cache expensive derived mappings (labels/options) using a static local variable. Avoid global state or external caches unless persistence is required.
+
+    - Backed Enums add negligible overhead; optimize only if profiling identifies a hotspot.
+    - Cache expensive derived mappings (labels/options) using a static local variable. Avoid global state or external caches unless persistence is required.
 
 9. Interoperability
-   - For API output, expose both `value` and a human `label`; never force clients to derive labels from case names.
+
+    - For API output, expose both `value` and a human `label`; never force clients to derive labels from case names.
 
 10. Migration Strategy
+
     - When introducing a new backed Enum for an existing varchar/int column, ship a data migration converting legacy values first.
     - Keep legacy constants during transition marked `@deprecated` until confirmation of full rollout.
 
 11. Testing
+
     - Add tests asserting helper methods, option builders, and deprecated case handling.
     - Validate that every `from()` or custom factory rejects invalid input (expect exceptions).
 
@@ -114,12 +125,14 @@ Follow these rules for all new and existing Enums:
 ## 1D. Enum Do's & Don'ts Quick List
 
 Do:
+
 - Use backed Enums for persisted values.
 - Centralize labels & option arrays inside the Enum.
 - Cache derived arrays with a static variable.
 - Provide semantic helpers (e.g. `isVisible()`).
 
 Don't:
+
 - Mix naming styles inside a single Enum.
 - Store raw scalar values where an Enum exists.
 - Add unrelated behaviors—split the Enum or create a service.
@@ -127,16 +140,24 @@ Don't:
 
 ---
 
+## 1E. Readability & Spacing
+
+- Prefer vertical spacing (blank lines) between logical blocks, method arguments, and inside methods to improve clarity and maintainability.
+- Add blank lines before/after control structures, between unrelated statements, and between methods.
+- Avoid excessive or inconsistent blank lines; use spacing to group related logic and visually separate distinct steps.
+- This applies to all PHP, test, and config files.
+
 ## 1K. Package Plugin Independence (`address` / `blog` / `hero` / `layout`)
 
 - `address`, `blog`, `hero`, and `layout` plugins MAY depend on each other, but MUST remain decoupled from Core internals except via documented public interfaces.
 - Core MUST NOT depend directly on any plugin (`address`, `blog`, `hero`, `layout`). Avoid imports, facades, or direct calls from Core into these plugins.
 - Cross-plugin coordination should use neutral boundaries (configuration, cache/filesystem paths, events/commands) without introducing compile-time dependencies.
 - When Core needs to trigger a behavior in a plugin (e.g., clear caches), prefer:
-  - Removing/invalidating the shared cache file/path via Filesystem, or
-  - Emitting a framework event or calling an Artisan command name (string), not importing plugin classes.
+    - Removing/invalidating the shared cache file/path via Filesystem, or
+    - Emitting a framework event or calling an Artisan command name (string), not importing plugin classes.
 - If shared behavior grows complex, extract a minimal interface in a shared module and implement adapters per plugin; do not point Core to concrete plugin classes.
 - Enforce with static analysis: any `use Capell\Address\...`, `use Capell\Blog\...`, `use Capell\Hero\...`, or `use Capell\Layout\...` from Core is a blocker.
+
 ---
 
 ## 2. Language & Framework Constraints
@@ -157,6 +178,7 @@ Don't:
 All reusable business logic SHOULD be implemented as Actions using `lorisleiva/laravel-actions`.
 
 Summary:
+
 - Use `AsAction` (or appropriate traits) with a mandatory `handle()` method.
 - Prefer `$this->run()` / `ActionClass::run()` for validation + authorization + execution.
 - Implement modes only as needed (`asController`, `asJob`, `asCommand`, `asListener`).
@@ -187,6 +209,7 @@ Use Pest expectations (`expect(...)->toContain(...)`) rather than snapshot files
 ### Pest Usage & Chaining Expectations
 
 Core style rules for Pest tests here:
+
 - Single, deterministic assertion: higher-order form is fine (`it('slugifies')->expect(Str::slug('X'))->toBe('x');`).
 - Multiple related assertions: use chaining with one expectation per line for clarity.
 - Keep test names behavior-focused, not implementation-focused.
@@ -196,6 +219,7 @@ Core style rules for Pest tests here:
 - For collections, prefer semantic helpers: `expect($users)->each->active->toBeTrue();`.
 
 Readable chaining pattern (preferred):
+
 ```php
 it('calculates monetary breakdown')
     ->expect($order)->subtotal->toBe(100_00)
@@ -205,6 +229,7 @@ it('calculates monetary breakdown')
 ```
 
 Spacing example with setup and multiple chains:
+
 ```php
 it('generates invoice payload')
     ->tap(function () {
@@ -224,6 +249,7 @@ it('generates invoice payload')
 ```
 
 Dataset + higher-order expectation (concise form):
+
 ```php
 use Illuminate\Support\Str;
 
@@ -239,6 +265,7 @@ it('slugifies provided titles')
 ```
 
 Anti-patterns to avoid:
+
 - Chaining 6+ heterogeneous expectations (split tests).
 - Embedding database queries directly in an expectation chain.
 - Asserting internal private state via reflection—assert public behavior instead.
@@ -362,11 +389,12 @@ If Copilot suggests a big block:
 - [ ] Strict types declared.
 - [ ] No secrets / credentials.
 - [ ] Imports trimmed & organized.
-- [ ] Tests added/updated & passing.
+- [ ] Tests added/updated & passing (run with `./vendor/bin/pest`).
 - [ ] Lint (`composer lint`) clean.
 - [ ] Static analysis (`composer analyze`) clean or justified.
 - [ ] README / docs updated if needed.
 - [ ] Commit message semantic.
+- [ ] **Never use `php artisan` in this package; use `vendor/bin/*` and orchestral/testbench if needed.**
 
 ---
 
@@ -425,12 +453,14 @@ To prevent regressions like missing class/enum case references (e.g. wrong helpe
 6. Add a minimal test when adding cache-flush logic to guarantee an existing Enum case remains valid (e.g. assert `CacheEnum::HasDefaultTheme` resolves and is a `CacheEnum`).
 
 Quick Command Set:
+
 ```
 composer analyze
 grep -R "CacheEnum::" packages/core/src/Observers
 ```
 
 Failure Handling:
+
 - If PHPStan reports `class.notFound` or `classConstant.notFound`, fix imports/case names instead of suppressing.
 - Do NOT commit while analysis fails; treat as a hard blocker.
 
@@ -444,6 +474,7 @@ Integrate a local git pre-commit hook running `composer analyze` and rejecting f
 The codebase favors self-explanatory naming and structure over comments. AI suggestions MUST NOT introduce superfluous comments.
 
 Allowed comment types ONLY:
+
 - Public surface docblocks (classes, interfaces, abstract methods) that clarify contracts or complex return types (e.g. generics, array shapes).
 - Security, performance, or algorithmic rationale where non-obvious (e.g. explaining a deliberate `O(n)` trade-off, cryptographic decision, or concurrency guard).
 - `@deprecated` / migration notes with planned removal version.
@@ -451,6 +482,7 @@ Allowed comment types ONLY:
 - Critical domain invariants or constraints that are not self-evident from code alone.
 
 Explicitly FORBIDDEN:
+
 - Redundant narration (e.g. `// set variable`, `// loop through items`).
 - Comments echoing code (`// increment i`).
 - Auto-generated filler (`// added import`, `// beginning of class`).
@@ -458,12 +490,14 @@ Explicitly FORBIDDEN:
 - Leaving commented‑out code in commits (delete or move to a gist/revision history).
 
 Enforcement Rules:
+
 - PRs containing forbidden comment styles must be revised before merge.
 - When replacing commented logic with clearer code, REMOVE the comment instead of updating it.
 - Prefer extracting well-named methods/Enums over explaining logic inline.
 - AI tooling should default to zero comments unless one of the allowed categories applies.
 
 Review Checklist Addition:
+
 - [ ] No unnecessary comments; all remaining comments fit an allowed category.
 
 Refactoring Guidance:
@@ -471,16 +505,25 @@ If a comment explains a block >3 lines, consider extracting a method named after
 
 Example Transform:
 Bad:
+
 ```php
 // fetch active users
 $users = User::query()->where('active', true)->get();
 ```
+
 Good:
+
 ```php
 $activeUsers = User::query()->where('active', true)->get();
 ```
+
 Exceptional (Allowed):
+
 ```php
 // Using array cache driver intentionally: avoids cross-request persistence & enables atomic test isolation.
 $cached = Cache::driver('array')->get($key);
 ```
+
+---
+
+**Note:** This is a package repository. `php artisan` does not exist in this context. Always use `vendor/bin/*` (e.g., `./vendor/bin/pest`) for running tests and CLI tools. If Laravel integration is required, orchestral/testbench will be used automatically.

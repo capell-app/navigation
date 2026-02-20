@@ -4,31 +4,37 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Layout;
 
-use Capell\Admin\CapellAdminManager;
+use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
-use Capell\Core\CapellCoreManager;
 use Capell\Core\Facades\CapellCore;
+use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
-use Override;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
+use Illuminate\Foundation\Application;
+use Livewire\LivewireServiceProvider;
 
 class LayoutTestCase extends AbstractTestCase
 {
-    #[Override]
+    protected string $packageServiceName = 'capell-layout';
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->registerAndMigrateSettings([
-            ...CapellCoreManager::getSettingMigrations(),
-        ], __DIR__ . '/../../../vendor/capell-app/core/database/settings');
-
-        $this->registerAndMigrateSettings([
-            ...CapellAdminManager::getSettingMigrations(),
-        ], __DIR__ . '/../../../vendor/capell-app/admin/database/settings');
+        $this->registerAndMigrateSettings(
+            CapellCore::getSettingMigrations(),
+            __DIR__ . '/../../../vendor/capell-app/core/database/settings',
+        );
+        $this->registerAndMigrateSettings(
+            CapellAdmin::getSettingMigrations(),
+            __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
+        );
     }
 
+    /**
+     * @param  Application  $app
+     * @return class-string[]
+     */
     protected function getPackageProviders($app): array
     {
         return [
@@ -36,20 +42,20 @@ class LayoutTestCase extends AbstractTestCase
             LayoutServiceProvider::class,
             AdminPanelProvider::class,
             AdminServiceProvider::class,
+            FrontendServiceProvider::class,
+            LivewireServiceProvider::class,
         ];
     }
 
-    #[Override]
+    /**
+     * @param  Application  $app
+     */
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(LayoutServiceProvider::$packageName);
-    }
-
-    protected function requiredPackages(): array
-    {
-        return ['layout'];
     }
 }

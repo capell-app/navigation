@@ -5,12 +5,11 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
 use Capell\Frontend\Http\Middleware\HtmlCacheMiddleware;
 use Capell\Frontend\Http\Middleware\ResolveFrontend;
-use Capell\Frontend\Livewire\Page\SitemapPage;
 use Saade\FilamentAdjacencyList\Forms\Components\Concerns\HasRelationship;
 
 arch('Layout package to be standalone')
     ->expect('Capell\Layout')
-    ->not->toUse(['Capell\Blog']);
+    ->not()->toUse(['Capell\Blog']);
 
 arch()
     ->preset()
@@ -44,7 +43,6 @@ it('does not use exit functions')
     ->toBeUsedInNothing()
     ->ignoring([
         HtmlCacheMiddleware::class,
-        SitemapPage::class,
     ]);
 
 arch()->expect(['env', 'sleep', 'usleep'])->toBeUsedInNothing();

@@ -7,8 +7,8 @@ use Capell\Core\Models\Navigation;
 use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Models\Widget;
-use Capell\Layout\Services\Creator\TypeCreator;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Layout\Support\Creator\TypeCreator;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 
 use function Pest\Laravel\assertSoftDeleted;
@@ -112,7 +112,7 @@ test('can edit widget', function (WidgetTypeEnum $typeEum): void {
         WidgetTypeEnum::Navigation => $typeCreator->navigationWidgetType(),
         WidgetTypeEnum::Pages => $typeCreator->pagesWidgetType(),
         WidgetTypeEnum::PageContents => $typeCreator->pageContentWidgetType(),
-        WidgetTypeEnum::PageResults => $typeCreator->pageResultsWidgetType(),
+        WidgetTypeEnum::Results => $typeCreator->resultsWidgetType(),
         WidgetTypeEnum::Assets => $typeCreator->assetsWidgetType(),
         WidgetTypeEnum::System => $typeCreator->systemWidgetType(),
         WidgetTypeEnum::ContentBuilder => $typeCreator->contentBuilderWidgetType(),

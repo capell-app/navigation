@@ -6,32 +6,58 @@ namespace Capell\Tests\Packages;
 
 use Capell\Address\Providers\AddressServiceProvider;
 use Capell\Admin\Providers\AdminServiceProvider;
+use Capell\Assistant\Providers\AssistantServiceProvider;
 use Capell\Blog\Providers\BlogServiceProvider;
+use Capell\Core\Facades\CapellCore;
 use Capell\Core\Providers\CapellServiceProvider;
 use Capell\Frontend\Providers\FrontendServiceProvider;
+use Capell\Hero\Providers\HeroServiceProvider;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Capell\Tests\AbstractTestCase;
-use Capell\Tests\Fixtures\Support\Filament\AdminPanelProvider;
+use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
+use Illuminate\Foundation\Application;
+use Livewire\LivewireServiceProvider;
+use Override;
 
 class PackagesTestCase extends AbstractTestCase
 {
+    protected string $packageServiceName = 'capell-packages';
+
+    /**
+     * @param  Application  $app
+     * @return class-string[]
+     */
     protected function getPackageProviders($app): array
     {
         return [
             ...parent::getPackageProviders($app),
             AddressServiceProvider::class,
-            BlogServiceProvider::class,
             LayoutServiceProvider::class,
             BlogServiceProvider::class,
+            HeroServiceProvider::class,
+            AssistantServiceProvider::class,
             FrontendServiceProvider::class,
             CapellServiceProvider::class,
             AdminPanelProvider::class,
             AdminServiceProvider::class,
+            LivewireServiceProvider::class,
         ];
     }
 
-    protected function requiredPackages(): array
+    /**
+     * @param  Application  $app
+     */
+    #[Override]
+    protected function getEnvironmentSetUp($app): void
     {
-        return ['address', 'layout', 'blog', 'hero', 'frontend', 'admin'];
+        parent::getEnvironmentSetUp($app);
+
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(HeroServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(AssistantServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(LayoutServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
     }
 }

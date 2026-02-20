@@ -30,7 +30,7 @@ class HeroWidgetSchema extends AssetsWidgetSchema
                 ->columns(['default' => 2, 'xl' => 3])
                 ->schema(CarouselSettingsSchema::make()),
             WidgetDisplaySection::make([
-                ColorSchemeComponent::make('color_scheme'),
+                ColorSchemeComponent::make('color'),
                 Select::make('height')
                     ->label(__('capell-admin::form.height'))
                     ->placeholder(__('capell-admin::generic.none'))

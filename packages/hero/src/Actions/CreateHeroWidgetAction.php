@@ -8,12 +8,16 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
 use Capell\Hero\Enums\WidgetComponentEnum;
+use Capell\Hero\Enums\WidgetTypeEnum;
 use Capell\Hero\Filament\Resources\Widgets\Schemas\Types\HeroWidgetSchema;
-use Capell\Layout\Enums\AssetEnum;
+use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Enums\WidgetTypeEnum;
+use Capell\Layout\Enums\WidgetTypeGroupEnum;
+use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
+use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\AssetsWidgetSchema;
 use Capell\Layout\Models\Widget;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -21,6 +25,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 class CreateHeroWidgetAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(): Widget
@@ -28,23 +33,13 @@ class CreateHeroWidgetAction
         /** @var class-string<Widget> $widgetModel */
         $widgetModel = CapellCore::getModel(ModelEnum::Widget->name);
 
-        /** @var class-string<Type> */
-        $typeModel = CapellCore::getModel(CoreModelEnum::Type->name);
-
-        $type = $typeModel::query()->firstOrCreate([
-            'key' => WidgetTypeEnum::Assets,
-            'type' => LayoutTypeEnum::Widget,
-        ], [
-            'name' => 'Assets Widget',
-        ]);
-
         return $widgetModel::query()->firstOrCreate([
             'key' => 'hero',
         ], [
             'name' => __('capell-hero::generic.hero'),
-            'type_id' => $type->id,
+            'type_id' => $this->createType()->id,
             'meta' => [
-                'component' => WidgetComponentEnum::Hero->value,
+                'component' => WidgetComponentEnum::Hero,
                 'heading_size' => 'h1',
                 'height' => 'large',
                 'carousel_fade' => true,
@@ -53,12 +48,45 @@ class CreateHeroWidgetAction
                 'carousel_loop' => true,
                 'carousel_auto' => true,
                 'carousel_auto_delay' => 50000,
-                'color_scheme' => 'dark',
+                'color' => 'dark',
+                'extra_relations' => [
+                    'assets.asset.translation',
+                ],
             ],
             'admin' => [
                 'icon' => 'heroicon-o-gift',
                 'schema' => HeroWidgetSchema::getKey(),
-                'asset_types' => [AssetEnum::Content->value],
+                'asset_types' => [LayoutAssetEnum::Content->value],
+            ],
+        ]);
+    }
+
+    private function createType(): Type
+    {
+        /** @var class-string<Type> */
+        $typeModel = CapellCore::getModel(CoreModelEnum::Type->name);
+
+        return $typeModel::query()->firstOrCreate([
+            'key' => WidgetTypeEnum::Hero,
+            'type' => LayoutTypeEnum::Widget,
+        ], [
+            'name' => __('capell-hero::generic.hero'),
+            'group' => WidgetTypeGroupEnum::Asset,
+            'admin' => [
+                'type_schema' => WidgetTypeSchema::getKey(),
+                'schema' => AssetsWidgetSchema::getKey(),
+                'icon' => 'heroicon-o-gift',
+                'asset_types' => [
+                    \Capell\Core\Enums\AssetEnum::Page,
+                    LayoutAssetEnum::Content,
+                ],
+            ],
+            'meta' => [
+                'component' => \Capell\Layout\Enums\WidgetComponentEnum::Assets,
+                'additional_asset_relations' => [
+                    'related.translation',
+                    'related.pageUrl',
+                ],
             ],
         ]);
     }

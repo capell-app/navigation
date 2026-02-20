@@ -6,6 +6,7 @@ namespace Capell\Hero\Actions;
 
 use Capell\Core\Models\Layout;
 use Capell\Layout\Models\Widget;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -13,6 +14,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 class AddHeroToLayoutAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(Layout $layout): void

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use Capell\Address\Filament\Resources\Addresses\Pages\ManageAddresses;
 use Capell\Address\Models\Address;
-use Capell\Admin\Filament\Actions\CreateModalAction;
+use Capell\Admin\Filament\Actions\CreateAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -102,7 +102,7 @@ test('can create address', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(0)
         ->callAction(
-            CreateModalAction::class,
+            CreateAction::class,
             [
                 'name' => $address->name,
                 'line1' => $address->line1,
@@ -131,7 +131,7 @@ test('can not create address', function (): void {
     livewire(ManageAddresses::class)
         ->assertSuccessful()
         ->callAction(
-            CreateModalAction::class,
+            CreateAction::class,
             data: [
                 'name' => '',
                 'line1' => '',

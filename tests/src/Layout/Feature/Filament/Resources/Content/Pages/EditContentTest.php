@@ -6,7 +6,7 @@ use Capell\Admin\Filament\Actions\DeleteAction;
 use Capell\Core\Models\Site;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Models\Content;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Livewire\livewire;

@@ -22,7 +22,7 @@ describe('Address model', function (): void {
     it('can relate to a country', function (): void {
         $country = Country::factory()->create(['name' => 'Testland']);
         $address = Address::factory()->create(['country_id' => $country->id]);
-        expect($address->country)->not->toBeNull();
+        expect($address->country)->not()->toBeNull();
         expect($address->country->name)->toBe('Testland');
     });
 

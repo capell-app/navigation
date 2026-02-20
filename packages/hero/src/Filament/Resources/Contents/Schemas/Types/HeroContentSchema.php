@@ -8,7 +8,7 @@ use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\MediaLibraryFileUpload;
-use Capell\Admin\Filament\Components\Forms\Page\PageSelect;
+use Capell\Admin\Filament\Components\Forms\PageSelect;
 use Capell\Admin\Filament\Components\Forms\PublishSection;
 use Capell\Layout\Filament\Components\Forms\ActionsRepeater;
 use Capell\Layout\Filament\Components\Forms\AssetsRepeater;
@@ -79,11 +79,11 @@ class HeroContentSchema extends DefaultContentSchema
     {
         return [
             Section::make()
-                ->contained(fn (string $operation): bool => $operation === 'create')
                 ->hiddenOn('edit')
                 ->columnSpanFull()
                 ->columns()
-                ->schema(ContentDetailsSchema::make($schema)),
+                ->schema(ContentDetailsSchema::make($schema))
+                ->contained(fn (string $operation): bool => $operation === 'create'),
             FixedWidthSidebar::make()
                 ->mainSchema([
                     Tabs::make()
@@ -172,7 +172,7 @@ class HeroContentSchema extends DefaultContentSchema
     protected function getAssetsComponent(Schema $schema): AssetsRepeater
     {
         return AssetsRepeater::make('assets')
-            ->compact()
+            ->compactRepeater()
             ->hiddenLabel()
             ->hint(__('capell-admin::generic.widget_assets_repeater_hint'));
     }

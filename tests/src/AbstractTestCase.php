@@ -11,13 +11,14 @@ use BezhanSalleh\FilamentShield\Support\Utils;
 use Bkwld\Cloner\ServiceProvider as ClonerServiceProvider;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
-use Camya\Filament\FilamentTitleWithSlugServiceProvider;
-use Capell\Core\CapellCoreManager;
+use Capell\Core\Data\PackageData;
+use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageTranslation;
 use Capell\Core\Providers\CapellServiceProvider;
 use Capell\Tests\Fixtures\Models\User;
 use Capell\Tests\Fixtures\Policies\RolePolicy;
+use CmsMulti\FilamentClearCache\FilamentClearCacheServiceProvider;
 use CodeWithDennis\FilamentSelectTree\FilamentSelectTreeServiceProvider;
 use Filament\Actions\ActionsServiceProvider;
 use Filament\FilamentServiceProvider;
@@ -37,22 +38,23 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSetServiceProvider;
 use LaraZeus\SpatieTranslatable\SpatieTranslatableServiceProvider;
-use Livewire\LivewireServiceProvider;
 use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
-use Rmsramos\Activitylog\ActivitylogServiceProvider;
 use RuntimeException;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
+use Sinnbeck\DomAssertions\DomAssertionsServiceProvider;
+use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
@@ -72,7 +74,7 @@ abstract class AbstractTestCase extends TestCase
     use WithFaker;
     use WithWorkbench;
 
-    protected array $packageMigrations = [];
+    protected string $packageName;
 
     protected function setUp(): void
     {
@@ -82,9 +84,13 @@ abstract class AbstractTestCase extends TestCase
 
         parent::setUp();
 
+        // Hacky fix for running in parallel causing Blade namespaces to not always be registered
+        Blade::componentNamespace('Capell\\Blog\\View\\Components', 'capell-blog');
+        Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
+
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
-        $migrations = CapellCoreManager::getMigrations();
+        $migrations = CapellCore::getMigrations();
         $path = realpath(__DIR__ . '/../../vendor/capell-app/core/database/migrations');
 
         if (! $path) {
@@ -95,19 +101,12 @@ abstract class AbstractTestCase extends TestCase
 
         array_walk($migrations, fn (&$migration): string => $migration = sprintf('%s/%s.php', $path, $migration));
 
-        $this->loadMigrationsFrom($migrations);
-
         // Load migrations for any explicitly required dependent packages.
-        foreach ($this->requiredPackages() as $requiredPackage) {
-            $this->packageMigrations = [
-                ...$this->packageMigrations,
-                ...$this->discoverPackageMigrations($requiredPackage),
-            ];
-        }
+        CapellCore::getInstalledPackages()->each(function (PackageData $package) use (&$migrations): void {
+            $migrations = array_merge($migrations, $this->discoverPackageMigrations($package->path));
+        });
 
-        if ($this->packageMigrations !== []) {
-            $this->loadMigrationsFrom(array_values(array_unique($this->packageMigrations)));
-        }
+        $this->loadMigrationsFrom($migrations);
 
         Http::preventStrayRequests();
 
@@ -122,17 +121,6 @@ abstract class AbstractTestCase extends TestCase
         $this->setUpDatabase();
 
         $this->withoutVite();
-    }
-
-    /**
-     * Packages whose migrations are required in addition to the primary package.
-     * Override in package test cases as needed (e.g. blog requires layout).
-     *
-     * @return string[]
-     */
-    protected function requiredPackages(): array
-    {
-        return [];
     }
 
     /**
@@ -155,6 +143,10 @@ abstract class AbstractTestCase extends TestCase
         Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
     }
 
+    /**
+     * @param  Application  $app
+     * @return class-string[]
+     */
     protected function getPackageProviders($app): array
     {
         return [
@@ -175,11 +167,10 @@ abstract class AbstractTestCase extends TestCase
             FilamentServiceProvider::class,
             FilamentAdjacencyListServiceProvider::class,
             FilamentShieldServiceProvider::class,
-            FilamentTitleWithSlugServiceProvider::class,
             FilamentSelectTreeServiceProvider::class,
-            ActivitylogServiceProvider::class,
+            FilamentClearCacheServiceProvider::class,
             FormsServiceProvider::class,
-            \Spatie\Activitylog\ActivitylogServiceProvider::class,
+            ActivitylogServiceProvider::class,
             LaravelDataServiceProvider::class,
             NestedSetServiceProvider::class,
             LaravelServiceProvider::class,
@@ -187,6 +178,7 @@ abstract class AbstractTestCase extends TestCase
             IconPickerServiceProvider::class,
             LaravelDraftsServiceProvider::class,
             RayServiceProvider::class,
+            DomAssertionsServiceProvider::class,
             SupportServiceProvider::class,
             SchemasServiceProvider::class,
             CapellServiceProvider::class,
@@ -195,7 +187,6 @@ abstract class AbstractTestCase extends TestCase
             TagsServiceProvider::class,
             MediaLibraryServiceProvider::class,
             WidgetsServiceProvider::class,
-            LivewireServiceProvider::class,
             NotificationsServiceProvider::class,
         ];
     }
@@ -216,18 +207,13 @@ abstract class AbstractTestCase extends TestCase
         }
 
         // config('filament-shield.register_role_policy.enabled', false);
+        Config::set('filament-shield.authenticable-resources', [User::class]);
         Config::set('filament-shield.auth_provider_model', User::class);
 
         // Prevent role being assigned to created user
         Config::set('filament-shield.panel_user.enabled', false);
 
         Config::set('auth.providers.users.model', User::class);
-
-        Config::set('filesystems.disks.page_cache', [
-            'driver' => 'local',
-            'root' => public_path('page-cache'),
-            'throw' => false,
-        ]);
 
         // Spatie Permission testing flag for sqlite compatibility
         Config::set('permission.testing', true);
@@ -330,9 +316,14 @@ abstract class AbstractTestCase extends TestCase
         }
     }
 
-    private function discoverPackageMigrations(string $package): array
+    private function discoverPackageMigrations(string $path): array
     {
-        $path = realpath(__DIR__ . '/../../packages/' . $package . '/database/migrations');
+        $path = realpath($path . '/database/migrations');
+
+        if (! $path) {
+            return [];
+        }
+
         $files = glob($path . '/*.php');
 
         return $files === false ? [] : $files;

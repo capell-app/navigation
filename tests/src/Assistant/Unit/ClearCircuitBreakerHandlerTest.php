@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+use Capell\Admin\Support\AdminEventRegistry;
+use Capell\Admin\Support\AdminEventRouter;
+use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
+use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Tests\Assistant\Fixtures\HandlerDummyComponent;
+use Filament\Notifications\Notification;
+
+it('registers clear-circuit-breaker handler for EditPage and executes', function (): void {
+    // Use the global app container to align with resolve()
+    $app = app();
+
+    $mockProvider = new class extends OpenAIProvider
+    {
+        public bool $resetCalled = false;
+
+        public function resetCircuitBreaker(): void
+        {
+            $this->resetCalled = true;
+        }
+    };
+    $app->instance(OpenAIProvider::class, $mockProvider);
+
+    $app->bind(ClearCircuitBreakerHandler::class, fn (): ClearCircuitBreakerHandler => new ClearCircuitBreakerHandler);
+
+    $router = new AdminEventRouter($app, $app->make(AdminEventRegistry::class));
+
+    // Register event mapping for the dummy component used in this unit test
+    $app->make(AdminEventRegistry::class)
+        ->register(HandlerDummyComponent::class, 'clear-circuit-breaker', ClearCircuitBreakerHandler::class);
+
+    $component = new HandlerDummyComponent;
+    $router->handle('clear-circuit-breaker', [], $component);
+
+    expect($mockProvider->resetCalled)->toBeTrue();
+    Notification::assertNotified();
+});

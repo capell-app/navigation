@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Capell\Blog\Database\Factories\ArticlePageFactory;
+use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
 use Capell\Core\Models\Page;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
 
@@ -19,7 +19,7 @@ beforeEach(function (): void {
 test('can list articles', function (): void {
     Page::factory()->withTranslations()->count(5)->create();
 
-    $pages = (new ArticlePageFactory)->withTranslations()->withTags()->count(5)->create();
+    $pages = (new ArticleFactory)->withTranslations()->withTags()->count(5)->create();
 
     livewire(ListArticles::class)
         ->assertSuccessful()

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Address\Filament\Resources\Addresses\AddressResource;
-use Capell\Tests\Fixtures\Support\Concerns\CreatesAdminUser;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;
 
