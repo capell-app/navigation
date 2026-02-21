@@ -207,9 +207,7 @@ class Widget extends Model implements HasMedia, PageCacheable, Publishable, Stat
 
     public function getMetaComponentType(): string
     {
-        $metaComponent = $this->getMetaComponent();
-
-        if ($metaComponent && str_contains($metaComponent, 'livewire')) {
+        if ($this->meta['livewire'] ?? $this->type->meta['livewire'] ?? false) {
             return 'livewire';
         }
 

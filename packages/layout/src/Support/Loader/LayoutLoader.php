@@ -91,9 +91,12 @@ class LayoutLoader
             Content::class => Content::getMorphRelations($language),
             Page::class => Page::getMorphRelations($language),
         ];
+
         foreach ($layoutWidgets as $widget) {
             $component = $widget->getComponent();
-            $livewire = $widget->type->meta['livewire'] ?? false;
+            $componentType = $widget->getMetaComponentType();
+            $livewire = $componentType === 'livewire';
+
             $componentClass = GetComponentClassAction::run($component, $livewire);
             if (method_exists($componentClass, 'loadWidgetAssets')) {
                 $componentClass::loadWidgetAssets($with, $language);

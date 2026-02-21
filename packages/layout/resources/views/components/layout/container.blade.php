@@ -6,27 +6,27 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Facades\CapellCore;
-                    use Capell\Core\Models\Layout;
-                    use Capell\Frontend\Facades\Frontend;
-                    use Capell\Layout\Facades\CapellLayout;
-                    use Spatie\MediaLibrary\MediaCollections\Models\Media;
+    use Capell\Core\Models\Layout;
+    use Capell\Frontend\Facades\Frontend;
+    use Capell\Layout\Facades\CapellLayout;
+    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 @endphp
 
 @props([
-'colspan' => 12,
-'columnStart' => 0,
-'container',
-'containerKey',
-'containerIndex',
-'containerWidth' => $container['meta']['container'] ?? null,
-'layout',
-'spacing' => $container['meta']['spacing'] ?? null,
-'padding' => $container['meta']['padding'] ?? [],
-'margin' => $container['meta']['margin'] ?? [],
-'htmlClass' => '',
-'previousColspan' => null,
-'pageSlot' => null,
-'tag' => $container['meta']['tag'] ?? 'div',
+    'colspan' => 12,
+    'columnStart' => 0,
+    'container',
+    'containerKey',
+    'containerIndex',
+    'containerWidth' => $container['meta']['container'] ?? null,
+    'layout',
+    'spacing' => $container['meta']['spacing'] ?? null,
+    'padding' => $container['meta']['padding'] ?? [],
+    'margin' => $container['meta']['margin'] ?? [],
+    'htmlClass' => '',
+    'previousColspan' => null,
+    'pageSlot' => null,
+    'tag' => $container['meta']['tag'] ?? 'div',
 ])
 {{-- format-ignore-start --}}
 @php
@@ -82,34 +82,34 @@ declare(strict_types=1);
 <div
     id="layout-container-{{ $containerKey }}"
     @class([
-    'layout-container',
-    $htmlClass => (bool) $htmlClass,
-    'space-y-4' => $spacing === 'sm',
-    'space-y-2' => $spacing === 'md',
-    'space-y-10' => $spacing === 'lg',
-    'py-4' => in_array('sm', $padding, true),
-    'pt-4' => in_array('t-sm', $padding, true),
-    'pb-4' => in_array('b-sm', $padding, true),
-    'py-8' => in_array('md', $padding, true),
-    'pt-8' => in_array('t-md', $padding, true),
-    'pb-8' => in_array('b-md', $padding, true),
-    'py-10' => in_array('lg', $padding, true),
-    'pt-10' => in_array('t-lg', $padding, true),
-    'pb-10' => in_array('b-lg', $padding, true),
-    'pt-20' => in_array('t-xl', $padding, true),
-    'pb-20' => in_array('b-xl', $padding, true),
-    'my-4' => in_array('sm', $margin, true),
-    'mt-4' => in_array('t-sm', $margin, true),
-    'mb-4' => in_array('b-sm', $margin, true),
-    'my-6 lg:my-10' => in_array('md', $margin, true),
-    'mt-6' => in_array('t-md', $margin, true),
-    'mb-6' => in_array('b-md', $margin, true),
-    'my-10' => in_array('lg', $margin, true),
-    'mt-10' => in_array('t-lg', $margin, true),
-    'mb-10' => in_array('b-lg', $margin, true),
-    'm-20' => in_array('xl', $margin, true),
-    'mt-20' => in_array('t-xl', $margin, true),
-    'mb-20' => in_array('b-xl', $margin, true),
+        'layout-container',
+        $htmlClass => (bool) $htmlClass,
+        'space-y-4' => $spacing === 'sm',
+        'space-y-2' => $spacing === 'md',
+        'space-y-10' => $spacing === 'lg',
+        'py-4' => in_array('sm', $padding, true),
+        'pt-4' => in_array('t-sm', $padding, true),
+        'pb-4' => in_array('b-sm', $padding, true),
+        'py-8' => in_array('md', $padding, true),
+        'pt-8' => in_array('t-md', $padding, true),
+        'pb-8' => in_array('b-md', $padding, true),
+        'py-10' => in_array('lg', $padding, true),
+        'pt-10' => in_array('t-lg', $padding, true),
+        'pb-10' => in_array('b-lg', $padding, true),
+        'pt-20' => in_array('t-xl', $padding, true),
+        'pb-20' => in_array('b-xl', $padding, true),
+        'my-4' => in_array('sm', $margin, true),
+        'mt-4' => in_array('t-sm', $margin, true),
+        'mb-4' => in_array('b-sm', $margin, true),
+        'my-6 lg:my-10' => in_array('md', $margin, true),
+        'mt-6' => in_array('t-md', $margin, true),
+        'mb-6' => in_array('b-md', $margin, true),
+        'my-10' => in_array('lg', $margin, true),
+        'mt-10' => in_array('t-lg', $margin, true),
+        'mb-10' => in_array('b-lg', $margin, true),
+        'm-20' => in_array('xl', $margin, true),
+        'mt-20' => in_array('t-xl', $margin, true),
+        'mb-20' => in_array('b-xl', $margin, true),
     ])
 >
     @foreach ($container['widgets'] as $widgetIndex => $widgetData)
@@ -125,13 +125,12 @@ declare(strict_types=1);
                 continue;
             }
 
-            $type = $widget->getMetaComponentType();
-
             $component = $widget->getComponent();
-
             if (! $component) {
                 continue;
             }
+
+            $type = $widget->getMetaComponentType();
 
             $currentColspan = $previousColspan + $colspan;
             if ($columnStart) {

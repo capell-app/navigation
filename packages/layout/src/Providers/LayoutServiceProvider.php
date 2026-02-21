@@ -24,13 +24,13 @@ use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Providers\FrontendServiceProvider;
+use Capell\Frontend\Support\Blocks\BlockRegistry;
 use Capell\Layout\Console\Commands\DemoCommand;
 use Capell\Layout\Console\Commands\InstallCommand;
 use Capell\Layout\Console\Commands\SetupCommand;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Enums\LivewireComponentsEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\ResourceEnum as LayoutResourceEnum;
 use Capell\Layout\Enums\TypeSchemaEnum;
@@ -325,15 +325,28 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLivewireComponents(): self
     {
-        foreach (LivewireComponentsEnum::getComponents() as $name => $component) {
-            if (! $component) {
-                continue;
+        if ($this->isLivewireV3()) {
+            $registry = resolve(BlockRegistry::class);
+            foreach ($registry->allLivewire() as $name => $component) {
+                Livewire::component($name, $component);
             }
-
-            Livewire::component($name, $component);
+        } else {
+            Livewire::addNamespace(
+                namespace: 'capell-layout',
+                classNamespace: 'Capell\\Layout\\Livewire',
+                classPath: __DIR__ . '/../Livewire',
+                classViewPath: __DIR__ . '/../../resources/views/livewire',
+            );
         }
 
         return $this;
+    }
+
+    private function isLivewireV3(): bool
+    {
+        $version = InstalledVersions::getVersion('livewire/livewire');
+
+        return version_compare($version, '4.0.0', '<');
     }
 
     private function registerBladeComponents(): self

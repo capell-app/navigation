@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\WithPagination;
 
-class PagesWidget extends AbstractWidget
+class Pages extends AbstractWidget
 {
     use WithPagination;
 
