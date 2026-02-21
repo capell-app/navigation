@@ -43,7 +43,7 @@ return new class extends Migration
 
             $table->index(['site_id', 'type_id', 'order']);
             $table->index(['site_id', 'type_id', 'parent_id']);
-            $table->index(['site_id', 'type_id', 'publish_from', 'publish_until']);
+            $table->index(['site_id', 'type_id', 'publish_from', 'publish_to']);
             $table->index(['site_id', 'type_id', 'is_published', 'is_current']);
             $table->index(NestedSet::getDefaultColumns());
         });

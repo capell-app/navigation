@@ -28,17 +28,7 @@ class InstallCommand extends Command
 
         AssignPermissionsToRole::run(resources: ResourceEnum::cases());
 
-        if (! $this->publishMigrations('create_tag_tables', base_path('vendor/spatie/laravel-tags/database/migrations'))) {
-            $this->error('Failed to publish create_tag_tables migration.');
-
-            return Command::FAILURE;
-        }
-
-        if (! $this->publishMigrations('alter_tags_table', __DIR__ . '/../../../database/migrations')) {
-            $this->error('Failed to publish alter_tags_table migration.');
-
-            return Command::FAILURE;
-        }
+        $this->publishMigrations();
 
         $this->call('migrate');
 
@@ -50,21 +40,14 @@ class InstallCommand extends Command
         return self::SUCCESS;
     }
 
-    private function publishMigrations(string $migration, string $path): bool
+    private function publishMigrations(): bool
     {
-        if (! is_dir($path)) {
-            $this->error('Migrations directory does not exist.');
+        $migrations = [
+            base_path('vendor/spatie/laravel-tags/database/migrations/create_tag_tables.php.stub'),
+            __DIR__ . '/../../../database/migrations/alter_tags_table.php',
+        ];
 
-            return false;
-        }
-
-        $this->call(
-            'capell:publish-migrations',
-            [
-                '--items' => [$migration],
-                '--path' => $path,
-            ],
-        );
+        $this->call('capell:publish-migrations', ['--items' => $migrations]);
 
         return true;
     }

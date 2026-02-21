@@ -7,6 +7,8 @@
 .phpunit.cache
 .phpunit.result.cache
 /build
+/coverage
+/deploy
 /storage
 Thumbs.db
 _ide-helper.php
@@ -18,4 +20,3 @@ package-lock.json
 ray.php
 testbench.yaml
 vendor
-/coverage
