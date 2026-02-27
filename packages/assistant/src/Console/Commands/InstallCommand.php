@@ -27,7 +27,7 @@ class InstallCommand extends Command
 
         $this->call('capell:publish-migrations', [
             '--items' => [
-                'create_ai_generation_histories_table',
+                '2026_01_02_000001_create_ai_generation_histories_table',
             ],
             '--path' => $migrations,
         ]);
@@ -42,7 +42,7 @@ class InstallCommand extends Command
         $this->call('capell:publish-migrations', [
             '--type' => 'settings',
             '--items' => [
-                'create_assistant_settings',
+                '2026_01_02_000001_create_assistant_settings',
             ],
             '--path' => $settings,
         ]);

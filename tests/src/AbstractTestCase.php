@@ -13,8 +13,6 @@ use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Capell\Core\Data\PackageData;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Page;
-use Capell\Core\Models\PageTranslation;
 use Capell\Core\Providers\CapellServiceProvider;
 use Capell\Tests\Fixtures\Models\User;
 use Capell\Tests\Fixtures\Policies\RolePolicy;
@@ -37,12 +35,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithSession;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSetServiceProvider;
 use LaraZeus\SpatieTranslatable\SpatieTranslatableServiceProvider;
 use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
@@ -73,8 +69,6 @@ abstract class AbstractTestCase extends TestCase
     use LazilyRefreshDatabase;
     use WithFaker;
     use WithWorkbench;
-
-    protected string $packageName;
 
     protected function setUp(): void
     {
@@ -179,6 +173,11 @@ abstract class AbstractTestCase extends TestCase
             LaravelDraftsServiceProvider::class,
             RayServiceProvider::class,
             DomAssertionsServiceProvider::class,
+            SpatieLaravelSettingsPluginServiceProvider::class,
+            CapellServiceProvider::class,
+            MediaLibraryServiceProvider::class,
+            ActivitylogServiceProvider::class,
+            LaravelSettingsServiceProvider::class,
             SupportServiceProvider::class,
             SchemasServiceProvider::class,
             CapellServiceProvider::class,
@@ -209,14 +208,24 @@ abstract class AbstractTestCase extends TestCase
         // config('filament-shield.register_role_policy.enabled', false);
         Config::set('filament-shield.authenticable-resources', [User::class]);
         Config::set('filament-shield.auth_provider_model', User::class);
+        CapellCore::registerModel('User', User::class);
 
         // Prevent role being assigned to created user
         Config::set('filament-shield.panel_user.enabled', false);
 
         Config::set('auth.providers.users.model', User::class);
 
-        // Spatie Permission testing flag for sqlite compatibility
-        Config::set('permission.testing', true);
+        Config::set('filesystems.disks.page_cache', [
+            'driver' => 'local',
+            'root' => public_path('page-cache'),
+            'throw' => false,
+        ]);
+
+        if (getenv('TEST_TOKEN')) {
+            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-' . getenv('TEST_TOKEN'));
+
+            Config::set('settings.cache.prefix', 'settings-cache-' . getenv('TEST_TOKEN'));
+        }
     }
 
     protected function getDefaultPackages(): array
@@ -236,6 +245,11 @@ abstract class AbstractTestCase extends TestCase
                 'user' => 'spatie',
                 'name' => 'laravel-permission',
                 'file' => 'permission',
+            ],
+            'settings' => [
+                'user' => 'spatie',
+                'name' => 'laravel-settings',
+                'file' => 'settings',
             ],
         ];
     }
@@ -265,19 +279,6 @@ abstract class AbstractTestCase extends TestCase
         }
 
         return glob($path . '/*.php');
-    }
-
-    protected function setupPage(Page $page, Collection $languages): void
-    {
-        $languages->each(function (int $languageId) use ($page): void {
-            $page->translations()->save(PageTranslation::factory()->make([
-                'language_id' => $languageId,
-                'title' => Str::title($page->name . ' ' . $languageId),
-                'slug' => Str::slug($page->name . ' ' . $languageId),
-            ]));
-        });
-
-        $page->refresh();
     }
 
     protected function registerAndMigrateSettings(array $migrations, string $basePath): void

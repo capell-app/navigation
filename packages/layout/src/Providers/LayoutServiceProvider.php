@@ -137,7 +137,27 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentAssets()
             ->registerPublishCommands()
             ->registerLivewireComponents()
-            ->registerBladeComponents();
+            ->registerBladeComponents()
+            ->registerModelFillableAndCasts();
+    }
+
+    private function registerModelFillableAndCasts(): self
+    {
+        /** @var Layout $layout */
+        $layout = app(Layout::class);
+
+        if (method_exists($layout, 'mergeFillable')) {
+            $layout->mergeFillable(['containers', 'widgets']);
+        }
+
+        if (method_exists($layout, 'mergeCasts')) {
+            $layout->mergeCasts([
+                'containers' => 'array',
+                'widgets' => 'array',
+            ]);
+        }
+
+        return $this;
     }
 
     private function registerModelInterceptors(): self

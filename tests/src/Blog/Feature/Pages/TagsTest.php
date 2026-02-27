@@ -77,9 +77,12 @@ test('tag page list articles by tag', function (): void {
 
     $title = trans($tagPage->translation->title, ['tag_name' => $tag->translate('name', $language->code)]);
 
+    $containers = $tagPage->layout->containers;
+    $containerWidgets = collect($containers)->pluck('widgets.*.widget_key')->flatten()->filter()->toArray();
+
     expect($tagPage)
         ->translation->title->toBe(':Tag_name Articles')
-        ->layout->getContainerWidgets()->toContain('breadcrumbs');
+        ->and($containerWidgets)->toContain('breadcrumbs');
 
     get($tag->getPageUrl($tagPage, $language))
         ->assertOk()

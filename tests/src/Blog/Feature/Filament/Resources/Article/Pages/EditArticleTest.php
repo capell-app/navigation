@@ -7,10 +7,12 @@ use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\ArticleResource;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Core\Models\Page;
+use Capell\Core\Models\PageTranslation;
 use Capell\Core\Models\Site;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Str;
 
 use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\get;
@@ -51,7 +53,15 @@ it('can save', function (): void {
 
     $page = (new ArticleFactory)->recycle($site)->create();
 
-    test()->setupPage($page, $languages);
+    $languages->each(function (int $languageId) use ($page): void {
+        $page->translations()->save(PageTranslation::factory()->make([
+            'language_id' => $languageId,
+            'title' => Str::title($page->name . ' ' . $languageId),
+            'slug' => Str::slug($page->name . ' ' . $languageId),
+        ]));
+    });
+
+    $page->refresh();
 
     $newData = (new ArticleFactory)->site($site)->make();
 

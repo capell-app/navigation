@@ -183,14 +183,7 @@ class DemoCommand extends Command
             ->limit(50)
             ->count();
 
-        $pagesForAssociationCount = $pageModel::query()
-            ->where('site_id', $site->id)
-            ->notHomePage()
-            ->whereHas('type', fn (BuilderContract $query): BuilderContract => $query->whereIn('key', ['default', 'article']))
-            ->limit(50)
-            ->count();
-
-        $totalSteps = $pagesToCreate + $pagesForTagsCount + $pagesForAssociationCount + 1; // +1 for CreateBlogPagesAction
+        $totalSteps = $pagesToCreate + $pagesForTagsCount + 1; // +1 for CreateBlogPagesAction
         $this->startProgress($totalSteps);
 
         $this->setProgressMessage('Ensuring required blog and ancillary pages exist');
@@ -237,31 +230,57 @@ class DemoCommand extends Command
             return false;
         }
 
-        $demo = (array) (config('capell-demo.pages', []));
+        $demo = $this->getDemoData($site->name, $site->languages->pluck('code')->toArray());
         $createdCount = 0;
 
         $type = $this->blogCreator->createArticlePageType();
 
-        foreach ($demo as $pageData) {
-            if ($limit !== null && $createdCount >= $limit) {
-                break;
-            }
-
-            $createdCount += $this->createDemoArticleRecursive(
-                $pageData,
-                $site,
-                $site->languages,
-                $site->language,
-                $blogPage,
-                '',
-                $type,
-                $user,
-                $limit,
-                $createdCount,
-            );
-        }
+        $this->createDemoArticleRecursive(
+            $demo['children'],
+            $site,
+            $site->languages,
+            $site->language,
+            $blogPage,
+            '',
+            $type,
+            $user,
+            $limit,
+            $createdCount,
+        );
 
         return true;
+    }
+
+    private function getDemoData(?string $name, array $languages): array
+    {
+        $data = collect(config('capell-demo.pages'));
+
+        if ($name !== null && $data->where('name.en', $name)->isNotEmpty()) {
+            $data = $data->firstWhere(fn (array $item): bool => $item['name']['en'] === $name);
+        } else {
+            $data = [
+                'name' => array_combine($languages, array_fill(0, count($languages), $name)),
+                'children' => $data->pluck('children')->flatten(1)->toArray(),
+            ];
+        }
+
+        if ($languages !== []) {
+            $filterLanguages = function (array $item) use (&$filterLanguages, $languages): array {
+                if (isset($item['name']) && is_array($item['name'])) {
+                    $item['name'] = array_intersect_key($item['name'], array_flip($languages));
+                }
+
+                if (isset($item['children']) && is_array($item['children'])) {
+                    $item['children'] = array_map($filterLanguages, $item['children']);
+                }
+
+                return $item;
+            };
+
+            $data['children'] = array_map($filterLanguages, $data['children']);
+        }
+
+        return $data;
     }
 
     /**
@@ -284,7 +303,7 @@ class DemoCommand extends Command
             return 0;
         }
 
-        $name = Str::title($data['name']['en']) . ' ' . $type->name;
+        $name = Str::title($data['name']['en']);
 
         $full_name = in_array($parentName, [null, '', '0'], true)
             ? $name

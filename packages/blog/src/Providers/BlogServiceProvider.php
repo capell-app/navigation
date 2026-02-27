@@ -198,15 +198,31 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLivewireComponents(): self
     {
-        foreach (LivewirePageComponentEnum::getComponents() as $name => $component) {
-            if (! $component) {
-                continue;
-            }
+        if ($this->isLivewireV3()) {
+            foreach (LivewirePageComponentEnum::getComponents() as $name => $component) {
+                if (! $component) {
+                    continue;
+                }
 
-            Livewire::component($name, $component);
+                Livewire::component($name, $component);
+            }
+        } else {
+            Livewire::addNamespace(
+                namespace: 'capell-blog',
+                classNamespace: 'Capell\\Blog\\Livewire',
+                classPath: __DIR__ . '/../Livewire',
+                classViewPath: __DIR__ . '/../../resources/views/livewire',
+            );
         }
 
         return $this;
+    }
+
+    private function isLivewireV3(): bool
+    {
+        $version = InstalledVersions::getVersion('livewire/livewire');
+
+        return version_compare($version, '4.0.0', '<');
     }
 
     private function registerRenderHooks(): self
