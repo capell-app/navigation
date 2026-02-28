@@ -41,6 +41,7 @@ use Capell\Layout\Filament\Resources\Types\Schemas\Types\ContentTypeSchema;
 use Capell\Layout\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
 use Capell\Layout\Listeners\AfterRecordSaved;
 use Capell\Layout\Listeners\LayoutLoaded;
+use Capell\Layout\Listeners\LayoutSavingListener;
 use Capell\Layout\Listeners\SiteTreeRebuilt;
 use Capell\Layout\Listeners\TypeValidated;
 use Capell\Layout\Models\Content;
@@ -94,6 +95,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         $this
             ->registerResources()
             ->registerModels()
+            ->registerModelFillableAndCasts()
             ->registerRelationships()
             ->registerPackageMetadata();
 
@@ -129,6 +131,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentServing()
             ->registerTypes()
             ->registerComponents()
+            ->registerModelEvents()
             ->registerModelInterceptors()
             ->registerAssets()
             ->registerSchemaExtenders()
@@ -137,25 +140,24 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentAssets()
             ->registerPublishCommands()
             ->registerLivewireComponents()
-            ->registerBladeComponents()
-            ->registerModelFillableAndCasts();
+            ->registerBladeComponents();
+    }
+
+    private function registerModelEvents(): self
+    {
+        Layout::saving(app(LayoutSavingListener::class));
+
+        return $this;
     }
 
     private function registerModelFillableAndCasts(): self
     {
-        /** @var Layout $layout */
-        $layout = app(Layout::class);
+        Layout::addFillable(['containers', 'widgets']);
 
-        if (method_exists($layout, 'mergeFillable')) {
-            $layout->mergeFillable(['containers', 'widgets']);
-        }
-
-        if (method_exists($layout, 'mergeCasts')) {
-            $layout->mergeCasts([
-                'containers' => 'array',
-                'widgets' => 'array',
-            ]);
-        }
+        Layout::addCasts([
+            'containers' => 'array',
+            'widgets' => 'array',
+        ]);
 
         return $this;
     }

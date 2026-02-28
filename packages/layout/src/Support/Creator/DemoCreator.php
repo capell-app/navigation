@@ -175,9 +175,16 @@ class DemoCreator
     public function createBannerImageWidget(Collection $languages): Widget
     {
         $siteId = Site::query()->default()?->value('id');
+
+        $type = $this->typeModel::query()->firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget]);
+
+        if (! $type) {
+            $type = resolve(TypeCreator::class)->contentBuilderWidgetType();
+        }
+
         $widget = $this->widgetModel::query()->firstOrCreate(['key' => 'banner-image'], [
             'name' => 'Banner Image',
-            'type_id' => $this->typeModel::query()->firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
+            'type_id' => $type->id,
             'meta' => [
                 'component' => WidgetComponentEnum::BannerImage,
                 'margin' => ['lg'],
@@ -303,6 +310,10 @@ class DemoCreator
         $widgetType = $this->typeModel::query()->where('type', LayoutTypeEnum::Widget)
             ->firstWhere('key', 'assets');
 
+        if (! $widgetType) {
+            $widgetType = resolve(TypeCreator::class)->assetsWidgetType();
+        }
+
         $widget = $this->widgetModel::query()->firstOrCreate(['key' => 'faq'], [
             'key' => 'faq',
             'name' => __('capell-admin::generic.faq'),
@@ -423,6 +434,11 @@ class DemoCreator
     {
         $widget = $this->widgetModel::query()->where('key', 'media-carousel')->first();
 
+        if (! $widget) {
+            $creator = resolve(WidgetCreator::class);
+            $widget = $creator->mediaCarouselWidget();
+        }
+
         if ($widget->assets()->exists()) {
             return $widget;
         }
@@ -464,10 +480,21 @@ class DemoCreator
             ->limit(4)
             ->get();
 
+        $navigationType = $this->typeModel::query()
+            ->where([
+                'key' => WidgetTypeEnum::Navigation,
+                'type' => LayoutTypeEnum::Widget,
+            ])
+            ->first();
+
+        if (! $navigationType) {
+            $navigationType = resolve(TypeCreator::class)->navigationWidgetType();
+        }
+
         $navigation = $model::query()->updateOrCreate([
             'key' => $key,
             'site_id' => $site->id,
-            'type_id' => $this->typeModel::navigationType()->default()->first()->id,
+            'type_id' => $navigationType->id,
         ], [
             'name' => $name,
             'items' => $this->navigationPageItems($pages, $languages->first()),
@@ -815,14 +842,20 @@ class DemoCreator
 
     public function createTeamPortfolioWidget(Collection $languages): Widget
     {
+        $type = $this->typeModel::query()
+            ->where([
+                'key' => WidgetTypeEnum::Contents,
+                'type' => LayoutTypeEnum::Widget,
+            ])
+            ->first();
+
+        if (! $type) {
+            $type = resolve(TypeCreator::class)->contentsWidgetType();
+        }
+
         $widget = $this->widgetModel::query()->firstOrCreate(['key' => 'team-portfolio'], [
             'name' => 'Team Portfolio',
-            'type_id' => $this->typeModel::query()
-                ->where([
-                    'key' => WidgetTypeEnum::Contents,
-                    'type' => LayoutTypeEnum::Widget,
-                ])
-                ->value('id'),
+            'type_id' => $type->id,
             'meta' => [
                 'align' => 'center',
                 'padding' => ['lg'],

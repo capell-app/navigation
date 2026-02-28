@@ -58,7 +58,7 @@ $theme = Frontend::theme();
 
     @if (! $pages || $pages->isEmpty())
         <x-capell::no-results>
-            {!! isset($widget->translation->meta['no_results']) && $widget->translation->meta['no_results'] !== '' ? $widget->translation->meta['no_results'] : __('capell-layout::messages.no_pages_found') !!}
+            {!! isset($widget->translation->meta['no_results']) && $widget->translation->meta['no_results'] !== '' ? $widget->translation->meta['no_results'] : __('capell-layout::generic.no_pages_found') !!}
         </x-capell::no-results>
     @else
         <div

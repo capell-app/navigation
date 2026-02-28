@@ -10,12 +10,14 @@ use Capell\Admin\Actions\ReplicateLayoutAction;
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
+use Capell\Admin\Filament\Contracts\HasPageResource;
 use Capell\Core\Actions\GetResourceFromTypeAction;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Layout\Enums\LivewireComponentsEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Exceptions\MissingWidgetAssetException;
@@ -63,7 +65,7 @@ use Livewire\Component;
  * @property-read $addWidgetAction
  * @property-read $editWidgetAssetAction
  */
-class LayoutBuilder extends Component implements HasActions, HasForms
+class LayoutBuilder extends Component implements HasActions, HasForms, HasPageResource
 {
     use HasPageCacheNotification;
     use InteractsWithActions;
@@ -98,6 +100,11 @@ class LayoutBuilder extends Component implements HasActions, HasForms
     protected ?Site $site = null;
 
     protected string $view = 'capell-layout::livewire.layout-builder';
+
+    public static function getResource(): string
+    {
+        return CapellAdmin::getResource(ResourceEnum::Page);
+    }
 
     public function mount(int|string|null $record = null): void
     {
@@ -398,7 +405,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 return new HtmlString(Blade::render(
                     <<<'blade'
-                       @livewire('capell.layout.livewire.layout.widget-table-select', [
+                       @livewire($component, [
                            'actionModalId' => $actionModalId,
                            'containerKey' => $containerKey,
                            'containers' => $containers,
@@ -407,6 +414,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                     [
                         'actionModalId' => sprintf('fi-%s-action-%s', $livewire->getId(), $action->getNestingIndex()),
                         'containerKey' => $arguments['containerKey'] ?? '',
+                        'component' => LivewireComponentsEnum::WidgetTableSelect->value,
                         'livewireKey' => sprintf('fi-%s-action-%s-widgets-table', $livewire->getId(), $action->getNestingIndex()),
                         'containers' => self::getContainerOptions(),
                     ],
@@ -535,7 +543,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                 /** @var self $livewire */
                 $livewire = $action->getLivewire();
 
-                $componentName = 'capell.layout.livewire.assets.table.' . $arguments['type'];
+                $component = LivewireComponentsEnum::loadAssetComponent($arguments['type'])->value;
 
                 $existingRecords = $livewire->getWidgetAssetsByType(
                     $arguments['containerKey'],
@@ -545,7 +553,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
 
                 return new HtmlString(Blade::render(
                     <<<'blade'
-                       @livewire($componentName, [
+                       @livewire($component, [
                            'actionModalId' => $actionModalId,
                            'tableArguments' => $arguments,
                            'existingRecords' => $existingRecords,
@@ -559,7 +567,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms
                             'pageId' => $livewire->page_id,
                             'siteId' => $livewire->site_id,
                         ],
-                        'componentName' => $componentName,
+                        'component' => $component,
                         'existingRecords' => $existingRecords,
                     ],
                 ));

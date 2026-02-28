@@ -10,8 +10,8 @@ use Capell\Core\Support\Creator\LayoutCreator;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
 use Capell\Layout\Enums\AssetEnum;
+use Capell\Layout\Enums\LivewireComponentsEnum;
 use Capell\Layout\Filament\Resources\Layouts\Schemas\Types\Widgets\DefaultLayoutWidgetSchema;
-use Capell\Layout\Livewire\Layout\WidgetTableSelect;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -401,7 +401,7 @@ test('Can add new widget', function (): void {
                 'containerKey' => $containerKey,
             ],
         )
-        ->assertSeeLivewire(WidgetTableSelect::class)
+        ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
         ->callMountedAction()
         ->dispatch(
             'add-widgets-to-container',
@@ -441,7 +441,7 @@ test('Can add existing widget', function (): void {
                 'containerKey' => $containerKey,
             ],
         )
-        ->assertSeeLivewire(WidgetTableSelect::class)
+        ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
         ->callMountedAction()
         ->dispatch(
             'add-widgets-to-container',
@@ -488,7 +488,7 @@ test('Can edit container widget', function (): void {
                 'containerKey' => $containerKey,
             ],
         )
-        ->assertSeeLivewire(WidgetTableSelect::class)
+        ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
         ->dispatch(
             'add-widgets-to-container',
             containerKey: $containerKey,

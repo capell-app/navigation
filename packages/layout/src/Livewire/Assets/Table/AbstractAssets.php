@@ -10,7 +10,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Ramsey\Uuid\UuidInterface;
 
-abstract class AbstractAssetsTable extends ModalTableSelect
+abstract class AbstractAssets extends ModalTableSelect
 {
     #[Locked]
     public array $tableArguments = [];

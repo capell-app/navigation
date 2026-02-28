@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
+use Capell\Layout\Livewire\Assets\Table\ContentAssets;
 use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
@@ -30,7 +30,7 @@ it('excludes existing content records from selection list', function (): void {
         'widgetIndex' => $widgetIndex,
     ];
 
-    livewire(ContentAssetsTable::class, [
+    livewire(ContentAssets::class, [
         'actionModalId' => 'select-assets',
         'tableArguments' => $arguments,
         'existingRecords' => $excluded->pluck('id')->toArray(),

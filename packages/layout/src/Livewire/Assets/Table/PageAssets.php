@@ -6,6 +6,7 @@ namespace Capell\Layout\Livewire\Assets\Table;
 
 use Capell\Admin\Enums\ResourceEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Admin\Filament\Contracts\HasPageResource;
 use Capell\Admin\Filament\Resources\Pages\Tables\PagesTable;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -14,7 +15,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Locked;
 
-class PageAssetsTable extends AbstractAssetsTable
+class PageAssets extends AbstractAssets implements HasPageResource
 {
     public string $type = 'page';
 

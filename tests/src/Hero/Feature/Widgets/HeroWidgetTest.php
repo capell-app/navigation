@@ -93,7 +93,7 @@ it('renders hero widget with assets', function (callable $factory, string $media
         ->get();
 
     // Ensure all referenced media files exist on the fake disk
-    $exampleImagePath = __DIR__ . '/../../../Fixtures/Support/Files/Images/img.png';
+    $exampleImagePath = __DIR__ . '/../../../Fixtures/Files/Images/img.png';
     $exampleImage = file_get_contents($exampleImagePath);
     foreach ($widgetAssets as $widgetAsset) {
         $mediaCollection = data_get($widgetAsset, $mediaRelation);

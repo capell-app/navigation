@@ -33,7 +33,17 @@ it('renders navigation widget on page', function (): void {
     $layout = (new LayoutFactory)->create();
     $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
     $home = Page::factory()->site($site)->home()->withTranslations()->create();
-    $services = Page::factory()->site($site)->withTranslations()->children(3)->state(['name' => 'Support'])->create();
+    $services = Page::factory()
+        ->site($site)
+        ->withTranslations()
+        ->children(3)
+        ->state(['name' => 'Support'])
+        ->create();
+    $services->load([
+        'translation',
+        'children' => ['translation', 'pageUrl.siteDomain'],
+    ]);
+
     $anotherSiteHome = Page::factory()->home()->withTranslations()->create();
     $externalUrl = 'https://example.com/external';
     $items = [

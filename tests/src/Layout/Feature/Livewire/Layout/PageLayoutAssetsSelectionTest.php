@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
-use Capell\Layout\Livewire\Assets\Table\PageAssetsTable;
+use Capell\Layout\Livewire\Assets\Table\ContentAssets;
+use Capell\Layout\Livewire\Assets\Table\PageAssets;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
@@ -49,7 +49,7 @@ it('excludes existing page assets when selecting new ones', function (): void {
         'widgetIndex' => $widgetIndex,
     ];
 
-    livewire(PageAssetsTable::class, [
+    livewire(PageAssets::class, [
         'actionModalId' => 'select-assets',
         'tableArguments' => $arguments,
         'existingRecords' => $existingAssets->pluck('asset_id')->toArray(),
@@ -74,8 +74,8 @@ it('dispatches sync-selected-assets for page layout context', function (string $
     };
 
     $component = match ($assetType) {
-        'content' => ContentAssetsTable::class,
-        'page' => PageAssetsTable::class,
+        'content' => ContentAssets::class,
+        'page' => PageAssets::class,
     };
 
     $arguments = [

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
-use Capell\Layout\Livewire\Assets\Table\PageAssetsTable;
+use Capell\Layout\Livewire\Assets\Table\ContentAssets;
+use Capell\Layout\Livewire\Assets\Table\PageAssets;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
@@ -26,8 +26,8 @@ it('renders assets tables for each asset type', function (string $assetType): vo
     $page = Page::factory()->layout($layout)->create();
 
     $component = match ($assetType) {
-        'content' => ContentAssetsTable::class,
-        'page' => PageAssetsTable::class,
+        'content' => ContentAssets::class,
+        'page' => PageAssets::class,
     };
 
     $arguments = [

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\File;
 it('runs the demo command and creates demo layouts for a site', function (): void {
     File::spy();
     $demoImgPath = DemoCreator::getDemoResourcePath('img');
-    $dummyFile = new SplFileInfo('home.jpg', $demoImgPath, 'home.jpg');
+    $dummyFile = new SplFileInfo($demoImgPath . DIRECTORY_SEPARATOR . 'home.jpg');
     File::shouldReceive('files')->with($demoImgPath)->andReturn([$dummyFile]);
     File::shouldReceive('exists')->with(Mockery::on(fn (string $path): bool => str_starts_with($path, $demoImgPath)))->andReturn(false);
 

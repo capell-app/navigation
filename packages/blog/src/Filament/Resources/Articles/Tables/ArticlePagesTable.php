@@ -30,7 +30,7 @@ class ArticlePagesTable implements TableConfigurator
     }
 
     /**
-     * Mutate the base filters adding the tags filter without subclassing PageAssetsTable.
+     * Mutate the base filters adding the tags filter without subclassing PageAssets.
      */
     protected static function mutateBaseFilters(array $filters): array
     {

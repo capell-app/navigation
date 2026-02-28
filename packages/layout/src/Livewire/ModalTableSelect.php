@@ -53,6 +53,8 @@ class ModalTableSelect extends Component implements HasActions, HasForms, HasTab
     #[Locked]
     public $tableQuery;
 
+    protected string $view = 'capell-layout::livewire.layout.widgets-table-select';
+
     public function mount(): void
     {
         throw_if(
@@ -140,7 +142,7 @@ class ModalTableSelect extends Component implements HasActions, HasForms, HasTab
 
     public function render(): View
     {
-        return view('capell-layout::livewire.widgets-table-select');
+        return view($this->view);
     }
 
     /**

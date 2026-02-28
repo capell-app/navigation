@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
-use Capell\Layout\Livewire\Assets\Table\PageAssetsTable;
+use Capell\Layout\Livewire\Assets\Table\ContentAssets;
+use Capell\Layout\Livewire\Assets\Table\PageAssets;
 use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
@@ -35,7 +35,7 @@ it('filters by site for contents assets', function (): void {
         'widgetIndex' => $widgetIndex,
     ];
 
-    livewire(ContentAssetsTable::class, [
+    livewire(ContentAssets::class, [
         'actionModalId' => 'select-assets',
         'tableArguments' => $arguments,
     ])
@@ -63,7 +63,7 @@ it('filters by site for page assets', function (): void {
         'widgetIndex' => $widgetIndex,
     ];
 
-    livewire(PageAssetsTable::class, [
+    livewire(PageAssets::class, [
         'actionModalId' => 'select-assets',
         'tableArguments' => $arguments,
     ])
@@ -87,8 +87,8 @@ it('dispatches sync-selected-assets event with selected records for each asset t
     };
 
     $component = match ($assetType) {
-        'content' => ContentAssetsTable::class,
-        'page' => PageAssetsTable::class,
+        'content' => ContentAssets::class,
+        'page' => PageAssets::class,
     };
 
     $arguments = [
@@ -131,7 +131,7 @@ it('searches within contents assets table', function (): void {
 
     $first = $contents->first();
 
-    livewire(ContentAssetsTable::class, [
+    livewire(ContentAssets::class, [
         'actionModalId' => 'select-assets',
         'tableArguments' => $arguments,
     ])

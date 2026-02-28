@@ -7,8 +7,8 @@ namespace Capell\Layout\Enums;
 use Capell\Core\Enums\Attribute\Component;
 use Capell\Core\Enums\Attribute\EnumAttributeHelper;
 use Capell\Core\Enums\Attribute\EnumAttributeInterface;
-use Capell\Layout\Livewire\Assets\Table\ContentAssetsTable;
-use Capell\Layout\Livewire\Assets\Table\PageAssetsTable;
+use Capell\Layout\Livewire\Assets\Table\ContentAssets;
+use Capell\Layout\Livewire\Assets\Table\PageAssets;
 use Capell\Layout\Livewire\Layout\WidgetTableSelect;
 use Capell\Layout\Livewire\LayoutBuilder;
 use Capell\Layout\Livewire\Widget\Pages;
@@ -23,11 +23,11 @@ enum LivewireComponentsEnum: string implements EnumAttributeInterface
     #[Component(WidgetTableSelect::class)]
     case WidgetTableSelect = 'capell-layout::layout.widget-table-select';
 
-    #[Component(PageAssetsTable::class)]
-    case PageAssetsTable = 'capell-layout::assets.table.page';
+    #[Component(PageAssets::class)]
+    case PageAssetsTable = 'capell-layout::assets.table.page-assets';
 
-    #[Component(ContentAssetsTable::class)]
-    case ContentAssetsTable = 'capell-layout::assets.table.content';
+    #[Component(ContentAssets::class)]
+    case ContentAssetsTable = 'capell-layout::assets.table.content-assets';
 
     #[Component(Pages::class)]
     case PagesWidget = 'capell-layout::widget.pages';
@@ -37,6 +37,14 @@ enum LivewireComponentsEnum: string implements EnumAttributeInterface
         $attributes = self::getAllCaseAttributes(Component::class);
 
         return array_map(fn (?Component $attribute): ?string => $attribute?->class ?? null, $attributes);
+    }
+
+    public static function loadAssetComponent(string $assetType): self
+    {
+        return match ($assetType) {
+            'page' => self::PageAssetsTable,
+            'content' => self::ContentAssetsTable,
+        };
     }
 
     public function getComponent(): ?string

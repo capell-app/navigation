@@ -15,7 +15,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Locked;
 
-class ContentAssetsTable extends AbstractAssetsTable
+class ContentAssets extends AbstractAssets
 {
     public string $type = 'content';
 
