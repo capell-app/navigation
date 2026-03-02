@@ -102,7 +102,7 @@ describe('from list article', function (): void {
 
         $newData = Page::factory()->recycle($site)->type($type)->make();
 
-        $blogCreator->createArticleLayout();
+        $blogCreator->createArticleLayout(createWidgets: false);
 
         $blogPage = $blogCreator->createBlogPage($site);
 
@@ -143,7 +143,7 @@ describe('from list article', function (): void {
         $blogCreator = resolve(BlogCreator::class);
 
         $type = $blogCreator->createArticlePageType();
-        $layout = $blogCreator->createArticleLayout();
+        $layout = $blogCreator->createArticleLayout(createWidgets: false);
 
         $language = Language::factory()->create();
         $site = Site::factory()->recycle($language)->hasSiteDomains()->create();

@@ -138,7 +138,19 @@ class HeroContentSchema extends DefaultContentSchema
     {
         return Tab::make('actions')
             ->label(__('capell-admin::generic.links'))
-            ->badge(fn (Get $get): ?int => count($get('actions') ?: []) !== 0 ? count($get('actions') ?: []) : null)
+            ->badge(function (Get $get): ?int {
+                if (! is_array($get('actions'))) {
+                    return null;
+                }
+
+                $count = count($get('actions'));
+
+                if ($count === 0) {
+                    return null;
+                }
+
+                return $count;
+            })
             ->icon('heroicon-o-link')
             ->schema([
                 ActionsRepeater::make('actions')
@@ -151,7 +163,19 @@ class HeroContentSchema extends DefaultContentSchema
 
         return Tab::make('media')
             ->label(__('capell-admin::generic.media'))
-            ->badge(fn (Get $get): ?int => count($get('assets') ?: []) !== 0 ? count($get('assets') ?: []) : null)
+            ->badge(function (Get $get): ?int {
+                if (! is_array($get('assets'))) {
+                    return null;
+                }
+
+                $count = count($get('assets'));
+
+                if ($count === 0) {
+                    return null;
+                }
+
+                return $count;
+            })
             ->icon('heroicon-o-photo')
             ->schema([
                 self::getAssetsComponent($schema),
@@ -162,7 +186,19 @@ class HeroContentSchema extends DefaultContentSchema
     {
         return Tab::make('related')
             ->label(__('capell-admin::generic.related'))
-            ->badge(fn (Get $get): ?int => count($get('related') ?: []) !== 0 ? count($get('related') ?: []) : null)
+            ->badge(function (Get $get): ?int {
+                if (! is_array($get('related'))) {
+                    return null;
+                }
+
+                $count = count($get('related'));
+
+                if ($count === 0) {
+                    return null;
+                }
+
+                return $count;
+            })
             ->icon(Heroicon::OutlinedArrowsRightLeft)
             ->schema([
                 RelatedRepeater::make($schema),

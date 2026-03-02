@@ -523,7 +523,7 @@ class BlogCreator
         return $page;
     }
 
-    public function createArticleLayout(bool $createWidgets = false): Layout
+    public function createArticleLayout(bool $createWidgets = true): Layout
     {
         if ($createWidgets) {
             $languages = Language::all();

@@ -27,7 +27,7 @@ test('archives page list articles archives by month/year', function (): void {
     $archivesPage = $blogCreator->createArchivesPage($blogPage);
     $archivePage = $blogCreator->createArchivePage($archivesPage);
     $articleType = $blogCreator->createArticlePageType();
-    $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $articleLayout = $blogCreator->createArticleLayout();
     $tagsPage = $blogCreator->createTagsPage($site, $blogPage);
     $blogCreator->createTagPage($site, $tagsPage);
 
@@ -87,7 +87,7 @@ test('archive page list articles by month/year', function (): void {
     $archivesPage = $blogCreator->createArchivesPage($blogPage);
     $archivePage = $blogCreator->createArchivePage($archivesPage);
     $articleType = $blogCreator->createArticlePageType();
-    $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $articleLayout = $blogCreator->createArticleLayout();
 
     $publishDate = now()->subMonth();
 

@@ -20,6 +20,8 @@ class HeroWidgetHasPrimaryHeadingAction
     {
         $hasPrimaryHeading = false;
 
+        $content = null;
+
         if ($widget->assets->isNotEmpty()) {
             $firstAssetTranslation = $widget->assets->first()?->asset->translation;
 

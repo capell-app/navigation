@@ -37,12 +37,12 @@ class Article extends AbstractWidget
         $language = Frontend::language();
         $site = Frontend::site();
 
-        if (empty($page->type->meta['hidden']) && ! empty($this->widget->meta['with_next_prev'])) {
+        if (! isset($page->type->meta['hidden']) && isset($this->widget->meta['with_next_prev'])) {
             $this->previousPage = PageLoader::getPreviousPage($page, $site, $language);
             $this->nextPage = PageLoader::getNextPage($page, $site, $language);
         }
 
-        if (! empty($this->widget->meta['with_author']) && ! empty($page->meta['author_id'])) {
+        if (isset($this->widget->meta['with_author'], $page->meta['author_id'])) {
             $this->author = PageLoader::getPageAuthor($page);
         }
     }

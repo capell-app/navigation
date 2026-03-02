@@ -33,7 +33,7 @@ test('blog page lists articles', function (): void {
     $blogPageUrl = $blogPage->pageUrl;
 
     $articleType = $blogCreator->createArticlePageType();
-    $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $articleLayout = $blogCreator->createArticleLayout();
 
     $archivesPage = $blogCreator->createArchivesPage($blogPage);
     $blogCreator->createArchivePage($archivesPage);
@@ -90,7 +90,7 @@ test('article page', function (): void {
 
     $blogPage = $blogCreator->createBlogPage($site);
     $articleType = $blogCreator->createArticlePageType();
-    $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $articleLayout = $blogCreator->createArticleLayout();
 
     $archivesPage = $blogCreator->createArchivesPage($blogPage);
     $blogCreator->createArchivePage($archivesPage);
@@ -134,7 +134,7 @@ test('article page list tags', function (): void {
     $archivePage = $blogCreator->createArchivePage($archivesPage);
 
     $articleType = $blogCreator->createArticlePageType();
-    $articleLayout = $blogCreator->createArticleLayout(createWidgets: true);
+    $articleLayout = $blogCreator->createArticleLayout();
 
     $article = Article::factory()
         ->site($site)

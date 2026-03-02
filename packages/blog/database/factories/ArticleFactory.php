@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Database\Factories;
 
-use Capell\Admin\Filament\Resources\Types\Schemas\Types\PageTypeSchema;
-use Capell\Blog\Enums\BlogTypeGroupEnum;
-use Capell\Blog\Enums\ResourceEnum;
-use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Models\Article;
 use Capell\Blog\Models\Tag;
+use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Database\Factories\PageFactory;
-use Capell\Core\Models\Type;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,18 +21,8 @@ class ArticleFactory extends PageFactory
     {
         return [
             ...parent::definition(),
-            'type_id' => fn () => Type::factory()
-                ->page()
-                ->state([
-                    'group' => BlogTypeGroupEnum::Article->value,
-                    'admin' => [
-                        'icon' => 'heroicon-o-newspaper',
-                        'type_schema' => PageTypeSchema::getKey(),
-                        'schema' => ArticlePageSchema::getKey(),
-                        'resource' => strtolower(ResourceEnum::Article->name),
-                        'exclude' => true,
-                    ],
-                ]),
+            'layout_id' => fn (): int => resolve(BlogCreator::class)->createArticleLayout()->id,
+            'type_id' => fn (): int => resolve(BlogCreator::class)->createArticlePageType()->id,
             'parent_id' => null,
         ];
     }
