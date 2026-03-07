@@ -10,7 +10,6 @@ use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Page;
 use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Capell\Core\Support\Sitemap\SitemapChainBuilder;
-use Exception;
 use Illuminate\Support\Collection;
 
 class TagsSitemap extends AbstractSitemapPages
@@ -19,11 +18,18 @@ class TagsSitemap extends AbstractSitemapPages
     {
         $tagPage = TagLoader::getTagResultsPage($this->site, $this->language);
 
-        throw_unless($tagPage instanceof Page, Exception::class, 'Tag results page not found for the current site and language.');
+        if (! $tagPage instanceof Page) {
+            return collect([]);
+        }
 
         $tagChildren = $this->getTagPages($tagPage);
 
-        $node = SitemapChainBuilder::build($tagPage->parent, children: $tagChildren);
+        $parent = $tagPage->parent;
+        if ($parent === null) {
+            return $tagChildren;
+        }
+
+        $node = SitemapChainBuilder::build($parent, $tagChildren);
 
         return collect([$node]);
     }
@@ -45,11 +51,10 @@ class TagsSitemap extends AbstractSitemapPages
         ]);
     }
 
-    private function getTagPages(Page $tagPage): array
+    private function getTagPages(Page $tagPage): Collection
     {
         return TagLoader::getTags(site: $this->site, language: $this->language, limit: 100)
             ->map(fn (Tag $tag): SitemapPageData => $this->format($tagPage, $tag))
-            ->values()
-            ->all();
+            ->values();
     }
 }

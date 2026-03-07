@@ -21,6 +21,7 @@ class AssistantTestCase extends AbstractTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->registerAndMigrateSettings(
             CapellCore::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/core/database/settings',
@@ -28,6 +29,10 @@ class AssistantTestCase extends AbstractTestCase
         $this->registerAndMigrateSettings(
             CapellAdmin::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
+        );
+        $this->registerAndMigrateSettings(
+            ['create_assistant_settings'],
+            __DIR__ . '/../../../packages/assistant/database/settings',
         );
     }
 

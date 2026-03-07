@@ -32,7 +32,7 @@ class ListWidgets extends ListRecords
 
     public function getSubheading(): string|Htmlable|null
     {
-        return __('capell-layout::generic.widgets_subheading');
+        return __('capell-layout::generic.widget_info');
     }
 
     public function getFilteredTableQuery(): Builder

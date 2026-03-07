@@ -14,5 +14,9 @@ return new class extends SettingsMigration
         if (! $this->migrator->exists('assistant.page_title_suggestions')) {
             $this->migrator->add('assistant.page_title_suggestions', true);
         }
+
+        if (! $this->migrator->exists('assistant.meta_description_suggestions')) {
+            $this->migrator->add('assistant.meta_description_suggestions', true);
+        }
     }
 };

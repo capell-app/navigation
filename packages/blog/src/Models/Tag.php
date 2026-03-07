@@ -106,6 +106,7 @@ class Tag extends \Spatie\Tags\Tag implements PageCacheable, Statusable
             if (! $tag) {
                 $tag = static::query()->create([
                     'name' => [$locale => $name],
+                    'slug' => [$locale => str($name)->slug()],
                     'type' => $type,
                 ]);
             }

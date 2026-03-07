@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Admin\Filament\Resources\Pages\Pages\ListPages;
-use Capell\Blog\Database\Factories\ArticleFactory;
+use Capell\Blog\Models\Article;
 use Capell\Core\Models\Page;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
@@ -17,7 +17,7 @@ beforeEach(function (): void {
 });
 
 test('can list pages', function (): void {
-    (new ArticleFactory)->create();
+    Article::factory()->create();
 
     $pages = Page::factory()->count(5)->create();
 

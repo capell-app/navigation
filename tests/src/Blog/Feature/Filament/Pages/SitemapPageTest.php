@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Resources\Pages\Pages\SitemapPage;
+use Capell\Admin\Filament\Pages\SitemapPage;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Core\Support\Creator\PageCreator;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
+
+use Spatie\Permission\Models\Permission;
 
 uses(CreatesAdminUser::class)
     ->group('page');
@@ -18,14 +21,24 @@ beforeEach(function (): void {
 });
 
 test('can render page', function (): void {
-    $site = Site::factory()->create();
+    Permission::create(['name' => 'View:SitemapPage', 'guard_name' => 'web']);
+    test()->actingAsAdmin();
+    auth()->user()->givePermissionTo('View:SitemapPage');
+
+    $site = Site::factory()->withTranslations()->create();
+
+    $pageCreator = resolve(PageCreator::class);
+
+    $pageCreator->createSitemapPage($site);
 
     $blogCreator = resolve(BlogCreator::class);
     $blogPage = $blogCreator->createBlogPage($site);
     $tagsPage = $blogCreator->createTagsPage($site, $blogPage);
     $blogCreator->createTagPage($site, $tagsPage);
+    $archivesPage = $blogCreator->createArchivesPage($blogPage);
+    $blogCreator->createArchivePage($archivesPage);
 
-    Page::factory()->site($site)->withTranslations($site->languages)->count(5)->create();
+    Page::factory()->count(5)->site($site)->withTranslations($site->languages)->create();
 
     livewire(SitemapPage::class)
         ->assertSuccessful();

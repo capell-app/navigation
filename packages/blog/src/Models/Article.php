@@ -230,9 +230,4 @@ class Article extends Page
     {
         return 'page_' . $this->getKeyName();
     }
-
-    public function getMorphClass()
-    {
-        return 'page';
-    }
 }

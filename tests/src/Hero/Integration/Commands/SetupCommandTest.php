@@ -7,7 +7,7 @@ use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Illuminate\Console\Command;
 
 it('runs hero install command successfully', function (): void {
-    $layout = Layout::factory()->create();
+    Layout::factory()->create();
 
     $mock = AddHeroToLayoutAction::mock();
     $mock->shouldReceive('handle')->once();

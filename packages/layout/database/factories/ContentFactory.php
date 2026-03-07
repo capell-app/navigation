@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Database\Factories;
 
+use Capell\Core\Database\Factories\Concerns\HasFactoryPublishDates;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
@@ -18,6 +19,8 @@ use Illuminate\Support\Collection;
  */
 class ContentFactory extends Factory
 {
+    use HasFactoryPublishDates;
+
     protected $model = Content::class;
 
     /**
@@ -48,14 +51,6 @@ class ContentFactory extends Factory
         return $this->set('parent_id', $parent->getKey());
     }
 
-    public function published(): self
-    {
-        return $this->state(fn (array $attributes): array => [
-            'publish_from' => fake()->dateTimeBetween('-1 year', '-6 month'),
-            'publish_to' => fake()->dateTimeBetween('-5 month'),
-        ]);
-    }
-
     public function site(Site $site): self
     {
         return $this->state(fn (array $attributes): array => [
@@ -80,10 +75,22 @@ class ContentFactory extends Factory
         ]);
     }
 
-    public function withTranslations(?Collection $languages = null, array $data = []): self
+    public function withTranslations(null|array|Collection|Language $languages = null, array $data = []): self
     {
         return $this->afterCreating(function (Content $content) use ($languages, $data): void {
-            $languages ??= $content->site?->languages ?? Language::all();
+            if ($languages instanceof Language) {
+                $languages = collect([$languages]);
+            } elseif (is_array($languages)) {
+                $languages = collect($languages);
+            } elseif ($content->site) {
+                $languages = $content->site->languages;
+            } else {
+                $languages = Language::all();
+            }
+
+            if ($content->site && $languages->doesntContain('id', $content->site->language->id)) {
+                $languages = $languages->prepend($content->site->language);
+            }
 
             $languages->each(function (Language $language) use ($content, $data): void {
                 if ($content->translations()->where('language_id', $language->id)->exists()) {

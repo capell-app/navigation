@@ -6,6 +6,7 @@ use Capell\Admin\Filament\Actions\Page\CreatePageAction;
 use Capell\Blog\Database\Factories\ArticleFactory;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
+use Capell\Blog\Models\Article;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
@@ -29,7 +30,7 @@ beforeEach(function (): void {
 
 describe('from edit article', function (): void {
     test('can create new article', function (): void {
-        $page = (new ArticleFactory)->create();
+        $page = Article::factory()->create();
         $newData = (new ArticleFactory)->recycle($page->site)->make();
 
         $slug = str($newData->name)->slug()->toString();
@@ -68,7 +69,7 @@ describe('from edit article', function (): void {
     });
 
     test('required fields are required', function (): void {
-        $page = (new ArticleFactory)->create();
+        $page = Article::factory()->create();
 
         livewire(EditArticle::class, ['record' => $page->getRouteKey()])
             ->assertSuccessful()
@@ -148,7 +149,7 @@ describe('from list article', function (): void {
         $language = Language::factory()->create();
         $site = Site::factory()->recycle($language)->hasSiteDomains()->create();
 
-        $newData = (new ArticleFactory)->make();
+        $newData = Article::factory()->make();
 
         livewire(ListArticles::class)
             ->assertSuccessful()

@@ -57,6 +57,7 @@ class PageArchiveService
             )
             ->where('site_id', $site->id)
             ->published()
+            ->publishedDate()
             ->when(
                 DB::getDriverName() === 'sqlite',
                 fn (Builder $query): Builder => $query->groupByRaw("strftime('%Y', COALESCE(`publish_from`, `created_at`)), strftime('%m', COALESCE(`publish_from`, `created_at`))"),

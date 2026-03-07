@@ -13,7 +13,6 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Capell\Core\Support\Sitemap\SitemapChainBuilder;
-use Exception;
 use Illuminate\Support\Collection;
 
 class ArchivesSitemap extends AbstractSitemapPages
@@ -23,10 +22,17 @@ class ArchivesSitemap extends AbstractSitemapPages
         /** @var class-string<Page> $model */
         $model = CapellCore::getModel(CoreModelEnum::Page);
 
-        $archivePage = $model::getFirstPageByTypeForSite('archive', $this->site, $this->language);
-        throw_unless($archivePage instanceof Page, Exception::class, 'Archive page not found for the current site and language.');
+        $maybeArchivePage = $model::getFirstPageByTypeForSite('archive', $this->site, $this->language);
+        if (! ($maybeArchivePage instanceof Page)) {
+            return collect([]);
+        }
 
+        $archivePage = $maybeArchivePage;
         $monthChildren = $this->getArchiveMonths($archivePage);
+
+        if ($archivePage->parent === null) {
+            return $monthChildren;
+        }
 
         $node = SitemapChainBuilder::build($archivePage->parent, $monthChildren);
 
@@ -41,7 +47,7 @@ class ArchivesSitemap extends AbstractSitemapPages
         ]);
     }
 
-    private function getArchiveMonths(Page $archivePage): array
+    private function getArchiveMonths(Page $archivePage): Collection
     {
         $archives = BlogLoader::getArchives(
             $this->site,
@@ -50,7 +56,7 @@ class ArchivesSitemap extends AbstractSitemapPages
         );
 
         return $archives->map(
-            fn (ArchiveMonthData $archive): array => $this->format($archive, $archivePage)->toArray(),
-        )->values()->all();
+            fn (ArchiveMonthData $archive): SitemapPageData => $this->format($archive, $archivePage),
+        )->values();
     }
 }

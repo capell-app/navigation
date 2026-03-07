@@ -52,6 +52,7 @@ class TagForm implements FormConfigurator
                     SiteSelect::make('site_id'),
 
                     Grid::make()
+                        ->columnSpanFull()
                         ->schema([
                             Checkbox::make('featured')
                                 ->label(__('capell-layout::form.featured'))

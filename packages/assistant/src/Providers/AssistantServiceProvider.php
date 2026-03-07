@@ -13,6 +13,7 @@ use Capell\Assistant\Console\Commands\MonitorAiUsageCommand;
 use Capell\Assistant\Console\Commands\TestOpenAiConnectionCommand;
 use Capell\Assistant\Events\AiGenerationCompleted;
 use Capell\Assistant\Events\AiGenerationFailed;
+use Capell\Assistant\Filament\Settings\AssistantSettingsSchema;
 use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
 use Capell\Assistant\Listeners\LogAiGeneration;
 use Capell\Assistant\Listeners\NotifyAiFailure;
@@ -20,6 +21,7 @@ use Capell\Assistant\Models\AIGenerationHistory;
 use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Assistant\Support\Admin\PageContentEditorConfigurator;
 use Capell\Assistant\Support\Admin\PageTitleWithSlugInputExtender;
+use Capell\Assistant\Support\Admin\SearchMetaDataSectionExtender;
 use Capell\Assistant\Support\AiFeatureRegistry;
 use Capell\Assistant\Support\AiRateLimiter;
 use Capell\Assistant\Support\AiResponseParser;
@@ -30,6 +32,7 @@ use Capell\Assistant\Support\OpenAIProvider;
 use Capell\Assistant\Support\PromptRepository;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
+use Capell\Core\Support\Settings\SettingsSchemaRegistry;
 use Composer\InstalledVersions;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
@@ -48,6 +51,7 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
         $package->name(self::$name)
             ->hasViews(self::$name)
             ->hasConfigFile(self::$name)
+            ->hasTranslations()
             ->hasCommands([
                 ClearAiCacheCommand::class,
                 InstallCommand::class,
@@ -143,7 +147,6 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
 
     protected function registerAdminExtenders(): self
     {
-        // Keep provider clean: tag small extender/configurator classes used by Admin UI to augment components
         $this->app->tag([
             PageContentEditorConfigurator::class,
         ], 'capell-admin:page-content-editor');
@@ -152,8 +155,9 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
             PageTitleWithSlugInputExtender::class,
         ], 'capell-admin:page-title-with-slug-input');
 
-        // Optional: register schema component replacers for DefaultPageSchema if needed in future
-        // $this->app->tag([SomeReplacer::class], 'capell-admin:schema-component-replacers:page');
+        $this->app->tag([
+            SearchMetaDataSectionExtender::class,
+        ], 'capell-admin:search-meta-data-section');
 
         return $this;
     }
@@ -164,7 +168,8 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
             ->registerAdminEvents()
             ->registerAdminExtenders()
             ->registerOpenAiCmsIntegrationServices()
-            ->registerOpenAiCmsIntegrationEventListeners();
+            ->registerOpenAiCmsIntegrationEventListeners()
+            ->registerSettingsSchemas();
     }
 
     private function isPackageInstalled(): bool
@@ -182,6 +187,7 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
             description: static::getDescription(),
             installCommand: 'capell:assistant-install',
             setting: AssistantSettings::class,
+            icon: 'heroicon-o-rocket-launch',
             requirements: [
                 AdminServiceProvider::$packageName,
             ],
@@ -208,6 +214,16 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
     private function registerModels(): self
     {
         CapellCore::registerModel('AIGenerationHistory', AIGenerationHistory::class);
+
+        return $this;
+    }
+
+    private function registerSettingsSchemas(): self
+    {
+        $registry = resolve(SettingsSchemaRegistry::class);
+
+        $registry->registerSettingsClass('assistant', AssistantSettings::class);
+        $registry->register('assistant', AssistantSettingsSchema::class);
 
         return $this;
     }

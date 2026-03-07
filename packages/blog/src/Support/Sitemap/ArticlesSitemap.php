@@ -36,12 +36,10 @@ class ArticlesSitemap extends AbstractSitemapPages
             ->filter(
                 fn (Page $child): bool => $child->type->group === BlogTypeGroupEnum::Article->value,
             )
-            ->map(fn (Page $child): array => $this->formatRecursive($child)->all())
-            ->values()
-            ->all();
+            ->map(fn (Page $child): SitemapPageData => $this->formatRecursive($child))
+            ->values();
 
-        // Attach children on the data object
-        $data->children = collect(array_map(SitemapPageData::from(...), $children));
+        $data->children = $children;
 
         return $data;
     }

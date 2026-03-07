@@ -17,7 +17,6 @@ use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\PublishIconColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeColumn;
-use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -46,7 +45,6 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 
@@ -135,6 +133,10 @@ class ContentsTable implements TableConfigurator
                 ->withParents()
                 ->toggleable(isToggledHiddenByDefault: true),
             TypeColumn::make('type.name'),
+            MediaLibraryImageColumn::make('image')
+                ->label(__('capell-admin::table.image'))
+                ->collection('image')
+                ->toggleable(),
             TextColumn::make('children_count')
                 ->label(__('capell-layout::table.children'))
                 ->alignCenter()
@@ -155,10 +157,6 @@ class ContentsTable implements TableConfigurator
                         ['tableFilters' => ['filter' => ['parent_id' => $record->id]]],
                     );
                 }),
-            MediaLibraryImageColumn::make('image')
-                ->label(__('capell-admin::table.image'))
-                ->collection('image')
-                ->toggleable(),
             BadgeableColumn::make('assets_count')
                 ->label(__('capell-layout::table.assets'))
                 ->alignCenter()
@@ -166,7 +164,7 @@ class ContentsTable implements TableConfigurator
                 ->sortable()
                 ->toggleable()
                 ->separator('')
-                ->formatStateUsing(fn (Content $record): string => $record->assets_count ? '' : ' &mdash; '),
+                ->formatStateUsing(fn (Content $record): int => $record->assets_count),
             SiteColumn::make('site.name')
                 ->hidden(
                     fn (HasTable $livewire): bool => $livewire->activeTab
@@ -248,7 +246,7 @@ class ContentsTable implements TableConfigurator
                     Select::make('parent_id')
                         ->label(__('capell-admin::form.parent'))
                         ->allowHtml()
-                        ->options(function (HasTable $livewire, Get $get): Collection {
+                        ->options(function (HasTable $livewire, Get $get): array {
                             $siteId = static::getSiteId($livewire);
 
                             /** @var class-string<Content> $model */
@@ -291,7 +289,8 @@ class ContentsTable implements TableConfigurator
                                 $label .= Str::limit($content->name, 40);
 
                                 return [$content->id => $label];
-                            });
+                            })
+                                ->all();
                         }),
                 ])
                 ->query(function (Builder $query, array $data): void {
@@ -352,13 +351,11 @@ class ContentsTable implements TableConfigurator
                     'expired' => __('capell-admin::generic.expired'),
                 ])
                 ->query(fn (Builder $query, array $state): Builder => match ($state['value'] ?? null) {
-                    'published' => $query->published(),
+                    'published' => $query->published()->publishedDate(),
                     'unpublished' => $query->pending(),
                     'expired' => $query->expired(),
                     default => $query,
                 }),
-
-            StatusFilter::make('status'),
 
             TrashedFilter::make(),
         ];

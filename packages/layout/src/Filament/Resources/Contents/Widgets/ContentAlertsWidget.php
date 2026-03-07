@@ -21,7 +21,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Widgets\Widget;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -110,7 +110,7 @@ class ContentAlertsWidget extends Widget implements HasActions, HasForms
         }
 
         if ($this->record->trashed()) {
-            $alerts->put('deleted', new MessageData(
+            $alerts->put('trashed', new MessageData(
                 message: __(
                     'capell-admin::message.resource_deleted',
                     ['name' => __('capell-layout::generic.content')],
@@ -148,8 +148,8 @@ class ContentAlertsWidget extends Widget implements HasActions, HasForms
 
     protected function loadRecord(): void
     {
-        $this->record->load([
-            'site' => fn (Builder $query) => $query->withTrashed(),
+        $this->record->loadMissing([
+            'site' => fn (Relation $query) => $query->withTrashed(),
         ]);
     }
 

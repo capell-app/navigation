@@ -44,7 +44,7 @@ it('edits the hero content via Filament', function (): void {
         ->toBeInstanceOf(Content::class)
         ->name->toBe('Updated Hero Content')
         ->type->scoped(
-            fn (Expectation $type) => $type->toBeInstanceOf(Type::class)
+            fn (Expectation $type): HigherOrderExpectation => $type->toBeInstanceOf(Type::class)
                 ->key->toBe('hero')
                 ->admin->scoped(fn (Expectation $admin): HigherOrderExpectation => $admin->schema->toBe(ContentSchemaEnum::Hero->name)),
         );
