@@ -9,19 +9,19 @@ use Capell\Core\Enums\Attribute\EnumAttributeHelper;
 use Capell\Core\Enums\Attribute\EnumAttributeInterface;
 use Capell\Layout\Livewire\Assets\Table\ContentAssets;
 use Capell\Layout\Livewire\Assets\Table\PageAssets;
-use Capell\Layout\Livewire\Layout\Builder;
-use Capell\Layout\Livewire\Layout\WidgetTableSelect;
+use Capell\Layout\Livewire\Filament\LayoutBuilder;
+use Capell\Layout\Livewire\Filament\LayoutBuilder\WidgetTableSelect;
 use Capell\Layout\Livewire\Widget\Pages;
 
 enum LivewireComponentsEnum: string implements EnumAttributeInterface
 {
     use EnumAttributeHelper;
 
-    #[Component(Builder::class)]
-    case LayoutBuilder = 'capell-layout::layout.builder';
+    #[Component(LayoutBuilder::class)]
+    case LayoutBuilder = 'capell-layout::filament.layout-builder';
 
     #[Component(WidgetTableSelect::class)]
-    case WidgetTableSelect = 'capell-layout::layout.widget-table-select';
+    case WidgetTableSelect = 'capell-layout::filament.layout-builder.widget-table-select';
 
     #[Component(PageAssets::class)]
     case PageAssetsTable = 'capell-layout::assets.table.page-assets';

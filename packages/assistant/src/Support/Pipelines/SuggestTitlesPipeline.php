@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Capell\Assistant\Support\Pipelines;
 
 use Capell\Assistant\Contracts\AiActionContextInterface;
+use Capell\Assistant\Data\PromptData;
 use Capell\Assistant\Models\AIGenerationHistory;
 use Capell\Assistant\Support\AiRateLimiter;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\AiResponseParser;
 use Capell\Assistant\Support\OpenAIProvider;
-use Capell\Assistant\Support\PromptRepository;
 use Illuminate\Pipeline\Pipeline;
 use InvalidArgumentException;
 
 class SuggestTitlesPipeline
 {
     public function __construct(
-        private readonly PromptRepository $prompts,
+        private readonly PromptData $prompts,
         private readonly OpenAIProvider $provider,
         private readonly AiResponseParser $parser,
         private readonly AiRateLimiter $rateLimiter,
@@ -62,23 +62,22 @@ class SuggestTitlesPipeline
     {
         $context = $payload['context'];
         $options = $payload['options'] ?? [];
-        $prompt = $this->prompts->get('title_generation');
         $content = $context->getContent();
         $keywords = $context->getKeywords();
 
-        $userMessage = strtr((string) ($prompt['user_template'] ?? ''), [
+        $userMessage = strtr($this->prompts->titleGenerationUserTemplate ?? '', [
             '{{content}}' => $content,
             '{{keywords}}' => $keywords,
             '{{current_title}}' => $options['current_title'] ?? '',
         ]);
 
         $messages = [
-            ['role' => 'system', 'content' => (string) ($prompt['system'] ?? '')],
+            ['role' => 'system', 'content' => $this->prompts->titleGenerationSystem ?? ''],
             ['role' => 'user', 'content' => $userMessage . "\nPlease provide 5 distinct title options as a simple bullet list."],
         ];
 
         $params = [
-            'model' => (string) ($prompt['model'] ?? config('capell-assistant.openai.default_model')),
+            'model' => config('capell-assistant.openai.default_model', $this->prompts->model),
             'messages' => $messages,
             'max_tokens' => config('capell-assistant.openai.max_tokens', 128),
             'temperature' => 0.7,

@@ -6,6 +6,7 @@ namespace Capell\Assistant\Support\Admin;
 
 use Capell\Assistant\Actions\GeneratorPageContentAction;
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
+use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Assistant\Support\Context\ContentActionContext;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -28,11 +29,22 @@ class PageContentEditorConfigurator
 {
     public function __invoke($component): void
     {
+        if (! $this->isEnabled()) {
+            return;
+        }
+
         if (! method_exists($component, 'hintAction')) {
             return;
         }
 
         $component->hintAction($this->generateContentAction());
+    }
+
+    private function isEnabled(): bool
+    {
+        $prompts = resolve(AssistantSettings::class)->prompts;
+
+        return isset($prompts['content_generation']) && $prompts['content_generation'] === true;
     }
 
     private function generateContentAction(): Action

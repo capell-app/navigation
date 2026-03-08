@@ -26,7 +26,7 @@ class WidgetComponentFilesSection
             ->schema([
                 Group::make([
                     Checkbox::make('livewire')
-                        ->label(__('capell-admin::form.livewire')),
+                        ->label(__('capell-layout::form.livewire_component')),
                     ComponentSelect::make('component')
                         ->when($componentRequired, fn (Select $component): Select => $component->required())
                         ->setupType(ComponentTypeEnum::Widget),

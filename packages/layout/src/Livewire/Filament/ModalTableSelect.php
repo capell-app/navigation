@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Livewire;
+namespace Capell\Layout\Livewire\Filament;
 
 use Closure;
 use Filament\Actions\Action;
@@ -54,7 +54,7 @@ class ModalTableSelect extends Component implements HasActions, HasForms, HasTab
     #[Locked]
     public Builder|Closure $tableQuery;
 
-    protected string $view = 'capell-layout::livewire.layout.widgets-table-select';
+    protected string $view = 'capell-layout::livewire.filament.layout-builder.widgets-table-select';
 
     public function mount(): void
     {

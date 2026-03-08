@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Assistant\Support\Admin;
 
-use Capell\Admin\Facades\CapellAdmin;
 use Capell\Assistant\Actions\SuggestPageTitlesAction;
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
+use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Assistant\Support\Context\ContentActionContext;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -46,7 +46,7 @@ class PageTitleWithSlugInputExtender
      */
     public function actions(): array
     {
-        if (! CapellAdmin::settings()->page_title_suggestions) {
+        if (! $this->isEnabled()) {
             return [];
         }
 
@@ -60,13 +60,20 @@ class PageTitleWithSlugInputExtender
      */
     public function afterLabel(FusedGroup $component): ?Schema
     {
-        if (! CapellAdmin::settings()->page_title_suggestions) {
+        if (! $this->isEnabled()) {
             return null;
         }
 
         return Schema::end([
             $component->getAction($this->titleSuggestionsActionName),
         ]);
+    }
+
+    private function isEnabled(): bool
+    {
+        $prompts = resolve(AssistantSettings::class)->prompts;
+
+        return isset($prompts['title_generation']) && $prompts['title_generation'] === true;
     }
 
     private function titleSuggestionsAction(): Action

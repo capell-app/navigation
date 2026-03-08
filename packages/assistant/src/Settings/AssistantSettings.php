@@ -10,11 +10,7 @@ use Spatie\LaravelSettings\Settings;
 
 class AssistantSettings extends Settings implements SettingsContract
 {
-    public bool $page_content_generator;
-
-    public bool $page_title_suggestions;
-
-    public bool $meta_description_suggestions;
+    public array $prompts;
 
     public static function group(): string
     {

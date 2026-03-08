@@ -228,7 +228,7 @@ class AssetsRepeater extends Repeater
             ->icon(Heroicon::Plus);
 
         return $action->group($actions)
-            ->view('capell-admin::filament.components.actions.dropdown-group');
+            ->view('capell-admin::components.actions.dropdown-group');
     }
 
     private static function modifyCreateAction(Action $action): Action

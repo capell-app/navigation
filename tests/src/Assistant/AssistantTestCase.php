@@ -31,7 +31,7 @@ class AssistantTestCase extends AbstractTestCase
             __DIR__ . '/../../../vendor/capell-app/admin/database/settings',
         );
         $this->registerAndMigrateSettings(
-            ['create_assistant_settings'],
+            ['2026_01_02_000001_create_assistant_settings'],
             __DIR__ . '/../../../packages/assistant/database/settings',
         );
     }

@@ -103,7 +103,7 @@ class LayoutsTable extends \Capell\Admin\Filament\Resources\Layouts\Tables\Layou
                     return $indicators;
                 })
                 ->modifyQueryUsing(
-                    fn (Builder $query, ?string $state) => $query->when(
+                    fn (Builder $query, array $state) => $query->when(
                         isset($state['value']) && $state['value'] !== '',
                         fn (Builder $query) => $query->whereJsonContains('widgets', $state['value']),
                     ),

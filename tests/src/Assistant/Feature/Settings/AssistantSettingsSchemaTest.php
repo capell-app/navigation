@@ -8,6 +8,7 @@ use Capell\Assistant\Filament\Settings\AssistantSettingsSchema;
 use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Core\Support\Settings\SettingsSchemaRegistry;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
+use Filament\Schemas\Schema;
 
 use function Pest\Laravel\get;
 
@@ -40,7 +41,7 @@ test('includes assistant settings schema in settings page', function (): void {
 });
 
 test('assistant settings schema returns form components', function (): void {
-    $schema = \Mockery::mock(\Filament\Schemas\Schema::class);
+    $schema = Mockery::mock(Schema::class);
     $components = AssistantSettingsSchema::make($schema);
 
     expect($components)->toBeArray();

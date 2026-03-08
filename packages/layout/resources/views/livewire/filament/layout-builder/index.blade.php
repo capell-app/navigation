@@ -156,7 +156,7 @@ declare(strict_types=1);
                     x-sort:config="{ forceFallback: true, fallbackClass: 'sortable-fallback' }"
                 >
                     @foreach ($containers as $containerKey => $container)
-                        <x-capell-layout::layout.builder.container
+                        <x-capell-layout::filament.layout-builder.container
                             :$container
                             :$containerKey
                             :containerWidgets="$this->containerWidgets[$containerKey] ?? []"

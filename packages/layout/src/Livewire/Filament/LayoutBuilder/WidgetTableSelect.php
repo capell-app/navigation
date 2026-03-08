@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Livewire\Layout;
+namespace Capell\Layout\Livewire\Filament\LayoutBuilder;
 
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Filament\Components\Forms\WidgetsContainerForm;
 use Capell\Layout\Filament\Resources\Widgets\Tables\WidgetsTable;
-use Capell\Layout\Livewire\ModalTableSelect;
+use Capell\Layout\Livewire\Filament\ModalTableSelect;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;

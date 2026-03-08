@@ -2,22 +2,21 @@
 
 declare(strict_types=1);
 
+use Capell\Assistant\Data\PromptData;
 use Capell\Assistant\Support\AiRateLimiter;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\Context\ContentActionContext;
 use Capell\Assistant\Support\OpenAIProvider;
 use Capell\Assistant\Support\Pipelines\GenerateContentPipeline;
-use Capell\Assistant\Support\PromptRepository;
 use Mockery\MockInterface;
 
 it('sanitizes unsafe html from AI output', function (): void {
-    $prompts = mock(PromptRepository::class, function (PromptRepository&MockInterface $mock): void {
-        $mock->shouldReceive('get')->andReturn([
-            'system' => 'system',
-            'user_template' => 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
-            'model' => 'gpt-4-turbo',
-        ]);
-    });
+    $prompts = new PromptData(
+        model: 'gpt-4-turbo',
+        contentGeneration: true,
+        contentGenerationSystem: 'system',
+        contentGenerationUserTemplate: 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
+    );
 
     $provider = mock(OpenAIProvider::class, function (OpenAIProvider&MockInterface $mock): void {
         $unsafe = <<<'HTML'
@@ -71,13 +70,12 @@ it('sanitizes unsafe html from AI output', function (): void {
 });
 
 it('renders prompt variables correctly', function (): void {
-    $prompts = mock(PromptRepository::class, function (PromptRepository&MockInterface $mock): void {
-        $mock->shouldReceive('get')->andReturn([
-            'system' => 'system',
-            'user_template' => 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
-            'model' => 'gpt-4-turbo',
-        ]);
-    });
+    $prompts = new PromptData(
+        model: 'gpt-4-turbo',
+        contentGeneration: true,
+        contentGenerationSystem: 'system',
+        contentGenerationUserTemplate: 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
+    );
 
     $provider = mock(OpenAIProvider::class, function (OpenAIProvider&MockInterface $mock): void {
         $mock->shouldReceive('chat')->withArgs(function (array $params): bool {

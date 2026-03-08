@@ -102,7 +102,7 @@ declare(strict_types=1);
             "
         >
             @foreach ($widget->assets as $widgetAsset)
-                <x-capell-layout::layout.builder.asset
+                <x-capell-layout::filament.layout-builder.asset
                     :$containerKey
                     :index="$loop->index"
                     :$occurrence

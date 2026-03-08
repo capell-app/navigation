@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Assistant\Support\Admin;
 
-use Capell\Admin\Facades\CapellAdmin;
 use Capell\Assistant\Actions\SuggestMetaDescriptionsAction;
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
+use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Assistant\Support\Context\ContentActionContext;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -43,13 +43,20 @@ class SearchMetaDataSectionExtender
      */
     public function headerActions(Section $component): array
     {
-        if (! CapellAdmin::settings()->meta_description_suggestions) {
+        if (! $this->isEnabled()) {
             return [];
         }
 
         return [
             $this->metaDescriptionSuggestionsAction(),
         ];
+    }
+
+    private function isEnabled(): bool
+    {
+        $prompts = resolve(AssistantSettings::class)->prompts;
+
+        return isset($prompts['meta_description']) && $prompts['meta_description'] === true;
     }
 
     private function metaDescriptionSuggestionsAction(): Action

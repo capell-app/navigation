@@ -11,6 +11,7 @@ use Capell\Assistant\Console\Commands\ClearAiCacheCommand;
 use Capell\Assistant\Console\Commands\InstallCommand;
 use Capell\Assistant\Console\Commands\MonitorAiUsageCommand;
 use Capell\Assistant\Console\Commands\TestOpenAiConnectionCommand;
+use Capell\Assistant\Data\PromptData;
 use Capell\Assistant\Events\AiGenerationCompleted;
 use Capell\Assistant\Events\AiGenerationFailed;
 use Capell\Assistant\Filament\Settings\AssistantSettingsSchema;
@@ -29,7 +30,6 @@ use Capell\Assistant\Support\AiTokenCounter;
 use Capell\Assistant\Support\Cache\AIGenerationCache;
 use Capell\Assistant\Support\Cache\RateLimitCache;
 use Capell\Assistant\Support\OpenAIProvider;
-use Capell\Assistant\Support\PromptRepository;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Core\Support\Settings\SettingsSchemaRegistry;
@@ -83,15 +83,15 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
         );
 
         $this->app->singleton(
-            PromptRepository::class,
-            fn (Application $app): PromptRepository => new PromptRepository(config('capell-assistant.prompts', [])),
+            PromptData::class,
+            fn (Application $application): PromptData => PromptData::from(resolve(AssistantSettings::class)->prompts),
         );
 
         $this->app->singleton(AiResponseParser::class, fn (): AiResponseParser => new AiResponseParser);
 
         $this->app->singleton(AiRateLimiter::class, fn (Application $app): AiRateLimiter => new AiRateLimiter(
             $app->make(RateLimitCache::class),
-            config('capell-assistant.rate_limiting', ['enabled' => false, 'requests_per_minute' => 60]),
+            config('capell-assistant.rate_limiting', ['enabled' => false, 'requests_per_minute' => resolve(AssistantSettings::class)->prompts['rate_limiting_requests_per_minute'] ?? 60]),
         ));
 
         $this->app->singleton(AiTokenCounter::class, fn (): AiTokenCounter => new AiTokenCounter);
@@ -184,10 +184,10 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
             type: static::getType(),
             serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
+            icon: 'heroicon-o-rocket-launch',
             description: static::getDescription(),
             installCommand: 'capell:assistant-install',
             setting: AssistantSettings::class,
-            icon: 'heroicon-o-rocket-launch',
             requirements: [
                 AdminServiceProvider::$packageName,
             ],

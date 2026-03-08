@@ -151,7 +151,7 @@ declare(strict_types=1);
             x-sort:group="widgets"
         >
             @foreach ($container['widgets'] as $widgetIndex => $containerWidget)
-                <x-capell-layout::layout.builder.widget
+                <x-capell-layout::filament.layout-builder.widget
                     :$containerKey
                     :$containerWidget
                     :$loop

@@ -263,7 +263,7 @@ declare(strict_types=1);
     </div>
 
     @if ($assetTypes)
-        <x-capell-layout::layout.builder.assets
+        <x-capell-layout::filament.layout-builder.assets
             :$containerKey
             :$hasPageAssets
             :$occurrence

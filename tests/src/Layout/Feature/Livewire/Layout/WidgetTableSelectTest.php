@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Layout\Livewire\Layout\WidgetTableSelect;
+use Capell\Layout\Livewire\Filament\LayoutBuilder\WidgetTableSelect;
 use Capell\Layout\Models\Widget;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Layout\Livewire\Layout;
+namespace Capell\Layout\Livewire\Filament;
 
 use BackedEnum;
 use Capell\Admin\Actions\NotifyClearCachedPagesAction;
@@ -65,7 +65,7 @@ use Livewire\Component;
  * @property-read $addWidgetAction
  * @property-read $editWidgetAssetAction
  */
-class Builder extends Component implements HasActions, HasForms, HasPageResource
+class LayoutBuilder extends Component implements HasActions, HasForms, HasPageResource
 {
     use HasPageCacheNotification;
     use InteractsWithActions;
@@ -99,7 +99,7 @@ class Builder extends Component implements HasActions, HasForms, HasPageResource
 
     protected ?Site $site = null;
 
-    protected string $view = 'capell-layout::livewire.layout.builder';
+    protected string $view = 'capell-layout::livewire.filament.layout-builder.index';
 
     public static function getResource(): string
     {
