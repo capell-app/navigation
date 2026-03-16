@@ -39,7 +39,7 @@ class ArticleObserver
 
     public function saved(Article $article): void
     {
-        $this->clearCache($article);
+        $this->clearCache();
     }
 
     public function publishing(Article $article): void
@@ -59,7 +59,7 @@ class ArticleObserver
             $article->revisions()->delete();
         }
 
-        $this->clearCache($article);
+        $this->clearCache();
     }
 
     public function restored(Article $article): void
@@ -80,10 +80,10 @@ class ArticleObserver
             $article->revisions()->getQuery()->update([$article->getDeletedAtColumn() => null]);
         });
 
-        $this->clearCache($article);
+        $this->clearCache();
     }
 
-    private function clearCache(Article $article): void
+    private function clearCache(): void
     {
         // TODO
     }

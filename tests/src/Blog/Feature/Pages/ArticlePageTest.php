@@ -25,24 +25,33 @@ test('article page with layout', function (): void {
     $blogCreator->createTagPage($site);
 
     $tags = Tag::factory()->count(3)->translate($language)->type(TagTypeEnum::Page)->create();
-    $articles = Article::factory()->count(3)->site($site)->publisher($user)->withTranslations()->create();
-    $page = $articles->get(1);
-    $page->tags()->attach($tags);
-    $pageTags = $page->tags()->ordered()->get();
+    $articles = Article::factory()
+        ->site($site)
+        ->publisher($user)
+        ->withTranslations()
+        ->forEachSequence(
+            ['publish_from' => now()->subDays(5)],
+            ['publish_from' => now()->subDays(3)],
+            ['publish_from' => now()->subDays(1)],
+        )
+        ->create();
+    $article = $articles->get(1);
+    $article->tags()->attach($tags);
+    $articleTags = $article->tags()->ordered()->get();
 
-    get($page->pageUrl->full_url)
+    get($article->pageUrl->full_url)
         ->assertOk()
         ->assertElementExists(
             'title',
-            fn (AssertElement $elm): BaseAssert => $elm->containsText($page->translation->title . ' | ' . $site->title),
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($article->translation->title . ' | ' . $site->title),
         )
         ->assertElementExists(
             'h1',
-            fn (AssertElement $elm): BaseAssert => $elm->containsText($page->translation->title),
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($article->translation->title),
         )
         ->assertElementExists(
             'time.published-date',
-            fn (AssertElement $elm): BaseAssert => $elm->has('datetime', $page->published_at->toW3cString()),
+            fn (AssertElement $elm): BaseAssert => $elm->has('datetime', $article->published_at->toW3cString()),
         )
         ->assertElementExists(
             '.article-meta',
@@ -55,7 +64,7 @@ test('article page with layout', function (): void {
                     fn (AssertElement $elm): BaseAssert => $elm->contains('.tag-item', count: 3)
                         ->each(
                             '.tag-item',
-                            fn (AssertElement $elm, int $index): BaseAssert => $elm->containsText($pageTags[$index]->translate('name', $language->code)),
+                            fn (AssertElement $elm, int $index): BaseAssert => $elm->containsText($articleTags[$index]->translate('name', $language->code)),
                         ),
                 ),
         )

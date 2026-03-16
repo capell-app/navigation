@@ -12,6 +12,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
+use Capell\Core\Actions\ResolvePageableMorphModelAction;
 use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Type;
@@ -77,7 +78,7 @@ class WidgetAssetsTable implements TableConfigurator
             TextColumn::make('asset_type')
                 ->badge()
                 ->sortable(),
-            PageNameColumn::make('page.name')
+            PageNameColumn::make('pageable.name')
                 ->label(__('capell-admin::table.page'))
                 ->withParents()
                 ->sortable(),
@@ -90,17 +91,18 @@ class WidgetAssetsTable implements TableConfigurator
             Filter::make('filter')
                 ->columnSpanFull()
                 ->schema([
-                    Select::make('page_id')
+                    Select::make('pages')
                         ->label(__('capell-admin::form.page'))
+                        ->multiple()
                         ->options(
                             fn (HasTable $livewire): array => $livewire->getTable()->getQuery()
-                                ->select('page_id')
+                                ->select(['pageable_type', 'pageable_id'])
                                 ->withOnly('page')
-                                ->whereNotNull('page_id')
-                                ->groupBy('page_id')
+                                ->whereNotNull(['pageable_type', 'pageable_id'])
+                                ->groupBy(['pageable_type', 'pageable_id'])
                                 ->get()
-                                ->mapWithKeys(
-                                    fn (WidgetAsset $widgetAsset): array => [$widgetAsset->page_id => $widgetAsset->page->name],
+                                ->pluck(
+                                    fn (WidgetAsset $widgetAsset): array => [self::buildLookupKey($widgetAsset->pageable_type, $widgetAsset->pageable_id) => $widgetAsset->page->name],
                                 )
                                 ->all(),
                         ),
@@ -119,16 +121,35 @@ class WidgetAssetsTable implements TableConfigurator
                 ->query(
                     fn (Builder $query, array $data): Builder => $query
                         ->when(
-                            isset($data['asset_type']),
+                            isset($data['asset_type']) && filled($data['asset_type']),
                             fn (Builder $query): Builder => $query->where('asset_type', $data['asset_type']),
                         )
                         ->when(
-                            isset($data['type_id']),
+                            isset($data['type_id']) && filled($data['type_id']),
                             fn (Builder $query): Builder => $query->where('type_id', $data['type_id']),
                         )
                         ->when(
-                            isset($data['page_id']),
-                            fn (Builder $query): Builder => $query->where('page_id', $data['page_id']),
+                            isset($data['pages']) && filled($data['pages']),
+                            fn (Builder $query): Builder => $query->where(function (Builder $query) use ($data): void {
+                                $pageLookupKeys = is_array($data['pages']) ? $data['pages'] : [];
+
+                                foreach ($pageLookupKeys as $pageLookupKey) {
+                                    [$pageableType, $pageableId] = array_pad(explode(':', (string) $pageLookupKey, 2), 2, null);
+                                    if (blank($pageableType)) {
+                                        continue;
+                                    }
+
+                                    if (blank($pageableId)) {
+                                        continue;
+                                    }
+
+                                    $query->orWhere(function (Builder $pageConditionQuery) use ($pageableType, $pageableId): void {
+                                        $pageConditionQuery
+                                            ->where('pageable_type', $pageableType)
+                                            ->where('pageable_id', $pageableId);
+                                    });
+                                }
+                            }),
                         ),
                 )
                 ->indicateUsing(function (array $data): array {
@@ -144,19 +165,29 @@ class WidgetAssetsTable implements TableConfigurator
                     if (isset($data['type_id'])) {
                         $indicators['type_id'] = __(
                             'capell-layout::filter.type',
-                            ['search' => Type::query()->find($data['type_id'])->name],
+                            ['search' => Type::query()->find($data['type_id'], ['name'])->name],
                         );
                     }
 
-                    if (isset($data['page_id'])) {
-                        $indicators['page_id'] = __(
-                            'capell-layout::filter.page',
-                            ['search' => Page::query()->withDrafts()->find($data['page_id'])->name],
+                    if (isset($data['pageable_type'], $data['pageable_id'])) {
+                        $pageableModel = ResolvePageableMorphModelAction::run(
+                            $data['pageable_type'],
+                            $data['pageable_id'],
+                            ['name'],
                         );
+
+                        if ($pageableModel !== null && filled($pageableModel->name)) {
+                            $indicators['page'] = __('capell-admin::filter.page', ['search' => $pageableModel->name]);
+                        }
                     }
 
                     return $indicators;
                 }),
         ];
+    }
+
+    private static function buildLookupKey(string $pageableType, int $pageableId): string
+    {
+        return $pageableType . ':' . $pageableId;
     }
 }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Database\Factories;
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
+use Capell\Layout\Enums\ActionLinkEnum;
 use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
@@ -64,7 +66,7 @@ class WidgetAssetFactory extends Factory
         ]);
     }
 
-    public function page(Page $page, ?string $container = null, ?int $occurrence = null): self
+    public function page(Pageable $page, ?string $container = null, ?int $occurrence = null): self
     {
         return $this->state(fn (array $attributes): array => [
             'pageable_id' => $page->getKey(),
@@ -140,7 +142,7 @@ class WidgetAssetFactory extends Factory
             $actions = [];
             for ($i = 0; $i < $count; $i++) {
                 $actions[] = [
-                    'type' => 'link',
+                    'type' => ActionLinkEnum::Link->value,
                     'label' => fake()->sentence(2),
                     'url' => fake()->url(),
                 ];

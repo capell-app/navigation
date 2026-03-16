@@ -10,6 +10,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Tests\Support\Concerns\TestingFrontend;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 uses(TestingFrontend::class);
@@ -52,18 +53,27 @@ it('builds recursive sitemap for archive page with parent chain and month childr
     /** @var SitemapPageData $root */
     $root = $result->first();
 
+    /** @var SitemapPageData $archivesNode */
+    $archivesNode = $root->children->first();
+
     expect($root)
         ->toBeInstanceOf(SitemapPageData::class)
         ->pageId->toBe($blogPage->id)
+        ->lastModified->toBeInstanceOf(CarbonImmutable::class)
         ->children
         ->toBeInstanceOf(Collection::class)
         ->toHaveCount(1)
-        ->and($root->children->first())
+        ->and($archivesNode)
         ->pageId->toBe($archivesPage->id)
+        ->lastModified->toBeInstanceOf(CarbonImmutable::class)
         ->children
         ->toBeInstanceOf(Collection::class)
         ->toHaveCount(3)
-        ->and($root->children->first()->children->pluck('url'))
+        ->and($root->toArray()['lastModified'])
+        ->toBe($root->lastModified?->toAtomString())
+        ->and($archivesNode->toArray()['lastModified'])
+        ->toBe($archivesNode->lastModified?->toAtomString())
+        ->and($archivesNode->children->pluck('url'))
         ->toContain($archivesUrl->first())
         ->toContain($archivesUrl->get(1))
         ->toContain($archivesUrl->last());

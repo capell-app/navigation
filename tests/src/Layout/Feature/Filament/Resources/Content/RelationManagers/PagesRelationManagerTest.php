@@ -38,7 +38,7 @@ it('can list pages for a content model', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(1)
         ->assertCanSeeTableRecords($content->pages)
-        ->assertTableColumnStateSet('page.name', [$page->name], record: $widgetAsset);
+        ->assertTableColumnStateSet('pageable.name', [$page->name], record: $widgetAsset);
 });
 
 it('can search pages for a content model', function (): void {
@@ -69,5 +69,5 @@ it('can search pages for a content model', function (): void {
         ->assertSuccessful()
         ->searchTable($page->getKey())
         ->assertCountTableRecords(1)
-        ->assertCanSeeTableRecords([$page]);
+        ->assertCanSeeTableRecords([$page->getMorphClass() . '-' . $page->getKey()]);
 });

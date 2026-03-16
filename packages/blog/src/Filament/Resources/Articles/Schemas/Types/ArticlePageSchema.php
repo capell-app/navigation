@@ -10,10 +10,11 @@ use Capell\Admin\Filament\Components\Forms\Page\LayoutSelect;
 use Capell\Admin\Filament\Components\Forms\Page\PagePublishSection;
 use Capell\Admin\Filament\Components\Forms\Page\PageSettingsSchema;
 use Capell\Admin\Filament\Components\Forms\Page\PageSiteSelect;
-use Capell\Admin\Filament\Components\Forms\Page\ParentPageSelect;
 use Capell\Admin\Filament\Components\Forms\PublishSchema;
+use Capell\Admin\Filament\Resources\Pages\RelationManagers\UrlsRelationManager;
 use Capell\Admin\Filament\Resources\Pages\Schemas\Types\DefaultPageSchema;
-use Capell\Blog\Filament\Components\Forms\Page\PageTagsInput;
+use Capell\Blog\Filament\Components\Forms\Article\ArticleTagsInput;
+use Capell\Blog\Filament\Components\Forms\Article\Tab\ArticleSettingsTab;
 use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -24,11 +25,19 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Override;
 
 class ArticlePageSchema extends DefaultPageSchema
 {
     protected bool $hasCreatePageSchema = false;
+
+    public static function relationManagers(Model $record): array
+    {
+        return [
+            UrlsRelationManager::class,
+        ];
+    }
 
     protected static function modifyParentQueryUsing(Schema $schema): Closure
     {
@@ -62,10 +71,11 @@ class ArticlePageSchema extends DefaultPageSchema
                     PageSettingsSchema::make(
                         $schema,
                         components: [
-                            PageTagsInput::make('tags'),
+                            ArticleTagsInput::make('tags'),
                         ],
                         pageGroup: $schema->getLivewire()->getResource()::getResourceName(),
                         modifyParentQueryUsing: static::modifyParentQueryUsing($schema),
+                        withParent: false,
                         withType: false,
                     ),
                     contained: true,
@@ -74,6 +84,19 @@ class ArticlePageSchema extends DefaultPageSchema
                 ->columnSpanFull()
                 ->tabs($this->getTabs($schema)),
         ];
+    }
+
+    protected function getTabs(Schema $schema): array
+    {
+        $tabs = [
+            ArticleSettingsTab::make($schema),
+        ];
+
+        foreach (static::getExtenders() as $extender) {
+            $tabs = $extender->extendTabs($schema, $tabs);
+        }
+
+        return $tabs;
     }
 
     #[Override]
@@ -88,11 +111,12 @@ class ArticlePageSchema extends DefaultPageSchema
                     ...PageSettingsSchema::make(
                         $schema,
                         components: [
-                            PageTagsInput::make('tags'),
+                            ArticleTagsInput::make('tags'),
                             MediaLibraryFileUpload::make('image'),
                         ],
                         pageGroup: $schema->getLivewire()->getResource()::getResourceName(),
                         modifyParentQueryUsing: static::modifyParentQueryUsing($schema),
+                        withParent: false,
                         withType: false,
                     ),
                     PagePublishSection::make(),
@@ -105,21 +129,10 @@ class ArticlePageSchema extends DefaultPageSchema
     {
         return [
             PageSiteSelect::make(),
-            $this->getParentPageSelect($schema),
             LayoutSelect::make('layout_id')
                 ->reactive(),
-            PageTagsInput::make('tags'),
+            ArticleTagsInput::make('tags'),
             PublishSchema::make($schema),
         ];
-    }
-
-    #[Override]
-    protected function getParentPageSelect(Schema $schema): ParentPageSelect
-    {
-        return ParentPageSelect::make('parent_id')
-            ->label(__('capell-admin::form.parent_page'))
-            ->setupRelation('parent', $schema)
-            ->pageGroup(static::modifyParentQueryUsing($schema))
-            ->reactive();
     }
 }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Enums\NavigationItemType;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
@@ -32,7 +33,7 @@ it('renders navigation widget on page', function (): void {
     $creator = resolve(WidgetCreator::class);
     $layout = (new LayoutFactory)->create();
     $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
-    $home = Page::factory()->site($site)->home()->withTranslations()->create();
+    $home = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
     $services = Page::factory()
         ->site($site)
         ->withTranslations()
@@ -44,42 +45,46 @@ it('renders navigation widget on page', function (): void {
         'children' => ['translation', 'pageUrl.siteDomain'],
     ]);
 
-    $anotherSiteHome = Page::factory()->home()->withTranslations()->create();
+    $anotherSiteHome = Page::factory()->home()->withTranslations(slug: '/')->create();
     $externalUrl = 'https://example.com/external';
     $items = [
         [
             'label' => 'Home',
-            'type' => 'page',
+            'type' => NavigationItemType::Page->value,
             'data' => [
-                'page_id' => $home->id,
+                'pageable_id' => $home->getKey(),
+                'pageable_type' => $home->getMorphClass(),
             ],
         ],
         [
             'label' => $page->translation->title,
-            'type' => 'page',
+            'type' => NavigationItemType::Page->value,
             'data' => [
-                'page_id' => $page->id,
+                'pageable_id' => $page->getKey(),
+                'pageable_type' => $page->getMorphClass(),
             ],
         ],
         [
             'label' => 'Another Site',
-            'type' => 'page',
+            'type' => NavigationItemType::Page->value,
             'data' => [
-                'page_id' => $anotherSiteHome->id,
+                'pageable_id' => $anotherSiteHome->getKey(),
+                'pageable_type' => $anotherSiteHome->getMorphClass(),
             ],
         ],
         [
             'label' => 'External link',
-            'type' => 'link',
+            'type' => NavigationItemType::Link->value,
             'data' => [
                 'url' => $externalUrl,
             ],
         ],
         [
             'label' => $services->translation->title,
-            'type' => 'page',
+            'type' => NavigationItemType::Page->value,
             'data' => [
-                'page_id' => $services->id,
+                'pageable_id' => $services->getKey(),
+                'pageable_type' => $services->getMorphClass(),
                 'auto_children' => true,
             ],
         ],

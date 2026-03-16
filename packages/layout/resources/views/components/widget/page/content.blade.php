@@ -66,7 +66,7 @@ $theme = Frontend::theme();
         @endif
 
         @if (! empty($widget->translation?->actions))
-            <x-capell::actions
+            <x-capell-layout::actions
                 class="mt-4"
                 :actions="$widget->translation?->actions"
                 button_color="primary"

@@ -81,7 +81,7 @@ declare(strict_types=1);
     if (! $description) {
         $description = '';
 
-        if ($widgetAsset->asset->ancestors?->isNotEmpty()) {
+        if ($widgetAsset->asset instanceof Page && $widgetAsset->asset->ancestors?->isNotEmpty()) {
             $description .= $widgetAsset->asset->ancestors->pluck('name')
                 ->map(fn (string $name): string => Str::limit($name, 30))
                 ->implode(' &raquo; ');

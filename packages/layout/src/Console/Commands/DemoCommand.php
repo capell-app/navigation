@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Console\Commands;
 
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
@@ -90,7 +91,7 @@ class DemoCommand extends Command
         /** @var Page $home */
         $home = $site->getHomePage();
 
-        if (! $home instanceof Page) {
+        if (! $home instanceof Pageable) {
             $this->error('Unable to find homepage for site: ' . $site->name);
 
             return false;
@@ -105,7 +106,7 @@ class DemoCommand extends Command
         return true;
     }
 
-    public function setupHomepage(Page $page, Collection $languages): void
+    public function setupHomepage(Pageable $page, Collection $languages): void
     {
         $layout = $this->getHomeLayout();
         throw_unless($layout instanceof Layout, Exception::class, 'Unable to find homepage layout');
@@ -166,7 +167,7 @@ class DemoCommand extends Command
         return null;
     }
 
-    private function populateMainContainer(array &$containers, Page $page): void
+    private function populateMainContainer(array &$containers, Pageable $page): void
     {
         $this->setProgressMessage('Creating page cards widget');
         $pageCardsWidget = $this->demoCreator->createPageCardsWidget($page);
@@ -198,7 +199,7 @@ class DemoCommand extends Command
         ];
     }
 
-    private function populateFaqContainers(array &$containers, Collection $languages, Page $page): void
+    private function populateFaqContainers(array &$containers, Collection $languages, Pageable $page): void
     {
         $this->setProgressMessage('Creating FAQ widget');
         $faqWidget = $this->demoCreator->createFaqWidget($languages);
@@ -228,7 +229,7 @@ class DemoCommand extends Command
         ];
     }
 
-    private function populateSecondaryContainer(array &$containers, Collection $languages, Page $page): void
+    private function populateSecondaryContainer(array &$containers, Collection $languages, Pageable $page): void
     {
         $this->setProgressMessage('Creating team portfolio widget');
         $teamPortfolioWidget = $this->demoCreator->createTeamPortfolioWidget($languages);

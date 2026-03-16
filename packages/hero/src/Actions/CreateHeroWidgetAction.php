@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Hero\Actions;
 
+use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
@@ -77,7 +78,7 @@ class CreateHeroWidgetAction
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => 'heroicon-o-gift',
                 'asset_types' => [
-                    \Capell\Core\Enums\AssetEnum::Page,
+                    AssetEnum::Page,
                     LayoutAssetEnum::Content,
                 ],
             ],

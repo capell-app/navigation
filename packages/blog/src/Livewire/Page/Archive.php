@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Livewire\Page;
 
+use Capell\Blog\Enums\ModelEnum;
 use Capell\Blog\Enums\ResourceEnum;
+use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Support\Loader\PageLoader;
@@ -72,20 +74,20 @@ class Archive extends AbstractPage
 
         $page = Frontend::page();
 
-        $paginationKey = config('capell-admin.page_query', 'pageQuery');
+        $paginationPage = config('capell-admin.page_query', 'pageQuery');
 
         $this->results = PageLoader::getPages(
             language: Frontend::language(),
             site: Frontend::site(),
-            limit: $page->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
-            paginationPage: (int) $this->getPage($paginationKey),
+            limit: $page->meta['limit'] ?? $page->type->meta['limit'] ?? config('capell-frontend.pagination_limit', 12),
+            paginationPage: (int) $this->getPage($paginationPage),
             typeKey: $page->type->meta['page_group'] ?? strtolower(ResourceEnum::Article->name),
             withImage: $page->type->meta['with_image'] ?? false,
             withPagination: $page->type->meta['pagination'] ?? true,
-            withParent: $page->type->meta['with_parent'] ?? false,
             withDate: $page->type->meta['with_date'] ?? false,
-            paginationKey: $paginationKey,
+            paginationKey: 'article-archives',
             cacheKeyPrepend: sprintf('year-%s-month-%s', $this->year, $this->month),
+            morphModel: CapellCore::getModel(ModelEnum::Article),
             modifyQuery: function (Builder $query) {
                 if (DB::getDriverName() === 'sqlite') {
                     return $query

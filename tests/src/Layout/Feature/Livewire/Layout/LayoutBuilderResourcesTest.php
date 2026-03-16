@@ -123,7 +123,7 @@ test('Can sync new widget assets to page layout', function (): void {
                 'widgetIndex' => 0,
                 'hasPageAssets' => true,
             ],
-            type: \Capell\Layout\Enums\AssetEnum::Content->value,
+            type: Capell\Layout\Enums\AssetEnum::Content->value,
             assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
         )
         ->call(
@@ -186,7 +186,7 @@ test('Can sync new widget assets to layout', function (): void {
                 'widgetIndex' => $widgetIndex,
                 'hasPageAssets' => false,
             ],
-            type: \Capell\Layout\Enums\AssetEnum::Content->value,
+            type: Capell\Layout\Enums\AssetEnum::Content->value,
             assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
         )
         ->call(
@@ -240,7 +240,7 @@ test('Can sync new page assets', function (): void {
                 'widgetIndex' => $widgetIndex,
                 'hasPageAssets' => true,
             ],
-            type: \Capell\Layout\Enums\AssetEnum::Content->value,
+            type: Capell\Layout\Enums\AssetEnum::Content->value,
             assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
         )
         ->call(
@@ -283,7 +283,7 @@ test('Can reorder assets', function (): void {
 
     $secondAsset = WidgetAsset::factory()
         ->widget($widget)
-        ->asset(\Capell\Layout\Enums\AssetEnum::Content)
+        ->asset(Capell\Layout\Enums\AssetEnum::Content)
         ->state([
             'order' => 2,
             'occurrence' => 2,

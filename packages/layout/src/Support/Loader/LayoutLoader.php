@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Capell\Layout\Support\Loader;
 
 use Capell\Core\Actions\GetComponentClassAction;
+use Capell\Core\Contracts\Pageable;
+use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
@@ -51,7 +53,7 @@ class LayoutLoader
      * Preload all widgets and their assets for a layout for the given language and page.
      * Results are stored in-memory only for the current request lifecycle.
      */
-    public function preloadLayoutWidgets(Layout $layout, Language $language, ?Page $page): void
+    public function preloadLayoutWidgets(Layout $layout, Language $language, ?Pageable $page): void
     {
         $cacheKey = $this->preloadedKey($layout, $language, $page);
         if (isset($this->preloaded[$cacheKey])) {
@@ -61,12 +63,20 @@ class LayoutLoader
         $layout->load([
             'layoutWidgets' => fn (BuilderContract $query): BuilderContract => $query->with([
                 'type',
-                'image',
-                'backgroundImage',
-                'media' => fn (BuilderContract $q): BuilderContract => $q->ordered(),
-                'translation' => fn (BuilderContract $q): BuilderContract => $q->where('language_id', $language->id),
+                'media' => fn (BuilderContract $query): BuilderContract => $query->ordered(),
+                'translation' => fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
             ]),
         ]);
+
+        $layout->layoutWidgets->each(function (Widget $widget): void {
+            if ($widget->media->isEmpty()) {
+                return;
+            }
+
+            $widget->setRelation('image', $widget->media->firstWhere('type', MediaCollectionEnum::Image->value));
+
+            $widget->setRelation('backgroundImage', $widget->media->firstWhere('type', MediaCollectionEnum::BackgroundImage->value));
+        });
 
         $layoutWidgets = $layout->layoutWidgets;
 
@@ -113,7 +123,7 @@ class LayoutLoader
             ])
             ->ordered();
 
-        if ($page instanceof Page) {
+        if ($page instanceof Pageable) {
             $assetQuery->where(function (BuilderContract $query) use ($page): void {
                 $query->where([
                     'pageable_type' => $page->getMorphClass(),
@@ -193,59 +203,24 @@ class LayoutLoader
         Layout $layout,
         string $widgetKey,
         Language $language,
-        ?Page $page,
+        ?Pageable $page,
         string $containerKey,
         int $occurrence,
     ): ?Widget {
-        $key = sprintf(
-            'layout-%d-widget-%s-lang-%d-container-%s-occurrence-%d',
-            $layout->id,
-            $widgetKey,
-            $language->id,
-            $containerKey,
-            $occurrence,
-        )
-            . ($page instanceof Page ? '-page-' . $page->id : '');
-
-        $fromCache = true;
-
-        // Ensure preloading is done once per layout/language/page
         $this->preloadLayoutWidgets($layout, $language, $page);
 
-        $widget = CapellCore::rememberCache(
-            $key,
-            function () use ($layout, $widgetKey, $language, $page, $containerKey, $occurrence, &$fromCache): ?Widget {
-                $fromCache = false;
-
-                return $this->getPreloadedWidget($layout, $language, $page, $containerKey, $widgetKey, $occurrence);
-            },
-        );
-
-        if ($fromCache && $widget instanceof Widget) {
-            resolve(ModelServingInterface::class)->track($widget);
-
-            $widget->assets->each(function (WidgetAsset $resource): void {
-                resolve(ModelServingInterface::class)->track($resource);
-            });
-
-            if ($widget->translation) {
-                resolve(ModelServingInterface::class)->track($widget->translation);
-                resolve(ModelServingInterface::class)->track($widget->translation->language);
-            }
-        }
-
-        return $widget;
+        return $this->loadWidget($layout, $language, $page, $containerKey, $widgetKey, $occurrence);
     }
 
-    private function preloadedKey(Layout $layout, Language $language, ?Page $page): string
+    private function preloadedKey(Layout $layout, Language $language, ?Pageable $page): string
     {
-        return 'layout:' . $layout->id . ':lang:' . $language->id . ':page:' . ($page instanceof Page ? $page->id : 0);
+        return 'layout:' . $layout->id . ':lang:' . $language->id . ':page:' . ($page instanceof Pageable ? $page->id : 0);
     }
 
-    private function getPreloadedWidget(
+    private function loadWidget(
         Layout $layout,
         Language $language,
-        ?Page $page,
+        ?Pageable $page,
         string $containerKey,
         string $widgetKey,
         int $occurrence,

@@ -16,7 +16,6 @@ use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Enums\LivewireComponentsEnum;
 use Capell\Layout\Enums\ModelEnum;
@@ -60,7 +59,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
- * @property-read ?Page $page
+ * @property-read ?Pageable $page
  * @property-read $changeLayoutAction
  * @property-read $duplicateLayoutAction
  * @property-read $addWidgetAction
@@ -180,7 +179,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms, HasPageRe
                 collect([$this->layout])
                     ->when(
                         $this->page,
-                        fn (SupportCollection $collection, Page $page): SupportCollection => $collection->push($page),
+                        fn (SupportCollection $collection, Pageable $page): SupportCollection => $collection->push($page),
                     ),
             );
         }
@@ -468,15 +467,11 @@ class LayoutBuilder extends Component implements HasActions, HasForms, HasPageRe
                         ->record(fn (): Widget => $action->getRecord()->fresh()),
                 ),
             )
-            ->action(
-                function (Action $action, Schema $schema, Widget $record, array $data): void {
-                    $schema->saveRelationships();
+            ->action(function (Action $action, Widget $record, Schema $schema, array $data): void {
+                $this->saveWidgetForm(schema: $schema, record: $record, data: $data);
 
-                    $record->update($data);
-
-                    $action->success();
-                },
-            );
+                $action->success();
+            });
     }
 
     public function duplicateWidgetAction(): Action
@@ -943,7 +938,7 @@ class LayoutBuilder extends Component implements HasActions, HasForms, HasPageRe
 
         return collect($assets)
             ->contains(
-                fn (array $asset) => $asset['pageable_type'] === $this->page->getMorphClass()
+                fn (array $asset): bool => $asset['pageable_type'] === $this->page->getMorphClass()
                     && $asset['pageable_id'] === $this->page->getKey(),
             );
     }
@@ -1494,6 +1489,15 @@ class LayoutBuilder extends Component implements HasActions, HasForms, HasPageRe
         }
 
         $this->layoutUpdated();
+    }
+
+    protected function saveWidgetForm(Schema $schema, Widget $record, array $data): void
+    {
+        $this->loadFromStore();
+
+        $schema->saveRelationships();
+
+        $record->update($data);
     }
 
     protected function removeWidget(string $containerKey, int $widgetIndex): void

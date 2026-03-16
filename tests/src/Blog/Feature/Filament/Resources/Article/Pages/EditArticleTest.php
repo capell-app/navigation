@@ -57,10 +57,14 @@ it('can save', function (): void {
     $page = Article::factory()->recycle($site)->create();
 
     $languages->each(function (int $languageId) use ($page): void {
-        $page->translations()->save(Translation::factory()->slug(Str::slug($page->name . ' ' . $languageId))->make([
-            'language_id' => $languageId,
-            'title' => Str::title($page->name . ' ' . $languageId),
-        ]));
+        $page->translations()->save(
+            Translation::factory()
+                ->slug(Str::slug($page->name . ' ' . $languageId))
+                ->make([
+                    'language_id' => $languageId,
+                    'title' => Str::title($page->name . ' ' . $languageId),
+                ]),
+        );
     });
 
     $page->refresh();
@@ -74,7 +78,6 @@ it('can save', function (): void {
         ->assertSchemaStateSet([
             'name' => $page->name,
             'layout_id' => $page->layout->getKey(),
-            'type_id' => $page->type->getKey(),
             'site_id' => $page->site->getKey(),
         ])
         ->fillForm([
@@ -113,8 +116,8 @@ test('can edit article tags', function (): void {
             'tags' => $tags->pluck('name')->toArray(),
         ])
         ->call('save')
-        ->assertSet('record', fn (Model $article): bool => $article instanceof Article)
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertSet('record', fn (Model $article): bool => $article instanceof Article);
 
     expect($article->refresh())->tags->toHaveCount(3);
 });

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 use Capell\Core\Console\Commands\PublishMigrationsCommand;
 use Capell\Core\Support\Dataset\DatasetPublisher;
 use Capell\Core\Support\Migration\MigrationFileManagerInterface;
@@ -9,6 +10,8 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Migrations\Migrator;
+
+use function Pest\Laravel\artisan;
 
 afterEach(function (): void {
     Mockery::close();
@@ -23,7 +26,7 @@ it('runs blog install command successfully without publishing files', function (
     $fakeDatasetPublisher = Mockery::mock(DatasetPublisher::class);
 
     // Ensure calls to publish migrations are no-ops and counted (called twice in Blog install)
-    $this->instance(
+    test()->instace(
         PublishMigrationsCommand::class,
         Mockery::mock(new PublishMigrationsCommand($fakeDatasetPublisher, $fakeFileManager))
             ->makePartial()
@@ -33,7 +36,7 @@ it('runs blog install command successfully without publishing files', function (
     // Ensure migrate command is a no-op
     $fakeMigrator = Mockery::mock(Migrator::class);
     $fakeDispatcher = Mockery::mock(Dispatcher::class);
-    $this->instance(
+    test()->instace(
         MigrateCommand::class,
         Mockery::mock(new MigrateCommand($fakeMigrator, $fakeDispatcher))
             ->makePartial()
@@ -42,7 +45,7 @@ it('runs blog install command successfully without publishing files', function (
 
     // If Filament AssetsCommand is available, stub it as a no-op
     if (class_exists('Filament\\Commands\\AssetsCommand')) {
-        $this->instance(
+        test()->instace(
             'Filament\\Commands\\AssetsCommand',
             Mockery::mock('Filament\\Commands\\AssetsCommand', [])->makePartial()
                 ->shouldReceive('run')->once()->andReturn(0)->getMock(),
@@ -51,7 +54,7 @@ it('runs blog install command successfully without publishing files', function (
 
     app()->instance(MigrationFileManagerInterface::class, $fakeFileManager);
 
-    $this->artisan('capell:blog-install')
+    artisan('capell:blog-install')
         ->doesntExpectOutput('Publishing migrations')
         ->doesntExpectOutput('Migrating')
         ->doesntExpectOutput('Building assets')

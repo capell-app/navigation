@@ -27,6 +27,8 @@ class Related extends AbstractPagesWidget
 
         $tagIds = $tags->pluck('id')->toArray();
 
+        $excludeParent = $page->hasPageHierarchy() && (bool) ($this->widget->meta['exclude_parent'] ?? false);
+
         $this->pages = PageLoader::getPages(
             language: Frontend::language(),
             site: Frontend::site(),
@@ -36,13 +38,14 @@ class Related extends AbstractPagesWidget
             withParent: $this->widget->meta['with_parent'] ?? false,
             withDate: $this->widget->meta['with_date'] ?? false,
             cacheKeyPrepend: 'tags-' . implode('-', $tagIds),
+            morphModel: $this->widget->meta['page_model'] ?? $this->widget->type->meta['page_model'] ?? null,
             /**
              * @param  Builder<Page>  $query
              */
             modifyQuery: fn (Builder $query) => $query
                 ->where('pages.id', '!=', $page->id)
                 ->when(
-                    $this->widget->meta['exclude_parent'] ?? false && $page->parent_id,
+                    $excludeParent && $page->parent_id,
                     fn (BuilderContract $query): BuilderContract => $query->where('pages.id', '!=', $page->parent_id),
                 )
                 ->whereHas(

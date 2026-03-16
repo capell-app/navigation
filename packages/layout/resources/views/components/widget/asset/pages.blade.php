@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
-use Capell\Frontend\Facades\Frontend;
-
-$language = Frontend::language();
-$theme = Frontend::theme();
 ?>
+
+@php
+    use Capell\Core\Enums\AssetComponentEnum;
+    use Capell\Core\Facades\CapellCore;
+    use Capell\Frontend\Facades\Frontend;
+
+    $language = Frontend::language();
+    $theme = Frontend::theme();
+@endphp
 
 @props([
     'columns' => $container['meta']['override_columns'] ?? ($widget->meta['columns'] ?? 3),
-    'componentItem' => ($widget->meta['component_item'] ?? \Capell\Core\Enums\AssetComponentEnum::Card->value),
+    'componentItem' => ($widget->meta['component_item'] ?? AssetComponentEnum::Card->value),
     'container',
     'containerKey',
     'containerWidth' => null,
@@ -89,7 +94,7 @@ $theme = Frontend::theme();
                     :count="$withChildCount ? $item->children_count : null"
                     :icon="$widget->meta['icon'] ?? false"
                     :image="$withImage ? $item->image : null"
-                    :parent="$withParent ? $item->loadParent($language) : null"
+                    :parent="$withParent && method_exists($item, 'loadParent') ? $item->loadParent($language) : null"
                     :publish-date="$withDate ? $item->getPublishDate() : null"
                     :$size
                     :summary="$withSummary ? $item->translation->summary : null"

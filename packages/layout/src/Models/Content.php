@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Bkwld\Cloner\Cloneable;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PublishStatusEnum;
@@ -36,13 +37,11 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -75,8 +74,8 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read Collection<int, Language> $languages
  * @property-read int|null $languages_count
  * @property-read Content|null $nodeTraitParent
- * @property-read Page|null $page
- * @property-read \Kalnoy\Nestedset\Collection<int, Page> $pages
+ * @property-read Pageable|null $page
+ * @property-read \Kalnoy\Nestedset\Collection<int, Pageable> $pages
  * @property-read int|null $pages_count
  * @property-read Content|null $parent
  * @property-read Model $publisher
@@ -115,7 +114,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @method static QueryBuilder<static>|Content getPlainNodeData($id, $required = false)
  * @method static QueryBuilder<static>|Content getTotalErrors()
  * @method static QueryBuilder<static>|Content hasChildren()
- * @method static QueryBuilder<static>|Content hasParent()
+ * @method static QueryBuilder<static>|Content hasPageHierarchy()
  * @method static QueryBuilder<static>|Content isBroken()
  * @method static QueryBuilder<static>|Content leaves(array $columns = [])
  * @method static QueryBuilder<static>|Content makeGap(int $cut, int $height)
@@ -361,13 +360,6 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
         ]);
     }
 
-    public function getPreviousRevision(): HasOne
-    {
-        return $this->hasOne(static::class, $this->getKeyName())
-            ->withDrafts()
-            ->latestOfMany();
-    }
-
     public function parent(): BelongsTo
     {
         return $this->hasDraftsAndNestedSetParent();
@@ -482,9 +474,9 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
             ->orderBy($this->qualifyColumn('name'));
     }
 
-    protected function actions(): Attribute
+    protected function getActionsAttribute(): array
     {
-        return Attribute::make(get: fn () => $this->meta['actions'] ?? []);
+        return $this->meta['actions'] ?? [];
     }
 
     protected function casts(): array

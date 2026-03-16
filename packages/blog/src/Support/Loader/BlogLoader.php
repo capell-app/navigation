@@ -8,6 +8,7 @@ use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\CacheEnum;
 use Capell\Blog\Support\PageArchiveService;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
@@ -34,7 +35,7 @@ class BlogLoader
             return $model::getFirstPageByTypeForSite(BlogPageTypeEnum::Archive->value, site: $site, language: $language);
         });
 
-        if ($fromCache && $page instanceof Page) {
+        if ($fromCache && $page instanceof Pageable) {
             resolve(ModelServingInterface::class)->track($page);
         }
 
@@ -51,7 +52,7 @@ class BlogLoader
         ?int $limit = null,
         bool $pagination = true,
         ?int $paginationPage = null,
-        string $paginationKey = 'page',
+        string $paginationKey = 'archives',
     ): Collection|LengthAwarePaginator {
         $cacheKey = CacheEnum::archives($site->id, $language->id, $group, $limit, $paginationPage);
 
@@ -86,17 +87,17 @@ class BlogLoader
             return $model::getFirstPageByTypeForSite($type, site: $site, language: $language);
         });
 
-        if ($fromCache && $page instanceof Page) {
+        if ($fromCache && $page instanceof Pageable) {
             resolve(ModelServingInterface::class)->track($page);
         }
 
         return $page;
     }
 
-    public static function getBlogPageUrl(Site $site, Language $language, ?Page $page = null): string
+    public static function getBlogPageUrl(Site $site, Language $language, bool $fullUrl = true): string
     {
-        $page ??= self::getBlogPage($site, language: $language);
+        $page = self::getBlogPage($site, language: $language);
 
-        return $page?->pageUrl?->full_url ?? '';
+        return $fullUrl ? ($page?->pageUrl?->full_url ?? '') : ($page?->pageUrl?->url ?? '');
     }
 }

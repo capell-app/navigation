@@ -9,6 +9,8 @@ use Capell\Core\Models\Site;
 use Capell\Core\Support\Creator\DemoCreator;
 use Illuminate\Support\Facades\File;
 
+use function Pest\Laravel\artisan;
+
 it('runs the demo command and creates demo layouts for a site', function (): void {
     File::spy();
     $demoImgPath = DemoCreator::getDemoResourcePath('img');
@@ -18,12 +20,12 @@ it('runs the demo command and creates demo layouts for a site', function (): voi
 
     $language = Language::factory()->english()->create();
     $site = Site::factory()->recycle($language)->withTranslations($language)->state(['name' => 'Test'])->create();
-    Page::factory()->site($site)->home()->withTranslations()->create();
+    Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
 
     Page::factory()->count(4)->site($site)->has(Media::factory())->create();
 
     // Act: run the command
-    $this->artisan('capell:layout-demo', [
+    artisan('capell:layout-demo', [
         '--sites' => $site->name,
     ])
         ->assertExitCode(0);

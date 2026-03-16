@@ -42,7 +42,7 @@ test('admin can see create article', function (): void {
         ->assertOk();
 });
 
-test('admin can see edit article', function (): void {
+test('admin can load edit article', function (): void {
     test()->actingAsAdmin();
 
     $page = Article::factory()->create();

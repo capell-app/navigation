@@ -12,6 +12,8 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
 
+use function Pest\Laravel\artisan;
+
 afterEach(function (): void {
     Mockery::close();
 });
@@ -23,7 +25,7 @@ it('runs install command and does not publish files for capell:publish-migration
     ]);
     $fakeDatasetPublisher = Mockery::mock(DatasetPublisher::class);
 
-    $this->instance(
+    test()->instace(
         PublishMigrationsCommand::class,
         Mockery::mock(new PublishMigrationsCommand($fakeDatasetPublisher, $fakeFileManager))
             ->makePartial()
@@ -32,7 +34,7 @@ it('runs install command and does not publish files for capell:publish-migration
 
     $fakeMigrator = Mockery::mock(Migrator::class);
     $fakeDispatcher = Mockery::mock(Dispatcher::class);
-    $this->instance(
+    test()->instace(
         MigrateCommand::class,
         Mockery::mock(new MigrateCommand($fakeMigrator, $fakeDispatcher))
             ->makePartial()
@@ -40,7 +42,7 @@ it('runs install command and does not publish files for capell:publish-migration
     );
     // If Filament AssetsCommand is not available, skip this mock
     if (class_exists('Filament\\Commands\\AssetsCommand')) {
-        $this->instance(
+        test()->instace(
             'Filament\\Commands\\AssetsCommand',
             Mockery::mock('Filament\\Commands\\AssetsCommand', [])->makePartial()
                 ->shouldReceive('run')->once()->andReturn(0)->getMock(),
@@ -51,7 +53,7 @@ it('runs install command and does not publish files for capell:publish-migration
 
     $theme = Theme::factory()->create();
 
-    $this->artisan('capell:address-install')
+    artisan('capell:address-install')
         ->doesntExpectOutput('Publishing migrations')
         ->doesntExpectOutput('Migrating')
         ->doesntExpectOutput('Building assets')

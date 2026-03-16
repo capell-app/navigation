@@ -84,7 +84,7 @@ class PageTitleWithSlugInputExtender
             ->color('warning')
             ->icon(Heroicon::OutlinedSparkles)
             ->modalDescription(__('Provide keywords or page content to generate SEO-friendly title suggestions using AI.'))
-            ->fillForm(function ($get): array {
+            ->fillForm(function (Get $get): array {
                 /** @var class-string<Site> $model */
                 $model = CapellCore::getModel(ModelEnum::Site);
 
@@ -146,7 +146,8 @@ class PageTitleWithSlugInputExtender
         $context = new ContentActionContext(
             content: $content,
             keywords: $keywords,
-            pageId: $record?->page_id,
+            pageId: $record?->translatable_id,
+            pageType: $record?->translatable_type,
             languageId: $record?->language_id,
         );
 

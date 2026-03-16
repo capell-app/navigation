@@ -150,7 +150,7 @@ class TypeCreator
             'admin' => [
                 'schema' => AssetsWidgetSchema::getKey(),
                 'icon' => config('capell-admin.assets.media.icon'),
-                'asset_types' => [\Capell\Layout\Enums\AssetEnum::Content],
+                'asset_types' => [LayoutAssetEnum::Content],
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Assets,

@@ -7,7 +7,6 @@ namespace Capell\Blog\Support;
 use Capell\Blog\Data\ArchiveMonthData;
 use Capell\Blog\Models\Article;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

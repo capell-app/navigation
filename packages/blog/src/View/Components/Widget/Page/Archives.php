@@ -6,6 +6,7 @@ namespace Capell\Blog\View\Components\Widget\Page;
 
 use Capell\Blog\Enums\BlogTypeGroupEnum;
 use Capell\Blog\Support\Loader\BlogLoader;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
@@ -38,7 +39,7 @@ class Archives extends AbstractWidget
 
         $this->archivePage = BlogLoader::getArchivePage($site, $language);
 
-        if (! $this->archivePage instanceof Page) {
+        if (! $this->archivePage instanceof Pageable) {
             $this->skipRender = true;
 
             return;

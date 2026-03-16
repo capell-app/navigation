@@ -15,6 +15,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
 use Kalnoy\Nestedset\Collection;
@@ -31,8 +32,12 @@ use Override;
  * @property bool $featured
  * @property bool $status
  * @property int|null $site_id
+ * @property-read Collection<int, Article> $articles
  * @property-read Collection<int, Page> $pages
+ * @property-read Collection<int, Taggable> $taggables
+ * @property-read int|null $articles_count
  * @property-read int|null $pages_count
+ * @property-read int|null $taggables_count
  * @property-read Site|null $site
  * @property-read mixed $translations
  *
@@ -130,9 +135,27 @@ class Tag extends \Spatie\Tags\Tag implements PageCacheable, Statusable
         return $this->belongsTo(Site::class);
     }
 
+    public function articles(): MorphToMany
+    {
+        return $this->morphedByMany(Article::class, 'taggable');
+    }
+
     public function pages(): MorphToMany
     {
         return $this->morphedByMany(Page::class, 'taggable');
+    }
+
+    /**
+     * Access the raw taggable pivot records for this tag.
+     *
+     * This returns the pivot rows from the `taggables` table so callers can
+     * inspect which models (type + id) are associated with this tag. For
+     * convenience use the morph-specific relations like `articles()` or
+     * `pages()` when you need the hydrated models.
+     */
+    public function taggables(): HasMany
+    {
+        return $this->hasMany(Taggable::class, 'tag_id', 'id');
     }
 
     public function scopeOrdered(Builder $query, string $direction = 'asc', ?string $locale = null): void

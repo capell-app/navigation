@@ -20,7 +20,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $total_tokens
  * @property float $duration
  * @property array<array-key, mixed>|null $metadata
- * @property int|null $page_id
+ * @property int|string|null $pageable_id
+ * @property string|null $pageable_type
  * @property int|null $language_id
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
@@ -61,7 +62,8 @@ class AIGenerationHistory extends Model
         'total_tokens',
         'duration',
         'metadata',
-        'page_id',
+        'pageable_id',
+        'pageable_type',
         'language_id',
     ];
 

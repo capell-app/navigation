@@ -6,6 +6,8 @@ use Capell\Core\Models\Layout;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Illuminate\Console\Command;
 
+use function Pest\Laravel\artisan;
+
 it('runs hero install command successfully', function (): void {
     Layout::factory()->create();
 
@@ -13,7 +15,7 @@ it('runs hero install command successfully', function (): void {
     $mock->shouldReceive('handle')->once();
     app()->instance(AddHeroToLayoutAction::class, $mock);
 
-    $this->artisan('capell:hero-setup')
+    artisan('capell:hero-setup')
         ->expectsOutput('Capell Hero setup successfully.')
         ->assertExitCode(Command::SUCCESS);
 });

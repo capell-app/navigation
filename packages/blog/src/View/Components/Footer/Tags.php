@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Blog\View\Components\Footer;
 
 use Capell\Blog\Support\Loader\TagLoader;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Illuminate\Contracts\View\View as ViewContract;
@@ -29,7 +30,7 @@ class Tags extends Component
         }
 
         $tagPage = TagLoader::getTagResultsPage($site, $language);
-        if (! $tagPage instanceof Page) {
+        if (! $tagPage instanceof Pageable) {
             return;
         }
 
@@ -38,7 +39,7 @@ class Tags extends Component
 
     public function render(): ?ViewContract
     {
-        if (! $this->tagPage instanceof Page || $this->tags->isEmpty()) {
+        if (! $this->tagPage instanceof Pageable || $this->tags->isEmpty()) {
             return null;
         }
 

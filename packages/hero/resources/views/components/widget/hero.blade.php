@@ -160,7 +160,7 @@ $theme = Frontend::theme();
                             @endif
 
                             @if ($widgetAsset->asset->meta['actions'] ?? null)
-                                <x-capell::actions
+                                <x-capell-layout::actions
                                     class="hero-actions mt-8 w-full"
                                     :actions="$widgetAsset->asset->meta['actions']"
                                     :color="$slideColorScheme"
@@ -174,7 +174,7 @@ $theme = Frontend::theme();
                                 class="relative z-30 flex w-full items-center lg:col-span-6 xl:col-span-5"
                             >
                                 @foreach ($images as $media)
-                                    @capture($mediaContent)
+                                    @capellBuffer($mediaContent)
                                         <x-capell::media
                                             format="webp"
                                             :media="$media"
@@ -182,7 +182,7 @@ $theme = Frontend::theme();
                                             class="hero-slide-img h-full max-h-[40vh] w-full object-cover object-center lg:max-h-[400px]"
                                             loading="lazy"
                                         />
-                                    @endcapture
+                                    @endcapellBuffer
 
                                     @if ($loop->first)
                                         {{ $mediaContent() }}

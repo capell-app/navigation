@@ -8,8 +8,6 @@ use BackedEnum;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
-use Capell\Admin\Filament\Contracts\FormConfigurator;
-use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Filament\Resources\Widgets\Pages\CreateWidget;
@@ -35,10 +33,8 @@ class WidgetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var class-string<FormConfigurator> */
     protected static string $formConfigurator = WidgetForm::class;
 
-    /** @var class-string<TableConfigurator> */
     protected static string $tableConfigurator = WidgetsTable::class;
 
     public static function form(Schema $schema): Schema

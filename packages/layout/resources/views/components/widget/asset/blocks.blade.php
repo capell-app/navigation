@@ -30,7 +30,7 @@ $theme = Frontend::theme();
     'columns' => $widget->meta['columns'] ?? ($widget->type->meta['columns'] ?? null),
 ])
 
-@capture($extendedBackground, $color, $position)
+@capellBuffer($extendedBackground, $color, $position)
     <div
         @class([
             '-z-1 absolute top-0 h-full w-1/2',
@@ -52,7 +52,7 @@ $theme = Frontend::theme();
             },
         ])
     ></div>
-@endcapture
+@endcapellBuffer
 
 <x-capell-layout::widget.wrapper
     class="widget-assets-blocks relative"

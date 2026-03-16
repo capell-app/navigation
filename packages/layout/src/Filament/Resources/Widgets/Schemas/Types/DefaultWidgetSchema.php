@@ -16,7 +16,7 @@ use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetSettingsTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
@@ -105,7 +105,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
             WidgetDisplaySection::make([
                 ColorSchemeComponent::make('color'),
             ]),
-            WidgetComponentFilesSection::make()
+            WidgetComponentSection::make()
                 ->statePath('meta'),
         ]);
     }

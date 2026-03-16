@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Blog\View\Components\Widget\Page;
 
-use Capell\Core\Models\Page;
+use Capell\Core\Contracts\Pageable;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
@@ -16,9 +16,9 @@ class Article extends AbstractWidget
 {
     public ?Authenticatable $author = null;
 
-    public ?Page $nextPage = null;
+    public ?Pageable $nextPage = null;
 
-    public ?Page $previousPage = null;
+    public ?Pageable $previousPage = null;
 
     protected static string $defaultView = 'capell-blog::components.widget.page.article';
 

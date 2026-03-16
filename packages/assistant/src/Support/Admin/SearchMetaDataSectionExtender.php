@@ -129,7 +129,8 @@ class SearchMetaDataSectionExtender
         $context = new ContentActionContext(
             content: $content,
             keywords: $keywords,
-            pageId: $record?->page_id,
+            pageId: $record?->translatable_id,
+            pageType: $record?->translatable_type,
             languageId: $record?->language_id,
         );
 

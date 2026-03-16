@@ -493,6 +493,36 @@ test('Can edit container widget', function (): void {
         ->meta->toMatchArray(['html_class' => 'foo']);
 });
 
+test('Can edit widget', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+
+    $containerKey = array_key_first($layout->containers);
+    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
+    $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
+
+    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
+
+    $newWidget = Widget::factory()->make();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->callAction(
+            'editWidget',
+            data: [
+                'name' => $newWidget->name,
+            ],
+            arguments: [
+                'containerKey' => $containerKey,
+                'widgetIndex' => $widgetIndex,
+            ],
+        )
+        ->assertHasNoFormErrors()
+        ->call('saveLayout');
+
+    expect($widget->refresh())
+        ->name->toEqual($newWidget->name);
+});
+
 test('Can duplicate widget', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
 

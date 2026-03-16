@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\LayoutFactory;
 use Capell\Layout\Livewire\Assets\Table\PageAssets;
@@ -24,7 +25,7 @@ it('excludes existing page records and current pageId from selection list', func
     $pages = Page::factory()->count(5)->create();
 
     $existingRecords = $pages->take(2);
-    $visibleExpected = $pages->slice(2)->filter(fn (Page $page): bool => $page->id !== $currentPage->id)->values();
+    $visibleExpected = $pages->slice(2)->filter(fn (Pageable $page): bool => $page->id !== $currentPage->id)->values();
 
     $arguments = [
         'containerKey' => $containerKey,

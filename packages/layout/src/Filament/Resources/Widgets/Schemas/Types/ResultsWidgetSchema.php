@@ -7,10 +7,10 @@ namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types;
 use Capell\Admin\Filament\Components\Forms\CacheFrequencySelect;
 use Capell\Admin\Filament\Components\Forms\ContentEditor;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
+use Capell\Layout\Filament\Components\Forms\PageModelSelect;
 use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
-use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetResultsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
@@ -18,10 +18,9 @@ use Capell\Layout\Filament\Components\Forms\Widget\WidgetTranslationsRepeater;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Override;
 
 class ResultsWidgetSchema extends DefaultWidgetSchema
@@ -51,12 +50,7 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
                     ]),
             ])
                 ->contained(fn (string $operation): bool => $operation === 'create'),
-            Section::make(__('capell-admin::generic.settings'))
-                ->columns()
-                ->compact()
-                ->icon(Heroicon::OutlinedCog6Tooth)
-                ->collapsed()
-                ->schema(WidgetSettingsSchema::make($schema)),
+            $this->getTabs($schema),
         ];
     }
 
@@ -73,11 +67,19 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
                     WidgetSettingsSchema::make($schema),
                     contained: true,
                 ),
-            Tabs::make()
-                ->visibleOn('edit')
-                ->columnSpanFull()
-                ->tabs([
-                    WidgetDisplayTab::make([
+            $this->getTabs($schema),
+        ];
+    }
+
+    protected function getTabs(Schema $schema, bool $withSettingsTab = false): Tabs
+    {
+        return Tabs::make()
+            ->columnSpanFull()
+            ->tabs([
+                Tab::make(__('capell-admin::generic.frontend'))
+                    ->statePath('meta')
+                    ->schema([
+                        PageModelSelect::make('page_model'),
                         WidgetDisplaySection::make([
                             TextInput::make('limit')
                                 ->label(__('capell-layout::form.limit')),
@@ -87,11 +89,10 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
                             CacheFrequencySelect::make('cache_frequency'),
                             ...WidgetResultsSchema::make($schema),
                         ]),
-                        WidgetComponentFilesSection::make()
+                        WidgetComponentSection::make()
                             ->statePath('meta'),
                     ]),
-                    WidgetAdminTab::make(),
-                ]),
-        ];
+                WidgetAdminTab::make(),
+            ]);
     }
 }

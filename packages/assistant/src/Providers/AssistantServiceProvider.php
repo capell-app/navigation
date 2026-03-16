@@ -84,7 +84,7 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
 
         $this->app->singleton(
             PromptData::class,
-            fn (Application $application): PromptData => PromptData::from(resolve(AssistantSettings::class)->prompts),
+            fn (Application $application): PromptData => $this->resolvePromptData($application->make(AssistantSettings::class)->prompts),
         );
 
         $this->app->singleton(AiResponseParser::class, fn (): AiResponseParser => new AiResponseParser);
@@ -216,6 +216,48 @@ class AssistantServiceProvider extends AbstractPackageServiceProvider
         CapellCore::registerModel('AIGenerationHistory', AIGenerationHistory::class);
 
         return $this;
+    }
+
+    /**
+     * @param  array<string, bool|int|string|null>  $prompts
+     */
+    private function resolvePromptData(array $prompts): PromptData
+    {
+        return new PromptData(
+            model: $this->resolveNullableString($prompts['model'] ?? null),
+            titleGeneration: $this->resolveBoolean($prompts['title_generation'] ?? false),
+            titleGenerationSystem: $this->resolveNullableString($prompts['title_generation_system'] ?? null),
+            titleGenerationUserTemplate: $this->resolveNullableString($prompts['title_generation_user_template'] ?? null),
+            metaDescription: $this->resolveBoolean($prompts['meta_description'] ?? false),
+            metaDescriptionSystem: $this->resolveNullableString($prompts['meta_description_system'] ?? null),
+            metaDescriptionUserTemplate: $this->resolveNullableString($prompts['meta_description_user_template'] ?? null),
+            contentGeneration: $this->resolveBoolean($prompts['content_generation'] ?? false),
+            contentGenerationSystem: $this->resolveNullableString($prompts['content_generation_system'] ?? null),
+            contentGenerationUserTemplate: $this->resolveNullableString($prompts['content_generation_user_template'] ?? null),
+        );
+    }
+
+    private function resolveBoolean(bool|int|string|null $value): bool
+    {
+        return match (true) {
+            is_bool($value) => $value,
+            is_int($value) => $value === 1,
+            is_string($value) => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            default => false,
+        };
+    }
+
+    private function resolveNullableString(bool|int|string|null $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        return (string) $value;
     }
 
     private function registerSettingsSchemas(): self

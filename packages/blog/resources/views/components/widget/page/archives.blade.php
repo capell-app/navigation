@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-use Capell\Frontend\Facades\Frontend;
-
-$site = Frontend::site();
-$page = Frontend::page();
-$theme = Frontend::theme();
-$urlParams = Frontend::params();
 ?>
+
+@php
+    use Capell\Blog\Actions\GenerateArchiveUrl;
+    use Capell\Frontend\Facades\Frontend;
+
+    $site = Frontend::site();
+    $page = Frontend::page();
+    $theme = Frontend::theme();
+    $urlParams = Frontend::params();
+@endphp
 
 @props([
     'archiveDate' => $urlParams['archive_date'] ?? null,
@@ -60,7 +64,7 @@ $urlParams = Frontend::params();
         >
             @foreach ($archives as $archive)
                 @php
-                    $url = Capell\Blog\Actions\GenerateArchiveUrl::run($archivePage->url, $archive);
+                    $url = GenerateArchiveUrl::run($archivePage->pageUrl, $archive);
                     $active = $archiveDate && $archiveDate->month === $archive->month && $archiveDate->year === $archive->year;
                 @endphp
 

@@ -9,6 +9,7 @@ use Capell\Blog\Enums\CacheEnum;
 use Capell\Blog\Enums\ModelEnum;
 use Capell\Blog\Enums\TagTypeEnum;
 use Capell\Blog\Models\Tag;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
@@ -22,7 +23,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TagLoader
 {
-    public static function getPageTags(Page $page): Collection
+    public static function getPageTags(Pageable $page): Collection
     {
         $key = CacheEnum::pageTags($page->id);
 
@@ -58,7 +59,7 @@ class TagLoader
             return $model::getFirstPageByTypeForSite(BlogPageTypeEnum::Tag->value, site: $site, language: $language);
         });
 
-        if ($fromCache && $page instanceof Page) {
+        if ($fromCache && $page instanceof Pageable) {
             resolve(ModelServingInterface::class)->track($page);
         }
 
@@ -78,19 +79,25 @@ class TagLoader
 
         return $model::query()
             ->withCount([
-                'pages' => fn (Builder $query) => $query->where('site_id', $site->id)
-                    ->whereRelation('translation', 'language_id', $language->id),
+                'taggables' => fn (Builder $query): Builder => $query->whereHas(
+                    'taggable',
+                    fn (Builder $query): Builder => $query->where('site_id', $site->id)
+                        ->whereRelation('translation', 'language_id', $language->id),
+                ),
             ])
             ->where('type', TagTypeEnum::Page)
             ->where(
-                fn (Builder $query) => $query->where('site_id', $site->id)->orWhereNull('site_id'),
+                fn (Builder $query): Builder => $query->where('site_id', $site->id)->orWhereNull('site_id'),
             )
             ->when(
                 $hasArticles,
                 fn (Builder $query) => $query->whereHas(
-                    'pages',
-                    fn (BuilderContract $query): BuilderContract => $query->where('site_id', $site->id)
-                        ->whereRelation('translation', 'language_id', $language->id),
+                    'taggables',
+                    fn (BuilderContract $query): BuilderContract => $query->whereHas(
+                        'taggable',
+                        fn (BuilderContract $query): BuilderContract => $query->where('site_id', $site->id)
+                            ->whereRelation('translation', 'language_id', $language->id),
+                    ),
                 ),
             )
             ->tap(fn (Builder $query) => $query->whereNotNull($query->qualifyColumn('name->' . $language->code)))

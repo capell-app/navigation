@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Filament\Concerns;
 
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
@@ -148,17 +149,19 @@ trait HasAssetsRelationManager
             );
     }
 
-    protected static function getPageOptionLabel(Page $page): HtmlString
+    protected static function getPageOptionLabel(Pageable $page): HtmlString
     {
         $label = $page->site->name . ' &raquo; ';
 
-        $ancestors = $page->ancestors()->get();
+        if ($page instanceof Page) {
+            $ancestors = $page->ancestors()->get();
 
-        if ($ancestors->isNotEmpty()) {
-            $label .= $ancestors->pluck('name')
-                ->map(fn (string $name): string => Str::limit($name, 30))
-                ->implode(' &raquo; ')
-                . ' &raquo; ';
+            if ($ancestors->isNotEmpty()) {
+                $label .= $ancestors->pluck('name')
+                    ->map(fn (string $name): string => Str::limit($name, 30))
+                    ->implode(' &raquo; ')
+                    . ' &raquo; ';
+            }
         }
 
         return new HtmlString($label . Str::limit($page->name, 40));

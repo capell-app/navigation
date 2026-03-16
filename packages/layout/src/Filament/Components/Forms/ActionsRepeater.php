@@ -8,6 +8,7 @@ use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\PageSelect;
 use Capell\Admin\Filament\Components\Forms\Site\SiteSelect;
 use Capell\Core\Models\Page;
+use Capell\Layout\Enums\ActionLinkEnum;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -45,12 +46,9 @@ class ActionsRepeater extends Repeater
                     ->label(__('capell-admin::form.type'))
                     ->required()
                     ->inline()
-                    ->default('page')
+                    ->options(ActionLinkEnum::class)
+                    ->default(ActionLinkEnum::Page)
                     ->hiddenLabel()
-                    ->options([
-                        'page' => __('capell-admin::generic.page'),
-                        'url' => __('capell-admin::generic.url'),
-                    ])
                     ->afterStateUpdated(function (Get $get, Set $set): void {
                         if ($get('type') === 'page') {
                             $set('url', null);

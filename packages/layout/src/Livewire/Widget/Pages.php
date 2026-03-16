@@ -54,6 +54,7 @@ class Pages extends AbstractWidget
             withDate: $this->widget->meta['with_date'] ?? false,
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('page-%d-widget-%d-container-%s-%d', $page->id, $this->widget->id, $this->containerKey, $this->occurrence),
+            morphModel: $this->widget->meta['page_model'] ?? $this->widget->type->meta['page_model'] ?? null,
             modifyQuery: fn (Builder $query) => $query->when(
                 $selection,
                 fn (Builder $query) => $query->whereIn('id', $selection),

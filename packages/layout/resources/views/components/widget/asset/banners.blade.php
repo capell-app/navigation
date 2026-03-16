@@ -5,6 +5,7 @@ declare(strict_types=1);
 ?>
 
 @php
+    use Capell\Core\Contracts\Pageable;
     use Capell\Core\Facades\CapellCore;
     use Capell\Core\Models\Page;
     use Capell\Frontend\Facades\Frontend;
@@ -44,7 +45,9 @@ declare(strict_types=1);
                         $content = $widgetAsset->asset->translation?->content;
                     }
 
-                    $linkedPage = $widgetAsset->asset instanceof Page ? $widgetAsset->asset : $widgetAsset->asset->linkedPage;
+                    $linkedPage = $widgetAsset->asset instanceof Pageable
+                        ? $widgetAsset->asset
+                        : $widgetAsset->asset->linkedPage;
                 @endphp
                 {{-- format-ignore-end --}}
                 <div
@@ -62,7 +65,7 @@ declare(strict_types=1);
                             :alt="$widgetAsset->asset->translation->label"
                             :loading="$loop->first ? 'eager' : 'lazy'"
                             :class="
-                                Illuminate\Support\Arr::toCssClasses([
+                                Arr::toCssClasses([
                                     'absolute inset-0 w-full h-full object-cover pointer-events-none z-0 bg-no-repeat bg-center bg-cover',
                                 ])
                             "
@@ -82,7 +85,7 @@ declare(strict_types=1);
                                 <h4
                                     class="font-heading text-2xl font-bold text-white md:text-4xl"
                                 >
-                                    @if ($linkedPage?->url?->full_url)
+                                    @if ($linkedPage?->pageUrl?->full_url)
                                         <a
                                             href="{{ $linkedPage->pageUrl->full_url }}"
                                             class="hover:underline"
@@ -105,7 +108,7 @@ declare(strict_types=1);
 
                             @if ($linkedPage?->translation)
                                 <x-capell::button
-                                    :url="$linkedPage?->url?->full_url"
+                                    :url="$linkedPage?->pageUrl?->full_url"
                                     color="primary"
                                     icon="heroicon-o-chevron-right"
                                 >

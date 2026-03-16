@@ -42,11 +42,15 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Kalnoy\Nestedset\NestedSetServiceProvider;
 use LaraZeus\SpatieTranslatable\SpatieTranslatableServiceProvider;
+use Lorisleiva\Actions\ActionServiceProvider;
+use MichalOravec\PaginateRoute\PaginateRouteServiceProvider;
 use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
-use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
+
+use function Pest\Laravel\artisan;
+
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
 use Sinnbeck\DomAssertions\DomAssertionsServiceProvider;
@@ -112,7 +116,7 @@ abstract class AbstractTestCase extends TestCase
         $seeder = $this->seeder();
         $shouldUseSeederClass = is_string($seeder) && $seeder !== '';
 
-        $this->artisan('migrate:fresh', array_merge(
+        artisan('migrate:fresh', array_merge(
             [
                 '--drop-views' => $this->shouldDropViews(),
                 '--drop-types' => $this->shouldDropTypes(),
@@ -120,7 +124,7 @@ abstract class AbstractTestCase extends TestCase
             $shouldUseSeederClass ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()],
         ));
 
-        $this->artisan('migrate', [
+        artisan('migrate', [
             '--path' => [$this->orderedMigrationWorkspacePath()],
             '--realpath' => true,
             '--force' => true,
@@ -169,9 +173,9 @@ abstract class AbstractTestCase extends TestCase
     {
         return [
             WorkbenchServiceProvider::class,
+            ActionServiceProvider::class,
             ActionsServiceProvider::class,
             BadgeableColumnServiceProvider::class,
-            BladeCaptureDirectiveServiceProvider::class,
             BladeCountryFlagsServiceProvider::class,
             BladeHeroiconsServiceProvider::class,
             BladeIconsServiceProvider::class,
@@ -180,6 +184,7 @@ abstract class AbstractTestCase extends TestCase
             SpatieLaravelSettingsPluginServiceProvider::class,
             TinyeditorServiceProvider::class,
             FilamentServiceProvider::class,
+            SupportServiceProvider::class,
             InfolistsServiceProvider::class,
             FilamentAuthenticationLogServiceProvider::class,
             FilamentServiceProvider::class,
@@ -188,6 +193,7 @@ abstract class AbstractTestCase extends TestCase
             FilamentSelectTreeServiceProvider::class,
             FilamentClearCacheServiceProvider::class,
             FormsServiceProvider::class,
+            PaginateRouteServiceProvider::class,
             ActivitylogServiceProvider::class,
             LaravelDataServiceProvider::class,
             NestedSetServiceProvider::class,
@@ -202,7 +208,6 @@ abstract class AbstractTestCase extends TestCase
             MediaLibraryServiceProvider::class,
             ActivitylogServiceProvider::class,
             LaravelSettingsServiceProvider::class,
-            SupportServiceProvider::class,
             SchemasServiceProvider::class,
             CapellServiceProvider::class,
             LaravelSettingsServiceProvider::class,

@@ -7,6 +7,7 @@ namespace Capell\Layout\Filament\Components\Forms;
 use Capell\Admin\Actions\GetAssetResourceUrlAction;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Components\Forms\SelectWithBelongsToRelation;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
@@ -157,19 +158,21 @@ class AssetsRepeater extends Repeater
                 )
                 ->selectablePlaceholder(false)
                 ->getOptionLabelFromRecordUsing(function (Select $component, Model $record): HtmlString {
-                    if (! $record instanceof Page) {
+                    if (! $record instanceof Pageable) {
                         return new HtmlString($record->getAttribute($component->getRelationshipTitleAttribute()));
                     }
 
                     $label = $record->site->name . ' &raquo; ';
 
-                    $ancestors = $record->ancestors()->get();
+                    if ($record instanceof Page) {
+                        $ancestors = $record->ancestors()->get();
 
-                    if ($ancestors->isNotEmpty()) {
-                        $label .= $ancestors->pluck('name')
-                            ->map(fn (string $name): string => Str::limit($name, 30))
-                            ->implode(' &raquo; ')
-                            . ' &raquo; ';
+                        if ($ancestors->isNotEmpty()) {
+                            $label .= $ancestors->pluck('name')
+                                ->map(fn (string $name): string => Str::limit($name, 30))
+                                ->implode(' &raquo; ')
+                                . ' &raquo; ';
+                        }
                     }
 
                     return new HtmlString($label . Str::limit($record->name, 40));

@@ -7,7 +7,7 @@ namespace Capell\Hero\Filament\Resources\Widgets\Schemas\Types;
 use Capell\Layout\Filament\Components\Forms\CarouselSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Resources\Widgets\Schemas\Types\AssetsWidgetSchema;
 use Filament\Forms\Components\Select;
@@ -43,7 +43,7 @@ class HeroWidgetSchema extends AssetsWidgetSchema
                     ->default('medium')
                     ->required(),
             ]),
-            WidgetComponentFilesSection::make()
+            WidgetComponentSection::make()
                 ->statePath('meta'),
         ]);
     }

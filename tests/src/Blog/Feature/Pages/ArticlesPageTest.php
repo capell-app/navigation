@@ -18,6 +18,9 @@ use Carbon\CarbonImmutable;
 
 use function Pest\Laravel\get;
 
+use Sinnbeck\DomAssertions\Asserts\AssertElement;
+use Sinnbeck\DomAssertions\Asserts\BaseAssert;
+
 uses(TestingFrontend::class);
 
 beforeEach(function (): void {
@@ -31,7 +34,7 @@ test('blog page lists articles', function (): void {
     $site = $siteDomain->site;
 
     $blogPage = $blogCreator->createBlogPage($site);
-    $blogUrl = $blogPage->url;
+    $blogUrl = $blogPage->pageUrl;
 
     $articleType = $blogCreator->createArticlePageType();
     $articleLayout = $blogCreator->createArticleLayout();
@@ -47,7 +50,6 @@ test('blog page lists articles', function (): void {
         ->site($siteDomain->site)
         ->layout($articleLayout)
         ->type($articleType)
-        ->parent($blogPage)
         ->withTranslations($site->languages)
         ->create();
 
@@ -71,7 +73,7 @@ test('visit blogs page with no articles and see appropriate message', function (
     $site = $siteDomain->site;
 
     $blogPage = $blogCreator->createBlogPage($site);
-    $blogUrl = $blogPage->url;
+    $blogUrl = $blogPage->pageUrl;
 
     expect($blogPage)
         ->toBeInstanceOf(Page::class)
@@ -103,15 +105,13 @@ test('article page', function (): void {
         ->site($siteDomain->site)
         ->layout($articleLayout)
         ->type($articleType)
-        ->parent($blogPage)
         ->withTranslations($site->languages)
         ->create();
 
     expect($article)
-        ->toBeInstanceOf(Page::class)
+        ->toBeInstanceOf(Article::class)
         ->type->name->toBe('Article')
-        ->layout->name->toBe('Article')
-        ->parent->name->toBe('Blog');
+        ->layout->name->toBe('Article');
 
     get($article->pageUrl->full_url)
         ->assertOk()
@@ -141,19 +141,26 @@ test('article page list tags', function (): void {
         ->site($site)
         ->layout($articleLayout)
         ->type($articleType)
-        ->parent($blogPage)
         ->withTranslations()
         ->hasAttached($tags)
         ->create();
 
     $archiveUrl = GenerateArchiveUrl::run(
-        $archivePage->url,
+        $archivePage->pageUrl,
         ArchiveMonthData::fromDate(
             ($article->publish_from ?? $article->created_at) instanceof CarbonImmutable
                 ? ($article->publish_from ?? $article->created_at)
                 : CarbonImmutable::instance($article->publish_from ?? $article->created_at),
         ),
     );
+
+    expect($article)
+        ->toBeInstanceOf(Article::class)
+        ->type->name->toBe('Article')
+        ->layout->name->toBe('Article')
+        ->translation->slug->toBe(str($article->name . '-' . $article->translation->language->locale)->slug()->toString())
+        ->pageUrl->url->toBe('/blog/' . $article->translation->slug)
+        ->tags->toHaveCount(3);
 
     get($article->pageUrl->full_url)
         ->assertOk()
@@ -162,4 +169,128 @@ test('article page list tags', function (): void {
         ->assertSee($tags[0]->translate('name', $language->code))
         ->assertSeeHtml('href="' . $tags[0]->getUrl($tagPage, $language) . '"')
         ->assertSeeHtml('href="' . $archiveUrl . '"');
+});
+
+test('articles pagination', function (): void {
+    $blogCreator = resolve(BlogCreator::class);
+
+    $siteDomain = SiteDomain::factory()->default()->create();
+    $site = $siteDomain->site;
+
+    $blogPage = $blogCreator->createBlogPage($site, meta: ['limit' => 5]);
+    $blogUrl = $blogPage->pageUrl;
+
+    $articleType = $blogCreator->createArticlePageType();
+    $articleLayout = $blogCreator->createArticleLayout();
+
+    $articles = Article::factory()
+        ->count(12)
+        ->site($siteDomain->site)
+        ->layout($articleLayout)
+        ->type($articleType)
+        ->withTranslations($site->languages)
+        ->create();
+
+    $orderedArticles = Article::query()->with(['translation'])->whereKey($articles->pluck('id'))->ordered()->get();
+    $this->shownArticles = 0;
+
+    expect($blogPage)
+        ->toBeInstanceOf(Page::class)
+        ->type->name->toBe('Blog')
+        ->layout->name->toBe('Blog Posts');
+
+    get($blogUrl->full_url)
+        ->assertOk()
+        ->assertElementExists(
+            'title',
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($blogPage->translation->title . ' | ' . $site->title),
+        )
+        ->assertElementExists(
+            'h1',
+            fn (AssertElement $elm): BaseAssert => $elm->containsText($blogPage->translation->title),
+        )
+        ->assertElementExists(
+            '.results',
+            fn (AssertElement $elm): BaseAssert => $elm->contains('.asset-item', count: 5)
+                ->each(
+                    '.asset-item',
+                    function (AssertElement $elm) use ($orderedArticles): BaseAssert {
+                        $this->shownArticles++;
+
+                        return $elm->containsText($orderedArticles[$this->shownArticles - 1]->title);
+                    },
+                ),
+        )
+        ->assertElementExists(
+            '.pagination',
+            fn (AssertElement $elm): BaseAssert => $elm->find(
+                '.pagination-info',
+                fn (AssertElement $elm): BaseAssert => $elm->has('aria-label', 'Showing 1 to 5 of 12 results'),
+            )
+                ->contains('.pagination-links__link', count: 3)
+                ->find(
+                    '.pagination-links__next',
+                    fn (AssertElement $elm): BaseAssert => $elm->has('href', $blogUrl->full_url . '/page/2'),
+                ),
+        );
+
+    get($blogUrl->full_url . '/page/2')
+        ->assertOk()
+        ->assertElementExists(
+            '.results',
+            fn (AssertElement $elm): BaseAssert => $elm->contains('.asset-item', count: 5)
+                ->each(
+                    '.asset-item',
+                    function (AssertElement $elm) use ($orderedArticles): BaseAssert {
+                        $this->shownArticles++;
+
+                        return $elm->containsText($orderedArticles[$this->shownArticles - 1]->title);
+                    },
+                ),
+        )
+        ->assertElementExists(
+            '.pagination',
+            fn (AssertElement $elm): BaseAssert => $elm->find(
+                '.pagination-info',
+                fn (AssertElement $elm): BaseAssert => $elm->has('aria-label', 'Showing 6 to 10 of 12 results'),
+            )
+                ->contains('.pagination-links__link', count: 4)
+                ->find(
+                    '.pagination-links__prev',
+                    fn (AssertElement $elm): BaseAssert => $elm->has('href', $blogUrl->full_url),
+                )
+                ->find(
+                    '.pagination-links__next',
+                    fn (AssertElement $elm): BaseAssert => $elm->has('href', $blogUrl->full_url . '/page/3'),
+                ),
+        );
+
+    // End the assertion chain before starting the next request
+    get($blogUrl->full_url . '/page/3')
+        ->assertOk()
+        ->assertElementExists(
+            '.results',
+            fn (AssertElement $elm): BaseAssert => $elm->contains('.asset-item', count: 2)
+                ->each(
+                    '.asset-item',
+                    function (AssertElement $elm) use ($orderedArticles): BaseAssert {
+                        $this->shownArticles++;
+
+                        return $elm->containsText($orderedArticles[$this->shownArticles - 1]->title);
+                    },
+                ),
+        )
+        ->assertElementExists(
+            '.pagination',
+            fn (AssertElement $elm): BaseAssert => $elm->find(
+                '.pagination-info',
+                fn (AssertElement $elm): BaseAssert => $elm->has('aria-label', 'Showing 11 to 12 of 12 results'),
+            )
+                ->contains('.pagination-links__link', count: 3)
+                ->find(
+                    '.pagination-links__prev',
+                    fn (AssertElement $elm): BaseAssert => $elm->has('href', $blogUrl->full_url . '/page/2'),
+                )
+                ->doesntContain('.pagination-links__next'),
+        );
 });

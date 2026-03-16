@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Capell\Blog\Console\Commands;
 
 use Capell\Blog\Actions\CreateBlogPagesAction;
+use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\ModelEnum as BlogModelEnum;
+use Capell\Blog\Enums\TagTypeEnum;
+use Capell\Blog\Models\Article;
+use Capell\Blog\Support\Creator\ArticleCreator;
 use Capell\Blog\Support\Creator\BlogCreator;
-use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Core\Support\Creator\DemoCreator;
@@ -109,7 +112,7 @@ class DemoCommand extends Command
     private function resolveSites(array $siteNames)
     {
         /** @var class-string<Site> $model */
-        $model = CapellCore::getModel(\Capell\Core\Enums\ModelEnum::Site);
+        $model = CapellCore::getModel(CoreModelEnum::Site);
 
         return $model::query()
             ->with(['languages'])
@@ -179,16 +182,7 @@ class DemoCommand extends Command
 
         $pagesToCreate = $limit !== null ? min($totalPagesAvailable, $limit) : $totalPagesAvailable;
 
-        /** @var class-string<Page> $pageModel */
-        $pageModel = CapellCore::getModel(CoreModelEnum::Page);
-        $pagesForTagsCount = $pageModel::query()
-            ->where('site_id', $site->id)
-            ->whereHas('children')
-            ->whereRelation('type', 'key', 'article')
-            ->limit(50)
-            ->count();
-
-        $totalSteps = $pagesToCreate + $pagesForTagsCount + 1; // +1 for CreateBlogPagesAction
+        $totalSteps = $pagesToCreate + 1; // +1 for CreateBlogPagesAction
         $this->startProgress($totalSteps);
 
         $this->setProgressMessage('Ensuring required blog and ancillary pages exist');
@@ -211,7 +205,7 @@ class DemoCommand extends Command
 
         // Tag association
         $this->setProgressMessage('Associating tags with pages');
-        $this->associatePageTags($site);
+        $this->associateTags($site);
         $this->setProgressMessage('Tags associated with pages');
 
         $this->finishProgress();
@@ -227,13 +221,6 @@ class DemoCommand extends Command
         ?int $limit = null,
     ): bool {
         $site->loadMissing('languages', 'language');
-        $blogPage = BlogLoader::getBlogPage($site);
-
-        if (! $blogPage instanceof Page) {
-            $this->warn('Blog page not found for site: ' . $site->name);
-
-            return false;
-        }
 
         $demo = $this->getDemoData($site->name, $site->languages->pluck('code')->toArray());
         $createdCount = 0;
@@ -250,7 +237,6 @@ class DemoCommand extends Command
                 $site,
                 $site->languages,
                 $site->language,
-                $blogPage,
                 '',
                 $type,
                 $user,
@@ -303,7 +289,6 @@ class DemoCommand extends Command
         Site $site,
         Collection $languages,
         Language $defaultLanguage,
-        Page|bool $parent,
         string $parentName,
         Type $type,
         ?Model $author,
@@ -336,7 +321,9 @@ class DemoCommand extends Command
             $data['title'][$language->code] = $title . ' ' . $data['name'][$language->code];
         }
 
-        $page = $this->demoCreator->createPage($data, $site, $languages, $parent, $type);
+        $pageCreator = resolve(ArticleCreator::class);
+
+        $this->demoCreator->createPage($data, $site, $languages, type: $type, pageCreator: $pageCreator);
 
         $this->advanceProgress();
 
@@ -356,7 +343,6 @@ class DemoCommand extends Command
                 $site,
                 $languages,
                 $defaultLanguage,
-                $parent === false ? false : $page,
                 $full_name,
                 $type,
                 $author,
@@ -370,20 +356,19 @@ class DemoCommand extends Command
 
     private function createTags(Site $site, Collection $languages): void
     {
-        /** @var class-string<Page> $model */
-        $model = CapellCore::getModel(CoreModelEnum::Page);
+        /** @var class-string<Article> $model */
+        $model = CapellCore::getModel(BlogModelEnum::Article);
 
         $pages = $model::query()
             ->where('site_id', $site->id)
-            ->whereHas('children')
-            ->whereRelation('type', 'key', 'article')
+            ->whereRelation('type', 'key', BlogPageTypeEnum::Article->value)
             ->with(['translations'])
             ->limit(50)
             ->get();
 
         $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
 
-        $pages->each(function (Page $page) use ($tagModel, $languages): void {
+        $pages->each(function (Pageable $page) use ($tagModel, $languages): void {
             $tag_names = [];
             $tag_slugs = [];
             $existingTag = null;
@@ -401,7 +386,7 @@ class DemoCommand extends Command
             });
             if ($existingTag === null) {
                 $tagModel::query()->create([
-                    'type' => 'page',
+                    'type' => TagTypeEnum::Page,
                     'name' => $tag_names,
                     'slug' => $tag_slugs,
                 ]);
@@ -417,25 +402,24 @@ class DemoCommand extends Command
         });
     }
 
-    private function associatePageTags(Site $site): void
+    private function associateTags(Site $site): void
     {
         $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
-        $pageModel = CapellCore::getModel(CoreModelEnum::Page);
-        $pages = $pageModel::query()
+        $articleModel = CapellCore::getModel(BlogModelEnum::Article);
+        $articles = $articleModel::query()
             ->with([
                 'translations.language',
-                'children',
             ])
             ->whereHas(
                 'type',
-                fn (BuilderContract $query): BuilderContract => $query->whereIn('key', ['default', 'article']),
+                fn (BuilderContract $query): BuilderContract => $query->whereIn('key', ['default', BlogPageTypeEnum::Article->value]),
             )
-            ->notHomePage()
             ->where('site_id', $site->id)
             ->inRandomOrder()
             ->limit(50)
             ->get();
-        foreach ($pages as $page) {
+
+        $articles->each(function (Pageable $page) use ($tagModel): void {
             $tag = false;
             foreach ($page->translations as $translation) {
                 $tag = $tagModel::findFromString($translation->label, 'page', $translation->language->code);
@@ -446,14 +430,11 @@ class DemoCommand extends Command
 
             if ($tag) {
                 $page->tags()->syncWithoutDetaching($tag);
-                $page->children->take(10)->each(function (Page $childPage) use ($tag): void {
-                    $childPage->tags()->syncWithoutDetaching($tag);
-                });
             }
 
             // Advance progress per processed page
             $this->advanceProgress();
-        }
+        });
     }
 
     // Progress bar helpers mirroring layout demo

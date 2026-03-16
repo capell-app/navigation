@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Support\Sitemap;
 
+use Capell\Blog\Filament\Resources\Tags\TagResource;
 use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\Loader\TagLoader;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Page;
 use Capell\Core\Support\Sitemap\AbstractSitemapPages;
@@ -18,7 +20,7 @@ class TagsSitemap extends AbstractSitemapPages
     {
         $tagPage = TagLoader::getTagResultsPage($this->site, $this->language);
 
-        if (! $tagPage instanceof Page) {
+        if (! $tagPage instanceof Pageable) {
             return collect([]);
         }
 
@@ -29,7 +31,7 @@ class TagsSitemap extends AbstractSitemapPages
             return $tagChildren;
         }
 
-        $node = SitemapChainBuilder::build($parent, $tagChildren);
+        $node = SitemapChainBuilder::build($parent, children: $tagChildren, withEditUrl: $this->withEditUrl);
 
         return collect([$node]);
     }
@@ -44,11 +46,13 @@ class TagsSitemap extends AbstractSitemapPages
 
         $url .= '/' . $tag->getTranslation('slug', $this->language->code);
 
-        return SitemapPageData::from([
-            'label' => $tag->getTranslation('name', $this->language->code) . ' (' . $tag->pages_count . ')',
-            'url' => $url,
-            'page_id' => $tag->id,
-        ]);
+        return new SitemapPageData(
+            label: $tag->getTranslation('name', $this->language->code) . ' (' . $tag->taggables_count . ')',
+            url: $url,
+            editUrl: $this->withEditUrl ? TagResource::getUrl('edit', ['record' => $tag]) : null,
+            pageableType: $tag->getMorphClass(),
+            pageId: $tag->id,
+        );
     }
 
     private function getTagPages(Page $tagPage): Collection

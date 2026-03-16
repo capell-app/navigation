@@ -7,6 +7,7 @@ use Capell\Layout\Filament\Resources\Contents\ContentResource;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Filament\Resources\Contents\Widgets\ContentAlertsWidget;
 use Capell\Layout\Models\Content;
+use Illuminate\Support\Collection;
 
 use function Pest\Livewire\livewire;
 
@@ -39,7 +40,7 @@ it('shows alert for content state', function (string $state, string $alertKey): 
 
     livewire(ContentAlertsWidget::class, ['record' => $content])
         ->assertSuccessful()
-        ->assertSet('alerts', fn ($alerts): bool => $alerts->has($alertKey));
+        ->assertSet('alerts', fn (Collection $alerts): bool => $alerts->has($alertKey));
 })
     ->with([
         'draft' => ['draft', 'draft'],
@@ -53,7 +54,7 @@ test('does not show alert for published content', function (): void {
 
     livewire(ContentAlertsWidget::class, ['record' => $content])
         ->assertSuccessful()
-        ->assertSet('alerts', fn ($alerts): bool => $alerts->isEmpty());
+        ->assertSet('alerts', fn (Collection $alerts): bool => $alerts->isEmpty());
 });
 
 test('publish draft content', function (): void {

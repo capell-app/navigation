@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Assistant\Support\Admin;
 
+use Capell\Admin\Filament\Components\Forms\Editor\RichEditor;
 use Capell\Assistant\Actions\GeneratorPageContentAction;
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
 use Capell\Assistant\Settings\AssistantSettings;
@@ -27,7 +28,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 
 class PageContentEditorConfigurator
 {
-    public function __invoke($component): void
+    public function __invoke(RichEditor $component): void
     {
         if (! $this->isEnabled()) {
             return;
@@ -114,7 +115,8 @@ class PageContentEditorConfigurator
         $context = new ContentActionContext(
             content: $content,
             keywords: $keywords,
-            pageId: $record?->page_id,
+            pageId: $record?->translatable_id,
+            pageType: $record?->translatable_type,
             languageId: $record?->language_id,
         );
 

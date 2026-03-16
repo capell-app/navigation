@@ -26,7 +26,7 @@ declare(strict_types=1);
         @svg('heroicon-s-chevron-left', 'group-hover:text-primary relative h-8 w-8 shrink-0 text-gray-400')
     @endif
 
-    @capture($imageContent)
+    @capellBuffer($imageContent)
         @if ($withImage && $neighborPage->image)
             <x-capell::media
                 :media="$neighborPage->image"
@@ -39,7 +39,7 @@ declare(strict_types=1);
                 loading="lazy"
             />
         @endif
-    @endcapture
+    @endcapellBuffer
 
     {{ $neighbor === 'previous' ? $imageContent() : '' }}
 

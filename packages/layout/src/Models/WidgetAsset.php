@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Models;
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Models\AssetRelation;
@@ -12,12 +13,10 @@ use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasUserstamps;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Capell\Core\Models\Contracts\Userstampable;
-use Capell\Core\Models\Page;
 use Capell\Layout\Database\Factories\WidgetAssetFactory;
 use Capell\Layout\Models\Concerns\ComposhipsJsonRelationshipsTrait;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,14 +46,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int|null $deleted_by
- * @property-read Model|Page|Content $asset
+ * @property-read Model|Model<Pageable>|Content $asset
  * @property-read User|null $creator
  * @property-read User|null $destroyer
  * @property-read User|null $editor
  * @property-read string $asset_key
  * @property-read Media|null $image
- * @property-read Page|null $page
- * @property-read Page|null $relatedPage
+ * @property-read Model<Pageable>|null $page
+ * @property-read Model<Pageable>|null $relatedPage
  * @property-read Widget|null $widget
  * @property-read Collection|Content[] $related
  * @property-read int|null $related_count
@@ -95,11 +94,11 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class WidgetAsset extends Model implements HasMedia, PageCacheable, Userstampable
 {
     use ComposhipsJsonRelationshipsTrait;
-
     use HasAssets;
 
     /** @use HasFactory<WidgetAssetFactory> */
     use HasFactory;
+
     use HasMetaData;
     use HasUserstamps;
     use InteractsWithMedia;
@@ -133,9 +132,9 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable, Userstampabl
         return $this->belongsTo(Widget::class);
     }
 
-    public function page(): MorphTo
+    public function pageable(): MorphTo
     {
-        return $this->morphTo('pageable');
+        return $this->morphTo();
     }
 
     public function asset(): MorphTo
@@ -148,14 +147,14 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable, Userstampabl
         return $this->morphTo('meta->linked_pageable_type', 'meta->linked_pageable_id');
     }
 
+    protected function getAssetKeyAttribute(): string
+    {
+        return $this->asset_type . '.' . $this->asset_id;
+    }
+
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'), $dir);
-    }
-
-    protected function assetKey(): Attribute
-    {
-        return Attribute::make(get: fn (): string => $this->asset_type . '.' . $this->asset_id);
     }
 
     protected function casts(): array

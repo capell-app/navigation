@@ -7,7 +7,7 @@ namespace Capell\Layout\Filament\Resources\Widgets\Schemas\Types;
 use Capell\Layout\Filament\Components\Forms\CarouselSettingsSchema;
 use Capell\Layout\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -30,7 +30,7 @@ class CarouselWidgetSchema extends AssetsWidgetSchema
             WidgetDisplaySection::make([
                 ColorSchemeComponent::make('color'),
             ]),
-            WidgetComponentFilesSection::make()
+            WidgetComponentSection::make()
                 ->statePath('meta'),
         ]);
     }

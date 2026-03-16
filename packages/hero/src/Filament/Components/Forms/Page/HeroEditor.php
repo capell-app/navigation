@@ -9,8 +9,8 @@ use Capell\Admin\Filament\Components\Forms\ContentEditor;
 use Capell\Admin\Filament\Components\Forms\Editor\ContentBuilder;
 use Capell\Admin\Filament\Components\Forms\Editor\RichEditor;
 use Capell\Admin\Filament\Components\Forms\Editor\TinyEditor;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Translation;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Models\WidgetAsset;
@@ -25,14 +25,14 @@ class HeroEditor extends Group
 
         $this->statePath('meta')
             ->visible(
-                function (null|Translation|Page $record): bool {
+                function (null|Translation|Pageable $record): bool {
                     if ($record === null) {
                         return false;
                     }
 
-                    $page = $record instanceof Page ? $record : $record->pageable;
+                    $page = $record instanceof Pageable ? $record : $record->pageable;
 
-                    if (! $page instanceof Page) {
+                    if (! $page instanceof Pageable) {
                         return false;
                     }
 
@@ -51,7 +51,7 @@ class HeroEditor extends Group
             ]);
     }
 
-    protected function hasPageWidgetHeroAssets(Page $page): bool
+    protected function hasPageWidgetHeroAssets(Pageable $page): bool
     {
         return cache()->driver('array')->rememberForever(
             sprintf('page-%d-has-hero-widget-assets', $page->id),
@@ -59,7 +59,9 @@ class HeroEditor extends Group
                 /** @var class-string<WidgetAsset> $model */
                 $model = CapellCore::getModel(ModelEnum::WidgetAsset);
 
-                return $model::query()->where('page_id', $page->id)
+                return $model::query()
+                    ->where('pageable_type', $page->getMorphClass())
+                    ->where('pageable_id', $page->getKey())
                     ->whereHas('widget', fn (Builder $query): Builder => $query->where('key', 'hero'))
                     ->exists();
             },

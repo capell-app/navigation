@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Hero\Console\Commands;
 
+use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
@@ -126,7 +128,7 @@ class DemoCommand extends Command
             ->whereRelation('type', 'key', 'blog')
             ->first();
 
-        if ($blogPage instanceof Page) {
+        if ($blogPage instanceof Pageable) {
             foreach ($blogPage->translations as $translation) {
                 $meta = $translation->meta;
                 $meta['hero'] = '<h1>' . __('capell-blog::generic.latest_articles') . '</h1><p>' . __('capell-blog::generic.blog_intro') . '</p>';
@@ -144,10 +146,10 @@ class DemoCommand extends Command
         $articlePages = $model::query()
             ->with('translations')
             ->where('site_id', $site->id)
-            ->whereRelation('type', 'key', 'article')
+            ->whereRelation('type', 'key', BlogPageTypeEnum::Article->value)
             ->get();
 
-        $articlePages->each(function (Page $page): void {
+        $articlePages->each(function (Pageable $page): void {
             foreach ($page->translations as $translation) {
                 $meta = $translation->meta;
                 $meta['hero'] = '<h1>' . $translation->title . '</h1>';

@@ -46,6 +46,7 @@ it('sanitizes unsafe html from AI output', function (): void {
         content: 'Existing content',
         keywords: 'foo,bar',
         pageId: 1,
+        pageType: 'page',
         languageId: 1,
     );
 
@@ -101,7 +102,7 @@ it('renders prompt variables correctly', function (): void {
 
     $pipeline = new GenerateContentPipeline($prompts, $provider, $rateLimiter);
 
-    $context = new ContentActionContext('Existing content', 'foo,bar', 1, 1);
+    $context = new ContentActionContext(content: 'Existing content', keywords: 'foo,bar', pageId: 1, pageType: 'page', languageId: 1);
 
     $result = $pipeline->execute([
         'context' => $context,

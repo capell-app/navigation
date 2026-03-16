@@ -1,16 +1,16 @@
 <?php
 
 declare(strict_types=1);
-
-use Capell\Frontend\Facades\Frontend;
-
-$theme = Frontend::theme();
 ?>
 
 @php
+    use Capell\Core\Contracts\Pageable;
     use Capell\Core\Enums\AssetComponentEnum;
     use Capell\Core\Facades\CapellCore;
     use Capell\Core\Models\Page;
+    use Capell\Frontend\Facades\Frontend;
+
+    $theme = Frontend::theme();
 @endphp
 
 @props([
@@ -29,9 +29,9 @@ $theme = Frontend::theme();
     'withSummary' => $widget->meta['with_summary'] ?? ($widget->type->meta['with_summary'] ?? true),
 ])
 
-@capture($assetBlock, $widgetAsset, $column)
+@capellBuffer($assetBlock, $widgetAsset, $column)
     @php
-        $linkedPage = $widgetAsset->asset instanceof Page ? $widgetAsset->asset : $widgetAsset->asset->linkedPage;
+        $linkedPage = $widgetAsset->asset instanceof Pageable ? $widgetAsset->asset : $widgetAsset->asset->linkedPage;
     @endphp
 
     <div
@@ -44,13 +44,13 @@ $theme = Frontend::theme();
             <div
                 class="bg-gray flex h-14 w-14 shrink-0 items-center justify-center rounded-full p-3 dark:bg-gray-600"
             >
-                @capture($iconContent)
+                @capellBuffer($iconContent)
                     <x-capell::icon
                         :icon="$widgetAsset->asset->meta['icon']"
                         class="h-10 w-10 text-white"
                         loading="lazy"
                     />
-                @endcapture
+                @endcapellBuffer
 
                 @if ($linkedPage)
                     <a href="{{ $linkedPage->pageUrl->full_url }}">
@@ -61,7 +61,7 @@ $theme = Frontend::theme();
                 @endif
             </div>
         @elseif ($image = $widgetAsset->media->first() ?: $widgetAsset->asset->image)
-            @capture($imageBlock)
+            @capellBuffer($imageBlock)
                 <x-capell::media
                     :media="$image"
                     :width="120"
@@ -71,7 +71,7 @@ $theme = Frontend::theme();
                     class="h-10 w-10 rounded-full object-cover object-center"
                     loading="lazy"
                 />
-            @endcapture
+            @endcapellBuffer
 
             @if ($linkedPage)
                 <a href="{{ $linkedPage->pageUrl->full_url }}">
@@ -96,7 +96,7 @@ $theme = Frontend::theme();
             />
         @endif
     </div>
-@endcapture
+@endcapellBuffer
 
 <x-capell-layout::widget.wrapper
     class="widget-assets widget-assets-features"

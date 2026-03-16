@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Blog\Filament\Resources\Articles;
 
 use BackedEnum;
-use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Blog\Actions\GetArticleLayoutAction;
 use Capell\Blog\Enums\BlogTypeGroupEnum;
@@ -14,6 +13,7 @@ use Capell\Blog\Enums\ResourceEnum;
 use Capell\Blog\Filament\Resources\Articles\Pages\CreateArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\EditArticle;
 use Capell\Blog\Filament\Resources\Articles\Pages\ListArticles;
+use Capell\Blog\Filament\Resources\Articles\Schemas\ArticleForm;
 use Capell\Blog\Filament\Resources\Articles\Tables\ArticlePagesTable;
 use Capell\Blog\Models\Article;
 use Capell\Blog\Providers\BlogServiceProvider;
@@ -21,6 +21,8 @@ use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Actions\GetNameFromTranslationsAction;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Site;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -32,8 +34,9 @@ class ArticleResource extends PageResource
 
     protected static ?string $slug = 'article';
 
-    /** @var class-string<TableConfigurator> */
     protected static string $tableConfigurator = ArticlePagesTable::class;
+
+    protected static string $formConfigurator = ArticleForm::class;
 
     /**
      * @return class-string<Article>
@@ -46,6 +49,11 @@ class ArticleResource extends PageResource
     public static function getResourceType(): string
     {
         return 'Pages';
+    }
+
+    public static function getBasePath(Site $site, Language $language): string
+    {
+        return BlogLoader::getBlogPageUrl($site, $language, fullUrl: false);
     }
 
     public static function getLabel(): string
@@ -107,10 +115,6 @@ class ArticleResource extends PageResource
 
         if (! isset($data['site_id']) || blank($data['site_id'])) {
             $data['site_id'] = $site->id;
-        }
-
-        if (! isset($data['parent_id']) || blank($data['parent_id'])) {
-            $data['parent_id'] = BlogLoader::getBlogPage($site)?->id;
         }
 
         if ((! isset($data['name']) || blank($data['name'])) && isset($formData['translations'])) {

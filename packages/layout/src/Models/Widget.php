@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Layout\Models;
 
 use Bkwld\Cloner\Cloneable;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PublishStatusEnum;
@@ -285,7 +286,7 @@ class Widget extends Model implements HasMedia, PageCacheable, Publishable, Stat
             ->whereNotNull('pageable_id');
     }
 
-    public function pageAssets(Page $page, string $container, int $occurrence): HasMany
+    public function pageAssets(Pageable $page, string $container, int $occurrence): HasMany
     {
         return $this->assets()
             ->where('widget_assets.pageable_type', $page->getMorphClass())

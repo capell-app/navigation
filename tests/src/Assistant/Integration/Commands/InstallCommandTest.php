@@ -6,6 +6,8 @@ use Capell\Core\Support\Migration\MigrationFileManagerInterface;
 use Capell\Tests\Fixtures\FakeMigrationFileManager;
 use Illuminate\Console\Command;
 
+use function Pest\Laravel\artisan;
+
 afterEach(function (): void {
     Mockery::close();
 });
@@ -17,7 +19,7 @@ it('runs assistant install command successfully', function (): void {
     ]);
     app()->instance(MigrationFileManagerInterface::class, $fakeFileManager);
 
-    $this->artisan('capell:assistant-install')
+    artisan('capell:assistant-install')
         ->expectsOutput('Capell Assistant installed successfully.')
         ->assertExitCode(Command::SUCCESS);
 

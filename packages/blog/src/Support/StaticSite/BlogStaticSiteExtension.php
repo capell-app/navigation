@@ -67,7 +67,7 @@ class BlogStaticSiteExtension
 
         $archives->each(function (ArchiveMonthData $archive) use ($pageModel, $site, $domain, $visit): void {
             $archivePage = $pageModel::getFirstPageByTypeForSite('archive', $site, $domain->language);
-            if (! $archivePage || ! $archivePage->url) {
+            if (! $archivePage || ! $archivePage->pageUrl) {
                 return;
             }
 

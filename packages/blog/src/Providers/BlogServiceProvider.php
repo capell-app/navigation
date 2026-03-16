@@ -18,8 +18,7 @@ use Capell\Blog\Enums\WidgetComponentEnum;
 use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Listeners\AddBlogPagesToNavigation;
-use Capell\Blog\Listeners\ArticleTranslationCreatedListener;
-use Capell\Blog\Listeners\ArticleTranslationUpdatedListener;
+use Capell\Blog\Listeners\ArticleTranslationSavedListener;
 use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\BlogModelRegistrar;
 use Capell\Blog\Support\Creator\BlogCreator;
@@ -414,8 +413,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
     private function registerTranslationEvents(): self
     {
-        Event::listen('eloquent.created: ' . Translation::class, ArticleTranslationCreatedListener::class);
-        Event::listen('eloquent.updated: ' . Translation::class, ArticleTranslationUpdatedListener::class);
+        Event::listen('eloquent.saved: ' . Translation::class, ArticleTranslationSavedListener::class);
 
         return $this;
     }

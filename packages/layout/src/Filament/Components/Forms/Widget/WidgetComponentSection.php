@@ -13,7 +13,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Icons\Heroicon;
 
-class WidgetComponentFilesSection
+class WidgetComponentSection
 {
     public static function make(bool $componentRequired = false): Section
     {
@@ -34,7 +34,6 @@ class WidgetComponentFilesSection
                         ->label(__('capell-layout::form.component_view_file'))
                         ->helperText(__('capell-admin::generic.component_view_file_info')),
                 ]),
-
                 ComponentSelect::make('component_item')
                     ->label(__('capell-admin::form.component_item'))
                     ->when($componentRequired, fn (Select $component): Select => $component->required())

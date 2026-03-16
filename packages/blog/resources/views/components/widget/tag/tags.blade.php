@@ -64,7 +64,7 @@ declare(strict_types=1);
                     <x-capell-blog::tag :$url>
                         {{ $tag->getTranslation('name', $language->code) }}
                         <x-slot:count>
-                            ({{ $tag->pages_count }})
+                            ({{ $tag->taggables_count }})
                         </x-slot>
                     </x-capell-blog::tag>
                 </li>

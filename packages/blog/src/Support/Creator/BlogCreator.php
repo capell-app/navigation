@@ -22,6 +22,7 @@ use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Enums\PageTypeEnum;
 use Capell\Core\Enums\TypeEnum;
 use Capell\Core\Enums\TypeGroupEnum;
+use Capell\Core\Enums\UrlParamTypeEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
@@ -40,6 +41,7 @@ use Capell\Layout\Support\Creator\TypeCreator as LayoutTypeCreator;
 use Capell\Layout\Support\Creator\WidgetCreator;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
 class BlogCreator
@@ -83,7 +85,7 @@ class BlogCreator
             $this->createArchivesWidget($languages);
             $this->createTagsWidget($languages);
             $this->createArticleWidget($articleType);
-            $this->relatedPagesWidget($resultsType, $languages);
+            $this->relatedArticlesWidget($resultsType, $languages);
         }
     }
 
@@ -111,7 +113,7 @@ class BlogCreator
                 'limit' => 10,
                 'listable' => false,
                 'pagination' => true,
-                'url_params' => ['tag' => 'string'],
+                'url_params' => ['tag' => UrlParamTypeEnum::String->value],
                 'with_date' => true,
                 'with_image' => true,
                 'with_summary' => true,
@@ -295,7 +297,7 @@ class BlogCreator
                 'limit' => 10,
                 'listable' => false,
                 'pagination' => true,
-                'url_params' => ['date' => 'string'],
+                'url_params' => ['date' => UrlParamTypeEnum::String->value],
                 'with_date' => true,
                 'with_image' => true,
                 'with_summary' => true,
@@ -453,6 +455,7 @@ class BlogCreator
             'type_id' => $type->id,
             'meta' => [
                 'component' => BlogWidgetComponentEnum::Tags,
+                'page_model' => Relation::getMorphAlias(CapellCore::getModel(\Capell\Blog\Enums\ModelEnum::Article)),
                 'size' => 'sm',
             ],
             'admin' => [
@@ -541,12 +544,12 @@ class BlogCreator
             $articleType = $this->createArticleWidgetType();
             $this->createArticleWidget($articleType);
 
-            $this->relatedPagesWidget($resultsType, $languages);
+            $this->relatedArticlesWidget($resultsType, $languages);
             $this->createTagsWidget($languages);
             $this->createArchivesWidget($languages);
         }
 
-        return Layout::query()->firstOrCreate(['key' => 'article'], [
+        return Layout::query()->firstOrCreate(['key' => BlogLayoutEnum::Article->value], [
             'name' => __('capell-blog::generic.article'),
             'group' => LayoutGroupEnum::Default->value,
             'containers' => [
@@ -580,7 +583,7 @@ class BlogCreator
     public function createArticlePageType(): Type
     {
         return Type::query()->firstOrCreate([
-            'key' => 'article',
+            'key' => BlogPageTypeEnum::Article->value,
             'type' => TypeEnum::Page,
         ], [
             'name' => __('capell-blog::generic.article'),
@@ -610,7 +613,7 @@ class BlogCreator
         ]);
     }
 
-    public function relatedPagesWidget(?Type $type = null, ?Collection $languages = null): Widget
+    public function relatedArticlesWidget(?Type $type = null, ?Collection $languages = null): Widget
     {
         if (! $type instanceof Type) {
             $typeCreator = resolve(LayoutTypeCreator::class);
@@ -630,6 +633,7 @@ class BlogCreator
                 'component' => BlogWidgetComponentEnum::PageRelated,
                 'limit' => 6,
                 'pagination' => false,
+                'page_model' => Relation::getMorphAlias(CapellCore::getModel(\Capell\Blog\Enums\ModelEnum::Article)),
                 'exclude_types' => ['home'],
                 'exclude_parent' => true,
                 'with_summary' => true,
@@ -680,6 +684,7 @@ class BlogCreator
         ?Type $type = null,
         ?Layout $layout = null,
         ?Collection $languages = null,
+        array $meta = [],
     ): Page {
         if (! $type instanceof Type) {
             $type = self::createBlogPageType();
@@ -698,6 +703,8 @@ class BlogCreator
             'site_id' => $site->id,
             'type_id' => $type->id,
         ]);
+
+        $page->mergeMeta($meta);
 
         $page->forceFill([
             'name' => __('capell-blog::generic.blog'),
@@ -747,7 +754,7 @@ class BlogCreator
                 'page_group' => strtolower(ResourceEnum::Article->name),
                 'pagination' => true,
                 'sitemap' => true,
-                'url_params' => ['page' => 'int'],
+                'url_params' => ['page' => UrlParamTypeEnum::Int->value],
                 'with_date' => true,
                 'with_image' => true,
                 'with_summary' => true,
@@ -773,6 +780,7 @@ class BlogCreator
                 'component' => LivewireComponentsEnum::PagesWidget,
                 'livewire' => true,
                 'limit' => 5,
+                'page_model' => Relation::getMorphAlias(CapellCore::getModel(\Capell\Blog\Enums\ModelEnum::Article)),
                 'page_group' => strtolower(ResourceEnum::Article->name),
                 'pagination' => false,
                 'with_date' => true,

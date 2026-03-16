@@ -37,6 +37,7 @@ trait RegistersPublishedConfigs
         $configs = $this->getPublishConfigs($package, $vendorPackage);
 
         foreach ($configs as $configFile) {
+            /** @var string $configFile */
             $config = require $configFile;
             $configName = basename($configFile, '.php');
 

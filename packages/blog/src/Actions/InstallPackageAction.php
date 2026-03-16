@@ -83,7 +83,7 @@ class InstallPackageAction
         Site::with('languages')->each(function (Site $site) use ($blogCreator, $resultsWidgetType): void {
             $blogCreator->createTagsWidget($site->languages);
 
-            $blogCreator->relatedPagesWidget(type: $resultsWidgetType);
+            $blogCreator->relatedArticlesWidget(type: $resultsWidgetType);
 
             CreateBlogPagesAction::run($site);
         });

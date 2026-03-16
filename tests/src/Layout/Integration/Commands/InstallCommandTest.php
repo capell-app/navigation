@@ -11,6 +11,8 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Migrations\Migrator;
 
+use function Pest\Laravel\artisan;
+
 afterEach(function (): void {
     Mockery::close();
 });
@@ -22,7 +24,7 @@ it('runs layout install command successfully without publishing files', function
     ]);
 
     $fakeDatasetPublisher = Mockery::mock(DatasetPublisher::class);
-    $this->instance(
+    test()->instace(
         PublishMigrationsCommand::class,
         Mockery::mock(new PublishMigrationsCommand($fakeDatasetPublisher, $fakeFileManager))
             ->makePartial()
@@ -31,7 +33,7 @@ it('runs layout install command successfully without publishing files', function
 
     $fakeMigrator = Mockery::mock(Migrator::class);
     $fakeDispatcher = Mockery::mock(Dispatcher::class);
-    $this->instance(
+    test()->instace(
         MigrateCommand::class,
         Mockery::mock(new MigrateCommand($fakeMigrator, $fakeDispatcher))
             ->makePartial()
@@ -39,7 +41,7 @@ it('runs layout install command successfully without publishing files', function
     );
 
     if (class_exists('Filament\\Commands\\AssetsCommand')) {
-        $this->instance(
+        test()->instace(
             'Filament\\Commands\\AssetsCommand',
             Mockery::mock('Filament\\Commands\\AssetsCommand', [])->makePartial()
                 ->shouldReceive('run')->once()->andReturn(0)->getMock(),
@@ -48,7 +50,7 @@ it('runs layout install command successfully without publishing files', function
 
     app()->instance(MigrationFileManagerInterface::class, $fakeFileManager);
 
-    $this->artisan('capell:layout-install')
+    artisan('capell:layout-install')
         ->doesntExpectOutput('Publishing migrations')
         ->doesntExpectOutput('Migrating')
         ->doesntExpectOutput('Building assets')
@@ -57,9 +59,9 @@ it('runs layout install command successfully without publishing files', function
 
     expect($fakeFileManager->calls)
         ->not()->toContain(fn (array $call): bool => $call[0] === 'copy')
-        ->toBeArray();
+        ->toBeArray()
+        ->and(collect($fakeFileManager->calls)->contains(
+            fn (array $call): bool => $call[0] === 'isDir',
+        ))->toBeTrue();
 
-    expect(collect($fakeFileManager->calls)->contains(
-        fn (array $call): bool => $call[0] === 'isDir',
-    ))->toBeTrue();
 });

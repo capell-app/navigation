@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Capell\Layout\Support\Creator;
 
 use BackedEnum;
+use Capell\Core\Actions\DummyContentGeneratorAction;
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
+use Capell\Core\Enums\NavigationItemType;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models;
 use Capell\Core\Models\Language;
@@ -17,6 +20,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Core\Support\Creator\DemoCreator as AdminDemoCreator;
 use Capell\Core\Support\Creator\NavigationCreator;
+use Capell\Layout\Enums\ActionLinkEnum;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Enums\ContainerWidthEnum;
 use Capell\Layout\Enums\ContentTypeEnum;
@@ -84,8 +88,9 @@ class DemoCreator
                 'background_color' => 'light-gray',
                 'actions' => [
                     [
-                        'type' => 'page',
-                        'page_id' => Page::query()->where('site_id', $siteId)
+                        'type' => ActionLinkEnum::Page->value,
+                        'pageable_type' => resolve(Page::class)->getMorphClass(),
+                        'pageable_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -110,7 +115,7 @@ class DemoCreator
                         [
                             'type' => 'content',
                             'data' => [
-                                'content' => config('capell-demo.contents')[$language->code],
+                                'content' => DummyContentGeneratorAction::run($language->code),
                             ],
                         ],
                     ],
@@ -135,8 +140,9 @@ class DemoCreator
                 'padding' => ['md'],
                 'actions' => [
                     [
-                        'type' => 'page',
-                        'page_id' => Page::query()->where('site_id', $siteId)
+                        'type' => ActionLinkEnum::Page->value,
+                        'pageable_type' => resolve(Page::class)->getMorphClass(),
+                        'pageable_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -161,7 +167,7 @@ class DemoCreator
                         [
                             'type' => 'content',
                             'data' => [
-                                'content' => str(config('capell-demo.contents')[$language->code])->limit(200)->toString(),
+                                'content' => str(DummyContentGeneratorAction::run($language->code))->limit(200)->toString(),
                             ],
                         ],
                     ],
@@ -190,8 +196,9 @@ class DemoCreator
                 'margin' => ['lg'],
                 'actions' => [
                     [
-                        'type' => 'page',
-                        'page_id' => Page::query()->where('site_id', $siteId)
+                        'type' => ActionLinkEnum::Page->value,
+                        'pageable_type' => resolve(Page::class)->getMorphClass(),
+                        'pageable_id' => Page::query()->where('site_id', $siteId)
                             ->whereHas(
                                 'type',
                                 /** @param Type $query */
@@ -223,7 +230,7 @@ class DemoCreator
                         [
                             'type' => 'content',
                             'data' => [
-                                'content' => config('capell-demo.contents')[$language->code],
+                                'content' => DummyContentGeneratorAction::run($language->code),
                             ],
                         ],
                     ],
@@ -249,7 +256,7 @@ class DemoCreator
         return $widget;
     }
 
-    public function createPageCardsWidget(Page $page, string $container = 'main', int $occurrence = 1): Widget
+    public function createPageCardsWidget(Pageable $page, string $container = 'main', int $occurrence = 1): Widget
     {
         $widget = $this->widgetModel::query()->firstWhere('key', 'pages-card');
 
@@ -274,7 +281,8 @@ class DemoCreator
         if (
             $widget->assets()
                 ->where([
-                    'page_id' => $page->id,
+                    'pageable_id' => $page->getKey(),
+                    'pageable_type' => $page->getMorphClass(),
                     'container' => $container,
                     'occurrence' => $occurrence,
                 ])
@@ -295,7 +303,8 @@ class DemoCreator
         throw_if($relatedPages->isEmpty(), RuntimeException::class, 'No pages with images found to associate with the widget.');
 
         $relatedPages->each(fn (Page $relatedPage): WidgetAsset => $widget->assets()->create([
-            'page_id' => $page->id,
+            'pageable_id' => $page->id,
+            'pageable_type' => $page->getMorphClass(),
             'asset_id' => $relatedPage->id,
             'asset_type' => resolve($this->pageModel)->getMorphClass(),
             'container' => $container,
@@ -408,7 +417,7 @@ class DemoCreator
             ]);
 
             foreach ($languages as $language) {
-                $desc_content = config('capell-demo.contents')[$language->code] ?? '';
+                $desc_content = DummyContentGeneratorAction::run($language->code);
 
                 $content->translations()->updateOrCreate(
                     ['language_id' => $language->id],
@@ -522,10 +531,11 @@ class DemoCreator
         return $widget;
     }
 
-    public function createContentsWidget(Widget $widget, Page $page, string $container, int $occurrence = 1, ?Type $type = null): void
+    public function createContentsWidget(Widget $widget, Pageable $page, string $container, int $occurrence = 1, ?Type $type = null): void
     {
         $pageWidgetAssets = $widget->assets()->where([
-            'page_id' => $page->id,
+            'pageable_id' => $page->getKey(),
+            'pageable_type' => $page->getMorphClass(),
             'container' => $container,
             'occurrence' => $occurrence,
         ])
@@ -569,8 +579,9 @@ class DemoCreator
                 'meta' => [
                     'actions' => [
                         [
-                            'type' => 'page',
-                            'page_id' => Page::query()->where('site_id', $page->site->id)
+                            'type' => ActionLinkEnum::Page->value,
+                            'pageable_type' => resolve(Page::class)->getMorphClass(),
+                            'pageable_id' => Page::query()->where('site_id', $page->site->id)
                                 ->whereHas(
                                     'type',
                                     /** @param Type $query */
@@ -581,8 +592,9 @@ class DemoCreator
                             'site_id' => $page->site->id,
                         ],
                         [
-                            'type' => 'page',
-                            'page_id' => Page::query()->where('site_id', $page->site->id)
+                            'type' => ActionLinkEnum::Page->value,
+                            'pageable_type' => resolve(Page::class)->getMorphClass(),
+                            'pageable_id' => Page::query()->where('site_id', $page->site->id)
                                 ->whereHas(
                                     'type',
                                     /** @param Type $query */
@@ -594,7 +606,7 @@ class DemoCreator
                             'color' => 'secondary',
                         ],
                         [
-                            'type' => 'link',
+                            'type' => ActionLinkEnum::Link->value,
                             'url' => 'https://example.com',
                             'label' => 'External',
                             'hide_label' => true,
@@ -618,7 +630,8 @@ class DemoCreator
             $this->createMedia($content);
 
             $widget->assets()->create([
-                'page_id' => $page->id,
+                'pageable_id' => $page->id,
+                'pageable_type' => $page->getMorphClass(),
                 'container' => $container,
                 'occurrence' => $occurrence,
                 'asset_type' => resolve($this->contentModel)->getMorphClass(),
@@ -903,9 +916,10 @@ class DemoCreator
         foreach ($siteTree as $page) {
             $items[(string) Str::uuid()] = [
                 'label' => NavigationCreator::getPageNavigationLabel($page, $language),
-                'type' => 'page',
+                'type' => NavigationItemType::Page->value,
                 'data' => [
-                    'page_id' => $page->id,
+                    'pageable_id' => $page->id,
+                    'pageable_type' => $page->getMorphClass(),
                 ],
                 'children' => $page->relationLoaded('children') ? $this->navigationPageItems($page->children, $language) : [],
             ];
@@ -1007,7 +1021,8 @@ class DemoCreator
             ], [
                 'meta' => [
                     'icon' => $feature['icon'],
-                    'page_id' => $page->id,
+                    'pageable_id' => $page->id,
+                    'pageable_type' => $page->getMorphClass(),
                 ],
             ]);
 

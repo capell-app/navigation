@@ -8,8 +8,6 @@ use BackedEnum;
 use Capell\Admin\Filament\Concerns\HasFormConfigurator;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
 use Capell\Admin\Filament\Concerns\HasTableConfigurator;
-use Capell\Admin\Filament\Contracts\FormConfigurator;
-use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
@@ -38,10 +36,8 @@ class ContentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var class-string<FormConfigurator> */
     protected static string $formConfigurator = ContentForm::class;
 
-    /** @var class-string<TableConfigurator> */
     protected static string $tableConfigurator = ContentsTable::class;
 
     public static function form(Schema $schema): Schema

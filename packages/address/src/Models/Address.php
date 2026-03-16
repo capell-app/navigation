@@ -102,7 +102,9 @@ class Address extends Model implements Defaultable, Userstampable
     use HasUserstamps;
     use SoftDeletes;
 
-    protected $fillable = [
+    protected $guarded = [];
+
+    /*protected $fillable = [
         'city',
         'country_id',
         'default',
@@ -113,7 +115,7 @@ class Address extends Model implements Defaultable, Userstampable
         'postal_code',
         'state',
         'status',
-    ];
+    ];*/
 
     protected static string $factory = AddressFactory::class;
 

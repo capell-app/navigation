@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Actions;
 
+use Capell\Blog\Enums\BlogLayoutEnum;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Support\Creator\BlogCreator;
+use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\NavigationHandle;
+use Capell\Core\Enums\PageTypeEnum;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
@@ -25,12 +28,12 @@ class CreateBlogPagesAction
     {
         $blogCreator = resolve(BlogCreator::class);
 
-        $archivesLayout = Layout::query()->firstWhere('key', 'archives');
-        $resultsLayout = Layout::query()->firstWhere('key', 'results');
+        $archivesLayout = Layout::query()->firstWhere('key', BlogLayoutEnum::Archives->value);
+        $resultsLayout = Layout::query()->firstWhere('key', LayoutEnum::Results->value);
 
         $archivePageType = Type::query()->where('key', BlogPageTypeEnum::Archive)->pageType()->first();
         $blogPageType = Type::query()->where('key', BlogPageTypeEnum::Blog)->pageType()->first();
-        $systemPageType = Type::query()->where('key', 'system')->pageType()->first();
+        $systemPageType = Type::query()->where('key', PageTypeEnum::System)->pageType()->first();
 
         $blogPage = $blogCreator->createBlogPage($site, type: $blogPageType);
 

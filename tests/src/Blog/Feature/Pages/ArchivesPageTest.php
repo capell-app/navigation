@@ -68,10 +68,13 @@ test('archives page list articles archives by month/year', function (): void {
                         'a',
                         fn (AssertElement $link): BaseAssert => $link->has(
                             'href',
-                            GenerateArchiveUrl::run($archivePage->pageUrl, ArchiveMonthData::from([
-                                'year' => '2023',
-                                'month' => 3 - $index,
-                            ])),
+                            GenerateArchiveUrl::run(
+                                $archivePage->pageUrl,
+                                new ArchiveMonthData(
+                                    year: 2023,
+                                    month: 3 - $index,
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -87,7 +90,7 @@ test('archive page list articles by month/year', function (): void {
     $blogPage = $blogCreator->createBlogPage($site);
     $archivesPage = $blogCreator->createArchivesPage($blogPage);
     $archivePage = $blogCreator->createArchivePage($archivesPage);
-    $articleType = $blogCreator->createArticlePageType();
+    $blogCreator->createArticlePageType();
     $articleLayout = $blogCreator->createArticleLayout();
 
     $publishDate = CarbonImmutable::now()->subMonth();
@@ -96,23 +99,22 @@ test('archive page list articles by month/year', function (): void {
         ->count(3)
         ->site($siteDomain->site)
         ->layout($articleLayout)
-        ->type($articleType)
-        ->parent($blogPage)
         ->withTranslations($site->languages)
         ->state([
             'publish_from' => fake()->dateTimeBetween($publishDate->startOfMonth(), $publishDate->endOfMonth()),
         ])
         ->create();
 
-    $archiveUrl = GenerateArchiveUrl::run($archivePage->pageUrl, ArchiveMonthData::fromDate($publishDate));
-
     expect($archivePage)
         ->toBeInstanceOf(Page::class)
         ->type->name->toBe('Archive Page')
         ->layout->name->toBe('Results')
         ->parent->name->toBe('Archives')
+        ->pageUrl->url->toBe('/blog/archives/*')
         ->and($archivePage->getAncestors(['name'])->pluck('name')->toArray())
         ->toEqual(['Blog', 'Archives']);
+
+    $archiveUrl = GenerateArchiveUrl::run($archivePage->pageUrl, ArchiveMonthData::fromDate($publishDate));
 
     get($archiveUrl)
         ->assertOk()

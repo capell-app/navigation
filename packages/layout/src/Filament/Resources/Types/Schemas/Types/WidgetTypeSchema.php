@@ -13,7 +13,7 @@ use Capell\Admin\Filament\Resources\Types\Schemas\Types\DefaultTypeSchema;
 use Capell\Layout\Enums\TypeSchemaEnum;
 use Capell\Layout\Enums\WidgetSchemaEnum;
 use Capell\Layout\Enums\WidgetTypeGroupEnum;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Tabs;
@@ -46,7 +46,8 @@ class WidgetTypeSchema extends DefaultTypeSchema
             options: fn (): array => collect(WidgetTypeGroupEnum::cases())
                 ->mapWithKeys(fn (WidgetTypeGroupEnum $case): array => [$case->value => $case->name])
                 ->all(),
-        );
+        )
+            ->label('Group');
     }
 
     protected function adminTab(): Tab
@@ -75,7 +76,7 @@ class WidgetTypeSchema extends DefaultTypeSchema
             ->columns()
             ->schema([
                 WidgetDisplaySection::make(),
-                WidgetComponentFilesSection::make()
+                WidgetComponentSection::make()
                     ->statePath('meta'),
             ]);
     }

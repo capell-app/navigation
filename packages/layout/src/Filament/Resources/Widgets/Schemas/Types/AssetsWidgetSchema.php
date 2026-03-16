@@ -12,7 +12,7 @@ use Capell\Layout\Filament\Components\Forms\Widget\CreateWidgetDetailsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetSettingsTab;
-use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentFilesSection;
+use Capell\Layout\Filament\Components\Forms\Widget\WidgetComponentSection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetDisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetResultsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\WidgetSettingsSchema;
@@ -119,7 +119,7 @@ class AssetsWidgetSchema extends DefaultWidgetSchema
                 ColorSchemeComponent::make('color'),
                 ...WidgetResultsSchema::make($schema),
             ]),
-            WidgetComponentFilesSection::make()
+            WidgetComponentSection::make()
                 ->statePath('meta'),
         ]);
     }

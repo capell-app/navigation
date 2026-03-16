@@ -9,9 +9,9 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Plugin\CapellAdminPlugin;
 use Capell\Admin\Filament\Widgets\AlertsWidget;
 use Capell\Admin\Filament\Widgets\AuthenticationLogsWidget;
-use Capell\Admin\Filament\Widgets\LatestPagesWidget;
-use Capell\Admin\Filament\Widgets\PopularPagesWidget;
+use Capell\Admin\Filament\Widgets\ListPagesWidget;
 use Capell\Admin\Filament\Widgets\TotalAccessLogsChartWidget;
+use Capell\Admin\Filament\Widgets\TotalAccessLogsWidget;
 use Capell\Admin\Filament\Widgets\TotalVisitorsChartWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -55,8 +55,8 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AlertsWidget::class,
                 AuthenticationLogsWidget::class,
-                PopularPagesWidget::class,
-                LatestPagesWidget::class,
+                TotalAccessLogsWidget::class,
+                ListPagesWidget::class,
                 TotalAccessLogsChartWidget::class,
                 TotalVisitorsChartWidget::class,
                 AccountWidget::class,

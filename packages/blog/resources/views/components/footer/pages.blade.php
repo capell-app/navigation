@@ -9,8 +9,8 @@ declare(strict_types=1);
     'pages',
 ])
 
-<div {{ $attributes->class(['footer-pages xl:w-[20%]']) }}>
-    <h3 class="{{ $headingClass }} mb-4 dark:text-gray-100">
+<div {{ $attributes->class(['footer-pages xl:w-[25%]']) }}>
+    <h3 class="{{ $headingClass }} mb-4">
         {{ __('Recent Articles') }}
     </h3>
     <div class="space-y-3 lg:space-y-4">
@@ -20,7 +20,7 @@ declare(strict_types=1);
                 $url = $page->pageUrl->full_url;
             @endphp
 
-            <div @class(['group grid', 'grid-cols-4 gap-x-3' => $page->image])>
+            <div @class(['grid', 'grid-cols-4 gap-x-3' => $page->image])>
                 @if ($page->image)
                     <a
                         href="{{ $url }}"
@@ -40,14 +40,12 @@ declare(strict_types=1);
                 <a
                     href="{{ $url }}"
                     @class([
-                        'hover:text-primary focus:text-primary group-hover:text-link group-focus:text-link flex flex-col justify-center gap-y-1 text-inherit',
+                        'focus:text-primary flex flex-col justify-center gap-y-1 text-inherit hover:text-gray-400',
                         'col-span-3 py-0.5' => $page->image,
                     ])
                     wire:navigate
                 >
-                    <span
-                        class="group-hover:text-link group-focus:text-link text-base font-medium leading-tight"
-                    >
+                    <span class="text-md font-medium">
                         {!! $page->getTranslation('label') !!}
                     </span>
                     <time

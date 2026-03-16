@@ -106,7 +106,7 @@ $theme = Frontend::theme();
                     @endif
 
                     @if (! empty($widget->meta['actions']))
-                        <x-capell::actions
+                        <x-capell-layout::actions
                             class="mt-4"
                             :actions="$widget->meta['actions']"
                         />

@@ -28,6 +28,11 @@ final readonly class TranslationActionContext implements AiActionContextInterfac
         return $this->translation->translatable_id;
     }
 
+    public function getPageType(): string
+    {
+        return $this->translation->translatable_type;
+    }
+
     public function getLanguageId(): int
     {
         return $this->translation->language_id ?? 0;
