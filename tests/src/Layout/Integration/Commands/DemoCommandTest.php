@@ -13,8 +13,20 @@ use Illuminate\Support\Facades\File;
 use function Pest\Laravel\artisan;
 
 it('runs the demo command and creates demo layouts for a site', function (): void {
-    File::spy();
     $demoImgPath = DemoCreator::getDemoResourcePath('img');
+    $demoVideoPath = dirname($demoImgPath) . DIRECTORY_SEPARATOR . 'video';
+
+    if (! is_dir($demoVideoPath)) {
+        mkdir($demoVideoPath, 0777, true);
+    }
+
+    $demoVideoFile = $demoVideoPath . DIRECTORY_SEPARATOR . 'SampleVideo_1280x720_1mb.mp4';
+
+    if (! file_exists($demoVideoFile)) {
+        file_put_contents($demoVideoFile, '0');
+    }
+
+    File::spy();
     $dummyFile = new SplFileInfo($demoImgPath . DIRECTORY_SEPARATOR . 'home.jpg');
     File::shouldReceive('files')->with($demoImgPath)->andReturn([$dummyFile]);
     File::shouldReceive('exists')->with(Mockery::on(fn (string $path): bool => str_starts_with($path, $demoImgPath)))->andReturn(false);
@@ -26,7 +38,6 @@ it('runs the demo command and creates demo layouts for a site', function (): voi
 
     Page::factory()->count(4)->site($site)->has(Media::factory())->create();
 
-    // Act: run the command
     artisan('capell:layout-demo', [
         '--sites' => $site->name,
     ])

@@ -48,9 +48,6 @@ use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
-
-use function Pest\Laravel\artisan;
-
 use Saade\FilamentAdjacencyList\FilamentAdjacencyListServiceProvider;
 use Silber\PageCache\LaravelServiceProvider;
 use Sinnbeck\DomAssertions\DomAssertionsServiceProvider;
@@ -78,16 +75,12 @@ abstract class AbstractTestCase extends TestCase
 
     protected function setUp(): void
     {
-        if (getenv('TEST_TOKEN')) {
-            putenv('VIEW_COMPILED_PATH=storage/framework/views/phpunit-parallel-' . getenv('TEST_TOKEN'));
-        }
-
         parent::setUp();
+
+        $this->loadMigrationsFrom($this->orderedMigrationWorkspacePath());
 
         Blade::componentNamespace('Capell\\Blog\\View\\Components', 'capell-blog');
         Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
-
-        $this->orderedMigrationWorkspacePath();
 
         Http::preventStrayRequests();
 
@@ -96,6 +89,10 @@ abstract class AbstractTestCase extends TestCase
         ]);
 
         Model::shouldBeStrict();
+
+        // $this->app->setLocale('en_GB');
+
+        $this->setUpDatabase();
     }
 
     protected function tearDown(): void
@@ -105,40 +102,6 @@ abstract class AbstractTestCase extends TestCase
         } finally {
             parent::tearDown();
         }
-    }
-
-    protected function migrateDatabases(): void
-    {
-        $seeder = $this->seeder();
-        $shouldUseSeederClass = is_string($seeder) && $seeder !== '';
-
-        artisan('migrate:fresh', array_merge(
-            [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ],
-            $shouldUseSeederClass ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()],
-        ));
-
-        artisan('migrate', [
-            '--path' => [$this->orderedMigrationWorkspacePath()],
-            '--realpath' => true,
-            '--force' => true,
-        ]);
-    }
-
-    protected function migrateFreshUsing(): array
-    {
-        $seeder = $this->seeder();
-        $shouldUseSeederClass = is_string($seeder) && $seeder !== '';
-
-        return array_merge(
-            [
-                '--drop-views' => $this->shouldDropViews(),
-                '--drop-types' => $this->shouldDropTypes(),
-            ],
-            $shouldUseSeederClass ? ['--seeder' => $seeder] : ['--seed' => $this->shouldSeed()],
-        );
     }
 
     /**
@@ -151,12 +114,12 @@ abstract class AbstractTestCase extends TestCase
         Gate::policy(Utils::getRoleModel(), RolePolicy::class);
     }
 
-    protected function afterRefreshingDatabase(): void
+    /**
+     * Set up the database.
+     */
+    protected function setUpDatabase(): void
     {
-        Role::firstOrCreate([
-            'name' => 'super_admin',
-            'guard_name' => 'web',
-        ]);
+        Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
     }
 
     /**
@@ -219,19 +182,22 @@ abstract class AbstractTestCase extends TestCase
             $packages = $this->getDefaultPackages();
         }
 
-        $this->registerPublishConfig('core', vendorPackage: true);
-        $this->registerPublishConfig('admin', vendorPackage: true);
+        $this->registerPublishConfig('core');
+        $this->registerPublishConfig('admin');
+        $this->registerPublishConfig('frontend');
 
-        foreach ($packages as $packageKey => $package) {
+        foreach ($packages as $package_key => $package) {
             $config = require __DIR__ . '/..' . $this->getPackageFile($package);
 
-            $this->registerPackageConfig($packageKey, $config);
+            $this->registerPackageConfig($package_key, $config);
         }
 
+        // config('filament-shield.register_role_policy.enabled', false);
         Config::set('filament-shield.authenticable-resources', [User::class]);
         Config::set('filament-shield.auth_provider_model', User::class);
         CapellCore::registerModel('User', User::class);
 
+        // Prevent role being assigned to created user
         Config::set('filament-shield.panel_user.enabled', false);
 
         Config::set('auth.providers.users.model', User::class);
@@ -249,20 +215,88 @@ abstract class AbstractTestCase extends TestCase
         }
     }
 
+    protected function getDefaultPackages(): array
+    {
+        return [
+            'filament-shield' => [
+                'user' => 'bezhansalleh',
+                'name' => 'filament-shield',
+                'file' => 'filament-shield',
+            ],
+            'authentication-log' => [
+                'user' => 'rappasoft',
+                'name' => 'laravel-authentication-log',
+                'file' => 'authentication-log',
+            ],
+            'permission' => [
+                'user' => 'spatie',
+                'name' => 'laravel-permission',
+                'file' => 'permission',
+            ],
+            'settings' => [
+                'user' => 'spatie',
+                'name' => 'laravel-settings',
+                'file' => 'settings',
+            ],
+        ];
+    }
+
+    protected function registerPublishConfig(string $package): void
+    {
+        $configs = $this->getPublishConfigs($package);
+
+        foreach ($configs as $configFile) {
+            $config = require $configFile;
+            $configName = basename((string) $configFile, '.php');
+
+            $this->registerPackageConfig($configName, $config);
+        }
+    }
+
+    protected function getPublishConfigs(string $package): array
+    {
+        $path = realpath(__DIR__ . '/../../packages/' . $package . '/publishes/config');
+
+        if (in_array($path, ['', '0', false], true)) {
+            return [];
+        }
+
+        return glob($path . '/*.php');
+    }
+
     protected function registerAndMigrateSettings(array $migrations, string $basePath): void
     {
         $migrator = resolve(SettingsMigrator::class);
-
         foreach ($migrations as $migrationFile) {
             $path = sprintf('%s/%s.php', $basePath, $migrationFile);
             /** @var SettingsMigration $migration */
             $migration = require $path;
-
             if (method_exists($migration, 'setMigrator')) {
                 $migration->setMigrator($migrator);
             }
 
             $migration->up();
+        }
+    }
+
+    private function getPackageFile(array $package): string
+    {
+        $path = '/../vendor/' . basename((string) $package['user']) . '/' . basename((string) $package['name']) . '/config';
+        $file = basename((string) $package['file']) . '.php';
+
+        return sprintf('%s/%s', $path, $file);
+    }
+
+    private function registerPackageConfig(string $package, array $config): void
+    {
+        foreach ($config as $key => $value) {
+            if (is_array($value)) {
+                $this->registerPackageConfig(sprintf('%s.%s', $package, $key), $value);
+
+                continue;
+            }
+
+            config()->set(sprintf('%s.%s', $package, $key), $value);
         }
     }
 }
