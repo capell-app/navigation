@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 ?>
 
+@php
+    use Capell\Frontend\Facades\Frontend;
+@endphp
+
 @props([
     'language' => Frontend::language(),
     'related',
