@@ -111,15 +111,15 @@ jobs:
       - name: Configure environment
         run: |
           if [ "${{ matrix.db }}" == "mysql" ]; then
-            echo "DB_CONNECTION=mysql" >> .env
-            echo "DB_HOST=127.0.0.1" >> .env
-            echo "DB_PORT=3306" >> .env
-            echo "DB_DATABASE=test_cms_multi" >> .env
-            echo "DB_USERNAME=root" >> .env
-            echo "DB_PASSWORD=root" >> .env
+            echo "DB_CONNECTION=mysql" >> "$GITHUB_ENV"
+            echo "DB_HOST=127.0.0.1" >> "$GITHUB_ENV"
+            echo "DB_PORT=3306" >> "$GITHUB_ENV"
+            echo "DB_DATABASE=test_cms_multi" >> "$GITHUB_ENV"
+            echo "DB_USERNAME=root" >> "$GITHUB_ENV"
+            echo "DB_PASSWORD=root" >> "$GITHUB_ENV"
           else
-            echo "DB_CONNECTION=sqlite" >> .env
-            echo "DB_DATABASE=:memory:" >> .env
+            echo "DB_CONNECTION=sqlite" >> "$GITHUB_ENV"
+            echo "DB_DATABASE=:memory:" >> "$GITHUB_ENV"
           fi
 
       - name: Rector Cache

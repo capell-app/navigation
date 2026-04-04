@@ -11,10 +11,44 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 
 use function Pest\Laravel\artisan;
 
 it('runs demo command and creates articles and tags for the site', function (): void {
+    $capellDirectory = storage_path('app/capell');
+    $demoDirectory = $capellDirectory . '/demo';
+    $stagingDirectory = $capellDirectory . '/demo-test-assets';
+    $demoZipPath = $capellDirectory . '/demo-test.zip';
+    $imageDirectory = $stagingDirectory . '/demo/img';
+    $imagePath = $imageDirectory . '/sample.jpg';
+
+    File::deleteDirectory($demoDirectory);
+    File::deleteDirectory($stagingDirectory);
+    File::delete($demoZipPath);
+
+    File::ensureDirectoryExists($imageDirectory);
+
+    $generatedImage = imagecreatetruecolor(16, 16);
+    $backgroundColor = imagecolorallocate($generatedImage, 40, 110, 180);
+    imagefill($generatedImage, 0, 0, $backgroundColor);
+    imagejpeg($generatedImage, $imagePath, 90);
+    imagedestroy($generatedImage);
+
+    $archive = new ZipArchive;
+    $archive->open($demoZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    $archive->addFile($imagePath, 'demo/img/sample.jpg');
+    $archive->close();
+
+    Http::fake([
+        'https://capell.app/demo.zip' => Http::response(
+            File::get($demoZipPath),
+            200,
+            ['Content-Type' => 'application/zip'],
+        ),
+    ]);
+
     /** @var Language $language */
     $language = Language::factory()->create([
         'code' => 'en',
@@ -23,11 +57,9 @@ it('runs demo command and creates articles and tags for the site', function (): 
     /** @var Site $site */
     $site = Site::factory()->language($language)->withTranslations()->create();
 
-    // Ensure the site has language relations loaded
     $site->refresh();
     $site->loadMissing('languages', 'language');
 
-    // Run the demo command for this site with a small limit
     artisan('capell:blog-demo', [
         '--sites' => $site->name,
         '--limit' => 2,
@@ -36,7 +68,9 @@ it('runs demo command and creates articles and tags for the site', function (): 
         ->expectsOutput('Blog demo setup completed for selected sites.')
         ->assertExitCode(Command::SUCCESS);
 
-    // Verify that article pages were created under the blog page for the site
+    Http::assertSentCount(1);
+
+    /** @var class-string<Article> $articleModel */
     $articleModel = CapellCore::getModel(BlogModelEnum::Article);
 
     /** @var Collection<int, Article> $articles */
@@ -47,12 +81,10 @@ it('runs demo command and creates articles and tags for the site', function (): 
 
     expect($articles->count())->toBeGreaterThanOrEqual(1);
 
-    // Verify that tags were created for pages
     $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
     $tagsCount = $tagModel::query()->count();
     expect($tagsCount)->toBeGreaterThanOrEqual(1);
 
-    // Verify that at least one created article has tags associated
     $articleWithTags = $articles->first(fn (Pageable $article): bool => $article->tags()->exists());
 
     expect($articleWithTags)->not()->toBeNull();

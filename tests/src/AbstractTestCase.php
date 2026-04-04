@@ -96,8 +96,6 @@ abstract class AbstractTestCase extends TestCase
         ]);
 
         Model::shouldBeStrict();
-
-        $this->setUpDatabase();
     }
 
     protected function tearDown(): void
@@ -153,14 +151,12 @@ abstract class AbstractTestCase extends TestCase
         Gate::policy(Utils::getRoleModel(), RolePolicy::class);
     }
 
-    /**
-     * Set up the database.
-     *
-     * @param  Application  $app
-     */
-    protected function setUpDatabase(): void
+    protected function afterRefreshingDatabase(): void
     {
-        Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
+        Role::firstOrCreate([
+            'name' => 'super_admin',
+            'guard_name' => 'web',
+        ]);
     }
 
     /**
