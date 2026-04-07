@@ -1,10 +1,16 @@
 <?php
 
 declare(strict_types=1);
-use Capell\Frontend\Facades\Frontend;
 
-$theme = Frontend::theme();
 ?>
+
+@php
+    use Capell\Core\Data\NavigationItemData;
+    use Capell\Frontend\Facades\Frontend;
+    use Illuminate\Support\Collection;
+
+    $theme = Frontend::theme();
+@endphp
 
 @props([
     'columns' => $container['meta']['override_columns'] ?? $widget->getMeta('columns', 3),
@@ -63,7 +69,7 @@ $theme = Frontend::theme();
                 >
                     @foreach ($chunk as $item)
                         <x-dynamic-component
-                            :component="! empty($item->data['component']) ? $item->data['component'] : 'capell::list.item'"
+                            :component="! empty($item->data['component_item']) ? $item->data['component_item'] : 'capell::list.item'"
                             class="widget-navigation-item"
                             :$item
                         />
@@ -78,9 +84,9 @@ $theme = Frontend::theme();
         >
             @foreach ($items as $item)
                 <x-dynamic-component
-                    :component="! empty($item->data['component']) ? $item->data['component'] : 'capell::list.item'"
-                    class="widget-navigation-item widget-navigation-child-item"
+                    :component="! empty($item->data['component_item']) ? $item->data['component_item'] : 'capell::list.item'"
                     :$item
+                    class="widget-navigation-item widget-navigation-child-item"
                 />
             @endforeach
         </x-dynamic-component>

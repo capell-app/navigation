@@ -83,6 +83,7 @@ abstract class AbstractTestCase extends TestCase
 
         $this->loadMigrationsFrom($this->orderedMigrationWorkspacePath());
 
+        // Temp fix to ensure components are locatable when run in parallel
         Blade::componentNamespace('Capell\\Blog\\View\\Components', 'capell-blog');
         Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
 

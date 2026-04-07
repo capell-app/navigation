@@ -213,15 +213,15 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLivewireComponents(): self
     {
-        foreach (LivewirePageComponentEnum::getComponents() as $name => $component) {
-            if (! $component) {
-                continue;
+        if ($this->isLivewireV3()) {
+            foreach (LivewirePageComponentEnum::getComponents() as $name => $component) {
+                if (! $component) {
+                    continue;
+                }
+
+                Livewire::component($name, $component);
             }
-
-            Livewire::component($name, $component);
-        }
-
-        if ($this->isLivewireV3() === false) {
+        } else {
             Livewire::addNamespace(
                 namespace: 'capell-blog',
                 classNamespace: 'Capell\\Blog\\Livewire',

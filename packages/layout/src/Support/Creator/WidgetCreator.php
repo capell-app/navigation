@@ -229,6 +229,7 @@ class WidgetCreator
                 'limit' => 20,
                 'container' => 'full',
                 'background_color' => 'light-gray',
+                'spacing' => 'md',
                 'margin' => 0,
                 'padding' => ['md'],
             ],

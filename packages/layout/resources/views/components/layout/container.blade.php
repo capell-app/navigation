@@ -142,9 +142,9 @@ declare(strict_types=1);
 
         <x-capell-layout::layout.widget
             :$component
-            :$container
-            :containerColspan="$colspan"
+            :container-colspan="$colspan"
             :container-width="$colspan !== 12 ? 'full' : null"
+            :$container
             :$containerKey
             :$containerIndex
             :$loop
@@ -152,7 +152,7 @@ declare(strict_types=1);
             :$widget
             :$widgetIndex
             :$widgetData
-            :pageSlot="$pageSlot"
+            :page-slot="$pageSlot"
         />
     @endforeach
 </div>

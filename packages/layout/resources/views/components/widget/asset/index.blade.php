@@ -70,7 +70,7 @@ declare(strict_types=1);
                     'xl' => 'max-w-xl',
                     '2xl' => 'max-w-2xl',
                     '3xl' => 'max-w-3xl',
-                    'max-w-[var(--max-max-width)]' => true,
+                    default => 'max-w-[var(--max-max-width)]',
                 } : '',
                 'gap-x-8 gap-y-6 lg:gap-x-10 lg:gap-y-10' => $spacing && $spacing !== 'none',
                 'md:grid-cols-[repeat(var(--columns),minmax(0,1fr))]' => $columns,

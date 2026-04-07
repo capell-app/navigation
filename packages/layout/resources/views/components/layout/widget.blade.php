@@ -44,6 +44,7 @@ declare(strict_types=1);
             'containerWidth' => $containerWidth,
             'loop' => $loop,
             'pageSlot' => $pageSlot,
+            'occurrence' => $occurrence,
             'widget' => $widget,
             'widgetData' => $widgetData,
             'widgetIndex' => $widgetIndex,

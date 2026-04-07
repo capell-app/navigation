@@ -206,13 +206,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         );
 
         CapellCore::registerVendorAsset(
-            VendorAssetData::tailwindSource(
-                base_path('vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php'),
-                static::$packageName,
-            ),
-        );
-
-        CapellCore::registerVendorAsset(
             VendorAssetData::tailwindImport('tippy.js/dist/tippy.css', static::$packageName),
         );
 
@@ -365,15 +358,15 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
 
     private function registerLivewireComponents(): self
     {
-        foreach (LivewireComponentsEnum::getComponents() as $name => $component) {
-            if (! $component) {
-                continue;
+        if ($this->isLivewireV3()) {
+            foreach (LivewireComponentsEnum::getComponents() as $name => $component) {
+                if (! $component) {
+                    continue;
+                }
+
+                Livewire::component($name, $component);
             }
-
-            Livewire::component($name, $component);
-        }
-
-        if ($this->isLivewireV3() === false) {
+        } else {
             Livewire::addNamespace(
                 namespace: 'capell-layout',
                 classNamespace: 'Capell\\Layout\\Livewire',
