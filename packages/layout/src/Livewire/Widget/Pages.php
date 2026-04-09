@@ -45,7 +45,7 @@ class Pages extends AbstractWidget
             page: $page,
             limit: $limit,
             paginationPage: $paginationPage,
-            ordering: $this->widget->meta['order'] ?? 'alphabetic',
+            ordering: $this->widget->meta['order'] ?? 'alphabetical',
             pageGroup: $this->widget->meta['page_group'] ?? null,
             withChildrenCount: $this->widget->meta['with_children_count'] ?? false,
             withImage: $this->widget->meta['with_image'] ?? false,

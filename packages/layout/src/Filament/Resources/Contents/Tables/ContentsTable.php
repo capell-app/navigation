@@ -198,7 +198,7 @@ class ContentsTable implements TableConfigurator
                     return $model::query()
                         ->ordered()
                         ->pluck('name', 'id')
-                        ->prepend(__('capell-layout::form.none'), 0)
+                        ->prepend(__('capell-admin::generic.none'), 0)
                         ->toArray();
                 })
                 ->modifyQueryUsing(

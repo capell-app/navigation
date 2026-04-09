@@ -98,8 +98,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerModels()
             ->registerModelFillableAndCasts()
             ->registerRelationships()
-            ->registerPackageMetadata()
-            ->registerPackageAssets();
+            ->registerPackageMetadata();
 
         $this->booted(function (): void {
             if (! $this->isPackageInstalled()) {
@@ -142,7 +141,8 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentAssets()
             ->registerPublishCommands()
             ->registerLivewireComponents()
-            ->registerBladeComponents();
+            ->registerBladeComponents()
+            ->registerVendorAssets();
     }
 
     private function registerModelEvents(): self
@@ -194,31 +194,6 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ],
             version: $this->getVersion(),
             url: 'https://capell.app',
-        );
-
-        return $this;
-    }
-
-    private function registerPackageAssets(): self
-    {
-        CapellCore::registerVendorAsset(
-            VendorAssetData::tailwindSource('resources/views/**/*.blade.php', static::$packageName),
-        );
-
-        CapellCore::registerVendorAsset(
-            VendorAssetData::tailwindImport('tippy.js/dist/tippy.css', static::$packageName),
-        );
-
-        CapellCore::registerVendorAsset(
-            VendorAssetData::tailwindImport('resources/css/capell-layout.css', static::$packageName),
-        );
-
-        CapellCore::registerVendorAsset(
-            VendorAssetData::tailwindPlugin('@tailwindcss/typography', static::$packageName),
-        );
-
-        CapellCore::registerVendorAsset(
-            VendorAssetData::npmDependency('tippy.js', '^6.3.7', static::$packageName),
         );
 
         return $this;
@@ -415,6 +390,39 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
                     ->loadedOnRequest(),
             ],
             package: 'capell-layout',
+        );
+
+        return $this;
+    }
+
+    private function registerVendorAssets(): self
+    {
+        CapellCore::registerVendorAsset(
+            VendorAssetData::buildAsset(
+                path: 'vendor/capell-layout/frontend',
+                file: 'resources/js/capell-layout.js',
+                packageName: self::$packageName,
+            ),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindSource('resources/views/**/*.blade.php', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('tippy.js/dist/tippy.css', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('resources/css/capell-layout.css', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindPlugin('@tailwindcss/typography', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::npmDependency('tippy.js', '^6.3.7', static::$packageName),
         );
 
         return $this;

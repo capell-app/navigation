@@ -82,8 +82,8 @@ class DemoCreator
             'type_id' => $this->typeModel::query()->firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
             'meta' => [
                 'size' => 'md',
-                'margin' => '',
-                'padding' => ['md'],
+                'margin' => 'none',
+                'padding' => 'md',
                 'reverse_order' => true,
                 'background_color' => 'light-gray',
                 'actions' => [
@@ -137,7 +137,8 @@ class DemoCreator
                 'align' => 'center',
                 'size' => 'md',
                 'style' => 'column',
-                'padding' => ['md'],
+                'padding' => 'xl',
+                'margin' => 'none',
                 'actions' => [
                     [
                         'type' => ActionLinkEnum::Page->value,
@@ -781,7 +782,7 @@ class DemoCreator
                 'view_file' => 'capell-layout::components.widget.asset.blocks',
                 'spacing' => 'none',
                 'columns' => 0,
-                'margin' => '',
+                'margin' => 'none',
                 'container' => ContainerWidthEnum::Small->value,
             ],
             'admin' => [

@@ -9,6 +9,7 @@ declare(strict_types=1);
     use Capell\Core\Enums\MediaCollectionEnum;
     use Capell\Frontend\Facades\Frontend;
     use Capell\Layout\Enums\ContainerWidthEnum;
+    use Illuminate\Support\Arr;
 
     $theme = Frontend::theme();
 @endphp
@@ -27,8 +28,8 @@ declare(strict_types=1);
     'containerClass' => '',
     'containerWidth' => $container['meta']['container'] ?? null,
     'index',
-    'margin' => (array) $widget->getMeta('margin'),
-    'padding' => (array) $widget->getMeta('padding'),
+    'margin' => Arr::wrap($widget->getMeta('margin')),
+    'padding' => Arr::wrap($widget->getMeta('padding')),
     'pageContainer' => $widget->getMeta('container', $theme->getMeta('container')),
     'tag' => 'section',
     'widget',

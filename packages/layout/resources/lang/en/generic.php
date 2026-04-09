@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'accordion' => 'Accordion',
+    'action_type_label' => ':Type: :label',
     'assets' => 'Assets',
     'auto' => 'Auto',
     'breadcrumbs' => 'Breadcrumbs',

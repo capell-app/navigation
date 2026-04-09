@@ -26,6 +26,8 @@ use Capell\Core\Models\Site;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ArticleResource extends PageResource
 {
@@ -94,6 +96,24 @@ class ArticleResource extends PageResource
     public static function getPluralModelLabel(): string
     {
         return __('capell-blog::generic.articles');
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return static::getEloquentQuery()
+            ->with([
+                'site:id,name,default',
+                'type:id,name',
+            ]);
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        if ($record->site->default) {
+            return [];
+        }
+
+        return [$record->site->name];
     }
 
     public static function mutateFormDataBeforeCreate(array &$data, array $formData = []): void

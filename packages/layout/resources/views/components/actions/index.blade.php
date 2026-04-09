@@ -55,24 +55,24 @@ declare(strict_types=1);
                         ? $site
                         : SiteLoader::getSites()->firstWhere('id', $action['site_id']);
 
-                    $url = PageLoader::getUrlById(
+                    $pageUrl = PageLoader::getUrlById(
                         pageType: $action['pageable_type'],
                         pageId: $action['pageable_id'],
                         site: $targetSite,
                         language: $language,
                     );
 
-                    if (! $url instanceof PageUrl) {
+                    if (! $pageUrl instanceof PageUrl) {
                         continue 2;
                     }
 
-                    $url = $url->full_url;
+                    $url = $pageUrl->full_url;
                     break;
             }
 
             throw_unless($url, InvalidArgumentException::class, 'Action URL is missing.');
 
-            $label = $action['label'] ?? $url->translation->link_text ?? '';
+            $label = $action['label'] ?? $pageUrl->translation->link_text ?? '';
 
             $wireNavigation = true;
         @endphp

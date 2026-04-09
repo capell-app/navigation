@@ -21,7 +21,6 @@ use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetSettingsTab;
 use Capell\Layout\Filament\Components\Forms\Widget\TranslationsRepeater;
 use Filament\Forms\Components\Checkbox;
-use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -126,11 +125,7 @@ class DefaultWidgetSchema implements TypeSchemaInterface
                                  $get('image')
                             JS),
                     ]),
-                Fieldset::make(__('capell-layout::form.actions'))
-                    ->schema([
-                        ActionsRepeater::make('actions')
-                            ->hiddenLabel(),
-                    ]),
+                ActionsRepeater::make('actions'),
             ]);
     }
 

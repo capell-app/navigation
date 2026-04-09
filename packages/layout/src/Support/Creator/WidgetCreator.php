@@ -387,7 +387,7 @@ class WidgetCreator
                 'view_file' => 'capell-layout::components.widget.asset.blocks',
                 'spacing' => 'none',
                 'columns' => 0,
-                'margin' => '',
+                'margin' => 'none',
                 'container' => ContainerWidthEnum::Small->value,
             ],
             'admin' => [
@@ -420,9 +420,13 @@ class WidgetCreator
             'type_id' => $type->id,
             'meta' => [
                 'align' => 'center',
+                'spacing' => 'none',
                 'background_overlay' => true,
                 'background_color' => DefaultColorEnum::Gray->value,
                 'view_file' => 'capell-layout::components.widget.asset.testimonials',
+            ],
+            'admin' => [
+                'schema' => CarouselWidgetSchema::getKey(),
             ],
         ]);
     }

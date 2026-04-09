@@ -37,10 +37,10 @@ $theme = Frontend::theme();
         'mt-10' => ! $loop->first,
         'bg-gray-50 dark:bg-gray-900' => $color === 'light',
         'bg-gray-800 dark:bg-gray-900' => $color === 'dark',
-        'h-[calc(100vh-var(--header-height))]' => $height === 'full',
-        'h-[calc(100vh-var(--header-height))] lg:min-h-[60vh]' => $height === 'large',
-        'h-[calc(100vh-var(--header-height))] md:min-h-[40vh]' => $height === 'medium',
-        'h-[calc(100vh-var(--header-height))] sm:min-h-[24rem]' => $height === 'small',
+        'min-h-[calc(100vh-var(--header-height))]' => $height === 'full',
+        'min-h-[calc(100vh-var(--header-height))] lg:max-h-[960px]' => $height === 'large',
+        'min-h-[calc(100vh-var(--header-height))] md:max-h-[720px]' => $height === 'medium',
+        'min-h-[calc(100vh-var(--header-height))' => $height === 'small',
     ])
 >
     <x-capell-hero::hero.wrapper

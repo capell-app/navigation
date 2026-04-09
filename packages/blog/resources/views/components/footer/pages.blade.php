@@ -58,7 +58,7 @@ declare(strict_types=1);
                 </a>
             </div>
         @empty
-            <div class="text-sm font-medium tracking-tight">
+            <div class="text-sm font-medium">
                 {{ __('capell-frontend::generic.no_articles') }}
             </div>
         @endforelse
