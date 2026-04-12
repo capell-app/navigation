@@ -13,6 +13,7 @@ use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Enums\MediaCollectionEnum;
+use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasAssets;
 use Capell\Core\Models\Concerns\HasDrafts;
@@ -116,6 +117,11 @@ class Article extends Model implements Draftable, HasMedia, Pageable, PageCachea
     public static function hasPageHierarchy(): bool
     {
         return false;
+    }
+
+    public static function defaultOrdering(): PageOrderEnum
+    {
+        return PageOrderEnum::Latest;
     }
 
     public function shouldLogVisit(): bool

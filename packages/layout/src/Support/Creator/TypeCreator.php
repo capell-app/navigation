@@ -194,6 +194,7 @@ class TypeCreator
             ],
             'meta' => [
                 'component' => WidgetComponentEnum::Default,
+                'with_next_prev' => true,
             ],
         ]);
     }

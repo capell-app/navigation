@@ -22,7 +22,7 @@ declare(strict_types=1);
                     :$url
                     wire:navigate
                     color="dark"
-                    size="sm"
+                    size="xs"
                     class="footer-tag"
                 >
                     {{ $tag->getTranslation('name', $language->code) }}

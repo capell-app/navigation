@@ -13,6 +13,8 @@ use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasUserstamps;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
 use Capell\Core\Models\Contracts\Userstampable;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Translation;
 use Capell\Layout\Database\Factories\WidgetAssetFactory;
 use Capell\Layout\Models\Concerns\ComposhipsJsonRelationshipsTrait;
 use Carbon\CarbonImmutable;
@@ -64,6 +66,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static Builder<static>|WidgetAsset newModelQuery()
  * @method static Builder<static>|WidgetAsset newQuery()
  * @method static Builder<static>|WidgetAsset ordered(string $dir = 'asc')
+ * @method static Builder<static>|WidgetAsset alphabetical(Language $language, string $direction = 'asc')
  * @method static Builder<static>|WidgetAsset query()
  * @method static Builder<static>|WidgetAsset withAssets(bool $withDrafts = true)
  *
@@ -155,6 +158,17 @@ class WidgetAsset extends Model implements HasMedia, PageCacheable, Userstampabl
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'), $dir);
+    }
+
+    protected function scopeAlphabetical(Builder $query, Language $language, string $direction = 'asc'): void
+    {
+        $query->orderBy(
+            Translation::query()->select('title')
+                ->whereColumn('translatable_id', $this->qualifyColumn('asset_id'))
+                ->whereColumn('translatable_type', $this->qualifyColumn('asset_type'))
+                ->where('language_id', $language->id),
+            $direction,
+        );
     }
 
     protected function casts(): array

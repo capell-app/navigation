@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Layout\View\Components\Widget\Page;
 
+use Capell\Core\Enums\PageOrderEnum;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -33,7 +34,7 @@ class Siblings extends AbstractPagesWidget
             site: Frontend::site(),
             page: $page,
             type: 'siblings',
-            ordering: 'alphabetical',
+            ordering: PageOrderEnum::Alphabetical,
             withChildrenCount: $this->widget->meta['with_children_count'] ?? false,
             withImage: $this->widget->meta['with_image'] ?? false,
             withParent: $this->widget->meta['with_parent'] ?? false,

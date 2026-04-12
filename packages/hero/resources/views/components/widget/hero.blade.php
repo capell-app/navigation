@@ -39,6 +39,8 @@ $theme = Frontend::theme();
 ])
 {{-- format-ignore-start --}}
 @php
+    use Capell\Layout\Actions\GetWidgetContainerWidthAction;
+
     if ($containerIndex === 0 && $theme->getMeta('header_position') === 'fixed') {
         $slideClass .= ' pt-20 lg:pt-32';
     }
@@ -119,7 +121,6 @@ $theme = Frontend::theme();
                     :background-repeat="$widgetAsset->asset->getMeta('background_repeat', $widget->getMeta('background_repeat', 'no-repeat'))"
                     :background-overlay="$bgImage && $widgetAsset->asset->translation ? $color : ''"
                     :first="$loop->first"
-                    :index="$loop->iteration"
                     :total="$total"
                     :title="$widgetAsset->asset->translation->title"
                     :color="$slideColorScheme"

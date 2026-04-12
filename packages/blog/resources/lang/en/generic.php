@@ -8,6 +8,7 @@ return [
     'archives_page' => 'Archives Page (articles by month/year)',
     'article' => 'Article',
     'articles' => 'Articles',
+    'article_archives' => 'Article Archives',
     'articles_info' => 'Blog articles',
     'blog' => 'Blog',
     'blog_archive_page' => 'Archive Page',

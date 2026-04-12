@@ -19,8 +19,10 @@ use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Resources\Articles\Schemas\Types\ArticlePageSchema;
 use Capell\Blog\Listeners\AddBlogPagesToNavigation;
 use Capell\Blog\Listeners\ArticleTranslationSavedListener;
+use Capell\Blog\Models\Article;
 use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\BlogModelRegistrar;
+use Capell\Blog\Support\Creator\ArticleCreator;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Blog\Support\Sitemap\ArchivesSitemap;
@@ -32,6 +34,7 @@ use Capell\Blog\View\Components\AssetAfterTitle;
 use Capell\Blog\View\Components\Footer\Pages;
 use Capell\Blog\View\Components\Footer\Tags;
 use Capell\Blog\View\Components\Page\BeforeContentTags;
+use Capell\Core\Data\PageTypeData;
 use Capell\Core\Data\VendorAssetData;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Events\NavigationCreating;
@@ -123,6 +126,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ->registerDefaultPages()
             ->registerBladeComponents()
             ->registerLivewireComponents()
+            ->registerTypes()
             ->registerRenderHooks()
             ->registerStaticSiteExtensions();
     }
@@ -422,6 +426,20 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     private function registerTranslationEvents(): self
     {
         Event::listen('eloquent.saved: ' . Translation::class, ArticleTranslationSavedListener::class);
+
+        return $this;
+    }
+
+    private function registerTypes(): self
+    {
+        CapellCore::registerPageType(
+            new PageTypeData(
+                name: 'article',
+                model: Article::class,
+                label: fn (): string => __('capell-blog::generic.article'),
+                creatorClass: ArticleCreator::class,
+            ),
+        );
 
         return $this;
     }

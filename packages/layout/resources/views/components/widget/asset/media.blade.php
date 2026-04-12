@@ -5,11 +5,9 @@ declare(strict_types=1);
 ?>
 
 @php
+    use Capell\Core\Enums\ContainerWidthEnum;
     use Capell\Frontend\Facades\Frontend;
-    use Capell\Layout\Enums\ContainerWidthEnum;
-    use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Str;
-    use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
     $theme = Frontend::theme();
 @endphp

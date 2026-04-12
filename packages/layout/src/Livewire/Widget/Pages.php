@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Livewire\Widget;
 
+use Capell\Core\Enums\PageOrderEnum;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Livewire\WithPagination;
 
@@ -39,13 +41,19 @@ class Pages extends AbstractWidget
 
         $selection = $this->widget->assets->pluck('asset_id')->toArray();
 
+        $morphModel = $this->widget->getMeta('page_model');
+
+        if ($morphModel !== null) {
+            $morphModel = Relation::getMorphedModel($morphModel);
+        }
+
         $this->pages = PageLoader::getPages(
             language: Frontend::language(),
             site: Frontend::site(),
             page: $page,
             limit: $limit,
             paginationPage: $paginationPage,
-            ordering: $this->widget->meta['order'] ?? 'alphabetical',
+            ordering: ($this->widget->meta['order'] ?? '') === '' ? null : PageOrderEnum::from($this->widget->meta['order']),
             pageGroup: $this->widget->meta['page_group'] ?? null,
             withChildrenCount: $this->widget->meta['with_children_count'] ?? false,
             withImage: $this->widget->meta['with_image'] ?? false,
@@ -54,7 +62,7 @@ class Pages extends AbstractWidget
             withDate: $this->widget->meta['with_date'] ?? false,
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('page-%d-widget-%d-container-%s-%d', $page->id, $this->widget->id, $this->containerKey, $this->occurrence),
-            morphModel: $this->widget->getMeta('page_model'),
+            morphModel: $morphModel,
             modifyQuery: fn (Builder $query) => $query->when(
                 $selection,
                 fn (Builder $query) => $query->whereIn('id', $selection),

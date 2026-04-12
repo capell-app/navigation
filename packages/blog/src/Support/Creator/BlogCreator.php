@@ -413,7 +413,7 @@ class BlogCreator
         $widget = Widget::query()->firstOrCreate([
             'key' => 'archives',
         ], [
-            'name' => __('capell-blog::generic.archive'),
+            'name' => __('capell-blog::generic.article_archives'),
             'type_id' => $type->id,
             'meta' => [
                 'component' => BlogWidgetComponentEnum::Archives,
@@ -571,7 +571,7 @@ class BlogCreator
                         'html_class' => 'sidebar-sticky space-y-8',
                     ],
                     'widgets' => [
-                        ['widget_key' => 'related-pages', 'meta' => ['hide_no_results' => true]],
+                        ['widget_key' => 'latest-articles', 'meta' => ['hide_no_results' => true]],
                         ['widget_key' => 'tags', 'meta' => ['hide_no_results' => true]],
                         ['widget_key' => 'archives', 'meta' => ['hide_no_results' => true]],
                     ],
@@ -785,6 +785,7 @@ class BlogCreator
                 'pagination' => false,
                 'with_date' => true,
                 'with_image' => true,
+                'with_summary' => true,
                 'with_link_text' => true,
                 'margin' => ['b-lg'],
             ],

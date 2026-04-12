@@ -49,30 +49,27 @@ class PageContentWidgetSchema implements TypeSchemaInterface
             ->tabs([
                 WidgetDisplayTab::make([
                     Grid::make()
+                        ->statePath('meta')
                         ->columnSpanFull()
                         ->schema([
-                            Grid::make()
-                                ->statePath('meta')
-                                ->schema([
-                                    CheckboxList::make('page_content')
-                                        ->label(__('capell-layout::form.page_content'))
-                                        ->helperText(__('capell-layout::generic.widget_page_content_helper'))
-                                        ->reactive()
-                                        ->columns(3)
-                                        ->options([
-                                            'title' => __('capell-admin::generic.title'),
-                                            'content' => __('capell-admin::generic.content'),
-                                            'contents' => __('capell-admin::generic.contents'),
-                                        ]),
-                                    HeadingSizeSelect::make('heading_size')
-                                        ->visible(
-                                            fn (Get $get): bool => $get('page_content') !== null && in_array('title', $get('page_content'), true),
-                                        ),
+                            CheckboxList::make('page_content')
+                                ->label(__('capell-layout::form.page_content'))
+                                ->helperText(__('capell-layout::generic.widget_page_content_helper'))
+                                ->reactive()
+                                ->columns(3)
+                                ->options([
+                                    'title' => __('capell-admin::generic.title'),
+                                    'content' => __('capell-admin::generic.content'),
+                                    'contents' => __('capell-admin::generic.contents'),
                                 ]),
-                            DisplaySection::make(),
-                            ComponentSection::make()
-                                ->statePath('meta'),
+                            HeadingSizeSelect::make('heading_size')
+                                ->visible(
+                                    fn (Get $get): bool => $get('page_content') !== null && in_array('title', $get('page_content'), true),
+                                ),
                         ]),
+                    DisplaySection::make(),
+                    ComponentSection::make()
+                        ->statePath('meta'),
                 ]),
                 WidgetAdminTab::make(),
             ]);

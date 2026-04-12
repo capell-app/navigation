@@ -25,8 +25,8 @@ declare(strict_types=1);
     'withChildCount' => (bool) $widget->getMeta('with_child_count'),
     'withImage' => (bool) $widget->getMeta('with_image', true),
     'withParent' => (bool) $widget->getMeta('with_parent'),
-    'withDate' => (bool) $widget->getMeta('with_date', true),
-    'withSummary' => (bool) $widget->getMeta('with_summary', true),
+    'withDate' => (bool) $widget->getMeta('with_date'),
+    'withSummary' => (bool) $widget->getMeta('with_summary'),
 ])
 
 @capellBuffer($assetBlock, $widgetAsset, $column)

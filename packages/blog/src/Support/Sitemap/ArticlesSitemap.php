@@ -10,6 +10,7 @@ use Capell\Blog\Models\Article;
 use Capell\Blog\Support\Loader\BlogLoader;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\SitemapPageData;
+use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Capell\Frontend\Support\Loader\PageLoader;
@@ -33,6 +34,7 @@ class ArticlesSitemap extends AbstractSitemapPages
             language: $this->language,
             site: $this->site,
             limit: 100,
+            ordering: PageOrderEnum::Latest,
             pageGroup: BlogTypeGroupEnum::Article->value,
             morphModel: CapellCore::getModel(ModelEnum::Article),
         );

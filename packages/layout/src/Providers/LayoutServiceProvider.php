@@ -170,9 +170,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
     {
         $layoutModel = CapellCore::getModel(\Capell\Core\Enums\ModelEnum::Layout);
 
-        CapellCore::registerModelInterceptor($layoutModel, LayoutEnum::Default, DefaultLayoutInterceptor::class);
-        CapellCore::registerModelInterceptor($layoutModel, LayoutEnum::Home, HomeLayoutInterceptor::class);
-        CapellCore::registerModelInterceptor($layoutModel, LayoutEnum::Results, ResultsLayoutInterceptor::class);
+        CapellCore::registerModelInterceptor($layoutModel, DefaultLayoutInterceptor::class, LayoutEnum::Default);
+        CapellCore::registerModelInterceptor($layoutModel, HomeLayoutInterceptor::class, LayoutEnum::Home);
+        CapellCore::registerModelInterceptor($layoutModel, ResultsLayoutInterceptor::class, LayoutEnum::Results);
 
         return $this;
     }

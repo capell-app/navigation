@@ -24,7 +24,7 @@ class ArticleWidgetSchema extends DefaultWidgetSchema
 
         return match ($operation) {
             'create', 'createOption', 'replicate' => [
-                $this->getArticleSettingsSchema(),
+                $this->articleSettingsSchema(),
             ],
             'editOption' => [
                 Section::make(__('capell-admin::generic.settings'))
@@ -34,7 +34,7 @@ class ArticleWidgetSchema extends DefaultWidgetSchema
                     ->collapsed()
                     ->schema([
                         ...SettingsSchema::make($schema),
-                        $this->getArticleSettingsSchema(),
+                        $this->articleSettingsSchema(),
                     ]),
             ],
             default => [
@@ -44,7 +44,7 @@ class ArticleWidgetSchema extends DefaultWidgetSchema
                     ->tabs([
                         WidgetDisplayTab::make([
                             ...SettingsSchema::make($schema),
-                            $this->getArticleSettingsSchema(),
+                            $this->articleSettingsSchema(),
                         ]),
                         Tab::make(__('capell-admin::generic.admin'))
                             ->statePath('admin')
@@ -56,7 +56,7 @@ class ArticleWidgetSchema extends DefaultWidgetSchema
         };
     }
 
-    protected function getArticleSettingsSchema(): Fieldset
+    protected function articleSettingsSchema(): Fieldset
     {
         return Fieldset::make(__('capell-blog::generic.article'))
             ->statePath('meta')

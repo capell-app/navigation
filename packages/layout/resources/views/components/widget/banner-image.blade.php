@@ -20,8 +20,7 @@ declare(strict_types=1);
 ])
 {{-- format-ignore-start --}}
 @php
-    use Capell\Core\Enums\MediaCollectionEnum;
-    use Capell\Frontend\Facades\Frontend;use Capell\Layout\Enums\ContainerWidthEnum;
+    use Capell\Core\Enums\ContainerWidthEnum;use Capell\Core\Enums\MediaCollectionEnum;use Capell\Frontend\Facades\Frontend;
 
     $theme = Frontend::theme();
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 ?>
 
 @php
+    use Capell\Core\Contracts\Pageable;
     use Capell\Core\Enums\ContentStructure;
     use Capell\Frontend\Facades\Frontend;
 
@@ -76,6 +77,29 @@ declare(strict_types=1);
                 :actions="$widget->translation?->actions"
                 button_color="primary"
             />
+        @endif
+
+        @if ($previousPage instanceof Pageable || $nextPage instanceof Pageable)
+            <div class="clear-both">
+                <div
+                    class="neighbor-links mt-10 flex divide-y divide-gray-100 border-t border-gray-100 pt-6 md:divide-x md:divide-y-0"
+                >
+                    @if ($previousPage)
+                        <x-capell::page.neighbor-link
+                            :neighbor-page="$previousPage"
+                            neighbor="previous"
+                        />
+                    @endif
+
+                    @if ($nextPage)
+                        <x-capell::page.neighbor-link
+                            :neighbor-page="$nextPage"
+                            neighbor="next"
+                            class="ml-auto"
+                        />
+                    @endif
+                </div>
+            </div>
         @endif
     </x-capell-layout::widget.wrapper>
 @endif

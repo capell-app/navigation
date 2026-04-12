@@ -123,7 +123,8 @@ class LayoutLoader
                     $morphTo->morphWith($with);
                 },
             ])
-            ->ordered();
+            ->ordered()
+            ->alphabetical($language);
 
         if ($page instanceof Pageable) {
             $assetQuery->where(function (BuilderContract $query) use ($page): void {

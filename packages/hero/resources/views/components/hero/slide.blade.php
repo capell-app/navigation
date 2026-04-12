@@ -20,7 +20,6 @@ declare(strict_types=1);
     'containerClass' => '',
     'first' => false,
     'height' => '',
-    'index',
     'slideBgImgClass' => '',
     'title' => null,
 ])
@@ -32,7 +31,6 @@ declare(strict_types=1);
             'swiper-slide-selected' => $first,
         ])
     }}
-    data-index="{{ $index }}"
 >
     <div
         @class([

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Capell\Layout\Support\Interceptors\Layouts;
 
 use Capell\Core\Contracts\ModelInterceptors\LayoutInterceptorInterface;
+use Capell\Core\Enums\ContainerWidthEnum;
 use Capell\Core\Models\Layout;
-use Capell\Layout\Enums\ContainerWidthEnum;
 use Capell\Layout\Support\Creator\WidgetCreator;
 
 final class ResultsLayoutInterceptor implements LayoutInterceptorInterface

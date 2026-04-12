@@ -14,6 +14,7 @@ use Capell\Layout\Filament\Components\Forms\Widget\DisplaySection;
 use Capell\Layout\Filament\Components\Forms\Widget\ResultsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\SettingsSchema;
 use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetAdminTab;
+use Capell\Layout\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
 use Capell\Layout\Filament\Components\Forms\Widget\TranslationsRepeater;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
@@ -77,26 +78,28 @@ class ResultsWidgetSchema extends DefaultWidgetSchema
         return Tabs::make()
             ->columnSpanFull()
             ->tabs([
-                Tab::make(__('capell-admin::generic.frontend'))
+                Tab::make(__('capell-admin::generic.results'))
+                    ->statePath('meta')
+                    ->columns()
                     ->schema([
-                        DisplaySection::make([
-                            TextInput::make('limit')
-                                ->label(__('capell-layout::form.limit')),
-                            Checkbox::make('pagination')
-                                ->label(__('capell-layout::form.pagination'))
-                                ->default(true),
-                            CacheFrequencySelect::make('cache_frequency'),
-                            ...ResultsSchema::make($schema),
-                        ]),
-                        ComponentSection::make()
-                            ->statePath('meta'),
+                        PageModelSelect::make('page_model'),
+                        TextInput::make('limit')
+                            ->label(__('capell-layout::form.limit')),
+                        CacheFrequencySelect::make('cache_frequency'),
                         Grid::make()
-                            ->statePath('meta')
                             ->columnSpanFull()
                             ->schema([
-                                PageModelSelect::make('page_model'),
+                                Checkbox::make('pagination')
+                                    ->label(__('capell-layout::form.pagination'))
+                                    ->default(true),
+                                ...ResultsSchema::make($schema),
                             ]),
                     ]),
+                WidgetDisplayTab::make([
+                    DisplaySection::make(),
+                    ComponentSection::make()
+                        ->statePath('meta'),
+                ]),
                 WidgetAdminTab::make(),
             ]);
     }

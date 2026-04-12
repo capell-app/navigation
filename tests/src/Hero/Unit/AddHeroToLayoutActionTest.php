@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Enums\ContainerWidthEnum;
 use Capell\Core\Models\Layout;
 use Capell\Hero\Actions\AddHeroToLayoutAction;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
-use Capell\Layout\Enums\ContainerWidthEnum;
 use Capell\Layout\Models\Widget;
 
 it('adds a hero container to a layout without one', function (): void {
@@ -31,7 +31,7 @@ it('does not change containers when hero already exists (but still resolves widg
         'hero' => [
             'meta' => [
                 'colspan' => 12,
-                'container' => ContainerWidthEnum::Full,
+                'container' => ContainerWidthEnum::Full->value,
             ],
             'widgets' => [
                 ['widget_key' => $widget->key],

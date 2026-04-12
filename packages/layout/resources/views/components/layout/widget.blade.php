@@ -19,6 +19,7 @@ declare(strict_types=1);
     'widgetIndex',
     'widgetData',
 ])
+
 @if ($type === 'blade')
     <x-dynamic-component
         :component="$component"

@@ -6,13 +6,13 @@ namespace Capell\Layout\Console\Commands;
 
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
 use Capell\Core\Contracts\Pageable;
+use Capell\Core\Enums\ContainerWidthEnum;
 use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Layout\Enums\ContainerWidthEnum;
 use Capell\Layout\Models\Content;
 use Capell\Layout\Support\Creator\ContentCreator;
 use Capell\Layout\Support\Creator\DemoCreator;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Actions;
 
+use Capell\Core\Enums\ContainerWidthEnum;
 use Capell\Frontend\Actions\GetLayoutContainerWidthAction;
-use Capell\Layout\Enums\ContainerWidthEnum;
 use Capell\Layout\Models\Widget;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -18,7 +18,9 @@ class GetWidgetContainerWidthAction
 
     public function handle(Widget $widget, ?string $default = null): ContainerWidthEnum
     {
-        if ($containerWidth = $widget->getMeta('container')) {
+        $containerWidth = $widget->getMeta('container');
+
+        if ($containerWidth !== null) {
             return ContainerWidthEnum::from($containerWidth);
         }
 

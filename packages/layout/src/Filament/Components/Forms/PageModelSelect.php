@@ -19,7 +19,7 @@ class PageModelSelect extends Select
             ->options(
                 fn (): array => collect(CapellCore::getPageTypes())
                     ->mapWithKeys(fn (PageTypeData $type): array => [
-                        $type->name => $type->model,
+                        $type->name => $type->getLabel(),
                     ])
                     ->all(),
             );

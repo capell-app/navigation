@@ -29,7 +29,7 @@ test('tag page list articles by tag', function (): void {
 
     $tag = Tag::factory()->translate($language)->type(TagTypeEnum::Page)->create();
 
-    $articles = Article::factory()
+    Article::factory()
         ->site($site)
         ->withTranslations()
         ->hasAttached($tag)
@@ -42,6 +42,12 @@ test('tag page list articles by tag', function (): void {
         )
         ->create();
 
+    $articles = Article::query()
+        ->with(['translation', 'pageUrl.siteDomain'])
+        ->whereRelation('site', 'id', $site->getKey())
+        ->latest()
+        ->get();
+
     $title = trans($tagPage->translation->title, ['tag_name' => $tag->translate('name', $language->code)]);
 
     $containers = $tagPage->layout->containers;
@@ -49,7 +55,8 @@ test('tag page list articles by tag', function (): void {
 
     expect($tagPage)
         ->translation->title->toBe(':Tag_name Articles')
-        ->and($containerWidgets)->toContain('breadcrumbs');
+        ->and($containerWidgets)->toContain('breadcrumbs')
+        ->and($articles)->toHaveCount(5);
 
     get($tag->getUrl($tagPage, $language))
         ->assertOk()

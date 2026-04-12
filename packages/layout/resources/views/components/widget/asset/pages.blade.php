@@ -19,17 +19,17 @@ declare(strict_types=1);
     'container',
     'containerKey',
     'containerWidth' => null,
-    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
-    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'index',
     'loop',
+    'showPageContent' => $widgetData['meta']['show_page_content'] ?? false,
+    'showPageTitle' => $widgetData['meta']['show_page_title'] ?? false,
     'size' => $widget->getMeta('size', $containerKey === 'sidebar' ? 'sm' : null),
     'spacing' => $widget->getMeta('spacing', $containerKey === 'sidebar' ? 'md' : 'lg'),
     'widget',
     'withChildCount' => (bool) $widget->getMeta('with_child_count'),
+    'withDate' => (bool) $widget->getMeta('with_date'),
     'withImage' => (bool) $widget->getMeta('with_image'),
     'withParent' => (bool) $widget->getMeta('with_parent'),
-    'withDate' => (bool) $widget->getMeta('with_date'),
     'withSummary' => (bool) $widget->getMeta('with_summary'),
 ])
 <x-capell-layout::widget.wrapper
@@ -100,10 +100,10 @@ declare(strict_types=1);
                     :parent="$withParent && method_exists($item, 'loadParent') ? $item->loadParent($language) : null"
                     :publish-date="$withDate ? $item->getPublishDate() : null"
                     :$size
-                    :summary="$withSummary ? $item->translation->summary : null"
+                    :summary="$item->translation->summary"
                     :title="$item->translation->title"
                     :url="$item->pageUrl->full_url"
-                    :with-summary="$withSummary"
+                    :$withSummary
                 />
             @endforeach
         </div>
