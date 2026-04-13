@@ -7,24 +7,27 @@ use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
-use Capell\Core\Support\Creator\DemoCreator;
 use Illuminate\Support\Facades\File;
 
 use function Pest\Laravel\artisan;
 
 it('runs the demo command and creates demo layouts for a site', function (): void {
-    $demoImgPath = DemoCreator::getDemoResourcePath('img');
-    $demoVideoPath = dirname($demoImgPath) . DIRECTORY_SEPARATOR . 'video';
+    $capellDirectory = storage_path('app/capell');
+    $demoDirectory = $capellDirectory . '/demo';
 
-    if (! is_dir($demoVideoPath)) {
-        mkdir($demoVideoPath, 0777, true);
+    File::deleteDirectory($demoDirectory);
+
+    $sourceDemoDirectory = realpath(__DIR__ . '/../../../../../demo');
+
+    if ($sourceDemoDirectory === false) {
+        throw new RuntimeException('Demo fixtures directory not found.');
     }
 
-    $demoVideoFile = $demoVideoPath . DIRECTORY_SEPARATOR . 'SampleVideo_1280x720_1mb.mp4';
+    $demoCopiedToStorage = File::copyDirectory($sourceDemoDirectory, $demoDirectory);
 
-    if (! file_exists($demoVideoFile)) {
-        file_put_contents($demoVideoFile, '0');
-    }
+    expect($demoCopiedToStorage)->toBeTrue();
+
+    $demoImgPath = $demoDirectory . DIRECTORY_SEPARATOR . 'img';
 
     File::spy();
     $dummyFile = new SplFileInfo($demoImgPath . DIRECTORY_SEPARATOR . 'home.jpg');
