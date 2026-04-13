@@ -29,7 +29,11 @@ beforeEach(function (): void {
     test()->actingAsAdmin();
 });
 
-test('Render layout builder', function (): void {
+// ──────────────────────────────────────────────
+// Rendering
+// ──────────────────────────────────────────────
+
+test('it renders the layout builder with containers', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
@@ -37,23 +41,7 @@ test('Render layout builder', function (): void {
         ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
 });
 
-test('can edit layouts', function (LayoutEnum $layoutEnum): void {
-    $language = Language::factory()->create();
-
-    $layout = resolve(LayoutCreator::class)->create($layoutEnum->value);
-
-    $widgetTypeCreator = resolve(TypeCreator::class);
-    $widgetTypeCreator->createWidgetTypes();
-
-    $widgetCreator = resolve(WidgetCreator::class);
-    $widgetCreator->createWidgets(collect([$language]));
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
-})->with(LayoutEnum::cases());
-
-test('Render layout builder with page', function (): void {
+test('it renders the layout builder for a page', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 
@@ -65,7 +53,7 @@ test('Render layout builder with page', function (): void {
         ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
 });
 
-test('Render layout without containers', function (): void {
+test('it renders an empty layout message when no containers exist', function (): void {
     $layout = (new LayoutFactory)->state(['containers' => []])->create();
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
@@ -73,7 +61,20 @@ test('Render layout without containers', function (): void {
         ->assertSeeHtml(__('capell-layout::message.layout_empty'));
 });
 
-test('Render layout with widget and assets', function (AssetEnum|Capell\Core\Enums\AssetEnum $assetType): void {
+test('it renders for each layout enum type', function (LayoutEnum $layoutEnum): void {
+    $language = Language::factory()->create();
+
+    $layout = resolve(LayoutCreator::class)->create($layoutEnum->value);
+
+    resolve(TypeCreator::class)->createWidgetTypes();
+    resolve(WidgetCreator::class)->createWidgets(collect([$language]));
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->assertSeeText(__('capell-layout::heading.layout_record', ['name' => $layout->name]));
+})->with(LayoutEnum::cases());
+
+test('it renders widgets with asset types', function (AssetEnum|Capell\Core\Enums\AssetEnum $assetType): void {
     $widget = Widget::factory()
         ->for((new WidgetTypeFactory)->state([
             'admin' => [
@@ -82,119 +83,22 @@ test('Render layout with widget and assets', function (AssetEnum|Capell\Core\Enu
         ]))
         ->has(WidgetAsset::factory()->asset($assetType), 'assets')
         ->create();
-    $layout = (new LayoutFactory)->state(['containers' => ['main' => ['widgets' => [['widget_key' => $widget->key]]]]])
-        ->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => ['main' => ['widgets' => [['widget_key' => $widget->key]]]],
+    ])->create();
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful();
 })->with([AssetEnum::Content, ...Capell\Core\Enums\AssetEnum::cases()]);
 
-test('Can reorder containers', function (): void {
-    $widget = Widget::factory()->create(['key' => 'test']);
-    $layout = (new LayoutFactory)->state([
-        'containers' => [
-            'first' => ['widgets' => [['widget_key' => $widget->key]]],
-            'second' => ['widgets' => [['widget_key' => $widget->key]]],
-        ],
-    ])->create();
+// ──────────────────────────────────────────────
+// Container operations
+// ──────────────────────────────────────────────
 
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->call(
-            'reorderContainers',
-            containerKey: 'second',
-            position: 0,
-        )
-        ->call('saveLayout');
-
-    $layout->refresh();
-
-    expect(array_keys($layout->containers))
-        ->toBe(['second', 'first']);
-});
-
-test('Can reorder widgets', function (): void {
-    Widget::factory()->state(['key' => 'first'])->create();
-    Widget::factory()->state(['key' => 'second'])->create();
-
-    $layout = (new LayoutFactory)->state([
-        'containers' => [
-            'test' => [
-                'widgets' => [
-                    ['widget_key' => 'first', 'occurrence' => 1],
-                    ['widget_key' => 'second', 'occurrence' => 1],
-                ],
-            ],
-        ],
-    ])->create();
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->call(
-            'reorderWidgets',
-            containerKey: 'test',
-            containerWidgetIndex: 'test.1',
-            widgetIndex: 0,
-        )
-        ->call('saveLayout');
-
-    $layout->refresh();
-
-    expect(array_column($layout->containers['test']['widgets'], 'widget_key'))
-        ->toBe(['second', 'first']);
-});
-
-test('Can reorder newly added widget', function (): void {
-    Widget::factory()->state(['key' => 'first'])->create();
-    Widget::factory()->state(['key' => 'second'])->create();
-    $widget = Widget::factory()->state(['key' => 'third'])->create();
-
-    $containerKey = 'test';
-
-    $layout = (new LayoutFactory)->state([
-        'containers' => [
-            $containerKey => [
-                'widgets' => [
-                    ['widget_key' => 'first', 'occurrence' => 1],
-                    ['widget_key' => 'second', 'occurrence' => 1],
-                ],
-            ],
-        ],
-    ])->create();
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->mountAction(
-            'addWidget',
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
-        )
-        ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
-        ->callMountedAction()
-        ->dispatch(
-            'add-widgets-to-container',
-            containerKey: $containerKey,
-            widgets: [$widget->id],
-        )
-        ->call(
-            'reorderWidgets',
-            containerKey: $containerKey,
-            containerWidgetIndex: $containerKey . '.2',
-            widgetIndex: 1,
-        )
-        ->call('saveLayout');
-
-    $layout->refresh();
-
-    expect(array_column($layout->containers[$containerKey]['widgets'], 'widget_key'))
-        ->toBe(['first', 'third', 'second']);
-});
-
-todo('Can reorder widgets into different container');
-
-test('Can add container', function (): void {
+test('it adds a container with metadata and persists it', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
+    $originalCount = count($layout->containers);
 
     $containerKey = array_key_first($layout->containers) . '-2';
     $htmlClass = 'test-class';
@@ -203,14 +107,10 @@ test('Can add container', function (): void {
         ->assertSuccessful()
         ->callAction(
             'addContainer',
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
+            arguments: ['containerKey' => $containerKey],
             data: [
                 'key' => $containerKey,
-                'meta' => [
-                    'html_class' => $htmlClass,
-                ],
+                'meta' => ['html_class' => $htmlClass],
             ],
         )
         ->assertHasNoFormErrors()
@@ -219,40 +119,16 @@ test('Can add container', function (): void {
     $layout->refresh();
 
     expect($layout->containers)
+        ->toHaveCount($originalCount + 1)
         ->toHaveKey($containerKey)
         ->and($layout->containers[$containerKey]['meta']['html_class'])
         ->toEqual($htmlClass);
 });
 
-test('Can clone layout', function (): void {
+test('it removes a container and persists the change', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
-    $page = Page::factory()->layout($layout)->create();
-
-    livewire(LayoutBuilder::class, [
-        'layout' => $layout,
-        'page' => $page,
-    ])
-        ->assertSuccessful()
-        ->callAction('duplicateLayoutAction')
-        ->assertHasNoFormErrors()
-        ->call('saveLayout');
-
-    $clonedLayout = Layout::query()->where('name', $layout->name . ' (2)')
-        ->where('key', $layout->key . ' (2)')
-        ->first();
-
-    expect($clonedLayout)
-        ->toBeInstanceOf(Layout::class)
-        ->not()->toBe($layout);
-
-    expect($clonedLayout->getAttribute('containers'))
-        ->toEqual($layout->getAttribute('containers'));
-});
-
-test('removeContainer action', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-
     $containerKey = array_key_first($layout->containers);
+    $originalCount = count($layout->containers);
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
@@ -264,51 +140,16 @@ test('removeContainer action', function (): void {
     $layout->refresh();
 
     expect($layout->containers)
+        ->toHaveCount($originalCount - 1)
         ->not()->toHaveKey($containerKey);
 });
 
-test('Can save layout without editing container', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-
-    $containers = $layout->containers;
-
-    $containerKey = array_key_first($containers);
-
-    $containerWidget = $containers[$containerKey]['widgets'][0];
-
-    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
-
-    WidgetAsset::factory()
-        ->count(2)
-        ->widget($widget)
-        ->occurrence($containerWidget['occurrence'])
-        ->create();
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->set('layoutModified', true)
-        ->call('saveLayout');
-
-    expect($layout->refresh()->getAttribute('containers'))
-        ->toHaveCount(count($containers))
-        ->toEqual($containers);
-
-    $assets = WidgetAsset::query()
-        ->where('widget_id', $widget->id)
-        ->whereNull(['pageable_id', 'pageable_type'])
-        ->exists();
-
-    expect($assets)->toBeTrue();
-});
-
-test('Can edit container', function (): void {
+test('it edits a container key and preserves widget assets', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
 
     $containerKey = array_key_first($layout->containers);
-    $newContainerKey = $containerKey . '-new';
-
+    $newContainerKey = $containerKey . '-renamed';
     $containerWidget = $layout->containers[$containerKey]['widgets'][0];
-
     $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
     WidgetAsset::factory()
@@ -321,18 +162,17 @@ test('Can edit container', function (): void {
         ->assertSuccessful()
         ->callAction(
             'editContainer',
-            data: [
-                'key' => $newContainerKey,
-            ],
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
+            data: ['key' => $newContainerKey],
+            arguments: ['containerKey' => $containerKey],
         )
         ->assertHasNoFormErrors()
         ->call('saveLayout');
 
-    expect($layout->refresh()->getAttribute('containers'))
-        ->toHaveKey($newContainerKey);
+    $layout->refresh();
+
+    expect($layout->containers)
+        ->toHaveKey($newContainerKey)
+        ->not()->toHaveKey($containerKey);
 
     $assets = WidgetAsset::query()
         ->where('widget_id', $widget->id)
@@ -349,12 +189,12 @@ test('Can edit container', function (): void {
         );
 });
 
-test('Can edit container for page layout', function (string $widgetKey): void {
+test('it edits a container key for a page layout and updates page asset references', function (string $widgetKey): void {
     $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
 
     $containerKey = array_key_first($layout->containers);
-    $newContainerKey = $containerKey . '-new';
+    $newContainerKey = $containerKey . '-renamed';
 
     foreach ($layout->containers as $container) {
         foreach ($container['widgets'] as $widget) {
@@ -382,17 +222,13 @@ test('Can edit container for page layout', function (string $widgetKey): void {
         ->assertSuccessful()
         ->callAction(
             'editContainer',
-            data: [
-                'key' => $newContainerKey,
-            ],
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
+            data: ['key' => $newContainerKey],
+            arguments: ['containerKey' => $containerKey],
         )
         ->assertHasNoFormErrors()
         ->call('saveLayout');
 
-    expect($layout->refresh()->getAttribute('containers'))
+    expect($layout->refresh()->containers)
         ->toHaveKey($newContainerKey);
 
     $assets = WidgetAsset::query()
@@ -414,27 +250,40 @@ test('Can edit container for page layout', function (string $widgetKey): void {
         );
 })->with(['first', 'second']);
 
-test('Can add new widget', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-    $widget = Widget::factory()->state(['key' => 'test'])->create();
+test('it reorders containers', function (): void {
+    $widget = Widget::factory()->create(['key' => 'test']);
+    $layout = (new LayoutFactory)->state([
+        'containers' => [
+            'first' => ['widgets' => [['widget_key' => $widget->key]]],
+            'second' => ['widgets' => [['widget_key' => $widget->key]]],
+        ],
+    ])->create();
 
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->call('reorderContainers', containerKey: 'second', position: 0)
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    expect(array_keys($layout->containers))->toBe(['second', 'first']);
+});
+
+// ──────────────────────────────────────────────
+// Widget operations
+// ──────────────────────────────────────────────
+
+test('it adds a new widget to a container', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+    $widget = Widget::factory()->state(['key' => 'new-widget'])->create();
     $containerKey = array_key_first($layout->containers);
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
-        ->mountAction(
-            'addWidget',
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
-        )
+        ->mountAction('addWidget', arguments: ['containerKey' => $containerKey])
         ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
         ->callMountedAction()
-        ->dispatch(
-            'add-widgets-to-container',
-            containerKey: $containerKey,
-            widgets: [$widget->id],
-        )
+        ->dispatch('add-widgets-to-container', containerKey: $containerKey, widgets: [$widget->id])
         ->call('saveLayout');
 
     $layout->refresh();
@@ -443,36 +292,23 @@ test('Can add new widget', function (): void {
 
     expect($layout->containers[$containerKey]['widgets'][$lastWidgetKey])
         ->toBeArray()
-        ->toEqual([
-            'widget_key' => $widget->key,
-            'occurrence' => 1,
-        ]);
+        ->toEqual(['widget_key' => $widget->key, 'occurrence' => 1]);
 });
 
-test('Can add existing widget', function (): void {
+test('it increments occurrence when adding an existing widget again', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
-
     $containerKey = array_key_first($layout->containers);
+
     $lastWidgetKey = array_key_last($layout->containers[$containerKey]['widgets']);
     $lastWidget = $layout->containers[$containerKey]['widgets'][$lastWidgetKey];
-
     $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
-        ->mountAction(
-            'addWidget',
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
-        )
+        ->mountAction('addWidget', arguments: ['containerKey' => $containerKey])
         ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
         ->callMountedAction()
-        ->dispatch(
-            'add-widgets-to-container',
-            containerKey: $containerKey,
-            widgets: [$widget->id],
-        )
+        ->dispatch('add-widgets-to-container', containerKey: $containerKey, widgets: [$widget->id])
         ->call('saveLayout');
 
     $layout->refresh();
@@ -487,9 +323,84 @@ test('Can add existing widget', function (): void {
         ]);
 });
 
-test('Can edit container widget', function (): void {
+test('it removes a widget from a container and persists the change', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
+    $containerKey = array_key_first($layout->containers);
+    $originalWidgetCount = count($layout->containers[$containerKey]['widgets']);
+    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
 
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->callAction('removeWidget', arguments: [
+            'containerKey' => $containerKey,
+            'widgetIndex' => $widgetIndex,
+        ])
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    expect($layout->containers[$containerKey]['widgets'])
+        ->toHaveCount($originalWidgetCount - 1);
+});
+
+test('it duplicates a widget within the same container', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+    $containerKey = array_key_first($layout->containers);
+    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
+    $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
+    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
+    $originalWidgetCount = count($layout->containers[$containerKey]['widgets']);
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->callAction('duplicateWidget', arguments: [
+            'containerKey' => $containerKey,
+            'widgetIndex' => $widgetIndex,
+        ])
+        ->assertHasNoFormErrors()
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    $lastWidgetKey = array_key_last($layout->containers[$containerKey]['widgets']);
+
+    expect($layout->containers[$containerKey]['widgets'])
+        ->toHaveCount($originalWidgetCount + 1)
+        ->and($layout->containers[$containerKey]['widgets'][$lastWidgetKey])
+        ->toBeArray()
+        ->toEqual([
+            'widget_key' => $widget->key,
+            'occurrence' => 3,
+        ]);
+});
+
+test('it edits a widget name', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+    $containerKey = array_key_first($layout->containers);
+    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
+    $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
+
+    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
+    $newWidget = Widget::factory()->make();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->callAction(
+            'editWidget',
+            data: ['name' => $newWidget->name],
+            arguments: [
+                'containerKey' => $containerKey,
+                'widgetIndex' => $widgetIndex,
+            ],
+        )
+        ->assertHasNoFormErrors()
+        ->call('saveLayout');
+
+    expect($widget->refresh()->name)->toEqual($newWidget->name);
+});
+
+test('it edits layout widget meta via the editLayoutWidget action', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
 
@@ -505,18 +416,9 @@ test('Can edit container widget', function (): void {
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
-        ->mountAction(
-            'addWidget',
-            arguments: [
-                'containerKey' => $containerKey,
-            ],
-        )
+        ->mountAction('addWidget', arguments: ['containerKey' => $containerKey])
         ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
-        ->dispatch(
-            'add-widgets-to-container',
-            containerKey: $containerKey,
-            widgets: [$widget->id],
-        )
+        ->dispatch('add-widgets-to-container', containerKey: $containerKey, widgets: [$widget->id])
         ->callMountedAction()
         ->mountAction(
             TestAction::make('editLayoutWidget')
@@ -539,79 +441,125 @@ test('Can edit container widget', function (): void {
         ->meta->toMatchArray(['html_class' => 'foo']);
 });
 
-test('Can edit widget', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
+// ──────────────────────────────────────────────
+// Reordering widgets
+// ──────────────────────────────────────────────
 
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
-    $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
+test('it reorders widgets within the same container', function (): void {
+    Widget::factory()->state(['key' => 'first'])->create();
+    Widget::factory()->state(['key' => 'second'])->create();
 
-    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
-
-    $newWidget = Widget::factory()->make();
+    $layout = (new LayoutFactory)->state([
+        'containers' => [
+            'test' => [
+                'widgets' => [
+                    ['widget_key' => 'first', 'occurrence' => 1],
+                    ['widget_key' => 'second', 'occurrence' => 1],
+                ],
+            ],
+        ],
+    ])->create();
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
-        ->callAction(
-            'editWidget',
-            data: [
-                'name' => $newWidget->name,
-            ],
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-            ],
-        )
-        ->assertHasNoFormErrors()
-        ->call('saveLayout');
-
-    expect($widget->refresh())
-        ->name->toEqual($newWidget->name);
-});
-
-test('Can duplicate widget', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
-    $lastWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
-
-    $widget = Widget::query()->firstWhere('key', $lastWidget['widget_key']);
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->callAction(
-            'duplicateWidget',
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-            ],
-        )
-        ->assertHasNoFormErrors()
+        ->call('reorderWidgets', containerKey: 'test', containerWidgetIndex: 'test.1', widgetIndex: 0)
         ->call('saveLayout');
 
     $layout->refresh();
 
-    $lastWidgetKey = array_key_last($layout->containers[$containerKey]['widgets']);
-
-    expect($layout->containers[$containerKey]['widgets'][$lastWidgetKey])
-        ->toBeArray()
-        ->toEqual([
-            'widget_key' => $widget->key,
-            'occurrence' => 3,
-        ]);
+    expect(array_column($layout->containers['test']['widgets'], 'widget_key'))
+        ->toBe(['second', 'first']);
 });
 
-test('Can remove widget', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
+test('it reorders a newly added widget within the same container', function (): void {
+    Widget::factory()->state(['key' => 'first'])->create();
+    Widget::factory()->state(['key' => 'second'])->create();
+    $widget = Widget::factory()->state(['key' => 'third'])->create();
 
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_last($layout->containers[$containerKey]['widgets']);
+    $containerKey = 'test';
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => [
+            $containerKey => [
+                'widgets' => [
+                    ['widget_key' => 'first', 'occurrence' => 1],
+                    ['widget_key' => 'second', 'occurrence' => 1],
+                ],
+            ],
+        ],
+    ])->create();
 
     livewire(LayoutBuilder::class, ['layout' => $layout])
         ->assertSuccessful()
-        ->callAction('removeWidget', arguments: [
-            'containerKey' => $containerKey,
-            'widgetIndex' => $widgetIndex,
-        ]);
+        ->mountAction('addWidget', arguments: ['containerKey' => $containerKey])
+        ->assertSeeLivewire(LivewireComponentsEnum::WidgetTableSelect->value)
+        ->callMountedAction()
+        ->dispatch('add-widgets-to-container', containerKey: $containerKey, widgets: [$widget->id])
+        ->call('reorderWidgets', containerKey: $containerKey, containerWidgetIndex: $containerKey . '.2', widgetIndex: 1)
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    expect(array_column($layout->containers[$containerKey]['widgets'], 'widget_key'))
+        ->toBe(['first', 'third', 'second']);
+});
+
+// ──────────────────────────────────────────────
+// Layout persistence
+// ──────────────────────────────────────────────
+
+test('it saves the layout without modifications preserving existing containers and assets', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+    $containers = $layout->containers;
+
+    $containerKey = array_key_first($containers);
+    $containerWidget = $containers[$containerKey]['widgets'][0];
+    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
+
+    WidgetAsset::factory()
+        ->count(2)
+        ->widget($widget)
+        ->occurrence($containerWidget['occurrence'])
+        ->create();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->set('layoutModified', true)
+        ->call('saveLayout');
+
+    expect($layout->refresh()->getAttribute('containers'))
+        ->toHaveCount(count($containers))
+        ->toEqual($containers);
+
+    expect(
+        WidgetAsset::query()
+            ->where('widget_id', $widget->id)
+            ->whereNull(['pageable_id', 'pageable_type'])
+            ->exists(),
+    )->toBeTrue();
+});
+
+test('it clones the layout and page association', function (): void {
+    $layout = (new LayoutFactory)->containers()->create();
+    $page = Page::factory()->layout($layout)->create();
+
+    livewire(LayoutBuilder::class, [
+        'layout' => $layout,
+        'page' => $page,
+    ])
+        ->assertSuccessful()
+        ->callAction('duplicateLayoutAction')
+        ->assertHasNoFormErrors()
+        ->call('saveLayout');
+
+    $clonedLayout = Layout::query()
+        ->where('name', $layout->name . ' (2)')
+        ->where('key', $layout->key . ' (2)')
+        ->first();
+
+    expect($clonedLayout)
+        ->toBeInstanceOf(Layout::class)
+        ->not()->toBe($layout)
+        ->and($clonedLayout->getAttribute('containers'))
+        ->toEqual($layout->getAttribute('containers'));
 });

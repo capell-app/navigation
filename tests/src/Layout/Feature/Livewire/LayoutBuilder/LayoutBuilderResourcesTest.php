@@ -695,43 +695,6 @@ test('can remove all assets', function (): void {
     ]);
 });
 
-test('can not remove assets if no records selected', function (): void {
-    $layout = (new LayoutFactory)->containers()->create();
-    $containerKey = array_key_first($layout->containers);
-    $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
-    $containerWidget = $layout->containers[$containerKey]['widgets'][$widgetIndex];
-
-    $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
-
-    WidgetAsset::factory()
-        ->widget($widget)
-        ->occurrence($containerWidget['occurrence'])
-        ->count(3)
-        ->create();
-
-    livewire(LayoutBuilder::class, ['layout' => $layout])
-        ->assertSuccessful()
-        ->mountAction(
-            'removeAssets',
-            arguments: [
-                'containerKey' => $containerKey,
-                'widgetIndex' => $widgetIndex,
-            ],
-        )
-        ->assertHasNoFormErrors()
-        ->assertActionHalted('removeAssets')
-        ->call('saveLayout');
-
-    expect(
-        $widget->assets()
-            ->whereNull(['pageable_type', 'pageable_id'])
-            ->where('container', $containerKey)
-            ->where('occurrence', $containerWidget['occurrence'])
-            ->count(),
-    )
-        ->toBe(3);
-})->todo();
-
 test('Can revert page assets', function (): void {
     $layout = (new LayoutFactory)->containers()->create();
     $page = Page::factory()->layout($layout)->create();
