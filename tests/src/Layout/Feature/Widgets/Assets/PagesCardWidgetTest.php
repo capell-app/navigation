@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
@@ -35,25 +34,22 @@ it('renders pages card widget on page', function (): void {
     $site = Site::factory()->language($language)->withTranslations($language)->create();
     $creator = resolve(WidgetCreator::class);
     $widget = $creator->pagesCardWidget();
-    WidgetAsset::factory()->count(3)->widget($widget)->asset(AssetEnum::Page)->create();
+    $assetPages = Page::factory()->count(3)->site($site)->withTranslations($language)->create();
+    $assetPages->each(function (Page $assetPage) use ($widget): void {
+        WidgetAsset::factory()->widget($widget)->asset($assetPage)->create();
+    });
     $layout = (new LayoutFactory)->widgets([$widget])->create();
     $page = Page::factory()->site($site)->layout($layout)->withTranslations($language)->create();
-    $widgetAssets = $widget->widgetAssets()
-        ->ordered()
-        ->alphabetical($language)
-        ->with(['asset.translation', 'asset.type'])
-        ->get();
-
-    get($page->pageUrl->full_url)
+    $response = get($page->pageUrl->full_url)
         ->assertOk()
         ->assertElementExists(
             '.widget-pages-card',
-            fn (AssertElement $elm): BaseAssert => $elm->contains('.widget-asset', 3)
-                ->each(
-                    '.widget-asset',
-                    fn (AssertElement $asset, int $index): BaseAssert => $asset->containsText($widgetAssets[$index]->asset->translation->title),
-                ),
+            fn (AssertElement $elm): BaseAssert => $elm->contains('.pages-card-page-item', 3),
         );
+
+    foreach ($assetPages as $assetPage) {
+        $response->assertSee($assetPage->translation->title, false);
+    }
 });
 
 it('empty pages card widget hidden', function (): void {

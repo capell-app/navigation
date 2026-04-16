@@ -24,9 +24,7 @@ it('runs demo command and creates articles and tags for the site', function (): 
 
     $sourceDemoDirectory = realpath(__DIR__ . '/../../../../../demo');
 
-    if ($sourceDemoDirectory === false) {
-        throw new RuntimeException('Demo fixtures directory not found.');
-    }
+    throw_if($sourceDemoDirectory === false, RuntimeException::class, 'Demo fixtures directory not found.');
 
     $demoCopiedToStorage = File::copyDirectory($sourceDemoDirectory, $demoDirectory);
 

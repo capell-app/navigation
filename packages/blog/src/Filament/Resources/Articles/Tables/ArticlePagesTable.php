@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Blog\Filament\Resources\Articles\Tables;
 
 use Capell\Admin\Enums\FilamentColorEnum;
-use Capell\Admin\Filament\Actions\Table\BulkUpdateStatusAction;
 use Capell\Admin\Filament\Actions\Table\ReplicatePageAction;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
@@ -14,7 +13,6 @@ use Capell\Admin\Filament\Components\Tables\Columns\LanguagesColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\MediaLibraryImageColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageCachedIconColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\Page\PageNameColumn;
-use Capell\Admin\Filament\Components\Tables\Columns\PublishIconColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\TypeColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\DateFilter;
@@ -92,8 +90,6 @@ class ArticlePagesTable implements TableConfigurator
                             PageDeletedAction::run($record);
                         });
                     }),
-                BulkUpdateStatusAction::make()
-                    ->label(__('capell-admin::table.bulk_publish_status')),
                 RestoreBulkAction::make(),
                 ForceDeleteBulkAction::make()
                     ->after(function (Pageable $record): void {
@@ -231,7 +227,6 @@ class ArticlePagesTable implements TableConfigurator
                 ->toggleable(isToggledHiddenByDefault: true),
             PageCachedIconColumn::make('cached')
                 ->toggleable(isToggledHiddenByDefault: true),
-            PublishIconColumn::make('status'),
             DateColumn::make('created_at'),
             DateColumn::make('updated_at'),
             DateColumn::make('deleted_at'),

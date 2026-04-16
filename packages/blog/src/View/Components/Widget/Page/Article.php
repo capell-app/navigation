@@ -43,7 +43,7 @@ class Article extends AbstractWidget
         }
 
         if (isset($this->widget->meta['with_author'])) {
-            $this->author = PageLoader::getPageAuthor($page);
+            $this->author = $page->loadMissing('creator')->creator;
         }
     }
 }

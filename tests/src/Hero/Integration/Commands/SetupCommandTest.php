@@ -11,7 +11,7 @@ use function Pest\Laravel\artisan;
 it('runs hero install command successfully', function (): void {
     AddHeroWidgetToLayoutAction::shouldRun()->once();
 
-    Layout::factory()->create();
+    Layout::factory()->default()->create();
 
     artisan('capell:hero-setup')
         ->expectsOutput('Capell Hero setup successfully.')

@@ -10,7 +10,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
 use RuntimeException;
 
 /**
- * @method static void run(Widget $widget, Layout $layout, string $container)
+ * @method static void run(Widget $widget, Layout $layout, string $container, bool $skipExists = false)
  */
 class AddWidgetToLayoutContainerAction
 {
@@ -27,7 +27,7 @@ class AddWidgetToLayoutContainerAction
             fn (array $existingWidget): bool => $existingWidget['widget_key'] === $widget->key,
         );
 
-        if ($skipExists === true && count($existingWidgets) > 0) {
+        if ($skipExists && $existingWidgets !== []) {
             return;
         }
 

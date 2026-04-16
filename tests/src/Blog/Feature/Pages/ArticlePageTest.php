@@ -27,7 +27,7 @@ test('article page with layout', function (): void {
     $tags = Tag::factory()->count(3)->translate($language)->type(TagTypeEnum::Page)->create();
     $articles = Article::factory()
         ->site($site)
-        ->publisher($user)
+        ->state(['created_by' => $user->id])
         ->withTranslations()
         ->forEachSequence(
             ['visible_from' => now()->subDays(5)],
@@ -52,7 +52,7 @@ test('article page with layout', function (): void {
         )
         ->assertElementExists(
             'time.published-date',
-            fn (AssertElement $elm): BaseAssert => $elm->has('datetime', $article->published_at->toW3cString()),
+            fn (AssertElement $elm): BaseAssert => $elm->has('datetime', $article->visible_from->toW3cString()),
         )
         ->assertElementExists(
             '.article-meta',

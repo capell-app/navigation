@@ -28,7 +28,7 @@ class AddHeroWidgetToLayoutAction
 
         $layout->update(['containers' => $containers]);
 
-        AddWidgetToLayoutContainerAction::run($widget, $layout, $container);
+        AddWidgetToLayoutContainerAction::run($widget, $layout, $container, skipExists: true);
     }
 
     private function heroContainer(Widget $widget): array

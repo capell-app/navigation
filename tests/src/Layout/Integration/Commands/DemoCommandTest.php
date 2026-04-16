@@ -19,9 +19,7 @@ it('runs the demo command and creates demo layouts for a site', function (): voi
 
     $sourceDemoDirectory = realpath(__DIR__ . '/../../../../../demo');
 
-    if ($sourceDemoDirectory === false) {
-        throw new RuntimeException('Demo fixtures directory not found.');
-    }
+    throw_if($sourceDemoDirectory === false, RuntimeException::class, 'Demo fixtures directory not found.');
 
     $demoCopiedToStorage = File::copyDirectory($sourceDemoDirectory, $demoDirectory);
 

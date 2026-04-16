@@ -47,7 +47,7 @@ declare(strict_types=1);
             @if ($withDate)
                 <x-capell-blog::page.published-date
                     class="mt-4 whitespace-nowrap"
-                    :date="$page->published_at ?: $page->visible_from ?: $page->created_at"
+                    :date="$page->visible_from ?: $page->created_at"
                 />
             @endif
         </x-capell::content>

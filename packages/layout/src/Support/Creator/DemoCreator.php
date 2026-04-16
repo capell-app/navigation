@@ -77,9 +77,11 @@ class DemoCreator
     {
         $siteId = Site::query()->default()?->value('id');
 
+        $type = resolve(TypeCreator::class)->contentBuilderWidgetType();
+
         $widget = $this->widgetModel::query()->firstOrCreate(['key' => 'example-content'], [
             'name' => 'Example Content',
-            'type_id' => $this->typeModel::query()->firstWhere(['key' => WidgetTypeEnum::ContentBuilder, 'type' => LayoutTypeEnum::Widget])->id,
+            'type_id' => $type->id,
             'meta' => [
                 'size' => 'md',
                 'margin' => 'none',
@@ -181,7 +183,7 @@ class DemoCreator
 
     public function createBannerImageWidget(Collection $languages): Widget
     {
-        $widget = app(WidgetCreator::class)->bannerImageWidget();
+        $widget = resolve(WidgetCreator::class)->bannerImageWidget();
 
         $media = $this->createWidgetMedia($widget);
 

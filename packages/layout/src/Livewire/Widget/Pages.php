@@ -63,10 +63,7 @@ class Pages extends AbstractWidget
             paginationKey: $paginationKey,
             cacheKeyPrepend: sprintf('page-%d-widget-%d-container-%s-%d', $page->id, $this->widget->id, $this->containerKey, $this->occurrence),
             morphModel: $morphModel,
-            modifyQuery: fn (Builder $query) => $query->when(
-                $selection,
-                fn (Builder $query) => $query->whereIn('id', $selection),
-            ),
+            modifyQuery: fn (Builder $query) => $query->whereIn('id', $selection),
         );
 
         if ($this->pages->isEmpty() && config('capell-layout.widget.skip_render_empty', true)) {

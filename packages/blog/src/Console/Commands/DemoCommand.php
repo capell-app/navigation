@@ -379,12 +379,12 @@ class DemoCommand extends Command
 
             $page ??= $article;
 
-            if ($page->parent_id === null) {
+            if ($page instanceof Article || $page->parent_id === null) {
                 $tag = $this->createPageTag($page, $languages);
             } else {
                 $tag = $this->getPageTag($page, $languages->first());
 
-                if ($tag === null) {
+                if (! $tag instanceof Tag) {
                     $tag = $this->createPageTag($page, $languages);
                 }
             }
@@ -437,11 +437,7 @@ class DemoCommand extends Command
 
     private function getPageTag(Pageable $page, Language $language): ?Tag
     {
-        if (method_exists($page, 'ancestors')) {
-            $root = $page->ancestors->first();
-        } else {
-            $root = $page->parent;
-        }
+        $root = method_exists($page, 'ancestors') ? $page->ancestors->first() : $page->parent;
 
         if ($root === null) {
             $root = $page;

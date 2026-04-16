@@ -65,7 +65,7 @@ declare(strict_types=1);
 
     @if (! $pages || $pages->isEmpty())
         <x-capell::no-results>
-            {!! $widget->translation->getMeta('no_results', __('capell-layout::generic.no_pages_found')) !!}
+            {!! $widget->translation?->getMeta('no_results') ?: __('capell-layout::generic.no_pages_found') !!}
         </x-capell::no-results>
     @else
         <div

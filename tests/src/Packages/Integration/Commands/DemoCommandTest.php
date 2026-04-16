@@ -25,7 +25,7 @@ it('adds hero meta to blog and article pages when blog package is installed', fu
     CreateHeroContentTypeAction::shouldRun()->once()->andReturn(Type::factory()->type(LayoutTypeEnum::Content)->create());
 
     $heroWidget = Widget::factory()->make();
-    CreateHeroWidgetAction::shouldRun()->once()->andReturn($heroWidget);
+    CreateHeroWidgetAction::shouldRun()->twice()->andReturn($heroWidget);
 
     $demoCreator = mock(DemoCreator::class, function (DemoCreator&MockInterface $mock): void {
         $mock->shouldReceive('createContentsWidget')->once();
