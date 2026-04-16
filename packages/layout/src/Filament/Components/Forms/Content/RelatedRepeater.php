@@ -33,7 +33,7 @@ class RelatedRepeater
 
                         $newData = $items[$arguments['item']];
 
-                        $existingContent = Content::query()->withDrafts()->find($newData['content_id']);
+                        $existingContent = Content::query()->find($newData['content_id']);
 
                         throw_unless($existingContent, Exception::class, 'Content not found with ID: ' . $newData['content_id']);
 

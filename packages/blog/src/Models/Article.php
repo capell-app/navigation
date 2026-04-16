@@ -16,7 +16,6 @@ use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Models\Concerns\CloneableExcept;
 use Capell\Core\Models\Concerns\HasAssets;
-use Capell\Core\Models\Concerns\HasDrafts;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasMorphModelRelations;
 use Capell\Core\Models\Concerns\HasPageOrdering;
@@ -26,7 +25,6 @@ use Capell\Core\Models\Concerns\HasType;
 use Capell\Core\Models\Concerns\HasTypes;
 use Capell\Core\Models\Concerns\HasUserstamps;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
-use Capell\Core\Models\Contracts\Draftable;
 use Capell\Core\Models\Contracts\Publishable;
 use Capell\Core\Models\Contracts\Translatable;
 use Capell\Core\Models\Contracts\Typeable;
@@ -36,6 +34,7 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
+use Capell\Core\Workspaces\BelongsToWorkspace;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,12 +52,12 @@ use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
 use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
 
 #[ObservedBy(ArticleObserver::class)]
-class Article extends Model implements Draftable, HasMedia, Pageable, PageCacheable, Publishable, Translatable, Typeable, Userstampable
+class Article extends Model implements HasMedia, Pageable, PageCacheable, Publishable, Translatable, Typeable, Userstampable
 {
+    use BelongsToWorkspace;
     use Cloneable;
     use CloneableExcept;
     use HasAssets;
-    use HasDrafts;
 
     /** @use HasFactory<ArticleFactory> */
     use HasFactory;
@@ -83,25 +82,18 @@ class Article extends Model implements Draftable, HasMedia, Pageable, PageCachea
      * @var array<string>
      */
     protected $fillable = [
-        'is_published',
         'layout_id',
         'meta',
         'name',
         'order',
         'visible_from',
         'visible_until',
-        'published_at',
         'site_id',
         'type_id',
-        'uuid',
     ];
 
     protected array $clone_exempt_attributes = [
         'hidden',
-    ];
-
-    protected array $draftableRelations = [
-        'translations',
     ];
 
     protected static string $factory = ArticleFactory::class;
@@ -140,11 +132,8 @@ class Article extends Model implements Draftable, HasMedia, Pageable, PageCachea
                 'updated_at',
                 'created_at',
                 'deleted_at',
-                'draft_id',
-                'is_published',
-                'is_current',
-                'publisher_type',
-                'publisher_id',
+                'workspace_id',
+                'shadowed_by_workspace_id',
                 'created_by',
                 'updated_by',
                 'deleted_by',
@@ -167,7 +156,7 @@ class Article extends Model implements Draftable, HasMedia, Pageable, PageCachea
 
     public function getPublishDate(): ?CarbonImmutable
     {
-        $date = $this->published_at ?? $this->visible_from ?? $this->created_at;
+        $date = $this->visible_from ?? $this->created_at;
 
         return $date !== null ? CarbonImmutable::make($date) : null;
     }
@@ -278,7 +267,6 @@ class Article extends Model implements Draftable, HasMedia, Pageable, PageCachea
     protected function casts(): array
     {
         return [
-            'is_published' => 'boolean',
             'meta' => 'json',
             'visible_from' => 'datetime',
             'visible_until' => 'datetime',

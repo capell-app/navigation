@@ -68,7 +68,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static Builder<static>|WidgetAsset ordered(string $dir = 'asc')
  * @method static Builder<static>|WidgetAsset alphabetical(Language $language, string $direction = 'asc')
  * @method static Builder<static>|WidgetAsset query()
- * @method static Builder<static>|WidgetAsset withAssets(bool $withDrafts = true)
+ * @method static Builder<static>|WidgetAsset withAssets()
  *
  * @property-read Collection<int, AssetRelation> $assetRelations
  * @property-read int|null $asset_relations_count

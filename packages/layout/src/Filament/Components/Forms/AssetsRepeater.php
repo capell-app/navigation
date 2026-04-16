@@ -27,7 +27,6 @@ use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSet;
@@ -117,10 +116,9 @@ class AssetsRepeater extends Repeater
                     modifyQueryUsing: fn (Builder $query, Get $get): Builder => $query->when(
                         $get('asset_type') === 'page',
                         fn (BuilderContract $query): BuilderContract => $query->with([
-                            'ancestors' => fn (Relation $query) => $query->withDrafts(),
+                            'ancestors',
                             'site',
                         ])
-                            ->withDrafts()
                             ->orderBy('site_id')
                             ->orderBy(NestedSet::LFT, 'DESC')
                             ->whereHas(

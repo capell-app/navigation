@@ -14,10 +14,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\Creator\PageCreator;
-use Capell\Tests\Fixtures\Models\User;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
-use RuntimeException;
 
 class ArticleCreator extends PageCreator
 {
@@ -39,7 +36,6 @@ class ArticleCreator extends PageCreator
                 'image_id' => $data['image_id'] ?? null,
             ],
             'visible_from' => $data['visible_from'] ?? null,
-            'is_published' => true,
         ];
 
         /** @var Page $page */
@@ -54,14 +50,6 @@ class ArticleCreator extends PageCreator
             fn (array $data): array => CapellCore::mergeModelInterceptorData($defaults, $data),
             PageInterceptorInterface::class,
         );
-
-        if (isset($data['user_id']) && ($page->publisher_id !== $data['user_id'] || $page->publisher_id === null)) {
-            $page->forceFill([
-                'publisher_type' => resolve(self::getFullyQualifiedUserClass())->getMorphClass(),
-                'publisher_id' => $data['user_id'],
-            ])
-                ->saveQuietly();
-        }
 
         $languages->each(function (Language $language) use ($data, $page): void {
             $translation_data = $data['translations'][$language->code] ?? [];
@@ -99,21 +87,5 @@ class ArticleCreator extends PageCreator
         });
 
         return $page;
-    }
-
-    /**
-     * @return class-string<Authenticatable>
-     */
-    private static function getFullyQualifiedUserClass(): string
-    {
-        if (class_exists('App\Models\User')) {
-            return 'App\Models\User';
-        }
-
-        if (class_exists(User::class)) {
-            return User::class;
-        }
-
-        throw new RuntimeException('User model not found');
     }
 }

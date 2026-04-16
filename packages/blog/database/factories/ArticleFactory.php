@@ -15,8 +15,6 @@ use Capell\Core\Models\Layout;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\Sequence;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @extends Factory<Article>
@@ -57,14 +55,6 @@ class ArticleFactory extends Factory
         return $this->set('type_id', $type->id);
     }
 
-    public function publisher(Model $user): self
-    {
-        return $this->state(fn (): array => [
-            'publisher_type' => $user->getMorphClass(),
-            'publisher_id' => $user->getKey(),
-        ]);
-    }
-
     public function withTags(): self
     {
         return $this->afterCreating(function (Article $article): void {
@@ -75,28 +65,6 @@ class ArticleFactory extends Factory
             $tags = Tag::query()->inRandomOrder()->limit(fake()->numberBetween(1, 3))->get();
 
             $article->tags()->attach($tags);
-        });
-    }
-
-    public function hasDrafts(int $count = 1): static
-    {
-        return $this->afterCreating(function (Article $article) use ($count): void {
-            $currentDraft = $count > 1 ? $this->faker->numberBetween(1, $count) : 1;
-
-            Article::factory()
-                ->count($count)
-                ->site($article->site)
-                ->unpublished()
-                ->withTranslations($article->languages)
-                ->state([
-                    'uuid' => $article->uuid,
-                    'published_at' => null,
-                    'is_published' => false,
-                ])
-                ->sequence(fn (Sequence $sequence): array => [
-                    'is_current' => $currentDraft === ($sequence->index + 1),
-                ])
-                ->create();
         });
     }
 }

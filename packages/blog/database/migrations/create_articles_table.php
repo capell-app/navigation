@@ -2,27 +2,24 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Database\Concerns\CreatesDraftsSchema;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    use CreatesDraftsSchema;
-
     public function up(): void
     {
         Schema::create('articles', function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('workspace_id')->default(0)->index();
+            $table->unsignedBigInteger('shadowed_by_workspace_id')->default(0)->index();
             $table->string('name');
             $table->foreignId('type_id')->constrained();
             $table->foreignId('layout_id')->constrained();
             $table->foreignId('site_id')->constrained()->cascadeOnDelete();
             $table->json('meta')->nullable();
             $table->visibleDates();
-            $this->draftsCreateSchema($table);
             $table->unsignedInteger('order')->default(0);
             $table->userstamps();
             $table->timestamps();

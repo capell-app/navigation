@@ -25,8 +25,6 @@ class MutateContentDataBeforeFillAction
     {
         $site = Site::getDefault();
 
-        $data['is_published'] = true;
-
         $data['type_id'] = $this->getDefaultType()->getKey();
 
         $data['translations'] = $site?->translations->mapWithKeys(fn (Translation $translation): array => [

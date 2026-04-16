@@ -6,47 +6,56 @@ namespace Capell\Layout\Observers;
 
 use Capell\Core\Enums\CacheEnum;
 use Capell\Core\Models\Type;
-use Capell\Core\Observers\Concerns\DraftsAndNestedSetEvents;
 use Capell\Core\Support\CapellCoreHelper;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Models\Content;
+use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use Kalnoy\Nestedset\QueryBuilder;
 
 class ContentObserver
 {
-    use DraftsAndNestedSetEvents;
-
     private mixed $deletedAt = null;
 
     public function creating(Content $content): void
     {
-        // Existing type defaulting
         if (! $content->type_id) {
             $content->type_id = Type::query()->where('type', LayoutTypeEnum::Content)->default()->value('id');
             throw_unless($content->type_id, InvalidArgumentException::class, 'Unable to create content without a type.');
         }
 
-        $this->initializeNewModel($content);
+        // Normalize parent_id from loaded relation if needed (nested set).
+        if ($content->parent_id !== null) {
+            $parent = $content->getRelationValue('parent');
+            if ($parent !== null && $content->parent_id !== $parent->id) {
+                $content->parent_id = $parent->id;
+            }
+        }
     }
 
     public function saving(Content $content): void
     {
-        $this->beforeSaving($content);
-
-        if ($content->visible_from?->isNowOrFuture()) {
-            $content->is_published = true;
+        if (method_exists($content, 'nodeCallPendingAction')) {
+            $content->nodeCallPendingAction();
         }
     }
 
     public function deleting(Content $content): void
     {
-        $this->beforeDeleting($content);
+        if (method_exists($content, 'nodeRefreshNode')) {
+            $content->nodeRefreshNode();
+        }
     }
 
     public function deleted(Content $content): void
     {
-        $this->afterDeleted($content);
-        // Flush caches impacted by content changes
+        if (method_exists($content, 'nodeDeleteDescendants')) {
+            $content->nodeDeleteDescendants();
+        }
+
+        // TODO (Checkpoint 3 copy-on-write): when a workspace row is deleted,
+        //   clear `shadowed_by_workspace_id` on the live row it shadowed.
+
         CapellCoreHelper::flushCache([
             CacheEnum::RelationExists,
         ]);
@@ -54,12 +63,25 @@ class ContentObserver
 
     public function restoring(Content $content): void
     {
-        $this->deletedAt = $this->beforeRestoring($content);
+        $this->deletedAt = method_exists($content, 'nodeGetDeletedAtValue')
+            ? $content->nodeGetDeletedAtValue()
+            : null;
     }
 
     public function restored(Content $content): void
     {
-        $this->afterRestored($content, $this->deletedAt);
+        if ($this->deletedAt !== null && method_exists($content, 'restoreDescendants')) {
+            $content->restoreDescendants($this->deletedAt);
+        }
+
+        Model::withoutEvents(function () use ($content): void {
+            /** @var QueryBuilder $builder */
+            $builder = $content->newQueryWithoutScopes();
+            $builder
+                ->whereDescendantOf($content->getKey())
+                ->update([$content->getDeletedAtColumn() => null]);
+        });
+
         CapellCoreHelper::flushCache([
             CacheEnum::RelationExists,
         ]);

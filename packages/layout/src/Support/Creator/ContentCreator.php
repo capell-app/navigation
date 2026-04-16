@@ -49,7 +49,6 @@ class ContentCreator
             'site_id' => $site?->id,
             'type_id' => $type->id,
             'parent_id' => $parentId,
-            'is_published' => true,
         ];
 
         /** @var Content $content */

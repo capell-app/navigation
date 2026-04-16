@@ -11,7 +11,6 @@ use Capell\Core\Enums\MediaCollectionEnum;
 use Capell\Core\Enums\PublishStatusEnum;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Concerns\HasAssets;
-use Capell\Core\Models\Concerns\HasDraftsAndNestedSet;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasMorphModelRelations;
 use Capell\Core\Models\Concerns\HasPublishDates;
@@ -20,8 +19,6 @@ use Capell\Core\Models\Concerns\HasType;
 use Capell\Core\Models\Concerns\HasTypes;
 use Capell\Core\Models\Concerns\HasUserstamps;
 use Capell\Core\Models\Concerns\InteractsWithMedia;
-use Capell\Core\Models\Contracts\Draftable;
-use Capell\Core\Models\Contracts\HasDraftsAndNestedSetModel;
 use Capell\Core\Models\Contracts\Publishable;
 use Capell\Core\Models\Contracts\Typeable;
 use Capell\Core\Models\Contracts\Userstampable;
@@ -30,6 +27,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
+use Capell\Core\Workspaces\BelongsToWorkspace;
 use Capell\Layout\Database\Factories\ContentFactory;
 use Capell\Layout\Models\Concerns\ComposhipsJsonRelationshipsTrait;
 use Capell\Layout\Observers\ContentObserver;
@@ -49,7 +47,6 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 use Kalnoy\Nestedset\NodeTrait;
 use Kalnoy\Nestedset\QueryBuilder as NestedQueryBuilder;
-use Oddvalue\LaravelDrafts\Concerns\HasDrafts;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -67,9 +64,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read User|null $destroyer
  * @property-read User|null $editor
  * @property-read array $actions
- * @property-read mixed $draft
  * @property-read PublishStatusEnum $publish_status
- * @property-read Content|null $hasDraftsAndNestedSetParent
  * @property-read Media|null $image
  * @property-read Collection<int, Language> $languages
  * @property-read int|null $languages_count
@@ -78,9 +73,6 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read \Kalnoy\Nestedset\Collection<int, Pageable> $pages
  * @property-read int|null $pages_count
  * @property-read Content|null $parent
- * @property-read Model $publisher
- * @property-read \Kalnoy\Nestedset\Collection<int, Content> $revisions
- * @property-read int|null $revisions_count
  * @property-write mixed $parent_id
  * @property-read Site|null $site
  * @property-read Translation|null $translation
@@ -93,66 +85,6 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read int|null $media_count
  * @property-read Collection|Content[] $related
  * @property-read int|null $related_count
- *
- * @method static \Kalnoy\Nestedset\Collection<int, static> all($columns = ['*'])
- * @method static QueryBuilder<static>|Content ancestorsAndSelf($id, array $columns = [])
- * @method static QueryBuilder<static>|Content ancestorsOf($id, array $columns = [])
- * @method static QueryBuilder<static>|Content applyNestedSetScope(?string $table = null)
- * @method static QueryBuilder<static>|Content countErrors()
- * @method static QueryBuilder<static>|Content current()
- * @method static QueryBuilder<static>|Content d()
- * @method static QueryBuilder<static>|Content defaultOrder(string $dir = 'asc')
- * @method static QueryBuilder<static>|Content descendantsAndSelf($id, array $columns = [])
- * @method static QueryBuilder<static>|Content descendantsOf($id, array $columns = [], $andSelf = false)
- * @method static QueryBuilder<static>|Content excludeRevision(Model|int $exclude)
- * @method static QueryBuilder<static>|Content expired(Model $model)
- * @method static ContentFactory factory($count = null, $state = [])
- * @method static QueryBuilder<static>|Content fixSubtree($root)
- * @method static QueryBuilder<static>|Content fixTree($root = null)
- * @method static \Kalnoy\Nestedset\Collection<int, static> get($columns = ['*'])
- * @method static QueryBuilder<static>|Content getNodeData($id, $required = false)
- * @method static QueryBuilder<static>|Content getPlainNodeData($id, $required = false)
- * @method static QueryBuilder<static>|Content getTotalErrors()
- * @method static QueryBuilder<static>|Content hasChildren()
- * @method static QueryBuilder<static>|Content hasPageHierarchy()
- * @method static QueryBuilder<static>|Content isBroken()
- * @method static QueryBuilder<static>|Content leaves(array $columns = [])
- * @method static QueryBuilder<static>|Content makeGap(int $cut, int $height)
- * @method static QueryBuilder<static>|Content moveNode($key, $position)
- * @method static QueryBuilder<static>|Content newModelQuery()
- * @method static QueryBuilder<static>|Content newQuery()
- * @method static Builder<static>|Content onlyTrashed()
- * @method static QueryBuilder<static>|Content orWhereAncestorOf(bool $id, bool $andSelf = false)
- * @method static QueryBuilder<static>|Content orWhereDescendantOf($id)
- * @method static QueryBuilder<static>|Content orWhereNodeBetween($values)
- * @method static QueryBuilder<static>|Content orWhereNotDescendantOf($id)
- * @method static QueryBuilder<static>|Content ordered(string $dir = 'asc')
- * @method static QueryBuilder<static>|Content pending(Model $model)
- * @method static QueryBuilder<static>|Content published(Model $model)
- * @method static QueryBuilder<static>|Content query()
- * @method static QueryBuilder<static>|Content rebuildSubtree($root, array $data, $delete = false)
- * @method static QueryBuilder<static>|Content rebuildTree(array $data, $delete = false, $root = null)
- * @method static QueryBuilder<static>|Content reversed()
- * @method static QueryBuilder<static>|Content root(array $columns = [])
- * @method static QueryBuilder<static>|Content whereAncestorOf($id, $andSelf = false, $boolean = 'and')
- * @method static QueryBuilder<static>|Content whereAncestorOrSelf($id)
- * @method static QueryBuilder<static>|Content whereDescendantOf($id, $boolean = 'and', $not = false, $andSelf = false)
- * @method static QueryBuilder<static>|Content whereDescendantOrSelf(string $id, string $boolean = 'and', string $not = false)
- * @method static QueryBuilder<static>|Content whereIsAfter($id, $boolean = 'and')
- * @method static QueryBuilder<static>|Content whereIsBefore($id, $boolean = 'and')
- * @method static QueryBuilder<static>|Content whereIsLeaf()
- * @method static QueryBuilder<static>|Content whereIsRoot()
- * @method static QueryBuilder<static>|Content whereNodeBetween($values, $boolean = 'and', $not = false, $query = null)
- * @method static QueryBuilder<static>|Content whereNotDescendantOf($id)
- * @method static QueryBuilder<static>|Content withDepth(string $as = 'depth')
- * @method static QueryBuilder<static>|Content withAssets(bool $withDrafts = true)
- * @method static Builder<static>|Content withTrashed()
- * @method static QueryBuilder<static>|Content withWhereHasLanguage(int $language_id)
- * @method static QueryBuilder<static>|Content withoutCurrent()
- * @method static QueryBuilder<static>|Content withoutRoot()
- * @method static QueryBuilder<static>|Content withoutSelf()
- * @method static Builder<static>|Content withoutTrashed()
- *
  * @property-read Page|null $linkedPage
  * @property-read Collection<int, AssetRelation> $assetRelations
  * @property-read int|null $asset_relations_count
@@ -165,6 +97,8 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @mixin Model
  *
  * @property int $id
+ * @property int $workspace_id
+ * @property int $shadowed_by_workspace_id
  * @property string $name
  * @property int $type_id
  * @property int|null $site_id
@@ -172,12 +106,6 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property int $order
  * @property CarbonImmutable|null $visible_from
  * @property CarbonImmutable|null $visible_until
- * @property string|null $uuid
- * @property CarbonImmutable|null $published_at
- * @property bool $is_published
- * @property bool $is_current
- * @property string|null $publisher_type
- * @property int|null $publisher_id
  * @property int $_lft
  * @property int $_rgt
  * @property int|null $created_by
@@ -186,47 +114,14 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property CarbonImmutable|null $deleted_at
- * @property-read \Kalnoy\Nestedset\Collection<int, Content> $drafts
- * @property-read int|null $drafts_count
- *
- * @method static NestedQueryBuilder<static>|Content whereCreatedAt($value)
- * @method static NestedQueryBuilder<static>|Content whereCreatedBy($value)
- * @method static NestedQueryBuilder<static>|Content whereDeletedAt($value)
- * @method static NestedQueryBuilder<static>|Content whereDeletedBy($value)
- * @method static NestedQueryBuilder<static>|Content whereId($value)
- * @method static NestedQueryBuilder<static>|Content whereIsCurrent($value)
- * @method static NestedQueryBuilder<static>|Content whereIsPublished($value)
- * @method static NestedQueryBuilder<static>|Content whereLft($value)
- * @method static NestedQueryBuilder<static>|Content whereMeta($value)
- * @method static NestedQueryBuilder<static>|Content whereName($value)
- * @method static NestedQueryBuilder<static>|Content whereOrder($value)
- * @method static NestedQueryBuilder<static>|Content whereParentId($value)
- * @method static NestedQueryBuilder<static>|Content whereVisibleFrom($value)
- * @method static NestedQueryBuilder<static>|Content wherePublishTo($value)
- * @method static NestedQueryBuilder<static>|Content wherePublishedAt($value)
- * @method static NestedQueryBuilder<static>|Content wherePublisherId($value)
- * @method static NestedQueryBuilder<static>|Content wherePublisherType($value)
- * @method static NestedQueryBuilder<static>|Content whereRgt($value)
- * @method static NestedQueryBuilder<static>|Content whereSiteId($value)
- * @method static NestedQueryBuilder<static>|Content whereTypeId($value)
- * @method static NestedQueryBuilder<static>|Content whereUpdatedAt($value)
- * @method static NestedQueryBuilder<static>|Content whereUpdatedBy($value)
- * @method static NestedQueryBuilder<static>|Content whereUuid($value)
- *
- * @mixin Model
  */
 #[ObservedBy(ContentObserver::class)]
-class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, HasMedia, PageCacheable, Publishable, Typeable, Userstampable
+class Content extends Model implements HasMedia, PageCacheable, Publishable, Typeable, Userstampable
 {
+    use BelongsToWorkspace;
     use Cloneable;
     use ComposhipsJsonRelationshipsTrait;
     use HasAssets;
-    use HasDrafts {
-        bootHasDrafts as protected;
-    }
-    use HasDraftsAndNestedSet {
-        HasDraftsAndNestedSet::parent as hasDraftsAndNestedSetParent;
-    }
     use HasFactory;
     use HasMetaData;
     use HasMorphModelRelations;
@@ -252,7 +147,6 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
      * @var array<string>
      */
     protected $fillable = [
-        'is_published',
         'meta',
         'name',
         'order',
@@ -261,7 +155,6 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
         'visible_until',
         'site_id',
         'type_id',
-        'uuid',
     ];
 
     /**
@@ -334,10 +227,8 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
                 'updated_at',
                 'created_at',
                 'deleted_at',
-                'draft_id',
-                'is_published',
-                'is_current',
-                'publisher_type',
+                'workspace_id',
+                'shadowed_by_workspace_id',
                 '_lft',
                 '_rgt',
                 'created_by',
@@ -362,7 +253,7 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
 
     public function parent(): BelongsTo
     {
-        return $this->hasDraftsAndNestedSetParent();
+        return $this->nodeTraitParent();
     }
 
     public function site(): BelongsTo
@@ -452,20 +343,12 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
         // Handled in observer
     }
 
-    protected static function bootHasDrafts(): void
-    {
-        // Handled in observer
-    }
-
-    /**
-     * Ensure nested set operations include drafts when resolving parents/ancestors.
-     */
     protected function newScopedQuery(): NestedQueryBuilder
     {
         /** @var NestedQueryBuilder $query */
         $query = $this->nodeTraitNewScopedQuery();
 
-        return $query->withDrafts();
+        return $query;
     }
 
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
@@ -482,7 +365,6 @@ class Content extends Model implements Draftable, HasDraftsAndNestedSetModel, Ha
     protected function casts(): array
     {
         return [
-            'is_published' => 'boolean',
             'meta' => 'json',
             'visible_from' => 'datetime',
             'visible_until' => 'datetime',

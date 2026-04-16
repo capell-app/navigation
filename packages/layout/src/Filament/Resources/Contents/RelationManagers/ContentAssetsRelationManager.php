@@ -46,16 +46,15 @@ class ContentAssetsRelationManager extends RelationManager
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
-                'asset' => fn (MorphTo $morphTo) => $morphTo->withDrafts()
-                    ->morphWith(
-                        CapellCore::getAssets()
-                            ->mapWithKeys(fn (AssetData $asset): array => [
-                                $asset->model => method_exists($asset->model, 'getMorphRelations')
-                                    ? $asset->model::getMorphRelations()
-                                    : [],
-                            ])
-                            ->toArray(),
-                    ),
+                'asset' => fn (MorphTo $morphTo) => $morphTo->morphWith(
+                    CapellCore::getAssets()
+                        ->mapWithKeys(fn (AssetData $asset): array => [
+                            $asset->model => method_exists($asset->model, 'getMorphRelations')
+                                ? $asset->model::getMorphRelations()
+                                : [],
+                        ])
+                        ->toArray(),
+                ),
             ]))
             ->description(__('capell-admin::generic.content_assets_description'))
             ->columns([

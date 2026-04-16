@@ -192,7 +192,6 @@ class ContentSelect extends Select
         /** @var Collection $content */
         $contents = $model::query()->select('contents.*')
             ->with($relations)
-            ->withDrafts()
             ->join('types', 'contents.type_id', '=', 'types.id')
             ->when(
                 $this->modifySelectOptionsQueryUsing instanceof Closure,

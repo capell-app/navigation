@@ -354,7 +354,7 @@ class ContentsTable implements TableConfigurator
                     'expired' => __('capell-admin::generic.expired'),
                 ])
                 ->query(fn (Builder $query, array $state): Builder => match ($state['value'] ?? null) {
-                    'published' => $query->published()->publishedDate(),
+                    'published' => $query->publishedDate(),
                     'unpublished' => $query->pending(),
                     'expired' => $query->expired(),
                     default => $query,

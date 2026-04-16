@@ -66,7 +66,6 @@ class ContentResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withDrafts()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

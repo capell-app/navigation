@@ -917,13 +917,6 @@ class DemoCreator
             'name' => 'Features',
         ]);
 
-        if ($this->user instanceof Model) {
-            $parentPage->forceFill([
-                'publisher_type' => $this->user->getMorphClass(),
-                'publisher_id' => $this->user->id,
-            ]);
-        }
-
         $parentPage->save();
 
         $site->languages->each(function (Language $language) use ($parentPage): void {
@@ -948,13 +941,6 @@ class DemoCreator
                     'icon' => $feature['icon'],
                 ],
             ]);
-
-            if ($this->user instanceof Model) {
-                $page->forceFill([
-                    'publisher_type' => $this->user->getMorphClass(),
-                    'publisher_id' => $this->user->id,
-                ]);
-            }
 
             $page->save();
 

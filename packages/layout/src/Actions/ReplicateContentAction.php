@@ -27,23 +27,14 @@ class ReplicateContentAction
         /** @var Content $className */
         $className = $content::class;
 
-        $model = $className::withDrafts()->find($content->getKey());
+        $model = $className::query()->find($content->getKey());
 
         $model->fill($data);
 
-        $replica = $model->duplicate([
-            'uuid',
-        ]);
+        $replica = $model->replicate();
 
         $replica->created_at = now();
         $replica->updated_at = now();
-
-        if ($content->isPublished()) {
-            $replica->is_published = true;
-            $replica->published_at = now();
-        }
-
-        $className::setupNewModel($replica);
 
         $replica->save();
 

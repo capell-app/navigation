@@ -141,7 +141,7 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
             ->registerModelInterceptors()
             ->registerAssets()
             ->registerSchemaExtenders()
-            ->registerCloneableAndDraftableRelations()
+            ->registerCloneableRelations()
             ->registerThemeViewPath()
             ->registerFilamentAssets()
             ->registerPublishCommands()
@@ -329,10 +329,9 @@ class LayoutServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
-    private function registerCloneableAndDraftableRelations(): self
+    private function registerCloneableRelations(): self
     {
         CapellCore::addCloneableRelations('page', 'widgetAssets');
-        CapellCore::addDraftableRelations('page', 'widgetAssets');
 
         return $this;
     }

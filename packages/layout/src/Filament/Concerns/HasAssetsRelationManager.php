@@ -9,7 +9,6 @@ use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\AssetData;
 use Capell\Core\Enums\TypeGroupEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Contracts\Draftable;
 use Capell\Core\Models\Page;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -21,7 +20,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Kalnoy\Nestedset\NestedSet;
@@ -87,13 +85,9 @@ trait HasAssetsRelationManager
                             ->where('related_id', $record->getKey()),
                     )
                     ->when(
-                        in_array(Draftable::class, class_implements($asset->model), true),
-                        fn (Builder $query) => $query->withDrafts(),
-                    )
-                    ->when(
                         $asset->model === Page::class,
                         fn (Builder $query) => $query->with([
-                            'ancestors' => fn (Relation $query) => $query->withDrafts(),
+                            'ancestors',
                             'site',
                         ])
                             ->whereHas(

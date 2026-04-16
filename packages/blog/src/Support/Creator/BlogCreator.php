@@ -139,11 +139,6 @@ class BlogCreator
             'name' => __('capell-blog::generic.tag_page'),
         ]);
 
-        $page->forceFill([
-            'is_published' => true,
-            'is_current' => true,
-        ]);
-
         $page->save();
 
         $languages->each(function (Language $language) use ($page): void {
@@ -179,11 +174,6 @@ class BlogCreator
             'parent_id' => $parent?->getKey(),
         ], [
             'name' => __('capell-blog::generic.tags_page'),
-        ]);
-
-        $page->forceFill([
-            'is_published' => true,
-            'is_current' => true,
         ]);
 
         $page->save();
@@ -254,8 +244,6 @@ class BlogCreator
 
         $page->forceFill([
             'name' => __('capell-blog::generic.blog_archive_page'),
-            'is_published' => true,
-            'is_current' => true,
         ]);
 
         $page->save();
@@ -504,8 +492,6 @@ class BlogCreator
 
         $page->forceFill([
             'name' => __('capell-blog::generic.blog_archives_page'),
-            'is_published' => true,
-            'is_current' => true,
         ]);
 
         $page->save();
@@ -708,8 +694,6 @@ class BlogCreator
 
         $page->forceFill([
             'name' => __('capell-blog::generic.blog'),
-            'is_published' => true,
-            'is_current' => true,
         ]);
 
         $page->save();

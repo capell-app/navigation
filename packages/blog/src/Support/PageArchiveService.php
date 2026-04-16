@@ -56,7 +56,6 @@ class PageArchiveService
                 },
             )
             ->where('site_id', $site->id)
-            ->published()
             ->publishedDate()
             ->when(
                 DB::getDriverName() === 'sqlite',

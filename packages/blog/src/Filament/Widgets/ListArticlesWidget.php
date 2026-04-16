@@ -76,8 +76,7 @@ class ListArticlesWidget extends BaseWidget
                             'translations.language',
                             'type',
                             'pageUrl.siteDomain',
-                        ])
-                        ->current();
+                        ]);
                 },
             )
             ->searchable(false)
