@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Actions;
+namespace Capell\Mosaic\Actions;
 
 use Capell\Core\Models\Layout;
-use Capell\Mosaic\Actions\AddWidgetToLayoutContainerAction;
 use Capell\Mosaic\Models\Widget;
 use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;

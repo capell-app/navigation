@@ -147,16 +147,16 @@ Don't:
 - Avoid excessive or inconsistent blank lines; use spacing to group related logic and visually separate distinct steps.
 - This applies to all PHP, test, and config files.
 
-## 1K. Package Plugin Independence (`address` / `blog` / `hero` / `layout`)
+## 1K. Package Plugin Independence (`address` / `blog` / `mosaic`)
 
-- `address`, `blog`, `hero`, and `layout` plugins MAY depend on each other, but MUST remain decoupled from Core internals except via documented public interfaces.
-- Core MUST NOT depend directly on any plugin (`address`, `blog`, `hero`, `layout`). Avoid imports, facades, or direct calls from Core into these plugins.
+- `address`, `blog`, and `mosaic` plugins MAY depend on each other, but MUST remain decoupled from Core internals except via documented public interfaces.
+- Core MUST NOT depend directly on any plugin (`address`, `blog`, `mosaic`). Avoid imports, facades, or direct calls from Core into these plugins.
 - Cross-plugin coordination should use neutral boundaries (configuration, cache/filesystem paths, events/commands) without introducing compile-time dependencies.
 - When Core needs to trigger a behavior in a plugin (e.g., clear caches), prefer:
     - Removing/invalidating the shared cache file/path via Filesystem, or
     - Emitting a framework event or calling an Artisan command name (string), not importing plugin classes.
 - If shared behavior grows complex, extract a minimal interface in a shared module and implement adapters per plugin; do not point Core to concrete plugin classes.
-- Enforce with static analysis: any `use Capell\Address\...`, `use Capell\Blog\...`, `use Capell\Hero\...`, or `use Capell\Layout\...` from Core is a blocker.
+- Enforce with static analysis: any `use Capell\Address\...`, `use Capell\Blog\...`, or `use Capell\Mosaic\...` from Core is a blocker.
 
 ---
 

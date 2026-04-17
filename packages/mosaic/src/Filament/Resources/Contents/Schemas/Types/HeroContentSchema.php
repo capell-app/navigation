@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Filament\Resources\Contents\Schemas\Types;
+namespace Capell\Mosaic\Filament\Resources\Contents\Schemas\Types;
 
 use Capell\Admin\Filament\Components\Forms\CallToActionText;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
@@ -17,7 +17,6 @@ use Capell\Mosaic\Filament\Components\Forms\Content\RelatedRepeater;
 use Capell\Mosaic\Filament\Components\Forms\Content\SettingsSchema;
 use Capell\Mosaic\Filament\Components\Forms\Content\TranslationsRepeater;
 use Capell\Mosaic\Filament\Components\Forms\CustomColorInput;
-use Capell\Mosaic\Filament\Resources\Contents\Schemas\Types\DefaultContentSchema;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;

@@ -14,6 +14,8 @@ enum WidgetTypeEnum: string
 
     case Default = 'default';
 
+    case Hero = 'hero';
+
     case Media = 'media';
 
     case Navigation = 'navigation';

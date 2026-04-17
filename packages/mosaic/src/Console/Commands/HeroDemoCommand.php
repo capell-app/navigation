@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Console\Commands;
+namespace Capell\Mosaic\Console\Commands;
 
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Models\Article;
@@ -12,15 +12,15 @@ use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Hero\Actions\AddHeroWidgetToLayoutAction;
-use Capell\Hero\Actions\CreateHeroContentTypeAction;
-use Capell\Hero\Actions\CreateHeroWidgetAction;
+use Capell\Mosaic\Actions\AddHeroWidgetToLayoutAction;
+use Capell\Mosaic\Actions\CreateHeroContentTypeAction;
+use Capell\Mosaic\Actions\CreateHeroWidgetAction;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Support\Creator\DemoCreator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 
-class DemoCommand extends Command
+class HeroDemoCommand extends Command
 {
     use HasSitesOption;
 
@@ -30,9 +30,6 @@ class DemoCommand extends Command
 
     private DemoCreator $demoCreator;
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $siteOptions = $this->resolveSiteOptions();

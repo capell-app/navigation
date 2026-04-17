@@ -48,6 +48,7 @@ return [
     'page_model' => 'Page Model',
     'heading_size' => 'Heading Size',
     'heading_style' => 'Heading Style',
+    'hero' => 'Hero',
     'hide_no_results' => 'Hide No Results',
     'html_class' => 'HTML Class',
     'layout_widget_schema' => 'Layout Widget Schema',

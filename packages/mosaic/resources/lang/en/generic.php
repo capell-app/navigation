@@ -18,6 +18,8 @@ return [
     'faq' => 'FAQ',
     'fixed_content_tree' => 'Content tree fixed successfully.',
     'gallery' => 'Gallery',
+    'hero' => 'Hero',
+    'hero_info' => 'Introductory content for your site.',
     'hide_no_results_info' => 'Hide this widget if no results are found.',
     'latest_pages' => 'Latest Pages',
     'admin_widget_schema_info' => 'Overwrite the Schema set in the Widget Type',

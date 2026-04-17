@@ -6,6 +6,7 @@ use Capell\Admin\Console\Commands\DemoCommand;
 use Capell\Admin\Console\Commands\InstallCommand;
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Core\Support\Creator\DemoCreator;
+use Capell\Mosaic\Console\Commands\HeroDemoCommand;
 
 arch()
     ->expect('Capell\Blog')
@@ -15,7 +16,7 @@ arch()
         DemoCommand::class,
         DemoCreator::class,
         TypeFactory::class,
-        Capell\Hero\Console\Commands\DemoCommand::class,
+        HeroDemoCommand::class,
     ]);
 
 arch()

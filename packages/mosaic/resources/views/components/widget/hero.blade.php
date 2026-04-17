@@ -71,7 +71,7 @@ $theme = Frontend::theme();
     ])
     style="--hero-height: {{ $height }}"
 >
-    <x-capell-hero::hero.wrapper
+    <x-capell-mosaic::hero.wrapper
         :key="$containerKey . '-widget-' . $widgetIndex"
         :total="$total"
         :carousel-align="$carouselAlign"
@@ -121,7 +121,7 @@ $theme = Frontend::theme();
                     }
                 @endphp
                 {{-- format-ignore-end --}}
-                <x-capell-hero::hero.slide
+                <x-capell-mosaic::hero.slide
                     :background-image="$bgImage"
                     :background-color="$widgetAsset->asset->getMeta('background_color', $backgroundColor)"
                     :background-size="$widgetAsset->asset->getMeta('background_size', $widget->getMeta('background_size', 'cover'))"
@@ -151,7 +151,7 @@ $theme = Frontend::theme();
                             ])
                         >
                             @if ($widgetAsset->asset)
-                                <x-capell-hero::hero.content
+                                <x-capell-mosaic::hero.content
                                     :title="$widgetAsset->asset->translation->title"
                                     :heading-size="$loop->first ? 'h1' : 'h2'"
                                     :$url
@@ -174,11 +174,11 @@ $theme = Frontend::theme();
                                     @if ($loop->first && $heroContent)
                                         {{ $heroContent }}
                                     @endif
-                                </x-capell-hero::hero.content>
+                                </x-capell-mosaic::hero.content>
                             @endif
 
                             @if ($widgetAsset->asset->related?->isNotEmpty())
-                                <x-capell-hero::hero.related
+                                <x-capell-mosaic::hero.related
                                     class="w-full"
                                     :related="$widgetAsset->asset->related"
                                     :key="$containerKey . '-widget-' . $widgetIndex . '-related'"
@@ -224,10 +224,10 @@ $theme = Frontend::theme();
                             </div>
                         @endif
                     </div>
-                </x-capell-hero::hero.slide>
+                </x-capell-mosaic::hero.slide>
             @endforeach
         @elseif ($page->translation->getMeta('hero'))
-            <x-capell-hero::hero.slide
+            <x-capell-mosaic::hero.slide
                 :background-image="$widget->image"
                 :background-color="$widget->getMeta('background_color', $theme->getMeta('background_color'))"
                 :background-size="$widget->getMeta('background_size', 'cover')"
@@ -240,7 +240,7 @@ $theme = Frontend::theme();
                 container-class="container"
             >
                 <div class="@lg:py-16 flex select-text items-center py-20">
-                    <x-capell-hero::hero.content
+                    <x-capell-mosaic::hero.content
                         :title="
                             $widget->translation
                             ? __($widget->translation->title, $pageVariables)
@@ -257,15 +257,15 @@ $theme = Frontend::theme();
                                 Frontend::setFrontendData('has_pagination_summary', true);
                             @endphp
 
-                            <x-capell-hero::pagination.summary
+                            <x-capell-mosaic::pagination.summary
                                 :results="$this->results"
                             />
                         @endif
-                    </x-capell-hero::hero.content>
+                    </x-capell-mosaic::hero.content>
                 </div>
-            </x-capell-hero::hero.slide>
+            </x-capell-mosaic::hero.slide>
         @endif
-    </x-capell-hero::hero.wrapper>
+    </x-capell-mosaic::hero.wrapper>
 </section>
 
 <?php

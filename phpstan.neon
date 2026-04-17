@@ -33,11 +33,9 @@ parameters:
     translationDirectories:
         - packages/address/resources/lang
         - packages/blog/resources/lang
-        - packages/hero/resources/lang
         - packages/mosaic/resources/lang
     viewDirectories:
         - packages/address/resources/views
         - packages/blog/resources/views
-        - packages/hero/resources/views
         - packages/mosaic/resources/views
     tmpDir: /tmp/phpstan
