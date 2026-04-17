@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Filament\Extenders\Page;
+namespace Capell\Mosaic\Filament\Resources\Pages\Schemas\Extenders;
 
 use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
 use Capell\Admin\Enums\PageTranslationSchemaHookEnum;
-use Capell\Hero\Filament\Components\Forms\Page\HeroEditor;
+use Capell\Mosaic\Filament\Components\Forms\Page\HeroEditor;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;

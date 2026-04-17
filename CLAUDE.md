@@ -114,7 +114,7 @@ Use extensively. Any structured value crossing a boundary is a `Data` object:
 - **Every PHP file starts with `declare(strict_types=1);`**
 - **Actions**: `packages/{pkg}/src/Actions/`, naming `VerbNounAction` (extend `Lorisleiva\Actions\Action` or use `AsObject` trait). Match the core repo's patterns — see `capell-4/packages/core/src/Actions/` for the reference set (~90 examples).
 - **Data**: `packages/{pkg}/src/Data/`, suffix `Data`, constructor-promoted public properties, getter methods for computed/closure-backed values.
-- **Namespaces**: `Capell\Layout`, `Capell\Blog`, `Capell\Hero`, `Capell\Address`, `Capell\Assistant`.
+- **Namespaces**: `Capell\Mosaic`, `Capell\Blog`, `Capell\Address`, `Capell\Assistant`.
 
 #### Typical slice
 
@@ -202,9 +202,8 @@ capell-packages-4/
 ├── .claude/                      # Claude Code settings
 │   └── settings.json             # Hooks, permissions, env vars
 ├── packages/                     # All add-on packages
-│   ├── layout-builder/           # Example: Layout builder package
+│   ├── mosaic/                   # Example: Layout builder + hero widgets
 │   ├── blog/                     # Example: Blog package
-│   ├── hero/                     # Example: Hero sections
 │   └── [other-packages]/
 ├── demo/                         # Test workbench application
 │   ├── app/                      # Laravel app config
@@ -288,13 +287,12 @@ php vendor/bin/pest packages/layout-builder/tests
 
 | Package | Namespace | Purpose | Depends on |
 |---------|-----------|---------|------------|
-| `layout` | `Capell\Layout` | Visual layout builder, widgets, content blocks | core, admin, frontend |
-| `blog` | `Capell\Blog` | Blog post types, categories, tags, RSS | core, admin, frontend, layout |
-| `hero` | `Capell\Hero` | Hero section widgets | core, admin, frontend, layout |
-| `address` | `Capell\Address` | Address/country management on Sites | core, admin, frontend, layout |
+| `mosaic` | `Capell\Mosaic` | Visual layout builder, widgets, content blocks, hero sections | core, admin, frontend |
+| `blog` | `Capell\Blog` | Blog post types, categories, tags, RSS | core, admin, frontend, mosaic |
+| `address` | `Capell\Address` | Address/country management on Sites | core, admin, frontend, mosaic |
 | `assistant` | `Capell\Assistant` | AI-assisted editorial tooling | core, admin |
 
-**Blog, Hero, Address depend on Layout — install Layout first.** Keep inter-package dependencies minimal; most packages should only touch core + admin + frontend + their own layer.
+**Blog and Address depend on Mosaic — install Mosaic first.** Keep inter-package dependencies minimal; most packages should only touch core + admin + frontend + their own layer.
 
 ## Extending Capell from a package
 

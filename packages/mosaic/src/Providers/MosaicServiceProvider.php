@@ -27,6 +27,8 @@ use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Console\Commands\DemoCommand;
+use Capell\Mosaic\Console\Commands\HeroDemoCommand;
+use Capell\Mosaic\Console\Commands\HeroSetupCommand;
 use Capell\Mosaic\Console\Commands\InstallCommand;
 use Capell\Mosaic\Console\Commands\SetupCommand;
 use Capell\Mosaic\Console\Commands\UpgradeCommand;
@@ -39,6 +41,7 @@ use Capell\Mosaic\Enums\ResourceEnum as LayoutResourceEnum;
 use Capell\Mosaic\Enums\TypeSchemaEnum;
 use Capell\Mosaic\Filament\Resources\Layouts\LayoutResource;
 use Capell\Mosaic\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExtender;
+use Capell\Mosaic\Filament\Resources\Pages\Schemas\Extenders\HeroPageSchemaExtender;
 use Capell\Mosaic\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
 use Capell\Mosaic\Filament\Resources\Types\Schemas\Types\ContentTypeSchema;
 use Capell\Mosaic\Filament\Resources\Types\Schemas\Types\WidgetTypeSchema;
@@ -90,6 +93,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
             ->hasTranslations()
             ->hasCommands([
                 DemoCommand::class,
+                HeroDemoCommand::class,
+                HeroSetupCommand::class,
                 InstallCommand::class,
                 SetupCommand::class,
                 UpgradeCommand::class,
@@ -323,6 +328,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
     private function registerSchemaExtenders(): self
     {
         $this->registerSchemaExtender(SchemaExtenderEnum::Page->value, PageSchemaExtender::class);
+
+        $this->registerSchemaExtender(SchemaExtenderEnum::Page->value, HeroPageSchemaExtender::class);
 
         $this->registerSchemaExtender(SchemaExtenderEnum::Layout->value, LayoutSchemaExtender::class);
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Capell\Tests\Address\AddressTestCase;
 use Capell\Tests\Assistant\AssistantTestCase;
 use Capell\Tests\Blog\BlogTestCase;
-use Capell\Tests\Hero\HeroTestCase;
 use Capell\Tests\Layout\LayoutTestCase;
 use Capell\Tests\Packages\PackagesTestCase;
 
@@ -19,9 +18,6 @@ pest()->extends(AddressTestCase::class)
 
 pest()->extends(BlogTestCase::class)
     ->in($testsRoot . DIRECTORY_SEPARATOR . 'Blog');
-
-pest()->extends(HeroTestCase::class)
-    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Hero');
 
 pest()->extends(LayoutTestCase::class)
     ->in($testsRoot . DIRECTORY_SEPARATOR . 'Layout');

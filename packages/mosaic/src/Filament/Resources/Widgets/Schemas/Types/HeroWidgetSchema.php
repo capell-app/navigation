@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Filament\Resources\Widgets\Schemas\Types;
+namespace Capell\Mosaic\Filament\Resources\Widgets\Schemas\Types;
 
 use Capell\Admin\Filament\Components\Forms\CustomSelectGroup;
 use Capell\Mosaic\Filament\Components\Forms\CarouselSettingsSchema;
@@ -10,7 +10,6 @@ use Capell\Mosaic\Filament\Components\Forms\ColorSchemeComponent;
 use Capell\Mosaic\Filament\Components\Forms\Widget\ComponentSection;
 use Capell\Mosaic\Filament\Components\Forms\Widget\DisplaySection;
 use Capell\Mosaic\Filament\Components\Forms\Widget\Tab\WidgetDisplayTab;
-use Capell\Mosaic\Filament\Resources\Widgets\Schemas\Types\AssetsWidgetSchema;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;

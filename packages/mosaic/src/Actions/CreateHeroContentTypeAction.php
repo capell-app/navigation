@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Actions;
+namespace Capell\Mosaic\Actions;
 
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Type;
-use Capell\Hero\Filament\Resources\Contents\Schemas\Types\HeroContentSchema;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
+use Capell\Mosaic\Filament\Resources\Contents\Schemas\Types\HeroContentSchema;
 use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -29,7 +29,7 @@ class CreateHeroContentTypeAction
             'key' => 'hero',
             'type' => LayoutTypeEnum::Content,
         ], [
-            'name' => __('capell-hero::generic.hero'),
+            'name' => __('capell-mosaic::generic.hero'),
             'admin' => [
                 'schema' => HeroContentSchema::getKey(),
             ],

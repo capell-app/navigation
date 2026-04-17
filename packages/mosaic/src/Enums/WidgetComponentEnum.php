@@ -16,6 +16,7 @@ enum WidgetComponentEnum: string
     case Assets = 'capell-mosaic::widget.asset';
     case BannerImage = 'capell-mosaic::widget.banner-image';
     case Default = 'capell-mosaic::widget.default';
+    case Hero = 'capell-mosaic::widget.hero';
     case Navigation = 'capell-mosaic::widget.navigation';
     case NavigationTabs = 'capell-mosaic::widget.navigation.tabs';
     case PageBreadcrumbs = 'capell-mosaic::widget.page.breadcrumbs';

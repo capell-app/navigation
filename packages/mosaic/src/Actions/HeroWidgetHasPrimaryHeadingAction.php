@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Actions;
+namespace Capell\Mosaic\Actions;
 
 use Capell\Core\Contracts\Pageable;
 use Capell\Frontend\Facades\Frontend;

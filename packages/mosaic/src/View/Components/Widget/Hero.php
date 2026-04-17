@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\View\Components\Widget;
+namespace Capell\Mosaic\View\Components\Widget;
 
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
-use Capell\Hero\Actions\HeroWidgetHasPrimaryHeadingAction;
+use Capell\Mosaic\Actions\HeroWidgetHasPrimaryHeadingAction;
 use Capell\Mosaic\Models\Content;
-use Capell\Mosaic\View\Components\Widget\AbstractWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 
 class Hero extends AbstractWidget
 {
-    protected static string $defaultView = 'capell-hero::components.widget.hero';
+    protected static string $defaultView = 'capell-mosaic::components.widget.hero';
 
     public static function loadWidgetAssets(array &$morphRelations, ?Language $language = null): void
     {

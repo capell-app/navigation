@@ -2,35 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Capell\Hero\Console\Commands;
+namespace Capell\Mosaic\Console\Commands;
 
 use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\ModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
-use Capell\Hero\Actions\AddHeroWidgetToLayoutAction;
-use Capell\Hero\Actions\CreateHeroWidgetAction;
+use Capell\Mosaic\Actions\AddHeroWidgetToLayoutAction;
+use Capell\Mosaic\Actions\CreateHeroWidgetAction;
 use Illuminate\Console\Command;
 
-class SetupCommand extends Command
+class HeroSetupCommand extends Command
 {
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Setting up hero package';
+    protected $description = 'Setting up hero widgets';
 
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'capell:hero-setup';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         /** @var class-string<Layout> $layoutModel */
