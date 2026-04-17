@@ -32,6 +32,7 @@ use Capell\Core\Models\Type;
 use Capell\Core\Workspaces\BelongsToWorkspace;
 use Capell\Layout\Database\Factories\CollectionFactory;
 use Capell\Layout\Models\Concerns\ComposhipsJsonRelationshipsTrait;
+use Capell\Layout\Observers\CollectionObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
