@@ -8,14 +8,13 @@ use Capell\Admin\Data\MessageData;
 use Capell\Admin\Enums\AlertTypeEnum;
 use Capell\Admin\Filament\Concerns\HasBlankPlaceholder;
 use Capell\Core\Enums\PublishStatusEnum;
-use Capell\Layout\Models\Collection;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 
@@ -43,10 +42,10 @@ class ContentAlertsWidget extends Widget implements HasActions, HasForms
     }
 
     /**
-     * @return Collection<string, MessageData>
+     * @return SupportCollection<string, MessageData>
      */
     #[Computed]
-    public function alerts(): Collection
+    public function alerts(): SupportCollection
     {
         $alerts = collect();
 
