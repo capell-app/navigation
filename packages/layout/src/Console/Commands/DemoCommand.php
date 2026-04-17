@@ -327,7 +327,7 @@ class DemoCommand extends Command
             'name' => $data['name']['en'],
         ];
 
-        if ($parent instanceof Content) {
+        if ($parent instanceof Collection) {
             $contentData['parent_id'] = $parent->id;
         }
 

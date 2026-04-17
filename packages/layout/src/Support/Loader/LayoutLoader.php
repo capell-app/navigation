@@ -12,6 +12,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Support\ModelServing\RetrievedModelStore;
+use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -96,7 +97,7 @@ class LayoutLoader
 
         // Compute morph eager loads, including component-specific additions across all widgets
         $with = [
-            Content::class => Content::getMorphRelations($language),
+            Collection::class => Collection::getMorphRelations($language),
             Page::class => Page::getMorphRelations($language),
         ];
 

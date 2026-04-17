@@ -1252,7 +1252,7 @@ class DemoCreator
 
         $model->assets()->create([
             'asset_id' => $content->getKey(),
-            'asset_type' => resolve(Content::class)->getMorphClass(),
+            'asset_type' => resolve(Collection::class)->getMorphClass(),
         ]);
 
         // Attach primary media
