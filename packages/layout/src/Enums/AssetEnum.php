@@ -10,7 +10,6 @@ use Capell\Core\Contracts\Actionable;
 use Capell\Layout\Actions\CreateContentAction;
 use Capell\Layout\Actions\MutateContentDataBeforeFillAction;
 use Capell\Layout\Filament\Resources\Collections\Schemas\CollectionForm;
-use Capell\Layout\Models\Content;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;

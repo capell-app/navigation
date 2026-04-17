@@ -49,7 +49,7 @@ class ContentAssets extends AbstractAssets
 
     protected function getTableQuery(): Builder
     {
-        /* @var class-string<\Capell\Layout\Models\Content> $model */
+        /* @var class-string<\Capell\Layout\Models\Collection> $model */
         $model = CapellCore::getModel(ModelEnum::Content->name);
 
         return $model::with([

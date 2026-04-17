@@ -6,7 +6,6 @@ namespace Capell\Layout\Database\Factories;
 
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Models\Content;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

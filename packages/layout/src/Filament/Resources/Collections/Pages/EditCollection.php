@@ -16,7 +16,7 @@ use Capell\Layout\Enums\ResourceEnum;
 use Capell\Layout\Filament\Actions\CreateContentAction;
 use Capell\Layout\Filament\Resources\Collections\CollectionResource;
 use Capell\Layout\Filament\Resources\Collections\Widgets\ContentAlertsWidget;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -29,7 +29,7 @@ use Livewire\Attributes\On;
 use Override;
 
 /**
- * @property Content $record
+ * @property Collection $record
  */
 #[On('$refresh')]
 class EditCollection extends EditRecord

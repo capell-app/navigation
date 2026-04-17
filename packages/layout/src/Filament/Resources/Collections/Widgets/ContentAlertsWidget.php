@@ -8,7 +8,7 @@ use Capell\Admin\Data\MessageData;
 use Capell\Admin\Enums\AlertTypeEnum;
 use Capell\Admin\Filament\Concerns\HasBlankPlaceholder;
 use Capell\Core\Enums\PublishStatusEnum;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;

@@ -8,7 +8,6 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Filament\Resources\Contents\Pages\ListContents;
-use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

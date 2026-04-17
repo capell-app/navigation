@@ -7,7 +7,6 @@ use Capell\Core\Models\Page;
 use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Filament\Resources\Contents\RelationManagers\ContentAssetsRelationManager;
-use Capell\Layout\Models\Content;
 use Filament\Actions\CreateAction;
 use Filament\Actions\Testing\TestAction;
 

@@ -30,7 +30,7 @@ use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\WidgetComponentEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Resources\Collections\Schemas\Types\TestimonialContentSchema;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Exception;
@@ -655,7 +655,7 @@ class DemoCreator
 
         $features = $this->createFeatures($site);
 
-        $features->each(function (Content $content) use ($widget): void {
+        $features->each(function (Collection $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -678,7 +678,7 @@ class DemoCreator
 
         $features = $this->createFeatures($site);
 
-        $features->each(function (Content $content) use ($widget): void {
+        $features->each(function (Collection $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -707,7 +707,7 @@ class DemoCreator
 
         $testimonials = $this->createTestimonials($languages);
 
-        $testimonials->each(function (Content $content) use ($widget): void {
+        $testimonials->each(function (Collection $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -841,7 +841,7 @@ class DemoCreator
 
         $teamMembers = $this->createTeamMembers($languages);
 
-        $teamMembers->each(function (Content $content) use ($widget): void {
+        $teamMembers->each(function (Collection $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }

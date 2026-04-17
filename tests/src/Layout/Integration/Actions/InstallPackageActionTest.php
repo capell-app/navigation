@@ -9,7 +9,6 @@ use Capell\Layout\Actions\InstallPackageAction;
 use Capell\Layout\Enums\ContentTypeEnum;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\WidgetTypeEnum;
-use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Illuminate\Database\Eloquent\Relations\Relation;

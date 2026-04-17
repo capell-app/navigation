@@ -10,7 +10,6 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
 use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Models\Content;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Width;

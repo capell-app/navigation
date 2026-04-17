@@ -13,7 +13,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Capell\Layout\Support\Creator\ContentCreator;
 use Capell\Layout\Support\Creator\DemoCreator;
 use Capell\Layout\Support\Creator\TypeCreator;
@@ -311,7 +311,7 @@ class DemoCommand extends Command
         $this->advanceProgress();
     }
 
-    private function createSiteContents(ContentCreator $contentCreator, array $data, Site $site, ?Collection $languages = null, ?Content $parent = null): void
+    private function createSiteContents(ContentCreator $contentCreator, array $data, Site $site, ?Collection $languages = null, ?Collection $parent = null): void
     {
         if ($site->contents()->count() > 28) {
             $this->setProgressMessage('Content limit reached.');

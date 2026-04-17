@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Capell\Layout\Actions;
 
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
- * @method static Content run(Content $content, array $data = [])
+ * @method static Content run(Collection $content, array $data = [])
  */
 class ReplicateContentAction
 {
     use AsObject;
 
-    public function handle(Content $content, array $data = []): Content
+    public function handle(Collection $content, array $data = []): Collection
     {
         $content->load('translations');
 
@@ -24,7 +24,7 @@ class ReplicateContentAction
             unset($data['translations']);
         }
 
-        /** @var Content $className */
+        /** @var Collection $className */
         $className = $content::class;
 
         $model = $className::query()->find($content->getKey());

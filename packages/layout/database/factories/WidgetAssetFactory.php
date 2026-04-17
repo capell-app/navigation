@@ -11,7 +11,6 @@ use Capell\Core\Models\Media;
 use Capell\Core\Models\Page;
 use Capell\Layout\Enums\ActionLinkEnum;
 use Capell\Layout\Enums\AssetEnum as LayoutAssetEnum;
-use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Illuminate\Database\Eloquent\Factories\Factory;

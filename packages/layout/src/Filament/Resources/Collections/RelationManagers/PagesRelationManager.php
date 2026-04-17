@@ -16,7 +16,7 @@ use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
 use Capell\Core\Enums\AssetEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\WidgetAsset;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Override;
 
 /**
- * @property Content $ownerRecord
+ * @property Collection $ownerRecord
  */
 class PagesRelationManager extends AbstractPagesRelationManager
 {

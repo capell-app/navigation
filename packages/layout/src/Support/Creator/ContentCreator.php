@@ -10,7 +10,7 @@ use Capell\Core\Models;
 use Capell\Core\Models\Site;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Illuminate\Database\Eloquent\Collection;
 
 class ContentCreator
@@ -32,7 +32,7 @@ class ContentCreator
         $this->typeModel = CapellCore::getModel(CoreModelEnum::Type);
     }
 
-    public function createContent(array $data, ?Site $site, Collection $languages): Content
+    public function createContent(array $data, ?Site $site, Collection $languages): Collection
     {
         $type = $this->typeModel::query()->where('type', LayoutTypeEnum::Content)->default()->first();
 
@@ -51,7 +51,7 @@ class ContentCreator
             'parent_id' => $parentId,
         ];
 
-        /** @var Content $content */
+        /** @var Collection $content */
         $content = $this->contentModel::query()->firstOrCreate($payload);
 
         foreach ($languages as $language) {

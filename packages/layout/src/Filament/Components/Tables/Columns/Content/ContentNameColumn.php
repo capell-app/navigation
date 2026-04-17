@@ -6,7 +6,6 @@ namespace Capell\Layout\Filament\Components\Tables\Columns\Content;
 
 use Awcodes\BadgeableColumn\Components\Badge;
 use Capell\Admin\Filament\Components\Tables\Columns\BadgeableColumn;
-use Capell\Layout\Models\Content;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\HtmlString;
 

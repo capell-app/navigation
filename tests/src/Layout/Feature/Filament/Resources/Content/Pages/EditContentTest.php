@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Actions\DeleteAction;
 use Capell\Core\Models\Site;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
-use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\assertSoftDeleted;

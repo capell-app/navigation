@@ -6,7 +6,7 @@ namespace Capell\Layout\Actions;
 
 use Capell\Core\Facades\CapellCore;
 use Capell\Layout\Enums\ModelEnum;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -16,7 +16,7 @@ class CreateContentAction
 {
     use AsObject;
 
-    public function createTranslations(Content $content, array $translations): void
+    public function createTranslations(Collection $content, array $translations): void
     {
         foreach ($translations as $translation) {
             $content->translations()->create([
@@ -27,7 +27,7 @@ class CreateContentAction
         }
     }
 
-    public function handle(array $data): Content
+    public function handle(array $data): Collection
     {
         /** @var class-string<Content> $model */
         $model = CapellCore::getModel(ModelEnum::Content->name);

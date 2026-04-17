@@ -26,7 +26,7 @@ use Capell\Layout\Actions\ReplicateContentAction;
 use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Filament\Components\Tables\Columns\Content\ContentNameColumn;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -96,7 +96,7 @@ class CollectionsTable implements TableConfigurator
                 RestoreBulkAction::make(),
                 ForceDeleteBulkAction::make(),
             ])
-            ->recordClasses(fn (Content $record): ?string => match (true) {
+            ->recordClasses(fn (Collection $record): ?string => match (true) {
                 (bool) $record->deleted_at => 'table-row-warning',
                 default => null,
             });
@@ -146,7 +146,7 @@ class CollectionsTable implements TableConfigurator
                 ->sortable()
                 ->toggleable()
                 ->color('primary')
-                ->url(function (Content $record, int $state): ?string {
+                ->url(function (Collection $record, int $state): ?string {
                     if ($state === 0) {
                         return null;
                     }
@@ -166,7 +166,7 @@ class CollectionsTable implements TableConfigurator
                 ->sortable()
                 ->toggleable()
                 ->separator('')
-                ->formatStateUsing(fn (Content $record): int => $record->assets_count),
+                ->formatStateUsing(fn (Collection $record): int => $record->assets_count),
             SiteColumn::make('site.name')
                 ->hidden(
                     fn (HasTable $livewire): bool => $livewire->activeTab
@@ -271,7 +271,7 @@ class CollectionsTable implements TableConfigurator
                                 ->orderBy('_lft')
                                 ->get();
 
-                            return $contents->mapWithKeys(function (Content $content) use ($siteId): array {
+                            return $contents->mapWithKeys(function (Collection $content) use ($siteId): array {
                                 $label = '';
 
                                 if (! $siteId && $content->site) {

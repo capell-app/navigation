@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Filament\Resources\Contents\ContentResource;
-use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Laravel\get;

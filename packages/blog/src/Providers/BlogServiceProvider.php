@@ -54,7 +54,7 @@ use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Layout\Enums\ComponentTypeEnum;
 use Capell\Layout\Enums\ModelEnum;
 use Capell\Layout\Enums\TypeSchemaEnum as LayoutSchemaEnum;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -349,7 +349,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
         if (class_exists(Content::class)) {
             Content::resolveRelationUsing(
                 'tags',
-                fn (Content $model): MorphToMany => $model->morphToMany(Tag::class, 'taggable', 'taggables'),
+                fn (Collection $model): MorphToMany => $model->morphToMany(Tag::class, 'taggable', 'taggables'),
             );
 
             Tag::resolveRelationUsing(

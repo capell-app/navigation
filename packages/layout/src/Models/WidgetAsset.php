@@ -48,7 +48,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int|null $deleted_by
- * @property-read Model|Model<Pageable>|Content $asset
+ * @property-read Model|Model<Pageable>|Collection $asset
  * @property-read User|null $creator
  * @property-read User|null $destroyer
  * @property-read User|null $editor

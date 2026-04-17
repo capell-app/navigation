@@ -12,7 +12,6 @@ use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\AssetRelation;
 use Capell\Layout\Filament\Concerns\HasAssetsRelationManager;
-use Capell\Layout\Models\Content;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;

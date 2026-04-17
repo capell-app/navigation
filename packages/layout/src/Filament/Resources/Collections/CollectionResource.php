@@ -20,7 +20,7 @@ use Capell\Layout\Filament\Resources\Collections\RelationManagers\WidgetsRelatio
 use Capell\Layout\Filament\Resources\Collections\Schemas\CollectionForm;
 use Capell\Layout\Filament\Resources\Collections\Tables\CollectionsTable;
 use Capell\Layout\Filament\Resources\Collections\Widgets\ContentAlertsWidget;
-use Capell\Layout\Models\Content;
+use Capell\Layout\Models\Collection;
 use Capell\Layout\Providers\LayoutServiceProvider;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -163,7 +163,7 @@ class CollectionResource extends Resource
         ];
     }
 
-    private static function buildGlobalSearchBreadcrumbs(Content $record): ?HtmlString
+    private static function buildGlobalSearchBreadcrumbs(Collection $record): ?HtmlString
     {
         $breadcrumbs = [];
 

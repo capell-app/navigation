@@ -10,7 +10,6 @@ use Capell\Core\Models\Site;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
 use Capell\Hero\Enums\WidgetComponentEnum;
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Capell\Tests\Support\Concerns\TestingFrontend;

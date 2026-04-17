@@ -12,7 +12,6 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Support\ModelServing\RetrievedModelStore;
-use Capell\Layout\Models\Content;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;

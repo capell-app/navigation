@@ -8,7 +8,6 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Hero\Actions\HeroWidgetHasPrimaryHeadingAction;
-use Capell\Layout\Models\Content;
 use Capell\Layout\View\Components\Widget\AbstractWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 

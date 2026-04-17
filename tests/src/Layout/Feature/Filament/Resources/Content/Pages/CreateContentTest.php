@@ -7,7 +7,6 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
 use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Filament\Resources\Contents\Pages\CreateContent;
-use Capell\Layout\Models\Content;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Support\Str;
 
