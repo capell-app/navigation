@@ -2,6 +2,8 @@
 
 Article pages with archives, tags, and widgets for Capell. Ships Filament resources, Livewire pages, sitemap integration, and optional widgets for the layout builder.
 
+**[Full documentation →](https://docs.capell.app/packages/blog/)**
+
 ## Overview
 
 - Article page type with default Blog and Archives pages
@@ -25,8 +27,8 @@ Article pages with archives, tags, and widgets for Capell. Ships Filament resour
     - Registers Blog and Archives default pages
     - Listens to navigation creation to add entries
 - Commands
-    - `capell-blog:install` — publish config/migration and migrate
-    - `capell-blog:demo` — optional demo
+    - `capell:blog-install` — publish config/migration and migrate
+    - `capell:blog-demo` — optional demo
 
 ## Installation
 
@@ -39,7 +41,7 @@ Steps:
 1. Install and run the installer:
 
     ```bash
-    php artisan capell-blog:install
+    php artisan capell:blog-install
     ```
 
     This will:
@@ -51,12 +53,12 @@ Steps:
 2. (Optional) Create default pages for a given site:
 
     ```bash
-    php artisan capell-blog:create-pages {site-id}
+    php artisan capell:blog-create-pages {site-id}
     ```
 
 3. (Optional) Seed demo data:
     ```bash
-    php artisan capell-blog:demo
+    php artisan capell:blog-demo
     ```
 
 ## Database
@@ -70,5 +72,5 @@ Factories are available for Articles, Article types, and Tags.
 
 See the extra docs for details and references:
 
-- Database reference: [docs/Database.md](docs/Database.md)
+- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/blog/)
 - API reference: [docs/API.md](docs/API.md)

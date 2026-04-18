@@ -2,6 +2,8 @@
 
 Simple address and country management for Capell. This package provides reusable form components, Filament resources, and relationships to attach an address and country to your core `Site` model.
 
+**[Full documentation →](https://docs.capell.app/packages/address/)**
+
 ## Overview
 
 - Form inputs for selecting a country and composing an address
@@ -60,5 +62,5 @@ Factories are included for faster testing/development.
 
 See the extra docs for details and references:
 
-- Database reference: [docs/Database.md](docs/Database.md)
+- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/address/)
 - API reference: [docs/API.md](docs/API.md)

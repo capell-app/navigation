@@ -1,6 +1,8 @@
-# Capell Layout
+# Capell Layout (Mosaic)
 
 Content and Widget management for Capell. Provides the layout builder, Filament resources, runtime relations, and assets for rendering widgets on the frontend.
+
+**[Full documentation →](https://docs.capell.app/packages/mosaic/)**
 
 ## Overview
 
@@ -27,9 +29,9 @@ Content and Widget management for Capell. Provides the layout builder, Filament 
     - Publishes admin CSS/JS and frontend assets
     - Config file `config/capell-layout.php`
 - Commands
-    - `capell-layout:install` — publish assets and migrations, migrate, register resources
-    - `capell-layout:upgrade` — upgrade routines
-    - `capell-layout:demo` — optional demo
+    - `capell:layout-install` — publish assets and migrations, migrate, register resources
+    - `capell:layout-upgrade` — upgrade routines
+    - `capell:layout-demo` — optional demo
 
 ## Installation
 
@@ -68,5 +70,5 @@ Factories are available for `Content`, `Widget`, and `WidgetAsset`.
 
 See the extra docs for details and references:
 
-- Database reference: [docs/Database.md](docs/Database.md)
+- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/mosaic/)
 - API reference: [docs/API.md](docs/API.md)
