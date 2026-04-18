@@ -77,6 +77,4 @@ return [
     'spacing' => 'Spacing',
     'widget' => 'Widget',
     'widget_type' => 'Widget Type',
-    // Hero package language keys
-    'hero' => 'Hero',
 ];

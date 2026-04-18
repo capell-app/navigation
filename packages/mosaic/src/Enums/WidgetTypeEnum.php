@@ -10,7 +10,7 @@ enum WidgetTypeEnum: string
 
     case Contents = 'contents';
 
-    case ContentBuilder = 'content-builder';
+    case SectionBuilder = 'section-builder';
 
     case Default = 'default';
 

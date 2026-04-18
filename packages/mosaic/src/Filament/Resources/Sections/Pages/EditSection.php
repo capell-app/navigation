@@ -15,7 +15,7 @@ use Capell\Mosaic\Enums\LivewireComponentsEnum;
 use Capell\Mosaic\Enums\ResourceEnum;
 use Capell\Mosaic\Filament\Actions\CreateContentAction;
 use Capell\Mosaic\Filament\Resources\Sections\SectionResource;
-use Capell\Mosaic\Filament\Resources\Sections\Widgets\ContentAlertsWidget;
+use Capell\Mosaic\Filament\Resources\Sections\Widgets\SectionAlertsWidget;
 use Capell\Mosaic\Models\Section;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
@@ -102,7 +102,7 @@ class EditSection extends EditRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            ContentAlertsWidget::class,
+            SectionAlertsWidget::class,
         ];
     }
 
