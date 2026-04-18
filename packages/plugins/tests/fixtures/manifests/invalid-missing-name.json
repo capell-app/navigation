@@ -1,0 +1,12 @@
+{
+    "title": "Nameless",
+    "slug": "nameless",
+    "version": "0.1.0",
+    "description": "No name declared in this manifest fixture",
+    "vendor": "openkit",
+    "license_model": "free",
+    "compatibility": { "capell": "^4.0", "php": "^8.2" },
+    "capabilities": [],
+    "kind": "widget",
+    "entrypoint": "Openkit\\Nameless"
+}
