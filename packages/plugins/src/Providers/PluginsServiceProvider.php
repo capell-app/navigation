@@ -7,6 +7,7 @@ namespace Capell\Plugins\Providers;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Plugins\Services\AnystackClient;
+use Capell\Plugins\Services\ComposerRunner;
 use Spatie\LaravelPackageTools\Package;
 
 class PluginsServiceProvider extends AbstractPackageServiceProvider
@@ -34,6 +35,12 @@ class PluginsServiceProvider extends AbstractPackageServiceProvider
         $this->app->singleton(AnystackClient::class, fn () => new AnystackClient(
             config('capell-plugins.anystack.base_url', 'https://api.anystack.sh'),
             config('capell-plugins.anystack.timeout_seconds', 10),
+        ));
+
+        $this->app->singleton(ComposerRunner::class, fn () => new ComposerRunner(
+            binary: config('capell-plugins.composer.binary', 'composer'),
+            timeoutSeconds: config('capell-plugins.composer.timeout_seconds', 600),
+            workingDirectory: base_path(),
         ));
     }
 
