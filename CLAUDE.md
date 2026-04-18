@@ -161,6 +161,10 @@ packages/package-name/
 - Pre-configured Laravel application for testing packages
 - Use `composer serve` to run locally
 - Test all package functionality before committing
+- **New**: Includes marketing pages (home, about, contact, features, add-ons showcase)
+- **New**: Livewire components for forms (newsletter signup, contact form)
+- **New**: Design system with Tailwind marketing theme and SVG illustrations
+- **New**: Seeded navigation and content demonstrating Capell capabilities
 
 ## Git & Commit Workflow
 
@@ -207,9 +211,20 @@ capell-packages-4/
 │   ├── blog/                     # Example: Blog package
 │   └── [other-packages]/
 ├── demo/                         # Test workbench application
-│   ├── app/                      # Laravel app config
+│   ├── app/
+│   │   ├── Http/                 # Controllers
+│   │   ├── Livewire/             # Livewire components (forms, widgets)
+│   │   ├── Models/               # Eloquent models
+│   │   └── Providers/            # Service providers
+│   ├── resources/
+│   │   └── views/
+│   │       ├── layouts/          # Marketing layout templates
+│   │       └── pages/            # Marketing pages (about, contact, features, add-ons)
+│   ├── database/
+│   │   ├── migrations/           # Database migrations
+│   │   └── seeders/              # Demo data and navigation seeders
 │   ├── config/                   # Package service providers
-│   └── resources/views/          # Demo views
+│   └── routes/                   # Demo routing
 ├── tests/                        # Root-level integration tests
 ├── src/                          # Shared utilities (if any)
 ├── composer.json                 # Root composer config (monorepo)
