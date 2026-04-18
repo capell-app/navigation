@@ -1,0 +1,7 @@
+{
+  "label": "Blog",
+  "slug": "blog",
+  "kind": "addon",
+  "dependsOn": ["mosaic"],
+  "order": 20
+}

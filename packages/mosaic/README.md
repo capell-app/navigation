@@ -93,7 +93,7 @@ After install, these accessors are available on the core models:
 
 ## Database
 
-Three tables ship with this package (see [docs/Database.md](docs/Database.md) for the full column list):
+Three tables ship with this package (see [docs/mosaic-database.md](docs/mosaic-database.md) for the full column list):
 
 - `contents` — reusable content records (workspace-scoped, nested set, translatable)
 - `widgets` — widget instances with type, settings, and publish metadata
@@ -103,5 +103,5 @@ Plus an alter to the core `layouts` table: `add_container_widgets_to_layouts_tab
 
 ## Artisan commands
 
-- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/mosaic/)
-- API reference: [docs/API.md](docs/API.md)
+- Database reference: [docs/mosaic-database.md](docs/mosaic-database.md) · [docs.capell.app](https://docs.capell.app/packages/mosaic/)
+- API reference: [docs/mosaic-api.md](docs/mosaic-api.md)

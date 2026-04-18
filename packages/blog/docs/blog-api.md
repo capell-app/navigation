@@ -83,5 +83,5 @@ Under `src/Console/Commands/`:
 ## Quick links
 
 - Source directory: [`./src`](../src)
-- Database reference: [Database.md](Database.md)
+- Database reference: [blog-database.md](blog-database.md)
 - Package README: [../README.md](../README.md)

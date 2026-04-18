@@ -68,7 +68,7 @@ This keeps the core `sites` table untouched while still giving you normal Eloque
 | `create_countries_table.php` | `countries` |
 | `create_addresses_table.php` | `addresses` |
 
-See [docs/Database.md](docs/Database.md) for the full column list, casts, and scopes.
+See [docs/address-database.md](docs/address-database.md) for the full column list, casts, and scopes.
 
 ## Artisan commands
 
@@ -77,5 +77,5 @@ See [docs/Database.md](docs/Database.md) for the full column list, casts, and sc
 | `capell:address-install` | Publish/run migrations, register resources, assign permissions |
 | `capell:address-demo`    | Seed a demo country and address, attach to sites (`--sites=`)  |
 
-- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/address/)
-- API reference: [docs/API.md](docs/API.md)
+- Database reference: [docs/address-database.md](docs/address-database.md) · [docs.capell.app](https://docs.capell.app/packages/address/)
+- API reference: [docs/address-api.md](docs/address-api.md)

@@ -40,7 +40,7 @@ Under `src/Handlers/`:
 
 ## Model
 
-- `src/Models/AIGenerationHistory.php` — see [Database.md](Database.md).
+- `src/Models/AIGenerationHistory.php` — see [assistant-database.md](assistant-database.md).
 
 ## Filament surfaces
 
@@ -88,6 +88,6 @@ Under `src/Console/`:
 ## Quick links
 
 - Source directory: [`./src`](../src)
-- Database reference: [Database.md](Database.md)
+- Database reference: [assistant-database.md](assistant-database.md)
 - Package README: [../README.md](../README.md)
 - OpenAI integration overview: [../../../docs/openai-integration.md](../../../docs/openai-integration.md)

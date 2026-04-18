@@ -77,7 +77,7 @@ php artisan capell:blog-demo --sites=1 --limit=20
 | `create_articles_table.php` | Creates `articles` (workspace-scoped, typed, layout-linked, soft-delete)                                               |
 | `alter_tags_table.php`      | Adds `workspace_id`, `site_id`, `featured`, and `status` to the Spatie `tags` table, and `workspace_id` to `taggables` |
 
-Factories ship for Articles, Article types, and Tags. See [docs/Database.md](docs/Database.md) for the full schema.
+Factories ship for Articles, Article types, and Tags. See [docs/blog-database.md](docs/blog-database.md) for the full schema.
 
 ## Artisan commands
 
@@ -88,5 +88,5 @@ Factories ship for Articles, Article types, and Tags. See [docs/Database.md](doc
 | `capell:blog-create-pages {site}` | Create Blog, Archives, and Tags pages for a site       |
 | `capell:blog-demo`                | Seed demo articles (`--sites=`, `--user=`, `--limit=`) |
 
-- Database reference: [docs/Database.md](docs/Database.md) · [docs.capell.app](https://docs.capell.app/packages/blog/)
-- API reference: [docs/API.md](docs/API.md)
+- Database reference: [docs/blog-database.md](docs/blog-database.md) · [docs.capell.app](https://docs.capell.app/packages/blog/)
+- API reference: [docs/blog-api.md](docs/blog-api.md)

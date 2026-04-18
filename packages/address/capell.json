@@ -1,0 +1,7 @@
+{
+  "label": "Address",
+  "slug": "address",
+  "kind": "addon",
+  "dependsOn": ["mosaic"],
+  "order": 30
+}

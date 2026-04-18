@@ -227,6 +227,6 @@ OpenAI::shouldReceive('chat->create')->andReturn((object) [
 ## See also
 
 - [Assistant package README](../packages/assistant/README.md)
-- [Assistant API reference](../packages/assistant/docs/API.md)
-- [Assistant Database reference](../packages/assistant/docs/Database.md)
+- [Assistant API reference](../packages/assistant/docs/assistant-api.md)
+- [Assistant Database reference](../packages/assistant/docs/assistant-database.md)
 - [Test plan for AI actions & services](test-plan-actions-services.md)

@@ -11,7 +11,7 @@ Browse `src/` for full source. This page is a map of the key entry points.
 - `src/Models/Country.php` — `countries` table
 - `src/Models/Address.php` — `addresses` table
 
-See [Database.md](Database.md) for columns, traits, casts, and scopes.
+See [address-database.md](address-database.md) for columns, traits, casts, and scopes.
 
 ## Filament resources
 
@@ -70,5 +70,5 @@ Under `src/Console/Commands/`:
 ## Quick links
 
 - Source directory: [`./src`](../src)
-- Database reference: [Database.md](Database.md)
+- Database reference: [address-database.md](address-database.md)
 - Package README: [../README.md](../README.md)

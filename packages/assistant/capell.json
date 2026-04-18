@@ -1,0 +1,7 @@
+{
+  "label": "Assistant",
+  "slug": "assistant",
+  "kind": "addon",
+  "dependsOn": [],
+  "order": 40
+}
