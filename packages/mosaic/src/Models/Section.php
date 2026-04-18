@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Mosaic\Models;
 
+use Aimeos\Nestedset\Collection;
 use Aimeos\Nestedset\NodeTrait;
 use Aimeos\Nestedset\QueryBuilder;
 use Bkwld\Cloner\Cloneable;
@@ -58,7 +59,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read Collection<int, AssetRelation> $assets
  * @property-read int|null $assets_count
  * @property-read int|null $audits_count
- * @property-read \Aimeos\Nestedset\Collection<int, Section> $children
+ * @property-read Collection<int, Section> $children
  * @property-read int|null $children_count
  * @property-read User|null $creator
  * @property-read User|null $destroyer
@@ -69,7 +70,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read Collection<int, Language> $languages
  * @property-read int|null $languages_count
  * @property-read Pageable|null $page
- * @property-read \Aimeos\Nestedset\Collection<int, Pageable> $pages
+ * @property-read Collection<int, Pageable> $pages
  * @property-read int|null $pages_count
  * @property-read Section|null $parent
  * @property-write mixed $parent_id
@@ -82,7 +83,7 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read int|null $widgets_count
  * @property-read Collection|Media[] $media
  * @property-read int|null $media_count
- * @property-read Collection|Section[] $related
+ * @property-read EloquentCollection|Section[] $related
  * @property-read int|null $related_count
  * @property-read Page|null $linkedPage
  * @property-read Collection<int, AssetRelation> $assetRelations
@@ -133,6 +134,8 @@ class Section extends Model implements HasMedia, PageCacheable, Publishable, Typ
     use LogsActivity;
     use NodeTrait;
     use SoftDeletes;
+
+    protected $table = 'sections';
 
     /**
      * The attributes that are mass assignable.

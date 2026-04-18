@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Capell\Core\Models\Page;
+use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Models\WidgetAsset;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -31,7 +31,7 @@ it('has many widgets', function (): void {
 
 it('has many contents through widget assets', function (): void {
     $page = Page::factory()->create();
-    $content = Collection::factory()->create();
+    $content = Section::factory()->create();
     WidgetAsset::factory()->asset($content)->page($page)->create();
 
     expect($page->contents->pluck('id')->toArray())->toContain($content->id);

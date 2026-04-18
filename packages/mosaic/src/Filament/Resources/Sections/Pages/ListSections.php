@@ -9,7 +9,7 @@ use Capell\Admin\Filament\Concerns\ApplySearchRelationsTable;
 use Capell\Admin\Filament\Concerns\HasSiteTableFilterTabs;
 use Capell\Mosaic\Enums\ResourceEnum;
 use Capell\Mosaic\Filament\Actions\CreateContentAction;
-use Capell\Mosaic\Filament\Resources\Sections\ContentResource;
+use Capell\Mosaic\Filament\Resources\Sections\SectionResource;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -20,7 +20,7 @@ class ListSections extends ListRecords
 
     protected string $siteRelation = 'contents';
 
-    /** @return class-string<ContentResource> */
+    /** @return class-string<SectionResource> */
     public static function getResource(): string
     {
         return CapellAdmin::getResource(ResourceEnum::Section);

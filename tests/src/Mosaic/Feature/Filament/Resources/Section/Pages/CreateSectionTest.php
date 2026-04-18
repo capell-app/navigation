@@ -6,8 +6,6 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
 use Capell\Mosaic\Database\Factories\ContentTypeFactory;
-use Capell\Mosaic\Filament\Resources\Sections\Pages\CreateSection;
-use Capell\Mosaic\Models\Section;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Support\Str;
 
@@ -24,7 +22,7 @@ beforeEach(function (): void {
 test('required fields are required', function (): void {
     (new ContentTypeFactory)->create();
 
-    livewire(CreateSection::class)
+    livewire(CreateContent::class)
         ->assertSuccessful()
         ->fillForm([
             'name' => '',
@@ -36,13 +34,13 @@ test('required fields are required', function (): void {
 });
 
 it('can create', function (string $type): void {
-    $newData = Section::factory()->make();
+    $newData = Collection::factory()->make();
 
     if ($type === 'with deleted site') {
         Site::factory()->deleted()->create();
     }
 
-    livewire(CreateSection::class)
+    livewire(CreateContent::class)
         ->assertSuccessful()
         ->fillForm([
             'type_id' => $newData->type->getKey(),
@@ -55,7 +53,7 @@ it('can create', function (string $type): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(Section::class, [
+    assertDatabaseHas(Collection::class, [
         'name' => $newData->name,
     ]);
 })
@@ -67,16 +65,16 @@ test('create with translations', function (string $mode): void {
 
     $type = (new ContentTypeFactory)->default()->create();
 
-    $newData = Section::factory()
+    $newData = Collection::factory()
         ->type($type)
-        ->parent(Section::factory()->create())
+        ->parent(Collection::factory()->create())
         ->make();
 
     if ($mode === 'with deleted site') {
         Site::factory()->deleted()->create();
     }
 
-    livewire(CreateSection::class)
+    livewire(CreateContent::class)
         ->assertSuccessful()
         ->set('data.translations', [])
         ->fillForm([
@@ -103,7 +101,7 @@ test('create with translations', function (string $mode): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(Section::class, [
+    assertDatabaseHas(Collection::class, [
         'name' => $newData->name,
         'parent_id' => $newData->parent?->id,
         'type_id' => $type->getKey(),
@@ -121,9 +119,9 @@ test('create with translations', function (string $mode): void {
     ->with(['default', 'with deleted site']);
 
 test('can search parent results', function (): void {
-    $parent = Section::factory()->withTranslations()->create();
+    $parent = Collection::factory()->withTranslations()->create();
 
-    $livewire = livewire(CreateSection::class);
+    $livewire = livewire(CreateContent::class);
     $instance = $livewire->instance();
     $schema = $instance->getSchema($instance->getDefaultTestingSchemaName());
     $component = $schema->getComponent('parent_id');

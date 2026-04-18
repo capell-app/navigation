@@ -7,6 +7,7 @@ use Capell\Core\Models\Site;
 use Capell\Mosaic\Database\Factories\LayoutFactory;
 use Capell\Mosaic\Livewire\Assets\Table\ContentAssets;
 use Capell\Mosaic\Livewire\Assets\Table\PageAssets;
+use Capell\Mosaic\Models\Section;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
@@ -24,9 +25,9 @@ it('filters by site for contents assets', function (): void {
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
 
-    $otherSiteContent = Collection::factory()->create();
+    $otherSiteContent = Section::factory()->create();
     $site = Site::factory()->create();
-    $siteContents = Collection::factory()->site($site)->count(4)->create();
+    $siteContents = Section::factory()->site($site)->count(4)->create();
 
     $arguments = [
         'containerKey' => $containerKey,
@@ -81,7 +82,7 @@ it('dispatches sync-selected-assets event with selected records for each asset t
 
     $site = Site::factory()->create();
     $records = match ($assetType) {
-        'content' => Collection::factory()->recycle($site)->count(3)->create(),
+        'content' => Section::factory()->recycle($site)->count(3)->create(),
         'page' => Page::factory()->recycle($site)->count(3)->create(),
     };
 
@@ -120,7 +121,7 @@ it('searches within contents assets table', function (): void {
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
 
-    $contents = Collection::factory()->count(3)->create();
+    $contents = Section::factory()->count(3)->create();
 
     $arguments = [
         'containerKey' => $containerKey,

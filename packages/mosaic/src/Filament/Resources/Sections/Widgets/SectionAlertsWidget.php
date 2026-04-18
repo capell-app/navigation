@@ -8,6 +8,7 @@ use Capell\Admin\Data\MessageData;
 use Capell\Admin\Enums\AlertTypeEnum;
 use Capell\Admin\Filament\Concerns\HasBlankPlaceholder;
 use Capell\Core\Enums\PublishStatusEnum;
+use Capell\Mosaic\Models\Section;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -25,7 +26,7 @@ class SectionAlertsWidget extends Widget implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    public ?Content $record = null;
+    public ?Section $record = null;
 
     protected int|string|array $columnSpan = 'full';
 

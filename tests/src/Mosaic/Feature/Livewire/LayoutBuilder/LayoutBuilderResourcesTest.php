@@ -9,6 +9,7 @@ use Capell\Core\Models\Type;
 use Capell\Mosaic\Database\Factories\LayoutFactory;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Capell\Mosaic\Livewire\Filament\LayoutBuilder;
+use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Models\WidgetAsset;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
@@ -40,7 +41,7 @@ test('can save without affecting widget assets', function (bool $withPage): void
 
     $widget = Widget::query()->firstWhere('key', $widgetKey);
     WidgetAsset::factory()->count(2)->create();
-    Collection::factory()->count(2)->create();
+    Section::factory()->count(2)->create();
     Page::factory()->count(3)->create();
 
     WidgetAsset::factory()->count(5)->widget($widget)->create();
@@ -99,7 +100,7 @@ test('can sync new content and page assets to widget in page layout context', fu
         ->create();
 
     // 5 to add
-    $contents = Collection::factory()->count(2)->create();
+    $contents = Section::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     // Excluded
@@ -122,8 +123,8 @@ test('can sync new content and page assets to widget in page layout context', fu
                 'widgetIndex' => 0,
                 'hasPageAssets' => true,
             ],
-            type: Capell\Mosaic\Enums\AssetEnum::Section->value,
-            assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
+            type: Capell\Mosaic\Enums\AssetEnum::Content->value,
+            assets: $contents->map(fn (Section $record): string => (string) $record->id)->all(),
         )
         ->call(
             'addAssetsToWidget',
@@ -149,7 +150,7 @@ test('can sync new content and page assets to widget in layout context', functio
     $layout = (new LayoutFactory)->containers()->create();
 
     // 5 to add
-    $contents = Collection::factory()->count(2)->create();
+    $contents = Section::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     $containerKey = array_key_first($layout->containers);
@@ -185,8 +186,8 @@ test('can sync new content and page assets to widget in layout context', functio
                 'widgetIndex' => $widgetIndex,
                 'hasPageAssets' => false,
             ],
-            type: Capell\Mosaic\Enums\AssetEnum::Section->value,
-            assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
+            type: Capell\Mosaic\Enums\AssetEnum::Content->value,
+            assets: $contents->map(fn (Section $record): string => (string) $record->id)->all(),
         )
         ->call(
             'addAssetsToWidget',
@@ -215,7 +216,7 @@ test('can sync new page-specific assets with pageable reference', function (): v
 
     $widget = Widget::query()->firstWhere('key', $widgetKey);
 
-    $contents = Collection::factory()->count(2)->create();
+    $contents = Section::factory()->count(2)->create();
     $pages = Page::factory()->count(3)->create();
 
     WidgetAsset::factory()
@@ -239,8 +240,8 @@ test('can sync new page-specific assets with pageable reference', function (): v
                 'widgetIndex' => $widgetIndex,
                 'hasPageAssets' => true,
             ],
-            type: Capell\Mosaic\Enums\AssetEnum::Section->value,
-            assets: $contents->map(fn (Content $record): string => (string) $record->id)->all(),
+            type: Capell\Mosaic\Enums\AssetEnum::Content->value,
+            assets: $contents->map(fn (Section $record): string => (string) $record->id)->all(),
         )
         ->call(
             'addAssetsToWidget',
@@ -282,7 +283,7 @@ test('can reorder assets', function (): void {
 
     $secondAsset = WidgetAsset::factory()
         ->widget($widget)
-        ->asset(Capell\Mosaic\Enums\AssetEnum::Section)
+        ->asset(Capell\Mosaic\Enums\AssetEnum::Content)
         ->state([
             'order' => 2,
             'occurrence' => 2,
@@ -324,7 +325,7 @@ test('can select all widget assets', function (): void {
 
     $widget = Widget::query()->firstWhere('key', $containerWidget['widget_key']);
 
-    foreach ([AssetEnum::Page, Capell\Mosaic\Enums\AssetEnum::Section] as $assetType) {
+    foreach ([AssetEnum::Page, Capell\Mosaic\Enums\AssetEnum::Content] as $assetType) {
         WidgetAsset::factory()
             ->count(2)
             ->widget($widget)

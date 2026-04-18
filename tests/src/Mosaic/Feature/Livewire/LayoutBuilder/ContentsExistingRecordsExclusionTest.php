@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Mosaic\Database\Factories\LayoutFactory;
 use Capell\Mosaic\Livewire\Assets\Table\ContentAssets;
+use Capell\Mosaic\Models\Section;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
@@ -19,7 +20,7 @@ it('shows all content records when no existing records are provided', function (
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
 
-    $allContents = Collection::factory()->count(5)->create();
+    $allContents = Section::factory()->count(5)->create();
 
     $arguments = [
         'containerKey' => $containerKey,
@@ -42,7 +43,7 @@ it('excludes existing content records from selection list', function (): void {
     $containerKey = array_key_first($layout->containers);
     $widgetIndex = array_key_first($layout->containers[$containerKey]['widgets']);
 
-    $allContents = Collection::factory()->count(5)->create();
+    $allContents = Section::factory()->count(5)->create();
     $excluded = $allContents->take(2);
     $expectedVisible = $allContents->slice(2);
 

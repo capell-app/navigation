@@ -7,12 +7,13 @@ use Capell\Core\Models\Type;
 use Capell\Mosaic\Database\Factories\ContentTypeFactory;
 use Capell\Mosaic\Database\Factories\WidgetTypeFactory;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
+use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Models\Widget;
 
 it('has many contents', function (): void {
     $type = (new ContentTypeFactory)->create();
 
-    Collection::factory()->create(['type_id' => $type->id]);
+    Section::factory()->create(['type_id' => $type->id]);
 
     $type->refresh()->load('contents');
 

@@ -12,6 +12,7 @@ use Capell\Core\Data\AssetData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\AssetRelation;
 use Capell\Mosaic\Filament\Concerns\HasAssetsRelationManager;
+use Capell\Mosaic\Models\Section;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -87,7 +88,7 @@ class SectionAssetsRelationManager extends RelationManager
                     ),
                 SelectFilter::make('type_id')
                     ->label(__('capell-admin::form.type'))
-                    ->options(fn (): array => Content::getTypes()),
+                    ->options(fn (): array => Section::getTypes()),
             ])
             ->headerActions([
                 self::createResourcesAction(),

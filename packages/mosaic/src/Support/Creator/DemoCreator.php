@@ -30,12 +30,14 @@ use Capell\Mosaic\Enums\ModelEnum;
 use Capell\Mosaic\Enums\WidgetComponentEnum;
 use Capell\Mosaic\Enums\WidgetTypeEnum;
 use Capell\Mosaic\Filament\Resources\Sections\Schemas\Types\TestimonialContentSchema;
+use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Models\WidgetAsset;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Spatie\Image\Image;
@@ -44,7 +46,7 @@ use Spatie\MediaLibrary\HasMedia;
 class DemoCreator
 {
     /**
-     * @var class-string<Content>
+     * @var class-string<Section>
      */
     private readonly string $contentModel;
 
@@ -517,7 +519,7 @@ class DemoCreator
         ];
 
         foreach ($features as $feature) {
-            $content = Content::query()->firstOrCreate([
+            $content = Section::query()->firstOrCreate([
                 'name' => $feature['title'],
                 'type_id' => $type->getKey(),
             ], [
@@ -654,7 +656,7 @@ class DemoCreator
 
         $features = $this->createFeatures($site);
 
-        $features->each(function (Content $content) use ($widget): void {
+        $features->each(function (Section $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -677,7 +679,7 @@ class DemoCreator
 
         $features = $this->createFeatures($site);
 
-        $features->each(function (Content $content) use ($widget): void {
+        $features->each(function (Section $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -706,7 +708,7 @@ class DemoCreator
 
         $testimonials = $this->createTestimonials($languages);
 
-        $testimonials->each(function (Content $content) use ($widget): void {
+        $testimonials->each(function (Section $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -772,7 +774,7 @@ class DemoCreator
         $site = Site::getDefault();
 
         foreach ($statistics as $statistic) {
-            $content = Content::query()->firstOrCreate([
+            $content = Section::query()->firstOrCreate([
                 'name' => $statistic['title'],
             ], [
                 'meta' => [
@@ -840,7 +842,7 @@ class DemoCreator
 
         $teamMembers = $this->createTeamMembers($languages);
 
-        $teamMembers->each(function (Content $content) use ($widget): void {
+        $teamMembers->each(function (Section $content) use ($widget): void {
             if ($widget->assets()->where('asset_id', $content->id)->exists()) {
                 return;
             }
@@ -854,7 +856,7 @@ class DemoCreator
         return $widget;
     }
 
-    protected function navigationPageItems(\Illuminate\Support\Collection $siteTree, Language $language): array
+    protected function navigationPageItems(Collection $siteTree, Language $language): array
     {
         $items = [];
 
@@ -947,7 +949,7 @@ class DemoCreator
 
             $this->createMedia($page);
 
-            $content = Content::query()->updateOrCreate([
+            $content = Section::query()->updateOrCreate([
                 'name' => $feature['title'],
             ], [
                 'meta' => [
@@ -983,7 +985,7 @@ class DemoCreator
 
     private function createTestimonials(Collection $languages): Collection
     {
-        $testimonialContent = Content::query()->firstOrCreate([
+        $testimonialContent = Section::query()->firstOrCreate([
             'name' => 'Testimonials',
         ], [
             'meta' => [
@@ -1025,7 +1027,7 @@ class DemoCreator
         ]);
 
         foreach ($testimonials as $testimonial) {
-            $content = Content::query()->firstOrCreate([
+            $content = Section::query()->firstOrCreate([
                 'name' => $testimonial['name'],
                 'parent_id' => $testimonialContent->id,
                 'type_id' => $testimonialType->id,
@@ -1139,7 +1141,7 @@ class DemoCreator
             ],
         ];
 
-        $teamContent = Content::query()->firstOrNew([
+        $teamContent = Section::query()->firstOrNew([
             'name' => 'Team Members',
         ]);
 
@@ -1152,7 +1154,7 @@ class DemoCreator
         $teamMembersCollection = new Collection;
 
         foreach ($teamMembers as $member) {
-            $content = Content::query()->firstOrCreate([
+            $content = Section::query()->firstOrCreate([
                 'name' => $member['name'],
                 'parent_id' => $teamContent->id,
             ], [
@@ -1245,13 +1247,13 @@ class DemoCreator
         }
 
         // Create content and link via WidgetAsset
-        $content = Content::query()->create([
+        $content = Section::create([
             'name' => str($filenameBase)->title(),
         ]);
 
         $model->assets()->create([
             'asset_id' => $content->getKey(),
-            'asset_type' => resolve(Content::class)->getMorphClass(),
+            'asset_type' => resolve(Section::class)->getMorphClass(),
         ]);
 
         // Attach primary media

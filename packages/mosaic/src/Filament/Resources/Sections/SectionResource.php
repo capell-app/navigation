@@ -11,10 +11,16 @@ use Capell\Admin\Filament\Concerns\HasTableConfigurator;
 use Capell\Core\Facades\CapellCore;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Capell\Mosaic\Enums\ModelEnum;
+use Capell\Mosaic\Filament\Resources\Sections\Pages\CreateSection;
+use Capell\Mosaic\Filament\Resources\Sections\Pages\EditSection;
+use Capell\Mosaic\Filament\Resources\Sections\Pages\ListSections;
 use Capell\Mosaic\Filament\Resources\Sections\RelationManagers\PagesRelationManager;
+use Capell\Mosaic\Filament\Resources\Sections\RelationManagers\SectionAssetsRelationManager;
 use Capell\Mosaic\Filament\Resources\Sections\RelationManagers\WidgetsRelationManager;
 use Capell\Mosaic\Filament\Resources\Sections\Schemas\SectionForm;
 use Capell\Mosaic\Filament\Resources\Sections\Tables\SectionsTable;
+use Capell\Mosaic\Filament\Resources\Sections\Widgets\ContentAlertsWidget;
+use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -81,7 +87,7 @@ class SectionResource extends Resource
     }
 
     /**
-     * @param  Content  $record
+     * @param  Section  $record
      * @return array|string[]
      */
     public static function getGlobalSearchResultDetails(Model $record): array
@@ -100,7 +106,7 @@ class SectionResource extends Resource
     }
 
     /**
-     * @return class-string<Content>
+     * @return class-string<Section>
      */
     public static function getModel(): string
     {
@@ -120,9 +126,9 @@ class SectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListContents::route('/'),
-            'create' => CreateContent::route('/create'),
-            'edit' => EditContent::route('/{record}/edit'),
+            'index' => ListSections::route('/'),
+            'create' => CreateSection::route('/create'),
+            'edit' => EditSection::route('/{record}/edit'),
         ];
     }
 
@@ -144,7 +150,7 @@ class SectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ContentAssetsRelationManager::class,
+            SectionAssetsRelationManager::class,
             WidgetsRelationManager::class,
             PagesRelationManager::class,
         ];
@@ -157,7 +163,7 @@ class SectionResource extends Resource
         ];
     }
 
-    private static function buildGlobalSearchBreadcrumbs(Content $record): ?HtmlString
+    private static function buildGlobalSearchBreadcrumbs(Section $record): ?HtmlString
     {
         $breadcrumbs = [];
 

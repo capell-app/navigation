@@ -7,12 +7,12 @@ namespace Capell\Mosaic\Filament\Resources\Sections\Pages;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Mosaic\Actions\MutateContentDataBeforeFillAction;
 use Capell\Mosaic\Enums\ResourceEnum;
-use Capell\Mosaic\Filament\Resources\Sections\ContentResource;
+use Capell\Mosaic\Filament\Resources\Sections\SectionResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSection extends CreateRecord
 {
-    /** @return class-string<ContentResource> */
+    /** @return class-string<SectionResource> */
     public static function getResource(): string
     {
         return CapellAdmin::getResource(ResourceEnum::Section);

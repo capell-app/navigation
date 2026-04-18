@@ -7,8 +7,6 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
-use Capell\Mosaic\Filament\Resources\Sections\Pages\ListSections;
-use Capell\Mosaic\Models\Section;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -27,23 +25,23 @@ beforeEach(function (): void {
 });
 
 test('can list contents', function (): void {
-    $contents = Section::factory()->count(5)->create();
+    $contents = Collection::factory()->count(5)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(5)
         ->assertCanSeeTableRecords($contents);
 });
 
 test('can search contents', function (): void {
-    $contents = Section::factory()
+    $contents = Collection::factory()
         ->sequence(fn (Sequence $sequence): array => ['name' => sprintf('Language(%d)', $sequence->index)])
         ->count(3)
         ->create();
 
     $name = $contents->random()->name;
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(3)
         ->searchTable($name)
@@ -53,9 +51,9 @@ test('can search contents', function (): void {
 });
 
 test('can sort contents', function (): void {
-    $contents = Section::factory()->count(5)->create();
+    $contents = Collection::factory()->count(5)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(5)
         ->sortTable('name')
@@ -63,9 +61,9 @@ test('can sort contents', function (): void {
 });
 
 test('can replicate contents', function (): void {
-    $content = Section::factory()->create();
+    $content = Collection::factory()->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(1)
         ->callAction(
@@ -77,15 +75,15 @@ test('can replicate contents', function (): void {
         ->assertHasNoFormErrors()
         ->assertCountTableRecords(2);
 
-    assertDatabaseHas('sections', [
+    assertDatabaseHas('contents', [
         'name' => $content->name . ' (copy)',
     ]);
 });
 
 test('can delete content', function (): void {
-    $content = Section::factory()->create();
+    $content = Collection::factory()->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(1)
         ->callAction(TestAction::make(DeleteAction::class)->table($content))
@@ -96,9 +94,9 @@ test('can delete content', function (): void {
 });
 
 test('can group delete contents', function (): void {
-    $contents = Section::factory()->count(5)->create();
+    $contents = Collection::factory()->count(5)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->selectTableRecords($contents->pluck('id')->toArray())
         ->callAction(TestAction::make(DeleteBulkAction::class)->table()->bulk())
@@ -110,7 +108,7 @@ test('can group delete contents', function (): void {
 });
 
 test('can select all records', function (): void {
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->call('getAllSelectableTableRecordKeys')
         ->assertSuccessful();
@@ -119,25 +117,25 @@ test('can select all records', function (): void {
 test('can create content', function (): void {
     Type::factory()->type(LayoutTypeEnum::Section)->create();
 
-    $newData = Section::factory()->make();
+    $newData = Collection::factory()->make();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->callAction('create', [
             'name' => $newData->name,
         ])
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(Section::class, [
+    assertDatabaseHas(Collection::class, [
         'name' => $newData->name,
     ]);
 });
 
 test('can filter by parent', function (): void {
-    $parent = Section::factory()->create();
-    $children = Section::factory()->count(3)->parent($parent)->create();
+    $parent = Collection::factory()->create();
+    $children = Collection::factory()->count(3)->parent($parent)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(4)
         ->filterTable('filter', ['parent_id' => $parent->id])
@@ -146,10 +144,10 @@ test('can filter by parent', function (): void {
 });
 
 test('can filter by type', function (): void {
-    $type = Type::factory()->type(LayoutTypeEnum::Content)->create();
-    $contents = Section::factory()->count(3)->type($type)->create();
+    $type = Type::factory()->type(LayoutTypeEnum::Section)->create();
+    $contents = Collection::factory()->count(3)->type($type)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(3)
         ->filterTable('type_id', $type->id)
@@ -159,9 +157,9 @@ test('can filter by type', function (): void {
 
 test('can filter by site', function (): void {
     $site = Site::factory()->create();
-    $contents = Section::factory()->count(3)->site($site)->create();
+    $contents = Collection::factory()->count(3)->site($site)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(3)
         ->filterTable('site_id', $site->id)
@@ -171,10 +169,10 @@ test('can filter by site', function (): void {
 
 test('can filter by language', function (): void {
     $language = Language::factory()->create();
-    Section::factory()->create();
-    $contents = Section::factory()->count(3)->withTranslations($language)->create();
+    Collection::factory()->create();
+    $contents = Collection::factory()->count(3)->withTranslations($language)->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(4)
         ->filterTable('filter', ['language_id' => $language->id])
@@ -183,11 +181,11 @@ test('can filter by language', function (): void {
 });
 
 test('can filter by publish status', function (string $status, int $expectedCount): void {
-    $publishedContents = Section::factory()->count(2)->published()->create();
-    $pendingContents = Section::factory()->count(3)->pending()->create();
-    $expiredContents = Section::factory()->count(4)->expired()->create();
+    $publishedContents = Collection::factory()->count(2)->published()->create();
+    $pendingContents = Collection::factory()->count(3)->pending()->create();
+    $expiredContents = Collection::factory()->count(4)->expired()->create();
 
-    livewire(ListSections::class)
+    livewire(ListContents::class)
         ->assertSuccessful()
         ->assertCountTableRecords(9)
         ->filterTable('publish_status', $status)

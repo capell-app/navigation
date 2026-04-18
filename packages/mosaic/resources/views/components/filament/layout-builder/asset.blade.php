@@ -50,24 +50,24 @@ declare(strict_types=1);
 
     if (! $image) {
         $image = match (get_class($widgetAsset->asset)) {
-            Page::class, Content::class => $widgetAsset->asset->image,
+            Page::class, Section::class => $widgetAsset->asset->image,
             Media::class => $widgetAsset->asset,
             default => null,
         };
     }
 
     $mediaCount = match (get_class($widgetAsset->asset)) {
-        Content::class => $widgetAsset->asset->media->count(),
+        Section::class => $widgetAsset->asset->media->count(),
         default => null,
     };
 
     $relatedCount = match (get_class($widgetAsset->asset)) {
-        Content::class => $widgetAsset->asset->related->count(),
+        Section::class => $widgetAsset->asset->related->count(),
         default => null,
     };
 
     $actionsCount = match (get_class($widgetAsset->asset)) {
-        Content::class => count($widgetAsset->asset->actions),
+        Section::class => count($widgetAsset->asset->actions),
         default => null,
     };
 
@@ -89,7 +89,7 @@ declare(strict_types=1);
         }
 
         $description .= match (get_class($widgetAsset->asset)) {
-            Page::class, Content::class => $widgetAsset->asset->translation?->title &&
+            Page::class, Section::class => $widgetAsset->asset->translation?->title &&
             $widgetAsset->asset->translation->title !== $widgetAsset->asset->name
                 ? $widgetAsset->asset->translation->title
                 : null,

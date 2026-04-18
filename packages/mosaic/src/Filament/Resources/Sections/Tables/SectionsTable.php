@@ -26,6 +26,7 @@ use Capell\Mosaic\Actions\ReplicateContentAction;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Capell\Mosaic\Enums\ModelEnum;
 use Capell\Mosaic\Filament\Components\Tables\Columns\Content\ContentNameColumn;
+use Capell\Mosaic\Models\Section;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -95,7 +96,7 @@ class SectionsTable implements TableConfigurator
                 RestoreBulkAction::make(),
                 ForceDeleteBulkAction::make(),
             ])
-            ->recordClasses(fn (Collection $record): ?string => match (true) {
+            ->recordClasses(fn (Section $record): ?string => match (true) {
                 (bool) $record->deleted_at => 'table-row-warning',
                 default => null,
             });
@@ -145,7 +146,7 @@ class SectionsTable implements TableConfigurator
                 ->sortable()
                 ->toggleable()
                 ->color('primary')
-                ->url(function (Collection $record, int $state): ?string {
+                ->url(function (Section $record, int $state): ?string {
                     if ($state === 0) {
                         return null;
                     }
@@ -165,7 +166,7 @@ class SectionsTable implements TableConfigurator
                 ->sortable()
                 ->toggleable()
                 ->separator('')
-                ->formatStateUsing(fn (Collection $record): int => $record->assets_count),
+                ->formatStateUsing(fn (Section $record): int => $record->assets_count),
             SiteColumn::make('site.name')
                 ->hidden(
                     fn (HasTable $livewire): bool => $livewire->activeTab
@@ -249,8 +250,8 @@ class SectionsTable implements TableConfigurator
                         ->options(function (HasTable $livewire, Get $get): array {
                             $siteId = static::getSiteId($livewire);
 
-                            /** @var class-string<Collection> $model */
-                            $model = CapellCore::getModel(ModelEnum::Section->name);
+                            /** @var class-string<Section> $model */
+                            $model = CapellCore::getModel(ModelEnum::Content->name);
 
                             $contents = $model::with([
                                 'site',
@@ -270,7 +271,7 @@ class SectionsTable implements TableConfigurator
                                 ->orderBy('_lft')
                                 ->get();
 
-                            return $contents->mapWithKeys(function (Collection $content) use ($siteId): array {
+                            return $contents->mapWithKeys(function (Section $content) use ($siteId): array {
                                 $label = '';
 
                                 if (! $siteId && $content->site) {
@@ -324,8 +325,8 @@ class SectionsTable implements TableConfigurator
                     }
 
                     if (isset($data['parent_id']) && $data['parent_id'] !== null && $data['parent_id'] !== '') {
-                        /** @var class-string<Collection> $model */
-                        $model = CapellCore::getModel(ModelEnum::Section->name);
+                        /** @var class-string<Section> $model */
+                        $model = CapellCore::getModel(ModelEnum::Content->name);
 
                         $indicators['parent_id'] = __(
                             'capell-admin::filter.parent',

@@ -14,7 +14,9 @@ use Capell\Mosaic\Actions\ReplicateContentAction;
 use Capell\Mosaic\Enums\LivewireComponentsEnum;
 use Capell\Mosaic\Enums\ResourceEnum;
 use Capell\Mosaic\Filament\Actions\CreateContentAction;
-use Capell\Mosaic\Filament\Resources\Sections\ContentResource;
+use Capell\Mosaic\Filament\Resources\Sections\SectionResource;
+use Capell\Mosaic\Filament\Resources\Sections\Widgets\ContentAlertsWidget;
+use Capell\Mosaic\Models\Section;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -27,7 +29,7 @@ use Livewire\Attributes\On;
 use Override;
 
 /**
- * @property Content $record
+ * @property Section $record
  */
 #[On('$refresh')]
 class EditSection extends EditRecord
@@ -39,7 +41,7 @@ class EditSection extends EditRecord
     }
     use HasTypeRelationManagers;
 
-    /** @return class-string<ContentResource> */
+    /** @return class-string<SectionResource> */
     public static function getResource(): string
     {
         return CapellAdmin::getResource(ResourceEnum::Section);

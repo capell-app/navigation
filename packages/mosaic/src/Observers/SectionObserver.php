@@ -13,11 +13,13 @@ use InvalidArgumentException;
 
 class SectionObserver
 {
+    private mixed $deletedAt = null;
+
     public function creating(Section $section): void
     {
         if (! $section->type_id) {
-            $section->type_id = Type::query()->where('type', LayoutTypeEnum::Section)->default()->value('id');
-            throw_unless($section->type_id, InvalidArgumentException::class, 'Unable to create section without a type.');
+            $section->type_id = Type::query()->where('type', LayoutTypeEnum::Content)->default()->value('id');
+            throw_unless($section->type_id, InvalidArgumentException::class, 'Unable to create content without a type.');
         }
 
         // Normalize parent_id from loaded relation if needed (nested set).
@@ -57,7 +59,12 @@ class SectionObserver
         ]);
     }
 
-    public function restoring(Section $section): void {}
+    public function restoring(Section $section): void
+    {
+        $this->deletedAt = method_exists($section, 'nodeGetDeletedAtValue')
+            ? $section->nodeGetDeletedAtValue()
+            : null;
+    }
 
     public function restored(Section $section): void
     {
