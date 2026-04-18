@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+namespace Capell\Tests\Mosaic\Hero\Feature\Filament;
+
 use Capell\Core\Models\Type;
-use Capell\Mosaic\Actions\Hero\CreateHeroContentTypeAction;
-use Capell\Mosaic\Enums\Hero\ContentSchemaEnum;
-use Capell\Mosaic\Filament\Resources\Contents\Pages\EditContent;
-use Capell\Mosaic\Models\Content;
+use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
+use Capell\Layout\Models\Collection;
+use Capell\Mosaic\Actions\CreateHeroContentTypeAction;
+use Capell\Mosaic\Enums\ContentSchemaEnum;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Pest\Expectation;
 use Pest\Expectations\HigherOrderExpectation;
@@ -22,7 +24,7 @@ beforeEach(function (): void {
 
 it('edits the hero content via Filament', function (): void {
     $type = CreateHeroContentTypeAction::run();
-    $content = Content::factory()->type($type)
+    $content = Collection::factory()->type($type)
         ->state([
             'name' => 'Hero Content',
         ])

@@ -286,6 +286,11 @@ class Content extends Model implements HasMedia, PageCacheable, Publishable, Typ
             ->groupBy('widget_assets.widget_id');
     }
 
+    public function draftRevisions(): HasMany
+    {
+        return $this->hasMany(self::class, 'id', 'id')->whereRaw('0=1');
+    }
+
     protected function scopeOrdered(Builder $query, string $dir = 'asc'): void
     {
         $query->orderBy($this->qualifyColumn('order'))

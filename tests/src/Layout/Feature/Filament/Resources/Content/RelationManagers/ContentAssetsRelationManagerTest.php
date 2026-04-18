@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Page;
-use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Filament\Resources\Contents\Pages\EditContent;
 use Capell\Layout\Filament\Resources\Contents\RelationManagers\ContentAssetsRelationManager;
 use Capell\Layout\Models\Collection;
+use Capell\Mosaic\Enums\AssetEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\Testing\TestAction;
 

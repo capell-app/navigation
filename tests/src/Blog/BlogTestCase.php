@@ -11,7 +11,7 @@ use Capell\Blog\Providers\BlogServiceProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
-use Capell\Layout\Providers\LayoutServiceProvider;
+use Capell\Mosaic\Providers\MosaicServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Contracts\Config\Repository;
@@ -54,7 +54,7 @@ class BlogTestCase extends AbstractTestCase
     {
         return [
             ...parent::getPackageProviders($app),
-            LayoutServiceProvider::class,
+            MosaicServiceProvider::class,
             AdminServiceProvider::class,
             FrontendServiceProvider::class,
             BlogServiceProvider::class,

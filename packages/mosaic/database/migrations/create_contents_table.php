@@ -24,7 +24,6 @@ return new class extends Migration
             $table->json('meta')->nullable();
             $table->unsignedInteger('order')->default(0)->index();
             $table->visibleDates();
-            $table->foreignId('parent_id')->nullable()->constrained('contents')->nullOnDelete()->cascadeOnUpdate();
             $table->nestedSet();
             $table->userstamps();
             $table->timestamps();

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Capell\Tests\Hero;
+namespace Capell\Tests\Mosaic\Hero;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
@@ -15,7 +15,7 @@ use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
 
-class HeroTestCase extends AbstractTestCase
+class MosaicTestCase extends AbstractTestCase
 {
     protected function setUp(): void
     {

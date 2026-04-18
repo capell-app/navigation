@@ -6,9 +6,9 @@ use Capell\Core\Enums\TypeEnum as CoreTypeEnum;
 use Capell\Core\Models\Type;
 use Capell\Layout\Database\Factories\ContentTypeFactory;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
-use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\Widget;
+use Capell\Mosaic\Enums\LayoutTypeEnum;
 
 it('has many contents', function (): void {
     $type = (new ContentTypeFactory)->create();

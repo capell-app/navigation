@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use Capell\Core\Models\Navigation;
 use Capell\Layout\Database\Factories\WidgetTypeFactory;
-use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Filament\Actions\CreateWidgetAction;
 use Capell\Layout\Filament\Resources\Widgets\Pages\EditWidget;
 use Capell\Layout\Filament\Resources\Widgets\Pages\ListWidgets;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Support\Creator\TypeCreator;
+use Capell\Mosaic\Enums\WidgetTypeEnum;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Actions\Testing\TestAction;
 

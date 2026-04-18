@@ -12,9 +12,9 @@ use Capell\Core\Models\Type;
 use Capell\Hero\Actions\AddHeroWidgetToLayoutAction;
 use Capell\Hero\Actions\CreateHeroContentTypeAction;
 use Capell\Hero\Actions\CreateHeroWidgetAction;
-use Capell\Layout\Enums\LayoutTypeEnum;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Support\Creator\DemoCreator;
+use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Illuminate\Console\Command;
 use Mockery\MockInterface;
 

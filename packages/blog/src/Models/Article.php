@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -216,6 +217,11 @@ class Article extends Model implements HasMedia, Pageable, PageCacheable, Publis
     public function canonicalPage(): MorphTo
     {
         return $this->morphTo(type: 'meta->canonical_pageable_type', id: 'meta->canonical_pageable_id');
+    }
+
+    public function draftRevisions(): HasMany
+    {
+        return $this->hasMany(self::class, 'id', 'id')->whereRaw('0=1');
     }
 
     /** @return Builder<self> */

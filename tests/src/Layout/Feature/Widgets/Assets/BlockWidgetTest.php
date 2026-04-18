@@ -6,10 +6,10 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Layout\Database\Factories\LayoutFactory;
-use Capell\Layout\Enums\AssetEnum;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
 use Capell\Layout\Support\Creator\WidgetCreator;
+use Capell\Mosaic\Enums\AssetEnum;
 use Capell\Tests\Support\Concerns\TestingFrontend;
 use Pest\Expectation;
 

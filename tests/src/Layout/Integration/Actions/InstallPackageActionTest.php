@@ -6,12 +6,12 @@ use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Models\Layout;
 use Capell\Core\Models\Type;
 use Capell\Layout\Actions\InstallPackageAction;
-use Capell\Layout\Enums\ContentTypeEnum;
-use Capell\Layout\Enums\LayoutTypeEnum;
-use Capell\Layout\Enums\WidgetTypeEnum;
 use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
+use Capell\Mosaic\Enums\ContentTypeEnum;
+use Capell\Mosaic\Enums\LayoutTypeEnum;
+use Capell\Mosaic\Enums\WidgetTypeEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 it('installs layout package: creates types, widgets, layouts, and registers morphs', function (): void {
