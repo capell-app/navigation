@@ -6,8 +6,10 @@ namespace Capell\Plugins\Providers;
 
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
+use Capell\Plugins\Jobs\ValidateLicensesJob;
 use Capell\Plugins\Services\AnystackClient;
 use Capell\Plugins\Services\ComposerRunner;
+use Illuminate\Console\Scheduling\Schedule;
 use Spatie\LaravelPackageTools\Package;
 
 class PluginsServiceProvider extends AbstractPackageServiceProvider
@@ -42,6 +44,15 @@ class PluginsServiceProvider extends AbstractPackageServiceProvider
             timeoutSeconds: config('capell-plugins.composer.timeout_seconds', 600),
             workingDirectory: base_path(),
         ));
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        $this->callAfterResolving(Schedule::class, function ($schedule): void {
+            $schedule->job(ValidateLicensesJob::class)->dailyAt('03:17');
+        });
     }
 
     public function registeringPackage(): void
