@@ -6,7 +6,7 @@ use Capell\Core\Models\Page;
 use Capell\Layout\Models\Collection;
 use Capell\Layout\Models\Widget;
 use Capell\Layout\Models\WidgetAsset;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -25,7 +25,7 @@ it('has many widgets', function (): void {
     WidgetAsset::factory()->create(['asset_id' => $page->id, 'asset_type' => 'page', 'widget_id' => $widget->id]);
 
     expect($page->widgets)
-        ->toBeInstanceOf(Collection::class)
+        ->toBeInstanceOf(EloquentCollection::class)
         ->toHaveCount(1)
         ->and($page->widgets->pluck('id'))->toContain($widget->id);
 });

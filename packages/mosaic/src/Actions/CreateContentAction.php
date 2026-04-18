@@ -36,7 +36,7 @@ class CreateContentAction
             $data['name'] = collect($data['translations'])->first()['title'];
         }
 
-        $content = $model::create($data);
+        $content = $model::query()->create($data);
 
         if (isset($data['translations'])) {
             $this->createTranslations($content, $data['translations']);

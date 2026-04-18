@@ -13,8 +13,6 @@ use InvalidArgumentException;
 
 class ContentObserver
 {
-    private mixed $deletedAt = null;
-
     public function creating(Content $content): void
     {
         if (! $content->type_id) {
@@ -59,12 +57,7 @@ class ContentObserver
         ]);
     }
 
-    public function restoring(Content $content): void
-    {
-        $this->deletedAt = method_exists($content, 'nodeGetDeletedAtValue')
-            ? $content->nodeGetDeletedAtValue()
-            : null;
-    }
+    public function restoring(Content $content): void {}
 
     public function restored(Content $content): void
     {

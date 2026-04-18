@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Layout\Filament\Resources\Contents\Widgets\ContentAlertsWidget;
 use Capell\Layout\Models\Collection;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 use function Pest\Livewire\livewire;
 
@@ -33,7 +33,7 @@ it('shows alert for content state', function (string $state, string $alertKey): 
 
     livewire(ContentAlertsWidget::class, ['record' => $content])
         ->assertSuccessful()
-        ->assertSet('alerts', fn (Collection $alerts): bool => $alerts->has($alertKey));
+        ->assertSet('alerts', fn (SupportCollection $alerts): bool => $alerts->has($alertKey));
 })
     ->with([
         'expired' => ['expired', 'expired'],

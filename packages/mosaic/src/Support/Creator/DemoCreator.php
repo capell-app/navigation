@@ -1246,7 +1246,7 @@ class DemoCreator
         }
 
         // Create content and link via WidgetAsset
-        $content = Content::create([
+        $content = Content::query()->create([
             'name' => str($filenameBase)->title(),
         ]);
 
