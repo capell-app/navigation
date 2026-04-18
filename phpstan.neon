@@ -27,6 +27,7 @@ parameters:
         - packages/address/database/migrations
         - packages/blog/database/migrations
         - packages/mosaic/database/migrations
+        - packages/plugins/database/migrations
     configDirectories:
         - packages/blog/config
         - packages/mosaic/config

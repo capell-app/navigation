@@ -7,6 +7,7 @@ use Capell\Tests\Assistant\AssistantTestCase;
 use Capell\Tests\Blog\BlogTestCase;
 use Capell\Tests\Mosaic\MosaicTestCase;
 use Capell\Tests\Packages\PackagesTestCase;
+use Capell\Tests\Plugins\PluginsTestCase;
 
 $testsRoot = __DIR__ . DIRECTORY_SEPARATOR . 'src';
 
@@ -24,3 +25,6 @@ pest()->extends(MosaicTestCase::class)
 
 pest()->extends(AssistantTestCase::class)
     ->in($testsRoot . DIRECTORY_SEPARATOR . 'Assistant');
+
+pest()->extends(PluginsTestCase::class)
+    ->in($testsRoot . DIRECTORY_SEPARATOR . 'Plugins');

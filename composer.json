@@ -78,6 +78,7 @@
         "capell-app/admin": "^2.0",
         "capell-app/core": "^2.0",
         "capell-app/frontend": "^2.0",
+        "capell-app/plugins": "@dev",
         "codewithdennis/filament-select-tree": "^4.0",
         "cms-multi/filament-clear-cache": "^3.0",
         "croustibat/filament-jobs-monitor": "^4.4",
