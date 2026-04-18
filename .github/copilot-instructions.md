@@ -147,10 +147,10 @@ Don't:
 - Avoid excessive or inconsistent blank lines; use spacing to group related logic and visually separate distinct steps.
 - This applies to all PHP, test, and config files.
 
-## 1K. Package Plugin Independence (`address` / `blog` / `hero` / `layout`)
+## 1K. Package Plugin Independence (`address` / `blog` / `mosaic`)
 
-- `address`, `blog`, `hero`, and `layout` plugins MAY depend on each other, but MUST remain decoupled from Core internals except via documented public interfaces.
-- Core MUST NOT depend directly on any plugin (`address`, `blog`, `hero`, `layout`). Avoid imports, facades, or direct calls from Core into these plugins.
+- `address`, `blog`, and `mosaic` plugins MAY depend on each other, but MUST remain decoupled from Core internals except via documented public interfaces.
+- Core MUST NOT depend directly on any plugin (`address`, `blog`, `mosaic`). Avoid imports, facades, or direct calls from Core into these plugins.
 - Cross-plugin coordination should use neutral boundaries (configuration, cache/filesystem paths, events/commands) without introducing compile-time dependencies.
 - When Core needs to trigger a behavior in a plugin (e.g., clear caches), prefer:
     - Removing/invalidating the shared cache file/path via Filesystem, or
