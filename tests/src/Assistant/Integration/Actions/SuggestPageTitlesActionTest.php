@@ -6,13 +6,13 @@ namespace Capell\Tests\Assistant\Integration\Actions\Ai;
 
 use Capell\Assistant\Actions\SuggestPageTitlesAction;
 use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Tests\Assistant\Fixtures\FakeContext;
 use Capell\Tests\Assistant\Fixtures\FakeOpenAIProvider;
 use RuntimeException;
 
 it('suggests page titles using provider', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): FakeOpenAIProvider => new FakeOpenAIProvider);
+    app()->bind(PrismProvider::class, fn (): FakeOpenAIProvider => new FakeOpenAIProvider);
 
     $titles = SuggestPageTitlesAction::run(new FakeContext('Some content'));
 
@@ -21,7 +21,7 @@ it('suggests page titles using provider', function (): void {
 });
 
 it('handles provider failure path', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): OpenAIProvider => new class([]) extends OpenAIProvider
+    app()->bind(PrismProvider::class, fn (): PrismProvider => new class([]) extends PrismProvider
     {
         public function chat(array $params): AiResponse
         {

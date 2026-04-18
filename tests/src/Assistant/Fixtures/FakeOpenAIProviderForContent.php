@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Capell\Tests\Assistant\Fixtures;
 
 use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 
-class FakeOpenAIProviderForContent extends OpenAIProvider
+class FakeOpenAIProviderForContent extends PrismProvider
 {
     public function chat(array $params): AiResponse
     {

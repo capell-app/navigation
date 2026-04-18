@@ -6,7 +6,7 @@ namespace Capell\Tests\Assistant\Integration\AI;
 
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
 use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Illuminate\Support\Facades\Cache;
 
 it('calls the OpenAI provider chat successfully structure-wise', function (): void {
@@ -28,12 +28,12 @@ it('calls the OpenAI provider chat successfully structure-wise', function (): vo
     // We cannot assert real OpenAI call here; just ensure the method is callable
     // and returns an AiResponse when underlying facade is configured. For now, we
     // expect an exception NOT to be thrown due to constructor mismatch anymore.
-    expect($provider)->toBeInstanceOf(OpenAIProvider::class);
+    expect($provider)->toBeInstanceOf(PrismProvider::class);
 });
 
 it('throws when circuit breaker is open', function (): void {
     // Force circuit breaker open
-    Cache::put('openai_circuit_breaker_state', ['failures' => 5], 300);
+    Cache::put('ai_circuit_breaker_state', ['failures' => 5], 300);
 
     $provider = new OpenAIProvider([
         'max_retries' => 1,
@@ -51,5 +51,5 @@ it('throws when circuit breaker is open', function (): void {
         ->toThrow(OpenAICircuitBreakerOpenException::class);
 
     // Reset after test
-    Cache::forget('openai_circuit_breaker_state');
+    Cache::forget('ai_circuit_breaker_state');
 });

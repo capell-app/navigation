@@ -7,7 +7,7 @@ namespace Capell\Tests\Assistant\Integration\Actions\Ai;
 use Capell\Assistant\Actions\GeneratorPageContentAction;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Tests\Assistant\Fixtures\FakeContext;
 use Capell\Tests\Assistant\Fixtures\FakeOpenAIProviderForContent;
 use OpenAI\Laravel\Facades\OpenAI;
@@ -15,7 +15,7 @@ use RuntimeException;
 use stdClass;
 
 it('generates page content using provider', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): FakeOpenAIProviderForContent => new FakeOpenAIProviderForContent);
+    app()->bind(PrismProvider::class, fn (): FakeOpenAIProviderForContent => new FakeOpenAIProviderForContent);
 
     $result = GeneratorPageContentAction::run(new FakeContext('Create content'));
 
@@ -28,7 +28,7 @@ it('generates page content using provider', function (): void {
 });
 
 it('handles provider failure', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): OpenAIProvider => new class([]) extends OpenAIProvider
+    app()->bind(PrismProvider::class, fn (): PrismProvider => new class([]) extends PrismProvider
     {
         public function chat(array $params): AiResponse
         {

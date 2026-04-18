@@ -8,7 +8,7 @@ use Capell\Assistant\Actions\SuggestMetaDescriptionsAction;
 use Capell\Assistant\Events\AiGenerationCompleted;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Tests\Assistant\Fixtures\FakeContext;
 use Capell\Tests\Assistant\Fixtures\FakeOpenAIProviderForDescriptions;
 use Illuminate\Support\Facades\Event;
@@ -17,7 +17,7 @@ use RuntimeException;
 use stdClass;
 
 it('suggests meta descriptions using provider', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): FakeOpenAIProviderForDescriptions => new FakeOpenAIProviderForDescriptions);
+    app()->bind(PrismProvider::class, fn (): FakeOpenAIProviderForDescriptions => new FakeOpenAIProviderForDescriptions);
 
     $descriptions = SuggestMetaDescriptionsAction::run(new FakeContext('Some content'));
 
@@ -26,7 +26,7 @@ it('suggests meta descriptions using provider', function (): void {
 });
 
 it('handles provider error path', function (): void {
-    app()->bind(OpenAIProvider::class, fn (): OpenAIProvider => new class([]) extends OpenAIProvider
+    app()->bind(PrismProvider::class, fn (): PrismProvider => new class([]) extends PrismProvider
     {
         public function chat(array $params): AiResponse
         {

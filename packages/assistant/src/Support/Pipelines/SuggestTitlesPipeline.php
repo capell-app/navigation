@@ -9,7 +9,7 @@ use Capell\Assistant\Models\AIGenerationHistory;
 use Capell\Assistant\Support\AiRateLimiter;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\AiResponseParser;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Assistant\Support\PromptRepository;
 use Illuminate\Pipeline\Pipeline;
 use InvalidArgumentException;
@@ -18,7 +18,7 @@ class SuggestTitlesPipeline
 {
     public function __construct(
         private readonly PromptRepository $prompts,
-        private readonly OpenAIProvider $provider,
+        private readonly PrismProvider $provider,
         private readonly AiResponseParser $parser,
         private readonly AiRateLimiter $rateLimiter,
     ) {}
