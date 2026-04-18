@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\PrismProvider;
-use EchoLabs\Prism\Facades\Prism;
-use EchoLabs\Prism\Testing\PrismFake;
-use EchoLabs\Prism\ValueObjects\Usage;
+use Prism\Prism\Facades\Prism;
+use Prism\Prism\Testing\TextResponseFake;
+use Prism\Prism\ValueObjects\Usage;
 
 it('returns an AiResponse from a chat call', function (): void {
     $fake = Prism::fake([
-        PrismFake::text('Hello there')->withUsage(new Usage(10, 20)),
+        TextResponseFake::make()->withText('Hello there')->withUsage(new Usage(10, 20)),
     ]);
 
     $provider = new PrismProvider([

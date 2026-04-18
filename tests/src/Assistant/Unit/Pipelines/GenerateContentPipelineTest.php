@@ -2,23 +2,24 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Data\PromptData;
 use Capell\Assistant\Support\AiRateLimiter;
 use Capell\Assistant\Support\AiResponse;
 use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\OpenAIProvider;
 use Capell\Assistant\Support\Pipelines\GenerateContentPipeline;
+use Capell\Assistant\Support\PrismProvider;
+use Capell\Assistant\Support\PromptRepository;
 use Mockery\MockInterface;
 
 it('sanitizes unsafe html from AI output', function (): void {
-    $prompts = new PromptData(
-        model: 'gpt-4-turbo',
-        contentGeneration: true,
-        contentGenerationSystem: 'system',
-        contentGenerationUserTemplate: 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
-    );
+    $prompts = new PromptRepository([
+        'content_generation' => [
+            'model' => 'gpt-4-turbo',
+            'system' => 'system',
+            'user_template' => 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
+        ],
+    ]);
 
-    $provider = mock(OpenAIProvider::class, function (OpenAIProvider&MockInterface $mock): void {
+    $provider = mock(PrismProvider::class, function (PrismProvider&MockInterface $mock): void {
         $unsafe = <<<'HTML'
         <h2 onclick="alert('x')">Welcome</h2>
         <p>Visit our <a href="https://evil.example/" target="_blank" rel="noopener">site</a> or <a href="/about">about page</a>.</p>
@@ -67,18 +68,19 @@ it('sanitizes unsafe html from AI output', function (): void {
         ->not()->toContain('javascript:')
         ->not()->toContain('onclick=')
         ->toContain('<a href="/about">')
-        ->toContain('<a href="https://evil.example/" target="_blank" rel="noopener">site</a>');
+        ->toContain('<span>site</span>');
 });
 
 it('renders prompt variables correctly', function (): void {
-    $prompts = new PromptData(
-        model: 'gpt-4-turbo',
-        contentGeneration: true,
-        contentGenerationSystem: 'system',
-        contentGenerationUserTemplate: 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
-    );
+    $prompts = new PromptRepository([
+        'content_generation' => [
+            'model' => 'gpt-4-turbo',
+            'system' => 'system',
+            'user_template' => 'Title: {{current_title}} Keywords: {{keywords}} Existing: {{content}} Length: {{target_length}} Refactor: {{refactor}}',
+        ],
+    ]);
 
-    $provider = mock(OpenAIProvider::class, function (OpenAIProvider&MockInterface $mock): void {
+    $provider = mock(PrismProvider::class, function (PrismProvider&MockInterface $mock): void {
         $mock->shouldReceive('chat')->withArgs(function (array $params): bool {
             $user = collect($params['messages'])->firstWhere('role', 'user')['content'] ?? '';
 

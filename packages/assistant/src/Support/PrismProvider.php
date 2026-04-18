@@ -6,11 +6,11 @@ namespace Capell\Assistant\Support;
 
 use Capell\Assistant\Exceptions\OpenAICircuitBreakerOpenException;
 use Capell\Core\Contracts\ServiceContract;
-use EchoLabs\Prism\Enums\Provider;
-use EchoLabs\Prism\Facades\Prism;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Sleep;
+use Prism\Prism\Enums\Provider;
+use Prism\Prism\Facades\Prism;
 use RuntimeException;
 use Throwable;
 

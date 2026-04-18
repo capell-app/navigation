@@ -119,7 +119,8 @@ class GenerateContentPipeline
                 'completion_tokens' => (int) ($response->metadata['completion_tokens'] ?? 0),
                 'total_tokens' => (int) $response->tokensUsed,
                 'duration' => (float) $response->duration,
-                'page_id' => $context->getPageId(),
+                'pageable_id' => $context->getPageId(),
+                'pageable_type' => $context->getPageType(),
                 'language_id' => $context->getLanguageId(),
                 'metadata' => array_merge($response->metadata, [
                     'ai_messages' => $payload['ai_messages'] ?? null,
@@ -157,7 +158,7 @@ class GenerateContentPipeline
 
         // Convert external absolute links to plain text or '#'
         // Preserve relative links (/, ./, ../) and anchors (#...)
-        $clean = preg_replace_callback('#<a\s+[^>]*href\s*=\s*( ["\'])([^"\']+)\1[^>]*>(.*?)</a>#is', function (array $m): string {
+        $clean = preg_replace_callback('#<a\s+[^>]*href\s*=\s*(["\'])([^"\']+)\1[^>]*>(.*?)</a>#is', function (array $m): string {
             $href = $m[2];
             $text = trim(strip_tags($m[3]));
 

@@ -78,7 +78,7 @@ it('empty asset block widget hidden', function (): void {
 });
 
 it('empty asset block widget visible', function (): void {
-    config()->set('capell-layout.widget.skip_render_empty', false);
+    config()->set('capell-mosaic.widget.skip_render_empty', false);
 
     $site = Site::factory()->withTranslations()->create();
     $creator = resolve(WidgetCreator::class);

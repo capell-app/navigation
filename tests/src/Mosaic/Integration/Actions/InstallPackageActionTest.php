@@ -89,7 +89,7 @@ it('installs layout package: creates types, widgets, layouts, and registers morp
     // Morph maps registered
     expect(Relation::getMorphedModel('widget'))
         ->toBe(Widget::class)
-        ->and(Relation::getMorphedModel('content'))
+        ->and(Relation::getMorphedModel('section'))
         ->toBe(Section::class)
         ->and(Relation::getMorphedModel('widget_asset'))
         ->toBe(WidgetAsset::class);

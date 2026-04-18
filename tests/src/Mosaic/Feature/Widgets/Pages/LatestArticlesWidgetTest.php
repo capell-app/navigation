@@ -53,7 +53,7 @@ test('latest pages widget not visible', function (): void {
 });
 
 test('empty latest pages widget visible', function (): void {
-    config()->set('capell-layout.widget.skip_render_empty', false);
+    config()->set('capell-mosaic.widget.skip_render_empty', false);
 
     $site = Site::factory()->withTranslations()->create();
 

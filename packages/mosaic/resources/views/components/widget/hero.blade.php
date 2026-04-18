@@ -257,7 +257,7 @@ $theme = Frontend::theme();
                                 Frontend::setFrontendData('has_pagination_summary', true);
                             @endphp
 
-                            <x-capell-mosaic::pagination.summary
+                            <x-capell-mosaic::pagination.hero-summary
                                 :results="$this->results"
                             />
                         @endif

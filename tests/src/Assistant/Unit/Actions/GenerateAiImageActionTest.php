@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 use Capell\Assistant\Actions\GenerateAiImageAction;
 use Capell\Assistant\DataObjects\AiImageData;
-use EchoLabs\Prism\Facades\Prism;
-use EchoLabs\Prism\Testing\PrismFake;
+use Prism\Prism\Facades\Prism;
+use Prism\Prism\Testing\ImageResponseFake;
+use Prism\Prism\ValueObjects\GeneratedImage;
 
 it('returns an image URL from the AI provider', function (): void {
     $fake = Prism::fake([
-        PrismFake::image('https://example.com/generated.jpg'),
+        ImageResponseFake::make()->withImages([new GeneratedImage(url: 'https://example.com/generated.jpg')]),
     ]);
 
     $data = new AiImageData(

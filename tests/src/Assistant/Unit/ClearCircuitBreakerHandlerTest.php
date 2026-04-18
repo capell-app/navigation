@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Admin\Support\AdminEventRegistry;
 use Capell\Admin\Support\AdminEventRouter;
 use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Tests\Assistant\Fixtures\HandlerDummyComponent;
 use Filament\Notifications\Notification;
 
@@ -13,7 +13,7 @@ it('registers clear-circuit-breaker handler for EditPage and executes', function
     // Use the global app container to align with resolve()
     $app = app();
 
-    $mockProvider = new class extends OpenAIProvider
+    $mockProvider = new class extends PrismProvider
     {
         public bool $resetCalled = false;
 
@@ -22,7 +22,7 @@ it('registers clear-circuit-breaker handler for EditPage and executes', function
             $this->resetCalled = true;
         }
     };
-    $app->instance(OpenAIProvider::class, $mockProvider);
+    $app->instance(PrismProvider::class, $mockProvider);
 
     $app->bind(ClearCircuitBreakerHandler::class, fn (): ClearCircuitBreakerHandler => new ClearCircuitBreakerHandler);
 

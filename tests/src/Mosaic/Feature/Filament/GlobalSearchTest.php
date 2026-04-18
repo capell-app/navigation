@@ -23,8 +23,8 @@ beforeEach(function (): void {
 });
 
 it('finds content', function (string $searchTerm): void {
-    $contentNameToken = 'capell-layout-content-name-token';
-    $contentTitleToken = 'capell-layout-content-title-token';
+    $contentNameToken = 'capell-mosaic-content-name-token';
+    $contentTitleToken = 'capell-mosaic-content-title-token';
 
     $language = Language::factory()->create();
 
@@ -45,16 +45,16 @@ it('finds content', function (string $searchTerm): void {
         ->and($contentResult->title)->toBe($content->name)
         ->and($contentResult->url)->toBe(SectionResource::getUrl('edit', ['record' => $content]));
 })->with([
-    'name' => ['capell-layout-content-name-token'],
-    'title' => ['capell-layout-content-title-token'],
+    'name' => ['capell-mosaic-content-name-token'],
+    'title' => ['capell-mosaic-content-title-token'],
 ]);
 
 it('finds a widget', function (string $searchTerm): void {
-    $widgetNameToken = 'capell-layout-widget-name-token';
-    $widgetKeyToken = 'capell-layout-widget-key-token';
-    $widgetTitleToken = 'capell-layout-widget-title-token';
-    $widgetComponentToken = 'capell-layout-widget-component-token';
-    $widgetFileToken = 'capell-layout-widget-file-token';
+    $widgetNameToken = 'capell-mosaic-widget-name-token';
+    $widgetKeyToken = 'capell-mosaic-widget-key-token';
+    $widgetTitleToken = 'capell-mosaic-widget-title-token';
+    $widgetComponentToken = 'capell-mosaic-widget-component-token';
+    $widgetFileToken = 'capell-mosaic-widget-file-token';
 
     $language = Language::factory()->create();
 
@@ -80,9 +80,9 @@ it('finds a widget', function (string $searchTerm): void {
         ->and($widgetResult->title)->toBe($widget->name)
         ->and($widgetResult->url)->toBe(WidgetResource::getUrl('edit', ['record' => $widget]));
 })->with([
-    'name' => ['capell-layout-widget-name-token'],
-    'key' => ['capell-layout-widget-key-token'],
-    'title' => ['capell-layout-widget-title-token'],
-    'component' => ['capell-layout-widget-component-token'],
-    'file' => ['capell-layout-widget-file-token'],
+    'name' => ['capell-mosaic-widget-name-token'],
+    'key' => ['capell-mosaic-widget-key-token'],
+    'title' => ['capell-mosaic-widget-title-token'],
+    'component' => ['capell-mosaic-widget-component-token'],
+    'file' => ['capell-mosaic-widget-file-token'],
 ]);

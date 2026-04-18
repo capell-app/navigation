@@ -85,7 +85,7 @@ abstract class AbstractTestCase extends TestCase
 
         // Temp fix to ensure components are locatable when run in parallel
         Blade::componentNamespace('Capell\\Blog\\View\\Components', 'capell-blog');
-        Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-layout');
+        Blade::componentNamespace('Capell\\Mosaic\\View\\Components', 'capell-mosaic');
 
         Http::preventStrayRequests();
 

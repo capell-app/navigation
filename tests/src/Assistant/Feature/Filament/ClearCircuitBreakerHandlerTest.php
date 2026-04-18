@@ -5,14 +5,14 @@ declare(strict_types=1);
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
 use Capell\Admin\Support\AdminEventRegistry;
 use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Capell\Core\Models\Page;
 use Filament\Notifications\Notification;
 
 use function Pest\Livewire\livewire;
 
 it('dispatches clear-circuit-breaker event and calls handler', function (): void {
-    $mockProvider = new class extends OpenAIProvider
+    $mockProvider = new class extends PrismProvider
     {
         public bool $resetCalled = false;
 
@@ -21,7 +21,7 @@ it('dispatches clear-circuit-breaker event and calls handler', function (): void
             $this->resetCalled = true;
         }
     };
-    app()->instance(OpenAIProvider::class, $mockProvider);
+    app()->instance(PrismProvider::class, $mockProvider);
 
     // Bind a shared AdminEventRegistry and register the event
     $registry = new AdminEventRegistry;

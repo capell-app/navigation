@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Capell\Assistant\Actions;
 
 use Capell\Assistant\DataObjects\AiImageData;
-use EchoLabs\Prism\Enums\Provider;
-use EchoLabs\Prism\Facades\Prism;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Prism\Prism\Enums\Provider;
+use Prism\Prism\Facades\Prism;
 
 class GenerateAiImageAction
 {
@@ -25,7 +25,7 @@ class GenerateAiImageAction
             ->withPrompt($data->prompt)
             ->generate();
 
-        return $response->images[0]->url ?? $response->images[0]->base64 ?? '';
+        return $response->images[0]->url() ?? $response->images[0]->base64 ?? '';
     }
 
     private function resolveProvider(string $name): Provider

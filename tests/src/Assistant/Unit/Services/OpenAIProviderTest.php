@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\OpenAIProvider;
+use Capell\Assistant\Support\PrismProvider;
 use Illuminate\Support\Facades\Cache;
 
 uses()->group('admin-ai');
 
 it('opens circuit after repeated failures', function (): void {
-    $provider = resolve(OpenAIProvider::class);
+    $provider = resolve(PrismProvider::class);
 
     Cache::shouldReceive('get')->andReturn(false);
 

@@ -13,6 +13,7 @@ use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
+use Prism\Prism\PrismServiceProvider;
 
 class AssistantTestCase extends AbstractTestCase
 {
@@ -51,6 +52,7 @@ class AssistantTestCase extends AbstractTestCase
             AdminPanelProvider::class,
             AdminServiceProvider::class,
             LivewireServiceProvider::class,
+            PrismServiceProvider::class,
         ];
     }
 
