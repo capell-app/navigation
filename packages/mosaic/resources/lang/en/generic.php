@@ -48,4 +48,7 @@ return [
     'widget_page_assets_description' => 'Assets which belong to a page.',
     'widget_page_content_helper' => 'Display the page title, content, etc in a widget.',
     'widgets' => 'Widgets',
+    // Hero package language keys
+    'hero' => 'Hero',
+    'hero_info' => 'Introductory content for your site.',
 ];
