@@ -6,6 +6,7 @@ namespace Capell\Plugins\Providers;
 
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
+use Capell\Plugins\Services\AnystackClient;
 use Spatie\LaravelPackageTools\Package;
 
 class PluginsServiceProvider extends AbstractPackageServiceProvider
@@ -24,6 +25,16 @@ class PluginsServiceProvider extends AbstractPackageServiceProvider
                 '2026_01_01_000002_create_marketplace_plugin_licenses_table',
                 '2026_01_01_000003_create_marketplace_plugin_audit_log_table',
             ]);
+    }
+
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->singleton(AnystackClient::class, fn () => new AnystackClient(
+            config('capell-plugins.anystack.base_url', 'https://api.anystack.sh'),
+            config('capell-plugins.anystack.timeout_seconds', 10),
+        ));
     }
 
     public function registeringPackage(): void
