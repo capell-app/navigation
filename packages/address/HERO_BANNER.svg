@@ -42,7 +42,7 @@
     </linearGradient>
   </defs>
 
-  <text x="80" y="160" font-size="52" font-weight="800" fill="white" letter-spacing="-0.5">Address</text>
+  <text x="80" y="160" font-size="52" font-weight="800" fill="white" letter-spacing="-0.5" font-family="Hoefler Text, Georgia, serif">Address</text>
   <text x="80" y="210" font-size="15" fill="rgba(255,255,255,0.8)" font-weight="500">Manage addresses, locations, and countries across your site with structured, queryable location data.</text>
 
   <!-- World map visualization -->

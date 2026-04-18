@@ -29,7 +29,7 @@
     </linearGradient>
   </defs>
 
-  <text x="80" y="160" font-size="56" font-weight="700" fill="#1a1a18" letter-spacing="-0.5">Blog</text>
+  <text x="80" y="160" font-size="56" font-weight="700" fill="#1a1a18" letter-spacing="-0.5" font-family="Hoefler Text, Georgia, serif">Blog</text>
   <text x="80" y="210" font-size="15" fill="#6b6b68" font-weight="400" letter-spacing="0.3">Publish and manage blog posts with built-in categories, tags, RSS feeds, and editorial workflows.</text>
 
   <!-- Pages visualization -->
