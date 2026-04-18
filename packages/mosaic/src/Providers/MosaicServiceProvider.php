@@ -27,16 +27,21 @@ use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Console\Commands\DemoCommand;
+use Capell\Mosaic\Console\Commands\Hero\DemoCommand as HeroDemoCommand;
+use Capell\Mosaic\Console\Commands\Hero\SetupCommand as HeroSetupCommand;
 use Capell\Mosaic\Console\Commands\InstallCommand;
 use Capell\Mosaic\Console\Commands\SetupCommand;
 use Capell\Mosaic\Console\Commands\UpgradeCommand;
 use Capell\Mosaic\Enums\AssetEnum;
 use Capell\Mosaic\Enums\ComponentTypeEnum;
+use Capell\Mosaic\Enums\Hero\ContentSchemaEnum as HeroContentSchemaEnum;
+use Capell\Mosaic\Enums\Hero\WidgetSchemaEnum as HeroWidgetSchemaEnum;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Capell\Mosaic\Enums\LivewireComponentsEnum;
 use Capell\Mosaic\Enums\ModelEnum;
 use Capell\Mosaic\Enums\ResourceEnum as LayoutResourceEnum;
 use Capell\Mosaic\Enums\TypeSchemaEnum;
+use Capell\Mosaic\Filament\Extenders\Page\HeroPageSchemaExtender;
 use Capell\Mosaic\Filament\Resources\Layouts\LayoutResource;
 use Capell\Mosaic\Filament\Resources\Layouts\Schemas\Extenders\LayoutSchemaExtender;
 use Capell\Mosaic\Filament\Resources\Pages\Schemas\Extenders\PageSchemaExtender;
@@ -93,6 +98,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
                 InstallCommand::class,
                 SetupCommand::class,
                 UpgradeCommand::class,
+                HeroDemoCommand::class,
+                HeroSetupCommand::class,
             ]);
     }
 
@@ -326,6 +333,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
 
         $this->registerSchemaExtender(SchemaExtenderEnum::Layout->value, LayoutSchemaExtender::class);
 
+        $this->registerSchemaExtender(HeroPageSchemaExtender::TAG, HeroPageSchemaExtender::class);
+
         return $this;
     }
 
@@ -369,6 +378,9 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
     {
         Blade::componentNamespace('Capell\\Layout\\View\\Components', 'capell-mosaic');
         Blade::anonymousComponentNamespace('Capell\\Layout\\View\\Components');
+
+        Blade::componentNamespace('Capell\\Mosaic\\View\\Components\\Widget\\Hero', 'capell-hero');
+        Blade::anonymousComponentNamespace('Capell\\Mosaic\\View\\Components\\Widget\\Hero');
 
         return $this;
     }
@@ -490,6 +502,9 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
 
         CapellAdmin::registerSchema(SchemaTypeEnum::Type, ContentTypeSchema::class);
         CapellAdmin::registerSchema(SchemaTypeEnum::Type, WidgetTypeSchema::class);
+
+        CapellAdmin::registerSchema(TypeSchemaEnum::Content, HeroContentSchemaEnum::Hero);
+        CapellAdmin::registerSchema(TypeSchemaEnum::Widget, HeroWidgetSchemaEnum::Hero);
 
         return $this;
     }
