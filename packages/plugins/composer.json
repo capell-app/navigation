@@ -20,7 +20,9 @@
     ],
     "require": {
         "php": "^8.2",
-        "capell-app/admin": "*"
+        "capell-app/admin": "*",
+        "spatie/laravel-data": "^4.5",
+        "opis/json-schema": "^2.3"
     },
     "autoload": {
         "psr-4": {

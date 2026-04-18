@@ -1,0 +1,17 @@
+{
+    "name": "openkit/minimal-widget",
+    "title": "Minimal Widget",
+    "slug": "minimal-widget",
+    "version": "0.1.0",
+    "description": "A bare-bones example widget used for docs and tests",
+    "vendor": "openkit",
+    "license_model": "free",
+    "categories": ["widgets"],
+    "compatibility": {
+        "capell": "^4.0",
+        "php": "^8.2"
+    },
+    "capabilities": ["admin_pages"],
+    "kind": "widget",
+    "entrypoint": "Openkit\\MinimalWidget\\MinimalWidget"
+}

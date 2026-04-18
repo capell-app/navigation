@@ -7,6 +7,16 @@ namespace Capell\Plugins\Enums;
 enum LicenseModel: string
 {
     case Free = 'free';
-    case PaidOnce = 'paid_once';
+    case PaidOneTime = 'paid_one_time';
     case PaidSubscription = 'paid_subscription';
+
+    public function isPaid(): bool
+    {
+        return $this !== self::Free;
+    }
+
+    public function isSubscription(): bool
+    {
+        return $this === self::PaidSubscription;
+    }
 }

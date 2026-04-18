@@ -6,8 +6,10 @@ namespace Capell\Plugins\Enums;
 
 enum PluginKind: string
 {
-    case Full = 'full';
-    case Integration = 'integration';
-    case PageType = 'page_type';
     case Theme = 'theme';
+    case PageType = 'page_type';
+    case Widget = 'widget';
+    case Integration = 'integration';
+    case ContentType = 'content_type';
+    case Full = 'full';
 }

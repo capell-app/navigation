@@ -13,6 +13,7 @@ use Capell\Tests\Fixtures\Admin\AdminPanelProvider;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
+use RuntimeException;
 
 class PluginsTestCase extends AbstractTestCase
 {
@@ -61,5 +62,27 @@ class PluginsTestCase extends AbstractTestCase
 
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(PluginsServiceProvider::$packageName);
+    }
+
+    protected function getFixturePath(string $relative): string
+    {
+        return dirname(__DIR__, 3) . '/packages/plugins/tests/fixtures/' . ltrim($relative, '/');
+    }
+
+    protected function loadFixture(string $relative): string
+    {
+        $path = $this->getFixturePath($relative);
+
+        if (! is_file($path)) {
+            throw new RuntimeException("Fixture not found: {$relative}");
+        }
+
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            throw new RuntimeException("Fixture could not be read: {$relative}");
+        }
+
+        return $contents;
     }
 }
