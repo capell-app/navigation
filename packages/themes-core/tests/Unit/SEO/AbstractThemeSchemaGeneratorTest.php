@@ -55,3 +55,64 @@ test('toJsonLd() produces valid JSON with unescaped slashes', function () use ($
     expect($json)->toContain('https://example.com/page');
     expect($json)->not->toContain('https:\/\/');
 });
+
+test('organization() includes logo when resolveOrgLogo returns a value', function (): void {
+    $generator = new class extends AbstractThemeSchemaGenerator
+    {
+        protected function resolveOrgName(): string
+        {
+            return 'Logo Corp';
+        }
+
+        /** @return array<int, string> */
+        protected function resolveSameAs(): array
+        {
+            return [];
+        }
+
+        protected function resolveOrgLogo(): ?string
+        {
+            return 'https://example.com/logo.png';
+        }
+    };
+
+    $result = $generator->organization();
+    expect($result)->toHaveKey('logo', 'https://example.com/logo.png');
+});
+
+test('organization() includes description when resolveOrgDescription returns a value', function (): void {
+    $generator = new class extends AbstractThemeSchemaGenerator
+    {
+        protected function resolveOrgName(): string
+        {
+            return 'Desc Corp';
+        }
+
+        /** @return array<int, string> */
+        protected function resolveSameAs(): array
+        {
+            return [];
+        }
+
+        protected function resolveOrgDescription(): ?string
+        {
+            return 'A fine company.';
+        }
+    };
+
+    $result = $generator->organization();
+    expect($result)->toHaveKey('description', 'A fine company.');
+});
+
+test('article() returns an Article node with required and optional fields', function () use ($makeGenerator): void {
+    $result = $makeGenerator()->article([
+        'headline' => 'My Article',
+        'author' => 'Jane Doe',
+        'datePublished' => '2026-01-01',
+    ]);
+
+    expect($result['@type'])->toBe('Article');
+    expect($result['headline'])->toBe('My Article');
+    expect($result['author']['name'])->toBe('Jane Doe');
+    expect($result)->not->toHaveKey('image');
+});

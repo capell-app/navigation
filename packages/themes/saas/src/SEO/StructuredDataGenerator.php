@@ -48,14 +48,14 @@ class StructuredDataGenerator extends AbstractThemeSchemaGenerator
             if ($monthly === null) {
                 continue;
             }
-            $offers[] = [
+            $offers[] = array_filter([
                 '@type' => 'Offer',
                 'name' => $tier['name'] ?? '',
                 'price' => (string) $monthly,
                 'priceCurrency' => $tier['currency'] ?? 'USD',
                 'url' => $tier['url'] ?? null,
                 'availability' => 'https://schema.org/InStock',
-            ];
+            ], static fn ($value) => $value !== null && $value !== '');
         }
 
         return array_filter([
