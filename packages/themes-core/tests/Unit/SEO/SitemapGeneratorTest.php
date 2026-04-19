@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+use Capell\Themes\Core\SEO\SitemapGenerator;
+
+test('add() accumulates URLs and count() returns the correct count', function (): void {
+    $sitemap = new SitemapGenerator;
+
+    expect($sitemap->count())->toBe(0);
+
+    $sitemap->add('https://example.com/', priority: 1.0, changefreq: 'daily')
+        ->add('https://example.com/about', priority: 0.8)
+        ->add('https://example.com/blog', priority: 0.7, changefreq: 'weekly');
+
+    expect($sitemap->count())->toBe(3);
+});
+
+test('toXml() produces valid XML with correct urlset structure', function (): void {
+    $sitemap = new SitemapGenerator;
+    $sitemap->add('https://example.com/');
+
+    $xml = $sitemap->toXml();
+
+    expect($xml)->toContain('<?xml version="1.0"');
+    expect($xml)->toContain('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"');
+    expect($xml)->toContain('<urlset');
+    expect($xml)->toContain('<url>');
+    expect($xml)->toContain('</urlset>');
+});
+
+test('toXml() includes loc, priority, changefreq, and lastmod when provided', function (): void {
+    $sitemap = new SitemapGenerator;
+    $sitemap->add(
+        url: 'https://example.com/page',
+        lastmod: '2024-06-01',
+        changefreq: 'weekly',
+        priority: 0.9,
+    );
+
+    $xml = $sitemap->toXml();
+
+    expect($xml)
+        ->toContain('<loc>https://example.com/page</loc>')
+        ->toContain('<lastmod>2024-06-01</lastmod>')
+        ->toContain('<changefreq>weekly</changefreq>')
+        ->toContain('<priority>0.9</priority>');
+});
+
+test('writeTo() writes to a temp file correctly', function (): void {
+    $sitemap = new SitemapGenerator;
+    $sitemap->add('https://example.com/', priority: 1.0);
+
+    $tempPath = sys_get_temp_dir() . '/sitemap_test_' . uniqid() . '.xml';
+
+    $result = $sitemap->writeTo($tempPath);
+
+    expect($result)->toBeTrue();
+    expect(file_exists($tempPath))->toBeTrue();
+
+    $contents = file_get_contents($tempPath);
+    expect($contents)->toContain('<loc>https://example.com/</loc>');
+
+    unlink($tempPath);
+});
