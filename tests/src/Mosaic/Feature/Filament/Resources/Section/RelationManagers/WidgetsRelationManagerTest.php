@@ -60,3 +60,40 @@ it('can search widgets for a content model', function (): void {
         ->assertCountTableRecords(1)
         ->assertCanSeeTableRecords([$widgetAsset]);
 });
+
+it('returns no results when search matches nothing', function (): void {
+    $content = Section::factory()->create();
+
+    Widget::factory()
+        ->count(3)
+        ->has(WidgetAsset::factory()->asset($content), 'assets')
+        ->create();
+
+    livewire(WidgetsRelationManager::class, [
+        'ownerRecord' => $content,
+        'pageClass' => EditSection::class,
+    ])
+        ->assertSuccessful()
+        ->assertCountTableRecords(3)
+        ->searchTable('zzz-no-match')
+        ->assertCountTableRecords(0);
+});
+
+it('can sort widgets by key', function (): void {
+    $content = Section::factory()->create();
+
+    Widget::factory()
+        ->count(3)
+        ->has(WidgetAsset::factory()->asset($content), 'assets')
+        ->create();
+
+    $widgetAssets = $content->widgets()->with('widget')->get()->sortBy('widget.key');
+
+    livewire(WidgetsRelationManager::class, [
+        'ownerRecord' => $content,
+        'pageClass' => EditSection::class,
+    ])
+        ->assertSuccessful()
+        ->sortTable('widget.key')
+        ->assertCanSeeTableRecords($widgetAssets, inOrder: true);
+});
