@@ -15,7 +15,7 @@ $makeWidget = (fn (string $view = 'stub::widget'): AbstractThemeWidget => new cl
         ['name' => 'count', 'label' => 'Count', 'type' => 'number'],
     ];
 
-    public function __construct(public string $view) {}
+    public function __construct(public string $view = 'stub::widget') {}
 });
 
 test('defaults() returns field default values keyed by name', function () use ($makeWidget): void {

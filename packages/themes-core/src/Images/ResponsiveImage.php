@@ -89,7 +89,7 @@ class ResponsiveImage
         $parts = [];
         foreach ($this->widths as $w) {
             $url = $this->urlTransformer
-                ? (string) ($this->urlTransformer)($src, $w)
+                ? ($this->urlTransformer)($src, $w)
                 : $this->appendQuery($src, $w);
 
             $parts[] = $url . ' ' . $w . 'w';
