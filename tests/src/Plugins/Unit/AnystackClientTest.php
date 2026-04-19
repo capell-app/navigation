@@ -93,8 +93,12 @@ final class AnystackClientTest extends PluginsTestCase
         $this->assertEquals(LicenseStatus::Revoked, $result->status);
     }
 
-    public function test_validate_license_maps_fingerprint_invalid_to_past_due(): void
+    public function test_validate_license_maps_fingerprint_invalid_to_invalid_not_past_due(): void
     {
+        // Fingerprint mismatch is an identity/activation problem, not a
+        // billing problem — mapping it to PastDue (the previous behavior)
+        // conflated "we couldn't charge you" with "the install identity is
+        // wrong." The Invalid bucket is terminal until manual intervention.
         Http::fake([
             'api.anystack.sh/*' => Http::response([
                 'data' => [
@@ -108,8 +112,9 @@ final class AnystackClientTest extends PluginsTestCase
         $result = $this->client->validateLicense('prod_xyz', 'test-key');
 
         $this->assertFalse($result->valid);
-        $this->assertEquals(LicenseStatus::PastDue, $result->status);
+        $this->assertEquals(LicenseStatus::Invalid, $result->status);
         $this->assertEquals('FINGERPRINT_INVALID', $result->statusCode);
+        $this->assertFalse($result->status->isUsable());
     }
 
     public function test_validate_license_sends_bearer_token_when_api_key_configured(): void
@@ -268,12 +273,12 @@ final class AnystackClientTest extends PluginsTestCase
         $this->assertSame('SUSPENDED', $result->statusCode);
     }
 
-    public function test_validate_license_maps_restricted_to_expired_as_a_terminal_state(): void
+    public function test_validate_license_maps_restricted_to_restricted_distinct_from_expired(): void
     {
-        // RESTRICTED goes in the same "no longer usable" bucket as EXPIRED,
-        // not into PastDue (that's fingerprint recovery) and not into Revoked
-        // (that's actively suspended). Keep the mapping explicit so future
-        // changes have to update this test intentionally.
+        // RESTRICTED is distinct from EXPIRED: the user is still entitled to
+        // whatever version shipped at the restriction boundary, just not to
+        // new updates. Previously bucketed as Expired; now its own case so
+        // the admin UI can render a softer "no new updates" message.
         Http::fake([
             'api.anystack.sh/*' => Http::response([
                 'data' => ['id' => 'license-123', 'suspended' => false],
@@ -284,11 +289,12 @@ final class AnystackClientTest extends PluginsTestCase
         $result = $this->client->validateLicense('prod_xyz', 'test-key');
 
         $this->assertFalse($result->valid);
-        $this->assertSame(LicenseStatus::Expired, $result->status);
+        $this->assertSame(LicenseStatus::Restricted, $result->status);
         $this->assertSame('RESTRICTED', $result->statusCode);
+        $this->assertFalse($result->status->isUsable());
     }
 
-    public function test_validate_license_maps_fingerprint_invalid_hostname_to_past_due(): void
+    public function test_validate_license_maps_fingerprint_invalid_hostname_to_invalid(): void
     {
         Http::fake([
             'api.anystack.sh/*' => Http::response([
@@ -299,8 +305,23 @@ final class AnystackClientTest extends PluginsTestCase
 
         $result = $this->client->validateLicense('prod_xyz', 'test-key');
 
-        $this->assertSame(LicenseStatus::PastDue, $result->status);
+        $this->assertSame(LicenseStatus::Invalid, $result->status);
         $this->assertSame('FINGERPRINT_INVALID_HOSTNAME', $result->statusCode);
+    }
+
+    public function test_validate_license_maps_fingerprint_missing_to_invalid(): void
+    {
+        Http::fake([
+            'api.anystack.sh/*' => Http::response([
+                'data' => ['id' => 'license-123', 'suspended' => false],
+                'meta' => ['valid' => false, 'status' => 'FINGERPRINT_MISSING'],
+            ], 200),
+        ]);
+
+        $result = $this->client->validateLicense('prod_xyz', 'test-key');
+
+        $this->assertSame(LicenseStatus::Invalid, $result->status);
+        $this->assertSame('FINGERPRINT_MISSING', $result->statusCode);
     }
 
     public function test_validate_license_throws_when_meta_valid_missing(): void

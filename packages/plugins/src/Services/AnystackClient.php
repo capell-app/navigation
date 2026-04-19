@@ -201,8 +201,16 @@ final class AnystackClient
             return LicenseStatus::Expired;
         }
 
-        if ($statusCode === 'EXPIRED' || $statusCode === 'RESTRICTED') {
+        if ($statusCode === 'EXPIRED') {
             return LicenseStatus::Expired;
+        }
+
+        if ($statusCode === 'RESTRICTED') {
+            // Entitled to the version shipped at expiry, but not new releases.
+            // Distinct from Expired so the admin UI can render a softer
+            // message ("no new updates") rather than the hard "license
+            // expired, plugin disabled" banner.
+            return LicenseStatus::Restricted;
         }
 
         if ($statusCode === 'SUSPENDED') {
@@ -210,7 +218,11 @@ final class AnystackClient
         }
 
         if (str_starts_with($statusCode, 'FINGERPRINT_')) {
-            return LicenseStatus::PastDue;
+            // Fingerprint mismatch is an identity/activation problem, not a
+            // billing problem. PastDue was the wrong bucket — a license
+            // with a FINGERPRINT_* status won't self-heal on the next
+            // heartbeat the way a PastDue billing issue might.
+            return LicenseStatus::Invalid;
         }
 
         return LicenseStatus::Expired;

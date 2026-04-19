@@ -20,7 +20,7 @@ test('license models cover free/paid-one-time/paid-subscription', function (): v
 
 test('license statuses are known set', function (): void {
     expect(array_map(static fn (LicenseStatus $status): string => $status->value, LicenseStatus::cases()))
-        ->toEqualCanonicalizing(['active', 'trial', 'past_due', 'expired', 'revoked', 'cancelled']);
+        ->toEqualCanonicalizing(['active', 'trial', 'past_due', 'expired', 'revoked', 'cancelled', 'restricted', 'invalid']);
 });
 
 test('capability warning levels are green/yellow/red', function (): void {
@@ -61,4 +61,6 @@ test('LicenseStatus::isUsable is true for Active, Trial, PastDue only', function
     expect(LicenseStatus::Expired->isUsable())->toBeFalse();
     expect(LicenseStatus::Revoked->isUsable())->toBeFalse();
     expect(LicenseStatus::Cancelled->isUsable())->toBeFalse();
+    expect(LicenseStatus::Restricted->isUsable())->toBeFalse();
+    expect(LicenseStatus::Invalid->isUsable())->toBeFalse();
 });
