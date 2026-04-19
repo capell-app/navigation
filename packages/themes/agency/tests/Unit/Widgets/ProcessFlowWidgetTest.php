@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Widgets\ProcessFlowWidget;
 
-test('process flow widget declares a steps field', function () {
+test('process flow widget declares a steps field', function (): void {
     $widget = ProcessFlowWidget::make();
 
     expect($widget->fieldNames())->toContain('steps')
@@ -12,7 +12,7 @@ test('process flow widget declares a steps field', function () {
         ->and($widget->name)->toBe('Process Flow');
 });
 
-test('process flow steps have numbered defaults', function () {
+test('process flow steps have numbered defaults', function (): void {
     $widget = ProcessFlowWidget::make();
     $defaults = $widget->defaults();
 

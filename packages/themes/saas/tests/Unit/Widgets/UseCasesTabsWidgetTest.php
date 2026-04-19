@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\UseCasesTabsWidget;
 
-test('use-cases-tabs widget has expected metadata', function () {
+test('use-cases-tabs widget has expected metadata', function (): void {
     $widget = UseCasesTabsWidget::make();
 
     expect($widget->name)->toBe('Use Cases Tabs')
@@ -12,7 +12,7 @@ test('use-cases-tabs widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('use_cases');
 });
 
-test('use-cases-tabs default use cases each include a label and benefits', function () {
+test('use-cases-tabs default use cases each include a label and benefits', function (): void {
     $widget = UseCasesTabsWidget::make();
     $cases = $widget->defaults()['use_cases'];
 

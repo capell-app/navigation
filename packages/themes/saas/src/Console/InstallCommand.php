@@ -30,7 +30,7 @@ class InstallCommand extends Command
             'seed_layouts' => (bool) $this->option('seed-layouts'),
         ]);
 
-        $this->info('SaaS theme installed: '.($result['theme_key'] ?? 'saas'));
+        $this->info('SaaS theme installed: ' . ($result['theme_key'] ?? 'saas'));
 
         return self::SUCCESS;
     }

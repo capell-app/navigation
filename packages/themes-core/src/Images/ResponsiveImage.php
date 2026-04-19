@@ -50,7 +50,7 @@ class ResponsiveImage
             'style' => sprintf('aspect-ratio: %d / %d;', max(1, $width), max(1, $height)),
         ], $extraAttributes);
 
-        return '<img '.$this->attrs($attributes).' />';
+        return '<img ' . $this->attrs($attributes) . ' />';
     }
 
     /**
@@ -76,7 +76,7 @@ class ResponsiveImage
             );
         }
 
-        return '<picture>'.$sources.$this->render($src, $alt, $width, $height, $sizes, $lazy, $extraAttributes).'</picture>';
+        return '<picture>' . $sources . $this->render($src, $alt, $width, $height, $sizes, $lazy, $extraAttributes) . '</picture>';
     }
 
     public function buildSrcset(string $src): string
@@ -92,7 +92,7 @@ class ResponsiveImage
                 ? (string) ($this->urlTransformer)($src, $w)
                 : $this->appendQuery($src, $w);
 
-            $parts[] = $url.' '.$w.'w';
+            $parts[] = $url . ' ' . $w . 'w';
         }
 
         return implode(', ', $parts);
@@ -102,7 +102,7 @@ class ResponsiveImage
     {
         $separator = str_contains($src, '?') ? '&' : '?';
 
-        return $src.$separator.'w='.$width;
+        return $src . $separator . 'w=' . $width;
     }
 
     /**

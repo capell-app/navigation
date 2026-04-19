@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\PricingTableWidget;
 
-test('pricing-table widget exposes correct view and fields', function () {
+test('pricing-table widget exposes correct view and fields', function (): void {
     $widget = PricingTableWidget::make();
 
     expect($widget->name)->toBe('Pricing Table')
@@ -12,7 +12,7 @@ test('pricing-table widget exposes correct view and fields', function () {
         ->and($widget->fieldNames())->toContain('cycle_default', 'tiers', 'annual_discount_label');
 });
 
-test('pricing-table default tiers include a highlighted plan', function () {
+test('pricing-table default tiers include a highlighted plan', function (): void {
     $widget = PricingTableWidget::make();
     $tiers = $widget->defaults()['tiers'];
 
@@ -21,7 +21,7 @@ test('pricing-table default tiers include a highlighted plan', function () {
     expect($highlighted)->not->toBeEmpty();
 });
 
-test('pricing-table default cycle is monthly', function () {
+test('pricing-table default cycle is monthly', function (): void {
     $widget = PricingTableWidget::make();
 
     expect($widget->defaults()['cycle_default'])->toBe('monthly');

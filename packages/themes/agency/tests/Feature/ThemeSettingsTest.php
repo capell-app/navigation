@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Data\AgencyThemeSettings;
 
-test('agency theme settings defaults match design system', function () {
+test('agency theme settings defaults match design system', function (): void {
     $settings = new AgencyThemeSettings;
 
     expect($settings->primary_color)->toBe('#ff5a7e')
@@ -17,7 +17,7 @@ test('agency theme settings defaults match design system', function () {
         ->and($settings->show_clients)->toBeTrue();
 });
 
-test('agency theme settings can carry organization and social metadata', function () {
+test('agency theme settings can carry organization and social metadata', function (): void {
     $settings = new AgencyThemeSettings(
         organization_name: 'Studio Example',
         organization_logo_url: 'https://example.com/logo.png',

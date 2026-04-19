@@ -39,7 +39,7 @@ class SeedSaasLayoutsAction
                     'name' => $definition['name'],
                     'widgets' => $definition['widgets'],
                     'status' => 1,
-                ]
+                ],
             );
 
             if (isset($model->id)) {

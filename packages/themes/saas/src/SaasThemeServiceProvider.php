@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Themes\Saas;
 
+use Capell\Themes\Saas\Console\InstallCommand;
 use Capell\Themes\Saas\Widgets\CTABannerWidget;
 use Capell\Themes\Saas\Widgets\FAQAccordionWidget;
 use Capell\Themes\Saas\Widgets\FeatureMatrixWidget;
@@ -22,11 +23,31 @@ class SaasThemeServiceProvider extends ServiceProvider
     public const VERSION = '1.0.0';
 
     /**
+     * Return list of widget classes bundled with this theme.
+     *
+     * @return array<int, class-string>
+     */
+    public static function widgets(): array
+    {
+        return [
+            HeroWithScreenshotWidget::class,
+            FeatureMatrixWidget::class,
+            PricingTableWidget::class,
+            IntegrationsGridWidget::class,
+            UseCasesTabsWidget::class,
+            TestimonialsWallWidget::class,
+            FAQAccordionWidget::class,
+            CTABannerWidget::class,
+            SaasFooterWidget::class,
+        ];
+    }
+
+    /**
      * Register bindings.
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/saas.php', 'capell-saas');
+        $this->mergeConfigFrom(__DIR__ . '/../config/saas.php', 'capell-saas');
     }
 
     /**
@@ -34,21 +55,21 @@ class SaasThemeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'saas');
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'saas');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../resources/views' => resource_path('vendor/capell-themes/saas/views'),
+                __DIR__ . '/../resources/views' => resource_path('vendor/capell-themes/saas/views'),
             ], 'capell-saas-views');
 
             $this->publishes([
-                __DIR__.'/../resources/css' => resource_path('vendor/capell-themes/saas/css'),
+                __DIR__ . '/../resources/css' => resource_path('vendor/capell-themes/saas/css'),
             ], 'capell-saas-css');
 
             $this->publishes([
-                __DIR__.'/../resources/views' => resource_path('vendor/capell-themes/saas/views'),
-                __DIR__.'/../resources/css' => resource_path('vendor/capell-themes/saas/css'),
+                __DIR__ . '/../resources/views' => resource_path('vendor/capell-themes/saas/views'),
+                __DIR__ . '/../resources/css' => resource_path('vendor/capell-themes/saas/css'),
             ], 'capell-saas');
 
             $this->registerCommands();
@@ -63,7 +84,7 @@ class SaasThemeServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         $this->commands([
-            \Capell\Themes\Saas\Console\InstallCommand::class,
+            InstallCommand::class,
         ]);
     }
 
@@ -88,25 +109,5 @@ class SaasThemeServiceProvider extends ServiceProvider
                 $mosaic->registerWidget(new $widget);
             }
         }
-    }
-
-    /**
-     * Return list of widget classes bundled with this theme.
-     *
-     * @return array<int, class-string>
-     */
-    public static function widgets(): array
-    {
-        return [
-            HeroWithScreenshotWidget::class,
-            FeatureMatrixWidget::class,
-            PricingTableWidget::class,
-            IntegrationsGridWidget::class,
-            UseCasesTabsWidget::class,
-            TestimonialsWallWidget::class,
-            FAQAccordionWidget::class,
-            CTABannerWidget::class,
-            SaasFooterWidget::class,
-        ];
     }
 }

@@ -68,7 +68,7 @@ class StructuredDataGenerator
             'name' => $name ?? ($this->settings instanceof CorporateThemeSettings ? $this->settings->organization_name : 'Capell'),
             'potentialAction' => [
                 '@type' => 'SearchAction',
-                'target' => rtrim($url, '/').'/search?q={search_term_string}',
+                'target' => rtrim($url, '/') . '/search?q={search_term_string}',
                 'query-input' => 'required name=search_term_string',
             ],
         ];

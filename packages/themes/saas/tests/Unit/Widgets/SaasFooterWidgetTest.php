@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\SaasFooterWidget;
 
-test('saas-footer widget has expected metadata', function () {
+test('saas-footer widget has expected metadata', function (): void {
     $widget = SaasFooterWidget::make();
 
     expect($widget->name)->toBe('SaaS Footer')
@@ -12,7 +12,7 @@ test('saas-footer widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('brand', 'columns', 'socials');
 });
 
-test('saas-footer defaults include product/company/resources/legal columns', function () {
+test('saas-footer defaults include product/company/resources/legal columns', function (): void {
     $widget = SaasFooterWidget::make();
     $columns = $widget->defaults()['columns'];
     $headings = array_map(static fn ($c) => $c['heading'] ?? '', $columns);

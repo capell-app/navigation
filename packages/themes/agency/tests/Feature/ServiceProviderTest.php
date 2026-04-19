@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\AgencyThemeServiceProvider;
 
-test('provider exposes widget list', function () {
+test('provider exposes widget list', function (): void {
     $widgets = AgencyThemeServiceProvider::widgets();
 
     expect($widgets)->toBeArray()->toHaveCount(9);
@@ -13,6 +13,6 @@ test('provider exposes widget list', function () {
     }
 });
 
-test('theme key constant is agency', function () {
+test('theme key constant is agency', function (): void {
     expect(AgencyThemeServiceProvider::THEME_KEY)->toBe('agency');
 });

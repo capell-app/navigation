@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Themes\Corporate\Data\CorporateThemeSettings;
 use Capell\Themes\Corporate\SEO\StructuredDataGenerator;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->settings = new CorporateThemeSettings(
         organization_name: 'Acme Corp',
         organization_logo_url: 'https://example.com/logo.png',
@@ -16,7 +16,7 @@ beforeEach(function () {
     $this->generator = new StructuredDataGenerator($this->settings);
 });
 
-test('organization includes name, logo, description and sameAs', function () {
+test('organization includes name, logo, description and sameAs', function (): void {
     $data = $this->generator->organization('https://example.com');
 
     expect($data['@type'])->toBe('Organization')
@@ -26,7 +26,7 @@ test('organization includes name, logo, description and sameAs', function () {
         ->and($data['sameAs'])->toContain('https://twitter.com/acme', 'https://linkedin.com/company/acme');
 });
 
-test('website includes SearchAction', function () {
+test('website includes SearchAction', function (): void {
     $data = $this->generator->website('https://example.com');
 
     expect($data['@type'])->toBe('WebSite')
@@ -34,7 +34,7 @@ test('website includes SearchAction', function () {
         ->and($data['potentialAction']['target'])->toContain('search?q=');
 });
 
-test('article filters null fields', function () {
+test('article filters null fields', function (): void {
     $data = $this->generator->article([
         'headline' => 'Hello',
         'datePublished' => '2026-04-19',
@@ -46,7 +46,7 @@ test('article filters null fields', function () {
         ->and($data['dateModified'])->toBe('2026-04-19');
 });
 
-test('breadcrumb indexes items from 1', function () {
+test('breadcrumb indexes items from 1', function (): void {
     $data = $this->generator->breadcrumb([
         ['name' => 'Home', 'url' => '/'],
         ['name' => 'Blog', 'url' => '/blog'],
@@ -57,7 +57,7 @@ test('breadcrumb indexes items from 1', function () {
         ->and($data['itemListElement'][1]['position'])->toBe(2);
 });
 
-test('faq wraps questions and answers', function () {
+test('faq wraps questions and answers', function (): void {
     $data = $this->generator->faq([
         ['question' => 'Q1?', 'answer' => 'A1.'],
     ]);
@@ -67,7 +67,7 @@ test('faq wraps questions and answers', function () {
         ->and($data['mainEntity'][0]['acceptedAnswer']['text'])->toBe('A1.');
 });
 
-test('toJsonLd produces valid JSON', function () {
+test('toJsonLd produces valid JSON', function (): void {
     $json = $this->generator->toJsonLd(['@type' => 'Test', 'name' => 'hello']);
 
     expect($json)->toBeString();

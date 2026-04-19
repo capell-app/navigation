@@ -61,7 +61,7 @@ class AssetOptimizer
             foreach ($hint as $attr => $value) {
                 $parts[] = sprintf('%s="%s"', $attr, htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
             }
-            $lines[] = '<link '.implode(' ', $parts).' />';
+            $lines[] = '<link ' . implode(' ', $parts) . ' />';
         }
 
         return implode("\n", $lines);

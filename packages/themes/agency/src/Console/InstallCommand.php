@@ -30,7 +30,7 @@ class InstallCommand extends Command
             'seed_layouts' => (bool) $this->option('seed-layouts'),
         ]);
 
-        $this->info('Agency theme installed: '.($result['theme_key'] ?? 'agency'));
+        $this->info('Agency theme installed: ' . ($result['theme_key'] ?? 'agency'));
 
         return self::SUCCESS;
     }

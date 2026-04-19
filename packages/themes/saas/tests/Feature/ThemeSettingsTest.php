@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Data\SaasThemeSettings;
 
-test('saas theme settings defaults match design system', function () {
+test('saas theme settings defaults match design system', function (): void {
     $settings = new SaasThemeSettings;
 
     expect($settings->primary_color)->toBe('#6366f1')
@@ -18,7 +18,7 @@ test('saas theme settings defaults match design system', function () {
         ->and($settings->pricing_cycle_default)->toBe('monthly');
 });
 
-test('saas theme settings carry product metadata', function () {
+test('saas theme settings carry product metadata', function (): void {
     $settings = new SaasThemeSettings(
         product_name: 'Acme SaaS',
         product_description: 'A powerful widget for teams.',

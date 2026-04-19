@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Corporate\Widgets\TeamGridWidget;
 
-test('team grid widget declares members field', function () {
+test('team grid widget declares members field', function (): void {
     $widget = TeamGridWidget::make();
 
     expect($widget->fieldNames())->toContain('members')

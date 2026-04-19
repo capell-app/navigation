@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\CTABannerWidget;
 
-test('cta-banner widget has expected metadata', function () {
+test('cta-banner widget has expected metadata', function (): void {
     $widget = CTABannerWidget::make();
 
     expect($widget->name)->toBe('CTA Banner')
@@ -12,7 +12,7 @@ test('cta-banner widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('title', 'primary_cta_label', 'variant');
 });
 
-test('cta-banner render produces non-empty html', function () {
+test('cta-banner render produces non-empty html', function (): void {
     $widget = CTABannerWidget::make();
     $html = $widget->render(['title' => 'Try it now']);
 

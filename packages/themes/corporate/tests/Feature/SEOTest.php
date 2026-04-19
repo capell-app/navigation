@@ -5,14 +5,14 @@ declare(strict_types=1);
 use Capell\Themes\Corporate\Data\CorporateThemeSettings;
 use Capell\Themes\Corporate\SEO\StructuredDataGenerator;
 
-test('structured data output embeds as valid json-ld', function () {
+test('structured data output embeds as valid json-ld', function (): void {
     $generator = new StructuredDataGenerator(new CorporateThemeSettings);
     $html = $generator->toJsonLd($generator->organization('https://example.com'));
 
     expect(json_decode($html, true))->toBeArray()->toHaveKey('@context');
 });
 
-test('structured data supports article + breadcrumb + faq in one page', function () {
+test('structured data supports article + breadcrumb + faq in one page', function (): void {
     $generator = new StructuredDataGenerator(new CorporateThemeSettings);
 
     $article = $generator->article(['headline' => 'Hello']);

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Widgets\ServicesShowcaseWidget;
 
-test('services showcase widget has services field', function () {
+test('services showcase widget has services field', function (): void {
     $widget = ServicesShowcaseWidget::make();
 
     expect($widget->fieldNames())->toContain('services', 'title')
         ->and($widget->view)->toBe('agency::components.services-showcase');
 });
 
-test('services showcase default services include expandable detail', function () {
+test('services showcase default services include expandable detail', function (): void {
     $widget = ServicesShowcaseWidget::make();
     $defaults = $widget->defaults();
 

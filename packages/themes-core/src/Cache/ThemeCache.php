@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Themes\Core\Cache;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
@@ -66,7 +67,7 @@ class ThemeCache
                 $store->tags($tag)->flush();
 
                 return;
-            } catch (\BadMethodCallException) {
+            } catch (BadMethodCallException) {
                 // Driver does not support tags; ignore and let caller rely on TTL.
             }
         }
@@ -79,7 +80,7 @@ class ThemeCache
         if (method_exists($base, 'tags')) {
             try {
                 return $base->tags($this->tags);
-            } catch (\BadMethodCallException) {
+            } catch (BadMethodCallException) {
                 return $base;
             }
         }
@@ -89,6 +90,6 @@ class ThemeCache
 
     private function key(string $key): string
     {
-        return 'capell:'.$key;
+        return 'capell:' . $key;
     }
 }

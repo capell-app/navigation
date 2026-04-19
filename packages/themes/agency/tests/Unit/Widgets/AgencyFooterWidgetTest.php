@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Widgets\AgencyFooterWidget;
 
-test('agency footer widget has wordmark and socials fields', function () {
+test('agency footer widget has wordmark and socials fields', function (): void {
     $widget = AgencyFooterWidget::make();
 
     expect($widget->fieldNames())->toContain('wordmark', 'tagline', 'socials', 'copyright')
         ->and($widget->view)->toBe('agency::components.agency-footer');
 });
 
-test('agency footer socials default to social channel links', function () {
+test('agency footer socials default to social channel links', function (): void {
     $widget = AgencyFooterWidget::make();
     $defaults = $widget->defaults();
 

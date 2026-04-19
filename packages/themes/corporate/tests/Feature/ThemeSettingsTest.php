@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Corporate\Data\CorporateThemeSettings;
 
-test('corporate theme settings defaults match design system', function () {
+test('corporate theme settings defaults match design system', function (): void {
     $settings = new CorporateThemeSettings;
 
     expect($settings->primary_color)->toBe('#1a2d6d')
@@ -16,7 +16,7 @@ test('corporate theme settings defaults match design system', function () {
         ->and($settings->show_team)->toBeTrue();
 });
 
-test('corporate theme settings can carry organization metadata', function () {
+test('corporate theme settings can carry organization metadata', function (): void {
     $settings = new CorporateThemeSettings(
         organization_name: 'Acme',
         organization_logo_url: 'https://example.com/logo.png',

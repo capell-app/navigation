@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Corporate\Widgets\HeroSectionWidget;
 
-test('hero widget instantiates with required metadata', function () {
+test('hero widget instantiates with required metadata', function (): void {
     $widget = HeroSectionWidget::make();
 
     expect($widget->name)->toBe('Hero Section')
@@ -13,13 +13,13 @@ test('hero widget instantiates with required metadata', function () {
         ->and($widget->icon)->not->toBeEmpty();
 });
 
-test('hero widget declares required fields', function () {
+test('hero widget declares required fields', function (): void {
     $widget = HeroSectionWidget::make();
 
     expect($widget->fieldNames())->toContain('title', 'cta_label', 'cta_url');
 });
 
-test('hero widget render produces non-empty html', function () {
+test('hero widget render produces non-empty html', function (): void {
     $widget = HeroSectionWidget::make();
 
     $html = $widget->render(['title' => 'Hello world']);

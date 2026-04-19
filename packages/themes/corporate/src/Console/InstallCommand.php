@@ -30,7 +30,7 @@ class InstallCommand extends Command
             'seed_layouts' => (bool) $this->option('seed-layouts'),
         ]);
 
-        $this->info('Corporate theme installed: '.($result['theme_key'] ?? 'corporate'));
+        $this->info('Corporate theme installed: ' . ($result['theme_key'] ?? 'corporate'));
 
         return self::SUCCESS;
     }

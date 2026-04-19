@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\FeatureMatrixWidget;
 
-test('feature-matrix widget has expected metadata', function () {
+test('feature-matrix widget has expected metadata', function (): void {
     $widget = FeatureMatrixWidget::make();
 
     expect($widget->name)->toBe('Feature Matrix')
@@ -12,7 +12,7 @@ test('feature-matrix widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('tiers', 'features');
 });
 
-test('feature-matrix defaults include at least one tier and feature', function () {
+test('feature-matrix defaults include at least one tier and feature', function (): void {
     $widget = FeatureMatrixWidget::make();
     $defaults = $widget->defaults();
 

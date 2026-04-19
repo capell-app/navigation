@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Corporate\CorporateThemeServiceProvider;
 
-test('provider exposes widget list', function () {
+test('provider exposes widget list', function (): void {
     $widgets = CorporateThemeServiceProvider::widgets();
 
     expect($widgets)->toBeArray()->toHaveCount(7);
@@ -13,6 +13,6 @@ test('provider exposes widget list', function () {
     }
 });
 
-test('theme key constant is corporate', function () {
+test('theme key constant is corporate', function (): void {
     expect(CorporateThemeServiceProvider::THEME_KEY)->toBe('corporate');
 });

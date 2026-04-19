@@ -81,7 +81,6 @@ class StructuredDataGenerator
     /**
      * Build a Product node with embedded offers from pricing tiers.
      *
-     * @param  string  $name
      * @param  array<int, array{name: string, price_monthly?: ?float|int, price_annual?: ?float|int, currency?: string, url?: string}>  $tiers
      * @return array<string, mixed>
      */
@@ -178,7 +177,7 @@ class StructuredDataGenerator
             'name' => $name ?? ($this->settings instanceof SaasThemeSettings ? $this->settings->product_name : 'Capell'),
             'potentialAction' => [
                 '@type' => 'SearchAction',
-                'target' => rtrim($url, '/').'/search?q={search_term_string}',
+                'target' => rtrim($url, '/') . '/search?q={search_term_string}',
                 'query-input' => 'required name=search_term_string',
             ],
         ];

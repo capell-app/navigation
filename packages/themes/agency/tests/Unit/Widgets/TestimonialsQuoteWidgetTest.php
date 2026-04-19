@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Widgets\TestimonialsQuoteWidget;
 
-test('testimonials quote widget has testimonials field', function () {
+test('testimonials quote widget has testimonials field', function (): void {
     $widget = TestimonialsQuoteWidget::make();
 
     expect($widget->fieldNames())->toContain('testimonials')
         ->and($widget->view)->toBe('agency::components.testimonials-quote');
 });
 
-test('testimonials quote defaults include name and role', function () {
+test('testimonials quote defaults include name and role', function (): void {
     $widget = TestimonialsQuoteWidget::make();
     $defaults = $widget->defaults();
 

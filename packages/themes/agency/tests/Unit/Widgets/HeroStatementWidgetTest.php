@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Agency\Widgets\HeroStatementWidget;
 
-test('hero statement widget instantiates with required metadata', function () {
+test('hero statement widget instantiates with required metadata', function (): void {
     $widget = HeroStatementWidget::make();
 
     expect($widget->name)->toBe('Hero Statement')
@@ -13,13 +13,13 @@ test('hero statement widget instantiates with required metadata', function () {
         ->and($widget->icon)->not->toBeEmpty();
 });
 
-test('hero statement widget declares required fields', function () {
+test('hero statement widget declares required fields', function (): void {
     $widget = HeroStatementWidget::make();
 
     expect($widget->fieldNames())->toContain('statement', 'cta_label', 'cta_url');
 });
 
-test('hero statement widget render produces non-empty html', function () {
+test('hero statement widget render produces non-empty html', function (): void {
     $widget = HeroStatementWidget::make();
 
     $html = $widget->render(['statement' => 'Make it beautiful']);

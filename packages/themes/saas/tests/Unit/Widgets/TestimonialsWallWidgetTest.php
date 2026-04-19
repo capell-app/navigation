@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\TestimonialsWallWidget;
 
-test('testimonials-wall widget has expected metadata', function () {
+test('testimonials-wall widget has expected metadata', function (): void {
     $widget = TestimonialsWallWidget::make();
 
     expect($widget->name)->toBe('Testimonials Wall')
@@ -12,7 +12,7 @@ test('testimonials-wall widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('testimonials', 'columns');
 });
 
-test('testimonials-wall defaults include quotes with authors', function () {
+test('testimonials-wall defaults include quotes with authors', function (): void {
     $widget = TestimonialsWallWidget::make();
 
     foreach ($widget->defaults()['testimonials'] as $t) {

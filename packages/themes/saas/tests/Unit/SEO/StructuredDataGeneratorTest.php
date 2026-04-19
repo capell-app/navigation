@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Themes\Saas\Data\SaasThemeSettings;
 use Capell\Themes\Saas\SEO\StructuredDataGenerator;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->settings = new SaasThemeSettings(
         product_name: 'Acme SaaS',
         product_description: 'A powerful widget platform.',
@@ -17,7 +17,7 @@ beforeEach(function () {
     $this->generator = new StructuredDataGenerator($this->settings);
 });
 
-test('organization includes name, description and sameAs', function () {
+test('organization includes name, description and sameAs', function (): void {
     $data = $this->generator->organization('https://example.com');
 
     expect($data['@type'])->toBe('Organization')
@@ -30,7 +30,7 @@ test('organization includes name, description and sameAs', function () {
         );
 });
 
-test('softwareApplication includes defaults and uses product screenshot', function () {
+test('softwareApplication includes defaults and uses product screenshot', function (): void {
     $data = $this->generator->softwareApplication();
 
     expect($data['@type'])->toBe('SoftwareApplication')
@@ -40,7 +40,7 @@ test('softwareApplication includes defaults and uses product screenshot', functi
         ->and($data['operatingSystem'])->toBe('Web');
 });
 
-test('product embeds offer per pricing tier and skips tiers without a price', function () {
+test('product embeds offer per pricing tier and skips tiers without a price', function (): void {
     $data = $this->generator->product('Acme', [
         ['name' => 'Starter', 'price_monthly' => 19, 'currency' => 'USD'],
         ['name' => 'Growth', 'price_monthly' => 49, 'currency' => 'USD'],
@@ -54,7 +54,7 @@ test('product embeds offer per pricing tier and skips tiers without a price', fu
         ->and($data['offers'][0]['price'])->toBe('19');
 });
 
-test('breadcrumb indexes items from 1', function () {
+test('breadcrumb indexes items from 1', function (): void {
     $data = $this->generator->breadcrumb([
         ['name' => 'Home', 'url' => '/'],
         ['name' => 'Pricing', 'url' => '/pricing'],
@@ -65,7 +65,7 @@ test('breadcrumb indexes items from 1', function () {
         ->and($data['itemListElement'][1]['position'])->toBe(2);
 });
 
-test('faq wraps questions and answers', function () {
+test('faq wraps questions and answers', function (): void {
     $data = $this->generator->faq([
         ['question' => 'Q1?', 'answer' => 'A1.'],
     ]);
@@ -75,7 +75,7 @@ test('faq wraps questions and answers', function () {
         ->and($data['mainEntity'][0]['acceptedAnswer']['text'])->toBe('A1.');
 });
 
-test('website includes SearchAction', function () {
+test('website includes SearchAction', function (): void {
     $data = $this->generator->website('https://example.com');
 
     expect($data['@type'])->toBe('WebSite')
@@ -83,7 +83,7 @@ test('website includes SearchAction', function () {
         ->and($data['potentialAction']['target'])->toContain('search?q=');
 });
 
-test('toJsonLd produces valid JSON', function () {
+test('toJsonLd produces valid JSON', function (): void {
     $json = $this->generator->toJsonLd(['@type' => 'Test', 'name' => 'hello']);
 
     expect($json)->toBeString();

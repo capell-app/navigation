@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\FAQAccordionWidget;
 
-test('faq-accordion widget has expected metadata', function () {
+test('faq-accordion widget has expected metadata', function (): void {
     $widget = FAQAccordionWidget::make();
 
     expect($widget->name)->toBe('FAQ Accordion')
@@ -12,7 +12,7 @@ test('faq-accordion widget has expected metadata', function () {
         ->and($widget->fieldNames())->toContain('faqs');
 });
 
-test('faq-accordion defaults each have question + answer', function () {
+test('faq-accordion defaults each have question + answer', function (): void {
     $widget = FAQAccordionWidget::make();
 
     foreach ($widget->defaults()['faqs'] as $faq) {

@@ -23,7 +23,7 @@ class AgencyFooterWidget extends AbstractAgencyWidget
             ['name' => 'tagline', 'label' => 'Tagline', 'type' => 'text', 'default' => 'Let\'s make something worth looking at.'],
             ['name' => 'cta_label', 'label' => 'CTA label', 'type' => 'text', 'default' => 'Start a project'],
             ['name' => 'cta_url', 'label' => 'CTA URL', 'type' => 'text', 'default' => '#inquiry'],
-            ['name' => 'copyright', 'label' => 'Copyright', 'type' => 'text', 'default' => '(c) '.date('Y').' Capell Studio. Made with opinions.'],
+            ['name' => 'copyright', 'label' => 'Copyright', 'type' => 'text', 'default' => '(c) ' . date('Y') . ' Capell Studio. Made with opinions.'],
             ['name' => 'socials', 'label' => 'Social links', 'type' => 'repeater', 'default' => [
                 ['label' => 'Instagram', 'url' => '#'],
                 ['label' => 'Dribbble', 'url' => '#'],

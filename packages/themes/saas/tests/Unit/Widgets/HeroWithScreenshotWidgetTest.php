@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Themes\Saas\Widgets\HeroWithScreenshotWidget;
 
-test('hero-with-screenshot widget instantiates with required metadata', function () {
+test('hero-with-screenshot widget instantiates with required metadata', function (): void {
     $widget = HeroWithScreenshotWidget::make();
 
     expect($widget->name)->toBe('Hero with Screenshot')
@@ -13,13 +13,13 @@ test('hero-with-screenshot widget instantiates with required metadata', function
         ->and($widget->icon)->not->toBeEmpty();
 });
 
-test('hero-with-screenshot declares required fields', function () {
+test('hero-with-screenshot declares required fields', function (): void {
     $widget = HeroWithScreenshotWidget::make();
 
     expect($widget->fieldNames())->toContain('title', 'primary_cta_label', 'primary_cta_url', 'screenshot_url');
 });
 
-test('hero-with-screenshot render produces non-empty html', function () {
+test('hero-with-screenshot render produces non-empty html', function (): void {
     $widget = HeroWithScreenshotWidget::make();
 
     $html = $widget->render(['title' => 'Hello world']);

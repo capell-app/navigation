@@ -36,7 +36,7 @@ class DatabaseSiteSearch implements SiteSearch
         $builder = $this->db->table($this->table);
         $builder->where(function ($q) use ($query): void {
             foreach ($this->columns as $column) {
-                $q->orWhere($column, 'like', '%'.$query.'%');
+                $q->orWhere($column, 'like', '%' . $query . '%');
             }
         });
 
@@ -52,10 +52,10 @@ class DatabaseSiteSearch implements SiteSearch
 
             return new SearchResult(
                 title: $title,
-                url: '/'.ltrim((string) ($row->{$this->urlColumn} ?? ''), '/'),
+                url: '/' . ltrim((string) ($row->{$this->urlColumn} ?? ''), '/'),
                 excerpt: $this->truncate($excerptRaw, 200),
                 type: (string) ($row->{$this->typeColumn} ?? 'page'),
-                score: $this->score($title.' '.$excerptRaw, $query),
+                score: $this->score($title . ' ' . $excerptRaw, $query),
             );
         });
 
@@ -70,7 +70,7 @@ class DatabaseSiteSearch implements SiteSearch
         }
 
         $escaped = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-        $pattern = '/('.preg_quote($query, '/').')/i';
+        $pattern = '/(' . preg_quote($query, '/') . ')/i';
 
         return (string) preg_replace($pattern, '<mark>$1</mark>', $escaped);
     }
@@ -81,7 +81,7 @@ class DatabaseSiteSearch implements SiteSearch
             return $text;
         }
 
-        return rtrim(mb_substr($text, 0, $length)).'…';
+        return rtrim(mb_substr($text, 0, $length)) . '…';
     }
 
     private function score(string $haystack, string $needle): float

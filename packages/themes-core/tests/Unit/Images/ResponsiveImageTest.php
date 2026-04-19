@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Themes\Core\Images\ResponsiveImage;
 
 test('builds srcset with default widths', function (): void {
-    $image = new ResponsiveImage();
+    $image = new ResponsiveImage;
 
     $srcset = $image->buildSrcset('https://example.com/a.jpg');
 
@@ -17,7 +17,7 @@ test('builds srcset with default widths', function (): void {
 });
 
 test('renders img tag with lazy loading and aspect-ratio', function (): void {
-    $image = new ResponsiveImage();
+    $image = new ResponsiveImage;
 
     $html = $image->render('https://example.com/a.jpg', 'A field at dusk', 1600, 900);
 
@@ -33,7 +33,7 @@ test('renders img tag with lazy loading and aspect-ratio', function (): void {
 
 test('supports custom url transformer', function (): void {
     $image = new ResponsiveImage(
-        urlTransformer: static fn (string $src, int $w): string => $src.'-'.$w.'.webp',
+        urlTransformer: static fn (string $src, int $w): string => $src . '-' . $w . '.webp',
         widths: [300, 600],
     );
 
@@ -43,7 +43,7 @@ test('supports custom url transformer', function (): void {
 });
 
 test('renders picture with webp sources', function (): void {
-    $image = new ResponsiveImage();
+    $image = new ResponsiveImage;
 
     $html = $image->renderPicture(
         'https://example.com/a.jpg',

@@ -8,7 +8,7 @@ declare(strict_types=1);
  */
 
 uses()
-    ->beforeEach(function () {
+    ->beforeEach(function (): void {
         // no-op shared setup
     })
     ->in('Unit');

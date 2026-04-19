@@ -5,14 +5,14 @@ declare(strict_types=1);
 use Capell\Themes\Saas\Data\SaasThemeSettings;
 use Capell\Themes\Saas\SEO\StructuredDataGenerator;
 
-test('structured data output embeds as valid json-ld', function () {
+test('structured data output embeds as valid json-ld', function (): void {
     $generator = new StructuredDataGenerator(new SaasThemeSettings);
     $html = $generator->toJsonLd($generator->organization('https://example.com'));
 
     expect(json_decode($html, true))->toBeArray()->toHaveKey('@context');
 });
 
-test('structured data supports software app + pricing product + faq + breadcrumb in one page', function () {
+test('structured data supports software app + pricing product + faq + breadcrumb in one page', function (): void {
     $generator = new StructuredDataGenerator(new SaasThemeSettings);
 
     $app = $generator->softwareApplication(['name' => 'Capell']);

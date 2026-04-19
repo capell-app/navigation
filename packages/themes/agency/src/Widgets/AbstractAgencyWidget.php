@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Themes\Agency\Widgets;
 
+use Throwable;
+
 /**
  * Base class shared by all Agency theme widgets.
  *
@@ -42,7 +44,7 @@ abstract class AbstractAgencyWidget
         if (function_exists('view') && function_exists('app')) {
             try {
                 return (string) view($this->view, $data)->render();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Fall through to fallbackRender when no Laravel app / view factory is available.
             }
         }
@@ -66,6 +68,14 @@ abstract class AbstractAgencyWidget
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function fieldNames(): array
+    {
+        return array_map(static fn ($f) => $f['name'], $this->fields);
+    }
+
+    /**
      * Minimal fallback HTML when Laravel view factory is unavailable
      * (useful for unit-testing widgets outside a full Laravel boot).
      *
@@ -75,15 +85,7 @@ abstract class AbstractAgencyWidget
     {
         $title = (string) ($data['title'] ?? $this->name);
 
-        return '<section data-widget="'.e(static::class).'"><h2>'.e($title).'</h2></section>';
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    public function fieldNames(): array
-    {
-        return array_map(static fn ($f) => $f['name'], $this->fields);
+        return '<section data-widget="' . e(static::class) . '"><h2>' . e($title) . '</h2></section>';
     }
 }
 
