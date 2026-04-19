@@ -71,3 +71,27 @@ it('can search pages for a content model', function (): void {
         ->assertCountTableRecords(1)
         ->assertCanSeeTableRecords([$page->getMorphClass() . '-' . $page->getKey()]);
 });
+
+it('returns no results when search matches nothing', function (): void {
+    $page = Page::factory()->withTranslations()->create();
+    $content = Section::factory()->create();
+
+    Widget::factory()
+        ->has(
+            WidgetAsset::factory()
+                ->page($page)
+                ->asset($content)
+                ->state(['container' => 'main', 'occurrence' => 1]),
+            'assets',
+        )
+        ->create();
+
+    livewire(PagesRelationManager::class, [
+        'ownerRecord' => $content,
+        'pageClass' => EditSection::class,
+    ])
+        ->assertSuccessful()
+        ->assertCountTableRecords(1)
+        ->searchTable('99999999')
+        ->assertCountTableRecords(0);
+});
