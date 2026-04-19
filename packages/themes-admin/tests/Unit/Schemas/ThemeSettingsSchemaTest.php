@@ -2,67 +2,80 @@
 
 declare(strict_types=1);
 
-namespace Capell\Themes\Admin\Tests\Unit\Schemas;
-
 use Capell\Themes\Admin\Schemas\ThemeSettingsSchema;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
-use Orchestra\Testbench\TestCase;
 
-class ThemeSettingsSchemaTest extends TestCase
+/**
+ * Retrieve child components directly from the internal property, avoiding
+ * the need for a Filament container (which requires the full Laravel app).
+ */
+function getThemeChildComponents(object $component): array
 {
-    protected function getPackageProviders($app)
-    {
-        return [
-            \Filament\FilamentServiceProvider::class,
-            \Filament\Forms\FormsServiceProvider::class,
-            \Filament\Schemas\SchemasServiceProvider::class,
-            \Filament\Support\SupportServiceProvider::class,
-        ];
+    $reflection = new ReflectionObject($component);
+
+    if (! $reflection->hasProperty('childComponents')) {
+        return [];
     }
 
-    public function test_theme_settings_schema_returns_tabs(): void
-    {
-        $schema = ThemeSettingsSchema::make();
+    $prop = $reflection->getProperty('childComponents');
+    $rawValue = $prop->getValue($component);
 
-        $this->assertInstanceOf(Tabs::class, $schema);
-        $this->assertNotEmpty($schema->getChildComponents());
+    if (! is_array($rawValue)) {
+        return [];
     }
 
-    public function test_schema_contains_active_theme_select(): void
-    {
-        $schema = ThemeSettingsSchema::make();
-        $components = $this->flattenComponents($schema);
+    $components = [];
 
-        $activeTheme = array_filter(
-            $components,
-            fn ($c) => $c instanceof Select && $c->getName() === 'active_theme',
-        );
-
-        $this->assertCount(1, $activeTheme);
-    }
-
-    public function test_schema_includes_color_pickers(): void
-    {
-        $schema = ThemeSettingsSchema::make();
-        $components = $this->flattenComponents($schema);
-
-        $colorPickers = array_filter($components, fn ($c) => $c instanceof ColorPicker);
-
-        $this->assertGreaterThanOrEqual(2, count($colorPickers));
-    }
-
-    private function flattenComponents(object $component): array
-    {
-        $result = [$component];
-
-        if (method_exists($component, 'getChildComponents')) {
-            foreach ($component->getChildComponents() as $child) {
-                $result = array_merge($result, $this->flattenComponents($child));
+    foreach ($rawValue as $group) {
+        foreach ((array) $group as $child) {
+            if (is_object($child)) {
+                $components[] = $child;
             }
         }
-
-        return $result;
     }
+
+    return $components;
 }
+
+function flattenThemeComponents(object $component): array
+{
+    $result = [$component];
+
+    foreach (getThemeChildComponents($component) as $child) {
+        $result = array_merge($result, flattenThemeComponents($child));
+    }
+
+    return $result;
+}
+
+test('ThemeSettingsSchema::make() returns a Tabs instance', function (): void {
+    $schema = ThemeSettingsSchema::make();
+
+    expect($schema)->toBeInstanceOf(Tabs::class);
+});
+
+test('schema contains an active_theme Select', function (): void {
+    $schema = ThemeSettingsSchema::make();
+    $components = flattenThemeComponents($schema);
+
+    $matches = array_filter(
+        $components,
+        fn (object $component): bool => $component instanceof Select && $component->getName() === 'active_theme',
+    );
+
+    expect($matches)->toHaveCount(1);
+});
+
+test('schema includes at least two ColorPickers', function (): void {
+    $schema = ThemeSettingsSchema::make();
+    $components = flattenThemeComponents($schema);
+
+    $pickers = array_filter(
+        $components,
+        fn (object $component): bool => $component instanceof ColorPicker,
+    );
+
+    expect(count($pickers))->toBeGreaterThanOrEqual(2);
+});
