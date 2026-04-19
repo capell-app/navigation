@@ -28,11 +28,9 @@ function makeComposerTestRunner(array $exitCodes = []): ComposerRunner
     );
 }
 
-test('require package without constraint', function () use (&$captured): void {
+test('require package without constraint', function (): void {
     $runner = makeComposerTestRunner();
-
     $result = $runner->requirePackage('vendor/name');
-
     expect($result->successful())->toBeTrue();
 });
 

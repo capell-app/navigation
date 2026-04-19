@@ -123,7 +123,7 @@ test('validate license throws on 500', function () use (&$client): void {
         'api.anystack.sh/*' => Http::response(['error' => 'boom'], 500),
     ]);
 
-    expect(fn () => $client->validateLicense('prod_xyz', 'test-key'))
+    expect(fn (): AnystackLicenseValidationData => $client->validateLicense('prod_xyz', 'test-key'))
         ->toThrow(RuntimeException::class, 'Anystack license validation failed with status 500');
 });
 
@@ -296,7 +296,7 @@ test('validate license throws when meta valid missing', function () use (&$clien
         ], 200),
     ]);
 
-    expect(fn () => $client->validateLicense('prod_xyz', 'test-key'))
+    expect(fn (): AnystackLicenseValidationData => $client->validateLicense('prod_xyz', 'test-key'))
         ->toThrow(RuntimeException::class, 'missing meta.valid');
 });
 
@@ -326,7 +326,7 @@ test('activate license throws on 422', function () use (&$client): void {
         ], 422),
     ]);
 
-    expect(fn () => $client->activateLicense('prod_xyz', 'test-key', 'fp-1'))
+    expect(fn (): AnystackLicenseValidationData => $client->activateLicense('prod_xyz', 'test-key', 'fp-1'))
         ->toThrow(RuntimeException::class, 'Anystack license activation failed with status 422');
 });
 
@@ -355,7 +355,7 @@ test('deactivate license throws on 500', function () use (&$client): void {
         'api.anystack.sh/*' => Http::response(['message' => 'boom'], 500),
     ]);
 
-    expect(fn () => $client->deactivateLicense('prod_xyz', 'license-1', 'activation-1'))
+    expect(fn (): bool => $client->deactivateLicense('prod_xyz', 'license-1', 'activation-1'))
         ->toThrow(RuntimeException::class, 'Anystack license deactivation failed with status 500');
 });
 

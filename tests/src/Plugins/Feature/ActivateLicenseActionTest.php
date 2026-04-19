@@ -84,7 +84,7 @@ test('anystack failure throws', function (): void {
     $plugin = makeActivatePlugin();
     $action = makeActivateAction();
 
-    expect(fn () => $action->handle($plugin, 'invalid_key', 'site_123'))
+    expect(fn (): MarketplacePluginLicense => $action->handle($plugin, 'invalid_key', 'site_123'))
         ->toThrow(RuntimeException::class, 'Anystack license activation failed');
 });
 
@@ -92,7 +92,7 @@ test('plugin without product id throws', function (): void {
     $plugin = makeActivatePlugin(['anystack_product_id' => null]);
     $action = makeActivateAction();
 
-    expect(fn () => $action->handle($plugin, 'key', 'site'))
+    expect(fn (): MarketplacePluginLicense => $action->handle($plugin, 'key', 'site'))
         ->toThrow(RuntimeException::class, 'no anystack_product_id');
 });
 

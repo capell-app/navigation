@@ -89,6 +89,7 @@ test('toJsonLd produces valid JSON', function (): void {
     $json = $this->generator->toJsonLd(['@type' => 'Test', 'name' => 'hello']);
 
     expect($json)->toBeString();
+    // @phpstan-ignore-next-line cast.useless -- Rector enforces strict null casting for json_decode()
     $decoded = json_decode((string) $json, true);
     expect($decoded)->toBe(['@type' => 'Test', 'name' => 'hello']);
 });

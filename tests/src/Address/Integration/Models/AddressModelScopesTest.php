@@ -14,7 +14,7 @@ describe('Address model scopes', function (): void {
         Address::factory()->create(['default' => false]);
         Address::factory()->create(['default' => true]);
 
-        $defaults = Address::default()->get();
+        $defaults = Address::query()->default()->get();
 
         expect($defaults)->toHaveCount(2);
         expect($defaults->every(fn (Address $a) => $a->default))->toBeTrue();
@@ -25,10 +25,10 @@ describe('Address model scopes', function (): void {
         Address::factory()->create(['default' => false]);
         Address::factory()->create(['default' => false]);
 
-        $nonDefaults = Address::nonDefault()->get();
+        $nonDefaults = Address::query()->nonDefault()->get();
 
         expect($nonDefaults)->toHaveCount(2);
-        expect($nonDefaults->every(fn (Address $a) => ! $a->default))->toBeTrue();
+        expect($nonDefaults->every(fn (Address $a): bool => ! $a->default))->toBeTrue();
     });
 
     it('can query enabled addresses', function (): void {
@@ -36,7 +36,7 @@ describe('Address model scopes', function (): void {
         Address::factory()->create(['status' => false]);
         Address::factory()->create(['status' => true]);
 
-        $enabled = Address::enabled()->get();
+        $enabled = Address::query()->enabled()->get();
 
         expect($enabled)->toHaveCount(2);
         expect($enabled->every(fn (Address $a) => $a->status))->toBeTrue();
@@ -47,10 +47,10 @@ describe('Address model scopes', function (): void {
         Address::factory()->create(['status' => false]);
         Address::factory()->create(['status' => false]);
 
-        $disabled = Address::disabled()->get();
+        $disabled = Address::query()->disabled()->get();
 
         expect($disabled)->toHaveCount(2);
-        expect($disabled->every(fn (Address $a) => ! $a->status))->toBeTrue();
+        expect($disabled->every(fn (Address $a): bool => ! $a->status))->toBeTrue();
     });
 
     it('can query addresses by status', function (): void {
@@ -58,7 +58,7 @@ describe('Address model scopes', function (): void {
         Address::factory()->create(['status' => false]);
         Address::factory()->create(['status' => true]);
 
-        $statusTrue = Address::status(true)->get();
+        $statusTrue = Address::query()->status(true)->get();
 
         expect($statusTrue)->toHaveCount(2);
     });
@@ -81,7 +81,7 @@ describe('Address model scopes', function (): void {
             'country_id' => null,
         ]);
 
-        $ordered = Address::ordered()->get();
+        $ordered = Address::query()->ordered()->get();
 
         expect($ordered->first()->line1)->toBe('Apple Ave');
         expect($ordered->last()->line1)->toBe('Zebra Lane');

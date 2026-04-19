@@ -41,6 +41,7 @@ function makeInstallComposerRunner(array $exitCodes, array $errorOutputs = [], ?
             if ($captured !== null) {
                 $captured[] = $command;
             }
+
             $exitCode = array_shift($exitCodes) ?? 0;
             $errorOutput = array_shift($errorOutputs) ?? '';
 

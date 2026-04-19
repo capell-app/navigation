@@ -2,43 +2,30 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Filament\Resources\Pages\PageResource;
 use Capell\Core\Models\Page;
 use Capell\Mosaic\Database\Factories\WidgetAssetFactory;
 use Capell\Mosaic\Database\Factories\WidgetFactory;
+use Capell\Tests\Mosaic\Fixtures\Forms\HeroEditorTestFixture;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
-use function Pest\Laravel\get;
+use function Pest\Livewire\livewire;
 
 uses(CreatesAdminUser::class)
     ->group('hero-editor');
 
-test('hero editor renders on page edit form', function (): void {
+beforeEach(function (): void {
     test()->actingAsAdmin();
-
-    $page = Page::factory()->create();
-
-    get(PageResource::getUrl('edit', ['record' => $page]))
-        ->assertOk();
 });
 
 test('hero editor is visible when page has no hero widget assets', function (): void {
-    test()->actingAsAdmin();
-
     $page = Page::factory()->create();
-    $cacheKey = sprintf('page-%d-has-hero-widget-assets', $page->id);
 
-    cache()->forget($cacheKey);
-
-    $response = get(PageResource::getUrl('edit', ['record' => $page]));
-
-    $response->assertOk();
-    expect(cache()->has($cacheKey))->toBeFalse();
+    livewire(HeroEditorTestFixture::class, ['record' => $page])
+        ->assertSuccessful()
+        ->assertSchemaComponentVisible('meta');
 });
 
 test('hero editor is hidden when page has hero widget assets', function (): void {
-    test()->actingAsAdmin();
-
     $page = Page::factory()->create();
 
     $heroWidget = WidgetFactory::new()
@@ -53,28 +40,30 @@ test('hero editor is hidden when page has hero widget assets', function (): void
         ])
         ->create();
 
-    get(PageResource::getUrl('edit', ['record' => $page]))
-        ->assertOk();
+    livewire(HeroEditorTestFixture::class, ['record' => $page])
+        ->assertSuccessful()
+        ->assertSchemaComponentHidden('meta');
 });
 
-test('hero editor caches hero asset existence checks per page', function (): void {
-    test()->actingAsAdmin();
+test('hero editor visibility is scoped per page', function (): void {
+    $pageWithHero = Page::factory()->create();
+    $pageWithoutHero = Page::factory()->create();
 
-    $page = Page::factory()->create();
-    $cacheKey = sprintf('page-%d-has-hero-widget-assets', $page->id);
+    $heroWidget = WidgetFactory::new()
+        ->state(['key' => 'hero-banner'])
+        ->create();
 
-    cache()->forget($cacheKey);
+    WidgetAssetFactory::new()
+        ->state([
+            'widget_id' => $heroWidget->id,
+            'pageable_type' => $pageWithHero->getMorphClass(),
+            'pageable_id' => $pageWithHero->id,
+        ])
+        ->create();
 
-    get(PageResource::getUrl('edit', ['record' => $page]));
-    $firstCacheState = cache()->has($cacheKey);
+    livewire(HeroEditorTestFixture::class, ['record' => $pageWithHero])
+        ->assertSchemaComponentHidden('meta');
 
-    $page2 = Page::factory()->create();
-    $cacheKey2 = sprintf('page-%d-has-hero-widget-assets', $page2->id);
-
-    cache()->forget($cacheKey2);
-
-    get(PageResource::getUrl('edit', ['record' => $page2]));
-    $secondCacheState = cache()->has($cacheKey2);
-
-    expect($firstCacheState)->toBe($secondCacheState);
+    livewire(HeroEditorTestFixture::class, ['record' => $pageWithoutHero])
+        ->assertSchemaComponentVisible('meta');
 });

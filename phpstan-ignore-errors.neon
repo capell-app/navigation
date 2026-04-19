@@ -1,9 +1,5 @@
 parameters:
     ignoreErrors:
-        # WorkspaceRegistry is a forward reference to a class not yet in the installed core version
-        -
-            identifier: class.notFound
-            message: '#Capell\\Core\\Workspaces\\WorkspaceRegistry#'
         # PageTranslation does not exist in the installed core version (uses Translation model)
         -
             identifier: class.notFound
