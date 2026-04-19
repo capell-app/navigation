@@ -26,4 +26,11 @@ enum WidgetComponentEnum: string
     case PageSiblings = 'capell-mosaic::widget.page.siblings';
     case PageSlot = 'capell-mosaic::widget.slot';
     case Pages = 'capell-mosaic::widget.asset.pages';
+
+    case ApHeroBanner = 'capell-mosaic::modern.hero-banner';
+    case ApCardGrid = 'capell-mosaic::modern.card-grid';
+    case ApFeatureList = 'capell-mosaic::modern.feature-list';
+    case ApCTASection = 'capell-mosaic::modern.cta-section';
+    case ApImageGallery = 'capell-mosaic::modern.image-gallery';
+    case ApFormSection = 'capell-mosaic::modern.form-section';
 }

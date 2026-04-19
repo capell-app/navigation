@@ -539,4 +539,99 @@ class WidgetCreator
             ],
         ]);
     }
+
+    public function apHeroBannerWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-hero-banner'], [
+            'name' => 'AP Hero Banner',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApHeroBanner,
+                'primary_button_text' => 'Get Started',
+                'primary_button_url' => '#',
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
+
+    public function apCardGridWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-card-grid'], [
+            'name' => 'AP Card Grid',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApCardGrid,
+                'columns' => 3,
+                'cards' => [],
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
+
+    public function apFeatureListWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-feature-list'], [
+            'name' => 'AP Feature List',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApFeatureList,
+                'layout' => 'grid',
+                'features' => [],
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
+
+    public function apCtaSectionWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-cta-section'], [
+            'name' => 'AP CTA Section',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApCTASection,
+                'primary_button_text' => 'Get Started',
+                'primary_button_url' => '#',
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
+
+    public function apImageGalleryWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-image-gallery'], [
+            'name' => 'AP Image Gallery',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApImageGallery,
+                'columns' => 3,
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
+
+    public function apFormSectionWidget(?Type $type = null): Widget
+    {
+        $type ??= resolve(TypeCreator::class)->defaultWidgetType();
+
+        return $this->widgetModel::query()->firstOrCreate(['key' => 'ap-form-section'], [
+            'name' => 'AP Form Section',
+            'type_id' => $type->id,
+            'meta' => [
+                'component' => WidgetComponentEnum::ApFormSection,
+                'submit_button_text' => 'Submit',
+                'form_fields' => [],
+                'margin' => ['lg'],
+            ],
+        ]);
+    }
 }

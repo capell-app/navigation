@@ -27,4 +27,16 @@ enum WidgetTypeEnum: string
     case Pages = 'pages';
 
     case System = 'system';
+
+    case HeroBanner = 'hero-banner';
+
+    case CardGrid = 'card-grid';
+
+    case FeatureList = 'feature-list';
+
+    case CTASection = 'cta-section';
+
+    case ImageGallery = 'image-gallery';
+
+    case FormSection = 'form-section';
 }

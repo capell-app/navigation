@@ -17,6 +17,7 @@ use Capell\Mosaic\Models\Section;
 use Capell\Mosaic\Support\Creator\ContentCreator;
 use Capell\Mosaic\Support\Creator\DemoCreator;
 use Capell\Mosaic\Support\Creator\TypeCreator;
+use Capell\Mosaic\Support\Creator\WidgetCreator;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -107,7 +108,7 @@ class DemoCommand extends Command
             return false;
         }
 
-        $totalSteps = 4 + 2 + 17 + 1 + 1;
+        $totalSteps = 4 + 2 + 17 + 1 + 1 + 6;
         $this->startProgress($totalSteps);
         $this->setupHomepage($home, $languages);
         $this->finishProgress();
@@ -127,6 +128,7 @@ class DemoCommand extends Command
         $this->populateMainContainer($containers, $page);
         $this->populateFaqContainers($containers, $languages, $page);
         $this->populateSecondaryContainer($containers, $languages, $page);
+        $this->populateAPWidgetsContainer($containers);
         $this->populateSplitTwoContainer($containers, $languages);
         $this->addSplitTwoBackgroundMedia($layout);
 
@@ -304,6 +306,32 @@ class DemoCommand extends Command
         $galleryWidget = $this->demoCreator->createModernImageGalleryWidget();
         $this->advanceProgress();
 
+        $widgetCreator = resolve(WidgetCreator::class);
+
+        $this->setProgressMessage('Creating AP hero banner widget');
+        $apHeroBannerWidget = $widgetCreator->apHeroBannerWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP card grid widget');
+        $apCardGridWidget = $widgetCreator->apCardGridWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP feature list widget');
+        $apFeatureListWidget = $widgetCreator->apFeatureListWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP CTA section widget');
+        $apCtaSectionWidget = $widgetCreator->apCtaSectionWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP image gallery widget');
+        $apImageGalleryWidget = $widgetCreator->apImageGalleryWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP form section widget');
+        $apFormSectionWidget = $widgetCreator->apFormSectionWidget();
+        $this->advanceProgress();
+
         $containers['secondary'] = [
             'meta' => [
                 'colspan' => 12,
@@ -325,6 +353,61 @@ class DemoCommand extends Command
                 ['widget_key' => $alternatingWidget->key],
                 ['widget_key' => $processWidget->key],
                 ['widget_key' => $galleryWidget->key],
+            ],
+        ];
+
+        $containers['ap-widgets'] = [
+            'meta' => [
+                'colspan' => 12,
+            ],
+            'widgets' => [
+                ['widget_key' => $apHeroBannerWidget->key],
+                ['widget_key' => $apCardGridWidget->key],
+                ['widget_key' => $apFeatureListWidget->key],
+                ['widget_key' => $apCtaSectionWidget->key],
+                ['widget_key' => $apImageGalleryWidget->key],
+                ['widget_key' => $apFormSectionWidget->key],
+            ],
+        ];
+    }
+
+    private function populateAPWidgetsContainer(array &$containers): void
+    {
+        $this->setProgressMessage('Creating AP Hero Banner widget');
+        $heroBannerWidget = $this->demoCreator->createApHeroBannerWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP Card Grid widget');
+        $cardGridWidget = $this->demoCreator->createApCardGridWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP Feature List widget');
+        $featureListWidget = $this->demoCreator->createApFeatureListWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP CTA Section widget');
+        $ctaSectionWidget = $this->demoCreator->createApCtaSectionWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP Image Gallery widget');
+        $imageGalleryWidget = $this->demoCreator->createApImageGalleryWidget();
+        $this->advanceProgress();
+
+        $this->setProgressMessage('Creating AP Form Section widget');
+        $formSectionWidget = $this->demoCreator->createApFormSectionWidget();
+        $this->advanceProgress();
+
+        $containers['ap-widgets'] = [
+            'meta' => [
+                'colspan' => 12,
+            ],
+            'widgets' => [
+                ['widget_key' => $heroBannerWidget->key],
+                ['widget_key' => $cardGridWidget->key],
+                ['widget_key' => $featureListWidget->key],
+                ['widget_key' => $ctaSectionWidget->key],
+                ['widget_key' => $imageGalleryWidget->key],
+                ['widget_key' => $formSectionWidget->key],
             ],
         ];
     }
