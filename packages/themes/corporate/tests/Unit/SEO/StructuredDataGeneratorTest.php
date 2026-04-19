@@ -71,6 +71,6 @@ test('toJsonLd produces valid JSON', function (): void {
     $json = $this->generator->toJsonLd(['@type' => 'Test', 'name' => 'hello']);
 
     expect($json)->toBeString();
-    $decoded = json_decode($json, true);
+    $decoded = json_decode((string) $json, true);
     expect($decoded)->toBe(['@type' => 'Test', 'name' => 'hello']);
 });

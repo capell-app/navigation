@@ -136,8 +136,8 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             type: static::getType(),
             serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
-            version: $this->getVersion(),
             permissions: $this->getPackagePermissions(),
+            version: $this->getVersion(),
         );
 
         return $this;

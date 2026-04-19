@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Fixtures;
 
-use Capell\Core\Support\Migration\MigrationFileManagerInterface;
+use Capell\Core\Support\Migration\MigrationFilesystemInterface;
 
-class FakeMigrationFileManager implements MigrationFileManagerInterface
+class FakeMigrationFileManager implements MigrationFilesystemInterface
 {
     public array $calls = [];
 

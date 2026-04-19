@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Capell\Core\Console\Commands\PublishMigrationsCommand;
 use Capell\Core\Support\Dataset\DatasetPublisher;
-use Capell\Core\Support\Migration\MigrationFileManagerInterface;
+use Capell\Core\Support\Migration\MigrationFilesystemInterface;
 use Capell\Tests\Fixtures\FakeMigrationFileManager;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -52,7 +52,7 @@ it('runs blog install command successfully without publishing files', function (
         );
     }
 
-    app()->instance(MigrationFileManagerInterface::class, $fakeFileManager);
+    app()->instance(MigrationFilesystemInterface::class, $fakeFileManager);
 
     artisan('capell:blog-install')
         ->doesntExpectOutput('Publishing migrations')

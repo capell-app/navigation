@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Support\Migration\MigrationFileManagerInterface;
+use Capell\Core\Support\Migration\MigrationFilesystemInterface;
 use Capell\Tests\Fixtures\FakeMigrationFileManager;
 use Illuminate\Console\Command;
 
@@ -17,7 +17,7 @@ it('runs assistant install command successfully', function (): void {
         'fileExists' => [],
         'isDir' => [],
     ]);
-    app()->instance(MigrationFileManagerInterface::class, $fakeFileManager);
+    app()->instance(MigrationFilesystemInterface::class, $fakeFileManager);
 
     artisan('capell:assistant-install')
         ->expectsOutput('Capell Assistant installed successfully.')
