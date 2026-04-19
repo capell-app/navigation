@@ -28,7 +28,7 @@ class CriticalCssInliner
             return '';
         }
 
-        $key = $path.'|'.(int) $minify;
+        $key = $path . '|' . (int) $minify;
         if (isset($this->cache[$key])) {
             return $this->cache[$key];
         }
@@ -42,7 +42,7 @@ class CriticalCssInliner
 
     private function wrap(string $css): string
     {
-        return '<style data-capell-critical>'.$css.'</style>';
+        return '<style data-capell-critical>' . $css . '</style>';
     }
 
     private function minify(string $css): string
@@ -52,6 +52,8 @@ class CriticalCssInliner
         // Collapse whitespace around punctuation and runs of whitespace.
         $css = (string) preg_replace('/\s*([{}:;,])\s*/', '$1', $css);
         $css = (string) preg_replace('/\s+/', ' ', $css);
+        // Strip redundant trailing semicolons before closing brace.
+        $css = (string) preg_replace('/;(})/', '$1', $css);
 
         return trim($css);
     }

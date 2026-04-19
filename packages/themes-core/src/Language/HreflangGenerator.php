@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Themes\Core\Language;
 
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\URL;
 
 /**
  * Produces `<link rel="alternate" hreflang="...">` tags for the current route,
@@ -27,7 +26,7 @@ class HreflangGenerator
         $path = parse_url($current, PHP_URL_PATH) ?: '/';
         $scheme = parse_url($current, PHP_URL_SCHEME) ?: 'https';
         $host = parse_url($current, PHP_URL_HOST) ?: Request::getHost();
-        $root = $scheme.'://'.$host;
+        $root = $scheme . '://' . $host;
 
         $entries = [];
         foreach ($this->languages->enabled() as $locale) {
@@ -70,9 +69,8 @@ class HreflangGenerator
             array_unshift($segments, $locale);
         }
 
-        $candidate = $root.'/'.implode('/', $segments);
+        $candidate = $root . '/' . implode('/', $segments);
 
-        // Preserve the leading slash normalisation that URL::to would normally apply.
-        return URL::isValidUrl($candidate) ? $candidate : $root.'/'.$locale;
+        return filter_var($candidate, FILTER_VALIDATE_URL) !== false ? $candidate : $root . '/' . $locale;
     }
 }
