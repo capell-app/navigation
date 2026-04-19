@@ -11,6 +11,8 @@ use Throwable;
  *
  * Mosaic is optional — widgets do not extend any Mosaic class. If Mosaic
  * is present the ServiceProvider registers these widgets via duck-typing.
+ *
+ * @phpstan-consistent-constructor
  */
 abstract class AbstractThemeWidget
 {
@@ -27,9 +29,9 @@ abstract class AbstractThemeWidget
      */
     public array $fields = [];
 
-    public static function make(): self
+    public static function make(): static
     {
-        return new self;
+        return new static;
     }
 
     /**

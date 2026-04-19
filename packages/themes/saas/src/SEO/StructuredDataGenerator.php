@@ -64,7 +64,7 @@ class StructuredDataGenerator extends AbstractThemeSchemaGenerator
             '@type' => 'Product',
             'name' => $name,
             'description' => $description,
-            'offers' => $offers ?? null,
+            'offers' => $offers !== [] ? $offers : null,
         ], static fn ($value): bool => $value !== null);
     }
 
