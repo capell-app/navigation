@@ -10,8 +10,8 @@ test('GoogleAnalytics4 implements AnalyticsProvider', function (): void {
     expect($ga4)->toBeInstanceOf(AnalyticsProvider::class);
 });
 
-test('AnalyticsProvider contract declares initScript and enabled', function (): void {
+test('AnalyticsProvider contract declares renderInitScript and isEnabled', function (): void {
     $methods = get_class_methods(AnalyticsProvider::class);
-    expect($methods)->toContain('initScript');
-    expect($methods)->toContain('enabled');
+    expect($methods)->toContain('renderInitScript');
+    expect($methods)->toContain('isEnabled');
 });

@@ -6,7 +6,7 @@ namespace Capell\Themes\Core\Analytics;
 
 interface AnalyticsProvider
 {
-    public function initScript(): string;
+    public function renderInitScript(): string;
 
-    public function enabled(): bool;
+    public function isEnabled(): bool;
 }
