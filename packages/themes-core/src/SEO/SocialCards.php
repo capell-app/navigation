@@ -26,9 +26,12 @@ class SocialCards
             'og:title' => $this->title,
             'og:description' => $this->description,
             'og:url' => $this->url,
-            'og:image' => $this->image,
             'og:type' => $this->type,
         ];
+
+        if ($this->image !== '') {
+            $tags['og:image'] = $this->image;
+        }
 
         if ($this->siteName !== '') {
             $tags['og:site_name'] = $this->siteName;
@@ -46,8 +49,11 @@ class SocialCards
             'twitter:card' => $this->twitterCard,
             'twitter:title' => $this->title,
             'twitter:description' => $this->description,
-            'twitter:image' => $this->image,
         ];
+
+        if ($this->image !== '') {
+            $tags['twitter:image'] = $this->image;
+        }
 
         if ($this->twitterSite !== null) {
             $tags['twitter:site'] = $this->twitterSite;

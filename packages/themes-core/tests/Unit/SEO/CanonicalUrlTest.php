@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Themes\Core\SEO\CanonicalUrl;
+use Illuminate\Http\Request;
 
 test('strips UTM parameters', function (): void {
     $canonical = new CanonicalUrl('https://example.com/about?utm_source=google&utm_medium=cpc&foo=bar');
@@ -29,4 +30,12 @@ test('works with URL that has no query string', function (): void {
 
     expect($canonical->resolve())->toBe('https://example.com/blog/post-title');
     expect($canonical->render())->toContain('href="https://example.com/blog/post-title"');
+});
+
+test('fromRequest builds from current request URL', function (): void {
+    $request = Request::create('https://example.com/page?utm_source=google&page=1');
+    $canonical = CanonicalUrl::fromRequest($request);
+
+    expect($canonical->resolve())
+        ->toBe('https://example.com/page?page=1');
 });

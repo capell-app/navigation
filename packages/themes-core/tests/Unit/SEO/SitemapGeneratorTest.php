@@ -63,3 +63,25 @@ test('writeTo() writes to a temp file correctly', function (): void {
 
     unlink($tempPath);
 });
+
+test('writeTo() creates nested directories when they do not exist', function (): void {
+    $sitemap = new SitemapGenerator;
+    $sitemap->add('https://example.com/', priority: 1.0);
+
+    $nestedDir = sys_get_temp_dir() . '/sitemap_nested_' . uniqid() . '/sub/dir';
+    $tempPath = $nestedDir . '/sitemap.xml';
+
+    $result = $sitemap->writeTo($tempPath);
+
+    expect($result)->toBeTrue();
+    expect(is_dir($nestedDir))->toBeTrue();
+    expect(file_exists($tempPath))->toBeTrue();
+
+    $contents = file_get_contents($tempPath);
+    expect($contents)->toContain('<loc>https://example.com/</loc>');
+
+    unlink($tempPath);
+    rmdir($nestedDir);
+    rmdir(dirname($nestedDir));
+    rmdir(dirname($nestedDir, 2));
+});

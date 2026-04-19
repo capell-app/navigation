@@ -20,7 +20,7 @@ test('render() includes og:title and og:description', function (): void {
 });
 
 test('twitterTags() returns the correct keys', function (): void {
-    $cards = new SocialCards(title: 'Test', twitterSite: '@mysite');
+    $cards = new SocialCards(title: 'Test', twitterSite: '@mysite', image: 'https://example.com/img.jpg');
 
     $twitter = $cards->twitterTags();
 
@@ -59,6 +59,20 @@ test('render() HTML-escapes special characters', function (): void {
 
     expect($rendered)->toContain('A &amp; B &lt; C &gt; D &quot;test&quot;');
     expect($rendered)->toContain('It&apos;s a test');
+});
+
+test('render() omits og:image and twitter:image when image is empty', function (): void {
+    $cards = new SocialCards(
+        title: 'No Image Page',
+        description: 'A page without a social image',
+        url: 'https://example.com/no-image',
+    );
+
+    $rendered = $cards->render();
+
+    expect($rendered)
+        ->not->toContain('og:image')
+        ->not->toContain('twitter:image');
 });
 
 test('twitter:site is only included when twitterSite is set', function (): void {

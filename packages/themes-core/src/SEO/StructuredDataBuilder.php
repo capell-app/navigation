@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Themes\Core\SEO;
 
+use LogicException;
+
 class StructuredDataBuilder
 {
     /** @var array<int, array<string, mixed>> */
@@ -40,11 +42,13 @@ class StructuredDataBuilder
             $addressSchema['postalCode'] = $postalCode;
         }
 
+        if ($this->schemas === []) {
+            throw new LogicException('address() requires an existing schema — call organization() first.');
+        }
+
         $lastIndex = count($this->schemas) - 1;
 
-        if ($lastIndex >= 0) {
-            $this->schemas[$lastIndex]['address'] = $addressSchema;
-        }
+        $this->schemas[$lastIndex]['address'] = $addressSchema;
 
         return $this;
     }
@@ -61,11 +65,13 @@ class StructuredDataBuilder
             $contactSchema['telephone'] = $phone;
         }
 
+        if ($this->schemas === []) {
+            throw new LogicException('contactPoint() requires an existing schema — call organization() first.');
+        }
+
         $lastIndex = count($this->schemas) - 1;
 
-        if ($lastIndex >= 0) {
-            $this->schemas[$lastIndex]['contactPoint'] = $contactSchema;
-        }
+        $this->schemas[$lastIndex]['contactPoint'] = $contactSchema;
 
         return $this;
     }

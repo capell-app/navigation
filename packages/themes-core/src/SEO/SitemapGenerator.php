@@ -73,6 +73,12 @@ class SitemapGenerator
     {
         $xml = $this->toXml();
 
+        $directory = dirname($path);
+
+        if ($directory !== '.' && ! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
         return file_put_contents($path, $xml) !== false;
     }
 }
