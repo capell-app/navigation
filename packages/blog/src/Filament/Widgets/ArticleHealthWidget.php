@@ -21,7 +21,7 @@ final class ArticleHealthWidget extends CapellWidget
     protected static string $settingsKey = 'article_health';
 
     /** @var list<string> */
-    protected static array $rolesConfigKeys = ['developer', 'admin'];
+    protected static array $rolesConfigKeys = ['developer', 'admin', 'super_admin'];
 
     protected string $view = 'capell-blog::filament.widgets.article-health';
 

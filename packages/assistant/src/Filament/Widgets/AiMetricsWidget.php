@@ -17,7 +17,7 @@ final class AiMetricsWidget extends CapellWidget
     protected static string $settingsKey = 'ai_metrics';
 
     /** @var list<string> */
-    protected static array $rolesConfigKeys = ['developer', 'admin'];
+    protected static array $rolesConfigKeys = ['developer', 'admin', 'super_admin'];
 
     protected string $view = 'capell-assistant::filament.widgets.ai-metrics';
 
