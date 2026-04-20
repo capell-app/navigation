@@ -415,6 +415,22 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
         );
 
         CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('swiper/css', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('swiper/css/autoplay', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('swiper/css/pagination', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindImport('swiper/css/navigation', static::$packageName),
+        );
+
+        CapellCore::registerVendorAsset(
             VendorAssetData::tailwindImport('resources/css/capell-mosaic.css', static::$packageName),
         );
 
