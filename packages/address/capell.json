@@ -16,6 +16,8 @@
         "setupParams": [],
         "upgrade": null,
         "demo": "capell:address-demo",
-        "demoParams": ["sites"]
+        "demoParams": ["sites"],
+        "faker": "capell:address-faker",
+        "fakerParams": []
     }
 }

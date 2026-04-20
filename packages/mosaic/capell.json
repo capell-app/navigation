@@ -16,6 +16,8 @@
         "setupParams": [],
         "upgrade": "capell:mosaic-upgrade",
         "demo": "capell:mosaic-demo",
-        "demoParams": ["user", "sites"]
+        "demoParams": ["user", "sites"],
+        "faker": "capell:mosaic-faker",
+        "fakerParams": []
     }
 }

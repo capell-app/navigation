@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Address\Providers;
 
 use Capell\Address\Console\Commands\DemoCommand;
+use Capell\Address\Console\Commands\FakerCommand;
 use Capell\Address\Console\Commands\InstallCommand;
 use Capell\Address\Enums\ResourceEnum;
 use Capell\Address\Enums\SchemaTypeEnum;
@@ -35,6 +36,7 @@ class AddressServiceProvider extends AbstractPackageServiceProvider
         $package->name(self::$name)
             ->hasCommands([
                 DemoCommand::class,
+                FakerCommand::class,
                 InstallCommand::class,
             ])
             ->hasTranslations();

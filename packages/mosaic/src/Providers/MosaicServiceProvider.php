@@ -25,6 +25,7 @@ use Capell\Core\Workspaces\WorkspaceRegistry;
 use Capell\Frontend\Contracts\AssetsRegistryInterface;
 use Capell\Frontend\Data\FrontendAssetData;
 use Capell\Mosaic\Console\Commands\DemoCommand;
+use Capell\Mosaic\Console\Commands\FakerCommand;
 use Capell\Mosaic\Console\Commands\Hero\DemoCommand as HeroDemoCommand;
 use Capell\Mosaic\Console\Commands\Hero\SetupCommand as HeroSetupCommand;
 use Capell\Mosaic\Console\Commands\InstallCommand;
@@ -90,6 +91,7 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
             ->hasTranslations()
             ->hasCommands([
                 DemoCommand::class,
+                FakerCommand::class,
                 HeroDemoCommand::class,
                 HeroSetupCommand::class,
                 InstallCommand::class,

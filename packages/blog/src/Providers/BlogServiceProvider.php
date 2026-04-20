@@ -9,6 +9,7 @@ use Capell\Admin\Enums\SchemaTypeEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Blog\Console\Commands\CreateBlogPagesCommand;
 use Capell\Blog\Console\Commands\DemoCommand;
+use Capell\Blog\Console\Commands\FakerCommand;
 use Capell\Blog\Console\Commands\InstallCommand;
 use Capell\Blog\Console\Commands\SetupCommand;
 use Capell\Blog\Enums\LivewirePageComponentEnum;
@@ -83,6 +84,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
             ->hasCommands([
                 CreateBlogPagesCommand::class,
                 DemoCommand::class,
+                FakerCommand::class,
                 InstallCommand::class,
                 SetupCommand::class,
             ]);

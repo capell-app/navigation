@@ -16,6 +16,8 @@
         "setupParams": [],
         "upgrade": null,
         "demo": "capell:blog-demo",
-        "demoParams": ["user", "sites"]
+        "demoParams": ["user", "sites"],
+        "faker": "capell:blog-faker",
+        "fakerParams": ["sites", "languages"]
     }
 }
