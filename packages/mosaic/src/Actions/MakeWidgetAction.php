@@ -22,9 +22,7 @@ class MakeWidgetAction
     {
         $studly = Str::studly($name);
 
-        if ($studly === '') {
-            throw new RuntimeException('Widget name is required.');
-        }
+        throw_if($studly === '', RuntimeException::class, 'Widget name is required.');
 
         $kebab = Str::kebab($studly);
         $headline = Str::headline($studly);

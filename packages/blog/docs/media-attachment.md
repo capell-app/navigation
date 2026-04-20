@@ -29,6 +29,7 @@ CapellAdmin::registerResource(
 ```
 
 This means:
+
 - **Type**: `'Page'` (articles are a type of page)
 - **Name**: `'article'` (the specific variant)
 

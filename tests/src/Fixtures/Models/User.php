@@ -7,23 +7,17 @@ namespace Capell\Tests\Fixtures\Models;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Capell\Core\Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract, FilamentUser
+class User extends Authenticatable implements FilamentUser
 {
-    use Authenticatable;
     use AuthenticationLoggable;
-    use Authorizable;
 
     /** @use HasFactory<UserFactory> */
     use HasFactory;
