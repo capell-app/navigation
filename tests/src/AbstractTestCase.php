@@ -207,6 +207,14 @@ abstract class AbstractTestCase extends TestCase
         // Prevent role being assigned to created user
         Config::set('filament-shield.panel_user.enabled', false);
 
+        // Route super_admin bypass through Gate::before so tests don't need
+        // every Shield-generated permission seeded. With define_via_gate=false
+        // (the package default) Shield expects `shield:generate` to have run
+        // and the role to have been granted every permission — tests don't
+        // run that pipeline, so any `hasPermissionTo('ViewAny:Layout')`-style
+        // check from a registered policy throws PermissionDoesNotExist.
+        Config::set('filament-shield.super_admin.define_via_gate', true);
+
         Config::set('auth.providers.users.model', User::class);
 
         Config::set('filesystems.disks.page_cache', [

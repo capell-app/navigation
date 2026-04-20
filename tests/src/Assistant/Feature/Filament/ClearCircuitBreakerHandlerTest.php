@@ -7,9 +7,16 @@ use Capell\Admin\Support\AdminEventRegistry;
 use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
 use Capell\Assistant\Support\PrismProvider;
 use Capell\Core\Models\Page;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Notifications\Notification;
 
 use function Pest\Livewire\livewire;
+
+uses(CreatesAdminUser::class);
+
+beforeEach(function (): void {
+    test()->actingAsAdmin();
+});
 
 it('dispatches clear-circuit-breaker event and calls handler', function (): void {
     $mockProvider = new class extends PrismProvider

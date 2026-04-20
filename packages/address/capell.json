@@ -3,7 +3,7 @@
     "slug": "address",
     "kind": "addon",
     "order": 30,
-    "dependsOn": ["mosaic"],
+    "dependsOn": ["capell-app/mosaic"],
     "description": "Address and country field components for forms.",
     "icon": null,
     "url": "https://capell.app",
