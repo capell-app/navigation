@@ -7,6 +7,7 @@ namespace Capell\Blog\Filament\Resources\Tags\Tables;
 use Capell\Admin\Enums\FilamentColorEnum;
 use Capell\Admin\Filament\Components\Tables\Actions\EditAction;
 use Capell\Admin\Filament\Components\Tables\Actions\ReplicateAction;
+use Capell\Admin\Filament\Components\Tables\Columns\DateColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\IdentifierColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
@@ -93,20 +94,8 @@ class TagsTable implements TableConfigurator
                 ->alignCenter()
                 ->toggleable(),
             StatusIconColumn::make('status'),
-            TextColumn::make('created_at')
-                ->label(__('capell-admin::table.created_at'))
-                ->sortable()
-                ->since()
-                ->size('sm')
-                ->alignRight()
-                ->toggleable(isToggledHiddenByDefault: true),
-            TextColumn::make('updated_at')
-                ->label(__('capell-admin::table.updated_at'))
-                ->sortable()
-                ->since()
-                ->size('sm')
-                ->alignRight()
-                ->toggleable(),
+            DateColumn::make('created_at'),
+            DateColumn::make('updated_at'),
         ];
     }
 }
