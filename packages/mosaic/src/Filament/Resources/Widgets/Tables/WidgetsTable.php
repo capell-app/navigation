@@ -138,8 +138,7 @@ class WidgetsTable implements TableConfigurator
                 ->label(__('capell-admin::table.key'))
                 ->searchable()
                 ->sortable()
-                ->toggleable(isToggledHiddenByDefault: true)
-                ->searchable('key'),
+                ->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('meta.component')
                 ->label(__('capell-admin::table.component'))
                 ->searchable(query: function (Builder $query, string $search): Builder {
@@ -196,15 +195,21 @@ class WidgetsTable implements TableConfigurator
                 ->toggleable()
                 ->disabledClick()
                 ->formatStateUsing(
-                    fn (Widget $record, int $state): HtmlString => new HtmlString(
-                        Blade::render(
-                            'capell-admin::components.tables.url',
-                            [
-                                'state' => $state,
-                                'url' => CapellAdmin::getResource(ResourceEnum::Layout)::getUrl('index', ['filters[widget_id][value]' => $record->key]),
-                            ],
-                        ),
-                    ),
+                    function (Widget $record, int $state): ?HtmlString {
+                        if ($state === 0) {
+                            return null;
+                        }
+
+                        return new HtmlString(
+                            Blade::render(
+                                'capell-admin::components.tables.url',
+                                [
+                                    'state' => $state,
+                                    'url' => CapellAdmin::getResource(ResourceEnum::Layout)::getUrl('index', ['filters[widget_id][value]' => $record->key]),
+                                ],
+                            ),
+                        );
+                    },
                 ),
             StatusIconColumn::make('status'),
             DateColumn::make('created_at'),
