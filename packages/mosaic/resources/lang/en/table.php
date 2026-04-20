@@ -13,4 +13,5 @@ return [
     'total_layouts' => 'Total Layouts',
     'slug' => 'Slug',
     'featured' => 'Featured',
+    'asset_type' => 'Asset type',
 ];

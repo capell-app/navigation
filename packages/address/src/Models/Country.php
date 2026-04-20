@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Staudenmeir\EloquentJsonRelations\HasJsonRelationships;
@@ -33,6 +34,8 @@ use Staudenmeir\EloquentJsonRelations\Relations\BelongsToJson;
  * @property-read Language|null $language
  * @property-read Collection|Language[] $languages
  * @property-read int|null $languages_count
+ * @property-read Collection|Address[] $addresses
+ * @property-read int|null $addresses_count
  *
  * @method static Builder<static>|Country default(bool $default = true)
  * @method static Builder<static>|Country disabled()
@@ -115,6 +118,11 @@ class Country extends Model implements Defaultable, Userstampable
     public function languages(): BelongsToJson
     {
         return $this->belongsToJson(Language::class, 'meta->languages');
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 
     protected function scopeOrdered(Builder $query): Builder

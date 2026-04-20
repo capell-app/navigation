@@ -85,6 +85,7 @@ class CountryResource extends Resource
                 'creator',
                 'editor',
             ])
+            ->withCount('addresses')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

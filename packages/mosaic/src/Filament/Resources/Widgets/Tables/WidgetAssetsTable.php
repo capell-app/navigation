@@ -26,6 +26,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\DateColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
@@ -76,12 +77,15 @@ class WidgetAssetsTable implements TableConfigurator
             IdentifierColumn::make('id'),
             NameColumn::make('asset.name'),
             TextColumn::make('asset_type')
+                ->label(__('capell-mosaic::table.asset_type'))
                 ->badge()
                 ->sortable(),
             PageNameColumn::make('pageable.name')
                 ->label(__('capell-admin::table.page'))
                 ->withParents()
                 ->sortable(),
+            DateColumn::make('updated_at')
+                ->toggleable(isToggledHiddenByDefault: true),
         ];
     }
 

@@ -56,6 +56,7 @@ class ArticlePagesTable implements TableConfigurator
     {
         return $table
             ->modifyQueryUsing(self::getTableQuery(...))
+            ->defaultSort('updated_at', 'desc')
             ->columns(static::getTableColumns())
             ->filters(static::getTableFilters())
             ->filtersFormWidth('4xl')
@@ -226,6 +227,9 @@ class ArticlePagesTable implements TableConfigurator
             TypeColumn::make('type.name')
                 ->toggleable(isToggledHiddenByDefault: true),
             PageCachedIconColumn::make('cached')
+                ->toggleable(isToggledHiddenByDefault: true),
+            TextColumn::make('creator.name')
+                ->label(__('capell-admin::table.created_by'))
                 ->toggleable(isToggledHiddenByDefault: true),
             DateColumn::make('created_at'),
             DateColumn::make('updated_at'),
