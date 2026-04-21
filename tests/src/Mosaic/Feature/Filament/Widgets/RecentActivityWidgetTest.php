@@ -41,7 +41,7 @@ it('shows draft status when visible_from is null', function (): void {
 
     /** @var class-string<Page> $pageModel */
     $pageModel = CapellCore::getModel(ModelEnum::Page);
-    $pageModel::factory()->create([
+    $pageModel::factory()->withTranslations()->create([
         'name' => 'Draft Page',
         'visible_from' => null,
         'visible_until' => null,
@@ -57,7 +57,7 @@ it('shows published status when visible_from is in the past and no visible_until
 
     /** @var class-string<Page> $pageModel */
     $pageModel = CapellCore::getModel(ModelEnum::Page);
-    $pageModel::factory()->create([
+    $pageModel::factory()->withTranslations()->create([
         'name' => 'Published Page',
         'visible_from' => now()->subDay(),
         'visible_until' => null,
@@ -73,7 +73,7 @@ it('shows expired status when visible_until is in the past', function (): void {
 
     /** @var class-string<Page> $pageModel */
     $pageModel = CapellCore::getModel(ModelEnum::Page);
-    $pageModel::factory()->create([
+    $pageModel::factory()->withTranslations()->create([
         'name' => 'Expired Page',
         'visible_from' => now()->subMonth(),
         'visible_until' => now()->subDay(),
