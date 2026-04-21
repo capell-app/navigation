@@ -21,7 +21,7 @@ final class LayoutHealthWidget extends CapellWidget
     protected static string $settingsKey = 'layout_health';
 
     /** @var list<string> */
-    protected static array $rolesConfigKeys = ['developer', 'super_admin'];
+    protected static array $rolesConfigKeys = ['super_admin'];
 
     protected string $view = 'capell-mosaic::filament.widgets.layout-health';
 
