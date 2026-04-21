@@ -10,7 +10,7 @@ use Capell\Assistant\Data\Dashboard\FeatureUsageData;
 use Capell\Assistant\Models\AIGenerationHistory;
 use Capell\Assistant\Settings\AssistantSettings;
 use Capell\Assistant\Support\AiRateLimiter;
-use Spatie\LaravelData\DataCollection;
+use Illuminate\Support\Collection;
 
 final class AiMetricsWidget extends CapellWidget
 {
@@ -42,8 +42,7 @@ final class AiMetricsWidget extends CapellWidget
         $totalGenerations = AIGenerationHistory::query()->count();
         $totalTokens = AIGenerationHistory::query()->sum('total_tokens') ?? 0;
         $failedGenerations = AIGenerationHistory::query()
-            ->where('failed', true)
-            ->orWhereNotNull('error_message')
+            ->whereNotNull('error_message')
             ->count();
 
         // Rate limit status
@@ -71,9 +70,9 @@ final class AiMetricsWidget extends CapellWidget
     }
 
     /**
-     * @return DataCollection<int, FeatureUsageData>
+     * @return Collection<int, FeatureUsageData>
      */
-    private function getFeatureUsage(): DataCollection
+    private function getFeatureUsage(): Collection
     {
         $features = AIGenerationHistory::query()
             ->select('action')
@@ -100,6 +99,6 @@ final class AiMetricsWidget extends CapellWidget
         // Sort by count descending
         usort($featureData, fn (FeatureUsageData $a, FeatureUsageData $b): int => $b->count <=> $a->count);
 
-        return DataCollection::from($featureData);
+        return collect($featureData);
     }
 }

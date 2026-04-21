@@ -14,7 +14,7 @@ use Capell\Blog\Models\Tag;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\LaravelData\DataCollection;
+use Illuminate\Support\Collection;
 
 final class ArticleHealthWidget extends CapellWidget
 {
@@ -106,16 +106,16 @@ final class ArticleHealthWidget extends CapellWidget
             expiredCount: $expiredCount,
             recentlyCreatedCount: $recentlyCreatedCount,
             recentlyUpdatedCount: $recentlyUpdatedCount,
-            topTags: TagCountData::collect($topTags, DataCollection::class),
+            topTags: $topTags,
             languageCoverage: $languageCoverage,
         );
     }
 
     /**
      * @param  class-string<Article>  $articleModel
-     * @return DataCollection<int, LanguageCoverageData>
+     * @return Collection<int, LanguageCoverageData>
      */
-    private function getLanguageCoverage(string $articleModel): DataCollection
+    private function getLanguageCoverage(string $articleModel): Collection
     {
         $languages = Language::all();
         $coverage = [];
@@ -136,6 +136,6 @@ final class ArticleHealthWidget extends CapellWidget
             );
         }
 
-        return LanguageCoverageData::collect($coverage, DataCollection::class);
+        return collect($coverage);
     }
 }

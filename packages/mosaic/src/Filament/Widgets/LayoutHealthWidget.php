@@ -14,7 +14,7 @@ use Capell\Mosaic\Data\Dashboard\WidgetGroupData;
 use Capell\Mosaic\Enums\ModelEnum;
 use Capell\Mosaic\Models\Widget;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\LaravelData\DataCollection;
+use Illuminate\Support\Collection;
 
 final class LayoutHealthWidget extends CapellWidget
 {
@@ -74,13 +74,9 @@ final class LayoutHealthWidget extends CapellWidget
 
     /**
      * @param  class-string<Widget>  $widgetModel
-     * @return DataCollection<int, WidgetGroupData>
+     * @return Collection<int, WidgetGroupData>
      */
-    /**
-     * @param  class-string<Widget>  $widgetModel
-     * @return DataCollection<int, WidgetGroupData>
-     */
-    private function getWidgetsByGroup(string $widgetModel): DataCollection
+    private function getWidgetsByGroup(string $widgetModel): Collection
     {
         $widgets = $widgetModel::query()->with('type')->get();
         $groups = [];
@@ -114,16 +110,17 @@ final class LayoutHealthWidget extends CapellWidget
             );
         }
 
-        return WidgetGroupData::collect($data, DataCollection::class);
+        return WidgetGroupData::collect($data, Collection::class);
     }
 
     /**
      * @param  class-string<Widget>  $widgetModel
-     * @return DataCollection<int, LeastUsedWidgetData>
+     * @return Collection<int, LeastUsedWidgetData>
      */
-    private function getLeastUsedWidgets(string $widgetModel): DataCollection
+    private function getLeastUsedWidgets(string $widgetModel): Collection
     {
         $leastUsed = $widgetModel::query()
+            ->with('type')
             ->withCount(['assets' => fn (Builder $query) => $query->distinct('container')])
             ->orderBy('assets_count', 'asc')
             ->limit(5)
@@ -134,15 +131,24 @@ final class LayoutHealthWidget extends CapellWidget
                 group: $widget->type?->group ?? 'default',
             ));
 
-        return LeastUsedWidgetData::collect($leastUsed, DataCollection::class);
+        return LeastUsedWidgetData::collect($leastUsed, Collection::class);
     }
 
     /**
      * @param  class-string<Widget>  $widgetModel
-     * @return DataCollection<int, UnusedWidgetData>
+     * @return Collection<int, UnusedWidgetData>
      */
-    private function getUnusedWidgets(string $widgetModel): DataCollection
+    private function getUnusedWidgets(string $widgetModel): Collection
     {
-        return UnusedWidgetData::collect([], DataCollection::class);
+        $unused = $widgetModel::query()
+            ->with('type')
+            ->doesntHave('assets')
+            ->get()
+            ->map(fn (Widget $widget): UnusedWidgetData => new UnusedWidgetData(
+                name: $widget->name ?? $widget->class,
+                group: $widget->type?->group ?? 'default',
+            ));
+
+        return UnusedWidgetData::collect($unused, Collection::class);
     }
 }

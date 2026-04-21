@@ -160,7 +160,7 @@
             </div>
 
             {{-- Feature Usage --}}
-            @if ($data->featureUsage->isNotEmpty())
+            @if ($data->featureUsage->count() > 0)
                 <details class="group">
                     <summary
                         class="flex cursor-pointer items-center justify-between gap-2 py-2 text-sm font-medium text-gray-900 dark:text-white"

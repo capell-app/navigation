@@ -92,7 +92,7 @@
             </div>
 
             {{-- Least Used Widgets --}}
-            @if ($data->leastUsedWidgets->isNotEmpty())
+            @if ($data->leastUsedWidgets->count())
                 <details class="group">
                     <summary
                         class="flex cursor-pointer items-center justify-between gap-2 py-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -131,7 +131,7 @@
             @endif
 
             {{-- Unused Widgets --}}
-            @if ($data->unusedWidgets->isNotEmpty())
+            @if ($data->unusedWidgets->count())
                 <details class="group">
                     <summary
                         class="flex cursor-pointer items-center justify-between gap-2 py-2 text-sm font-medium text-gray-900 dark:text-white"

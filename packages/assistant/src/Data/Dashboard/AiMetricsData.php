@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Capell\Assistant\Data\Dashboard;
 
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
 
 final class AiMetricsData extends Data
 {
     /**
-     * @param  DataCollection<int, FeatureUsageData>  $featureUsage
+     * @param  Collection<int, FeatureUsageData>  $featureUsage
      */
     public function __construct(
         public readonly int $totalGenerations,
@@ -24,7 +24,7 @@ final class AiMetricsData extends Data
         public readonly bool $pageContentGeneratorEnabled,
         public readonly bool $pageTitleSuggestionsEnabled,
         public readonly bool $aiCreatorEnabled,
-        public readonly DataCollection $featureUsage,
+        public readonly Collection $featureUsage,
     ) {}
 }
 

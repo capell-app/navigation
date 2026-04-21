@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Data\Dashboard;
 
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
 
 final class ArticleHealthData extends Data
 {
     /**
-     * @param  DataCollection<int, TagCountData>  $topTags
-     * @param  DataCollection<int, LanguageCoverageData>  $languageCoverage
+     * @param  Collection<int, TagCountData>  $topTags
+     * @param  Collection<int, LanguageCoverageData>  $languageCoverage
      */
     public function __construct(
         public readonly int $totalArticles,
@@ -23,7 +23,7 @@ final class ArticleHealthData extends Data
         public readonly int $expiredCount,
         public readonly int $recentlyCreatedCount,
         public readonly int $recentlyUpdatedCount,
-        public readonly DataCollection $topTags,
-        public readonly DataCollection $languageCoverage,
+        public readonly Collection $topTags,
+        public readonly Collection $languageCoverage,
     ) {}
 }
