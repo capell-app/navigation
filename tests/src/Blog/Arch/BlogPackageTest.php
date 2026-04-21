@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Admin\Console\Commands\DemoCommand;
 use Capell\Admin\Console\Commands\InstallCommand;
+use Capell\Admin\Filament\Pages\SystemHealthPage;
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Core\Support\Creator\DemoCreator;
 
@@ -16,6 +17,7 @@ arch()
         DemoCreator::class,
         TypeFactory::class,
         Capell\Mosaic\Console\Commands\Hero\DemoCommand::class,
+        SystemHealthPage::class,
     ]);
 
 arch()

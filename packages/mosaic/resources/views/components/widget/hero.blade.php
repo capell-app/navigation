@@ -199,7 +199,7 @@ $theme = Frontend::theme();
                             <div
                                 class="relative z-30 flex w-full items-center lg:col-span-6 xl:col-span-5"
                             >
-                                <@lgSqdhLtYgLMX57mjWEyRCgvKnB>
+                                @foreach ($images as $media)
                                     @capellBuffer($mediaContent)
                                         <x-capell::media
                                             format="webp"
@@ -220,7 +220,7 @@ $theme = Frontend::theme();
                                     >
                                         {{ $mediaContent() }}
                                     </div>
-                                </@lgSqdhLtYgLMX57mjWEyRCgvKnB>
+                                @endforeach
                             </div>
                         @endif
                     </div>

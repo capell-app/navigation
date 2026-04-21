@@ -115,7 +115,7 @@ class SectionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return (string) (__('capell-admin::navigation.group_library'));
+        return (string) (__('capell-admin::navigation.group_content'));
     }
 
     public static function getNavigationLabel(): string

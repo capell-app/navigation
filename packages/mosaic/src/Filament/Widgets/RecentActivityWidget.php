@@ -33,7 +33,7 @@ final class RecentActivityWidget extends CapellWidget
 
         $pages = $pageModel::query()
             ->with('translation')
-            ->orderByDesc('updated_at')
+            ->latest('updated_at')
             ->limit(10)
             ->get();
 

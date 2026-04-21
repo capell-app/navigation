@@ -21,18 +21,13 @@ beforeEach(function (): void {
 });
 
 it('renders for a developer user', function (): void {
-    $user = $this->createUser();
-    $user->assignRole(config('capell.roles.developer', 'developer'));
-
-    $this->actingAs($user);
+    test()->actingAsRole(config('capell.roles.developer', 'developer'));
 
     livewire(LayoutHealthWidget::class)->assertOk();
 });
 
 it('shows a widget with no assets in unused widgets section', function (): void {
-    $user = $this->createUser();
-    $user->assignRole(config('capell.roles.developer', 'developer'));
-    $this->actingAs($user);
+    test()->actingAsRole(config('capell.roles.developer', 'developer'));
 
     /** @var class-string<Widget> $widgetModel */
     $widgetModel = CapellCore::getModel(ModelEnum::Widget);
@@ -45,9 +40,7 @@ it('shows a widget with no assets in unused widgets section', function (): void 
 });
 
 it('does not show unused widgets section when all widgets are in use', function (): void {
-    $user = $this->createUser();
-    $user->assignRole(config('capell.roles.developer', 'developer'));
-    $this->actingAs($user);
+    test()->actingAsRole(config('capell.roles.developer', 'developer'));
 
     /** @var class-string<Widget> $widgetModel */
     $widgetModel = CapellCore::getModel(ModelEnum::Widget);
@@ -60,9 +53,7 @@ it('does not show unused widgets section when all widgets are in use', function 
 });
 
 it('shows only unused widgets in the unused widgets section', function (): void {
-    $user = $this->createUser();
-    $user->assignRole(config('capell.roles.developer', 'developer'));
-    $this->actingAs($user);
+    test()->actingAsRole(config('capell.roles.developer', 'developer'));
 
     /** @var class-string<Widget> $widgetModel */
     $widgetModel = CapellCore::getModel(ModelEnum::Widget);

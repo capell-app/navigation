@@ -11,7 +11,7 @@ uses(CreatesAdminUser::class)
     ->group('widget');
 
 it('renders for an authenticated user', function (): void {
-    $this->actingAs($this->createUser());
+    test()->actingAsUser();
 
     livewire(AiUsageWidget::class)->assertOk();
 });

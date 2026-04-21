@@ -67,7 +67,7 @@ class AddressResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return (string) (__('capell-admin::navigation.group_settings'));
+        return (string) (__('capell-admin::navigation.group_administration'));
     }
 
     public static function shouldRegisterNavigation(): bool

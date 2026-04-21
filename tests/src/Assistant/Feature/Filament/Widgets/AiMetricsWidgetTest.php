@@ -17,10 +17,7 @@ beforeEach(function (): void {
 });
 
 it('renders for a developer user', function (): void {
-    $user = $this->createUser();
-    $user->assignRole(config('capell.roles.developer', 'developer'));
-
-    $this->actingAs($user);
+    test()->actingAsRole(config('capell.roles.developer', 'developer'));
 
     livewire(AiMetricsWidget::class)->assertOk();
 });

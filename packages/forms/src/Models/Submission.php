@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Forms\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Submission extends Model
 {
+    use HasFactory;
+
     /** @var array<string> */
     protected $fillable = ['form_id', 'data', 'submitted_at'];
 
