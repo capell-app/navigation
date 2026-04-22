@@ -1,23 +1,13 @@
 {
-    "label": "Blog",
-    "slug": "blog",
-    "kind": "addon",
-    "order": 20,
-    "dependsOn": ["capell-app/mosaic"],
-    "description": "Article page type with tags, archives, sitemaps, and Livewire listing components.",
-    "icon": null,
-    "url": "https://capell.app",
-    "scopes": [],
-    "commands": {
-        "install": "capell:blog-install",
-        "afterInstall": null,
-        "afterInstallParams": [],
-        "setup": "capell:blog-setup",
-        "setupParams": [],
-        "upgrade": null,
-        "demo": "capell:blog-demo",
-        "demoParams": ["user", "sites"],
-        "faker": "capell:blog-faker",
-        "fakerParams": ["sites", "languages"]
-    }
+  "name": "capell-app/blog",
+  "kind": "package",
+  "capell-version": "^4.0",
+  "contexts": ["admin", "frontend", "console"],
+  "requires": ["capell-app/core", "capell-app/admin", "capell-app/frontend"],
+  "providers": {
+    "shared": ["Capell\\Blog\\Providers\\BlogServiceProvider"],
+    "admin": ["Capell\\Blog\\Providers\\AdminServiceProvider"],
+    "frontend": ["Capell\\Blog\\Providers\\FrontendServiceProvider"],
+    "console": ["Capell\\Blog\\Providers\\ConsoleServiceProvider"]
+  }
 }
