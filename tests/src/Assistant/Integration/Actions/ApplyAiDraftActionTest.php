@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\ApplyAiDraftAction;
-use Capell\Assistant\Support\Context\ContentActionContext;
+use Capell\SeoTools\Assistant\Actions\ApplyAiDraftAction;
+use Capell\SeoTools\Assistant\Support\Context\ContentActionContext;
 
 uses()->group('admin-ai');
 

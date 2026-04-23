@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\SuggestPageTitlesAction;
-use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Actions\SuggestPageTitlesAction;
+use Capell\SeoTools\Assistant\Support\AiResponse;
+use Capell\SeoTools\Assistant\Support\Context\ContentActionContext;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
 
 uses()->group('admin-ai');
 

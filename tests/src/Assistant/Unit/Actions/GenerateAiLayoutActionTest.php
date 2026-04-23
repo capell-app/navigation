@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\GenerateAiLayoutAction;
-use Capell\Assistant\DataObjects\AiCreatorData;
-use Capell\Assistant\Support\Pipelines\AiCreatorPipeline;
+use Capell\SeoTools\Assistant\Actions\GenerateAiLayoutAction;
+use Capell\SeoTools\Assistant\DataObjects\AiCreatorData;
+use Capell\SeoTools\Assistant\Support\Pipelines\AiCreatorPipeline;
 
 it('returns sections array from pipeline', function (): void {
     $sections = [

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\DataObjects\AiCreatorData;
-use Capell\Assistant\Models\AiCreatorContext;
-use Capell\Assistant\Models\AiCreatorSession;
-use Capell\Assistant\Models\AIGenerationHistory;
-use Capell\Assistant\Support\AiRateLimiter;
-use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\Pipelines\AiCreatorPipeline;
-use Capell\Assistant\Support\PrismProvider;
-use Capell\Assistant\Support\PromptRepository;
-use Capell\Assistant\Support\SectionRegistry;
+use Capell\SeoTools\Assistant\DataObjects\AiCreatorData;
+use Capell\SeoTools\Assistant\Models\AiCreatorContext;
+use Capell\SeoTools\Assistant\Models\AiCreatorSession;
+use Capell\SeoTools\Assistant\Models\AIGenerationHistory;
+use Capell\SeoTools\Assistant\Support\AiRateLimiter;
+use Capell\SeoTools\Assistant\Support\AiResponse;
+use Capell\SeoTools\Assistant\Support\Pipelines\AiCreatorPipeline;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Support\PromptRepository;
+use Capell\SeoTools\Assistant\Support\SectionRegistry;
 use Mockery\MockInterface;
 
 function makePipeline(

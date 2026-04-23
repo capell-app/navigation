@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\AiResponseParser;
+use Capell\SeoTools\Assistant\Support\AiResponseParser;
 
 uses()->group('admin-ai');
 

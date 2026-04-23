@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Assistant\Fixtures;
 
-use Capell\Assistant\Contracts\AiActionContextInterface;
+use Capell\SeoTools\Assistant\Contracts\AiActionContextInterface;
 
 class FakeContext implements AiActionContextInterface
 {

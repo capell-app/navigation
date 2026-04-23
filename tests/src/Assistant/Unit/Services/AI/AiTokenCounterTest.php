@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\AiTokenCounter;
+use Capell\SeoTools\Assistant\Support\AiTokenCounter;
 
 it('counts tokens by model baseline', function (): void {
     $counter = new AiTokenCounter;

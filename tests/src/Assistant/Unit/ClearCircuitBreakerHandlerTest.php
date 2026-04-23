@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Capell\Admin\Support\AdminEventRegistry;
 use Capell\Admin\Support\AdminEventRouter;
-use Capell\Assistant\Handlers\ClearCircuitBreakerHandler;
-use Capell\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Handlers\ClearCircuitBreakerHandler;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
 use Capell\Tests\Assistant\Fixtures\HandlerDummyComponent;
 use Filament\Notifications\Notification;
 

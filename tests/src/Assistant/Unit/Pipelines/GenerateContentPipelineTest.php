@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\AiRateLimiter;
-use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\Pipelines\GenerateContentPipeline;
-use Capell\Assistant\Support\PrismProvider;
-use Capell\Assistant\Support\PromptRepository;
+use Capell\SeoTools\Assistant\Support\AiRateLimiter;
+use Capell\SeoTools\Assistant\Support\AiResponse;
+use Capell\SeoTools\Assistant\Support\Context\ContentActionContext;
+use Capell\SeoTools\Assistant\Support\Pipelines\GenerateContentPipeline;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Support\PromptRepository;
 use Mockery\MockInterface;
 
 it('sanitizes unsafe html from AI output', function (): void {

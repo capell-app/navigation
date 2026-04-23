@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\GeneratorPageContentAction;
+use Capell\SeoTools\Assistant\Actions\GeneratorPageContentAction;
 
 return [
     'prism' => [

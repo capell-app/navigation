@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\GeneratorPageContentAction;
-use Capell\Assistant\Actions\RecordAiGenerationAction;
-use Capell\Assistant\Models\AIGenerationHistory;
+use Capell\SeoTools\Assistant\Actions\GeneratorPageContentAction;
+use Capell\SeoTools\Assistant\Actions\RecordAiGenerationAction;
+use Capell\SeoTools\Assistant\Models\AIGenerationHistory;
 
 uses()->group('admin-ai');
 

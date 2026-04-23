@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Actions\GeneratorPageContentAction;
-use Capell\Assistant\Models\AIGenerationHistory;
-use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\Context\ContentActionContext;
-use Capell\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Actions\GeneratorPageContentAction;
+use Capell\SeoTools\Assistant\Models\AIGenerationHistory;
+use Capell\SeoTools\Assistant\Support\AiResponse;
+use Capell\SeoTools\Assistant\Support\Context\ContentActionContext;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
 
 uses()->group('admin-ai');
 

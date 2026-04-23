@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\AiRateLimiter;
-use Capell\Assistant\Support\Cache\RateLimitCache;
+use Capell\SeoTools\Assistant\Support\AiRateLimiter;
+use Capell\SeoTools\Assistant\Support\Cache\RateLimitCache;
 use Illuminate\Support\Facades\Date;
 
 it('allows up to N requests per window and blocks subsequent ones', function (): void {

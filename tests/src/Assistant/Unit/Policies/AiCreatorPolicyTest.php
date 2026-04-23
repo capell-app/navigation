@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Policies\AiCreatorPolicy;
-use Capell\Assistant\Settings\AssistantSettings;
+use Capell\SeoTools\Assistant\Policies\AiCreatorPolicy;
+use Capell\SeoTools\Assistant\Settings\AssistantSettings;
 
 function makeSettings(bool $aiCreator): AssistantSettings
 {

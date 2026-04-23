@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Support\AiFeatureRegistry;
+use Capell\SeoTools\Assistant\Support\AiFeatureRegistry;
 
 it('registers and resolves features', function (): void {
     $registry = new AiFeatureRegistry;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Assistant\Filament\Widgets\AiMetricsWidgetAbstract;
+use Capell\SeoTools\Assistant\Filament\Widgets\AiMetricsWidgetAbstract;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;

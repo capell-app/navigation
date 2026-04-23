@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Tests\Assistant\Fixtures;
 
-use Capell\Assistant\Support\AiResponse;
-use Capell\Assistant\Support\PrismProvider;
+use Capell\SeoTools\Assistant\Support\AiResponse;
+use Capell\SeoTools\Assistant\Support\PrismProvider;
 
 class FakeOpenAIProviderForDescriptions extends PrismProvider
 {
