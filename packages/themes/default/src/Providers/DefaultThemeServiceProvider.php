@@ -19,6 +19,8 @@ class DefaultThemeServiceProvider extends ServiceProvider
         $themeModel = CapellCore::getModel(ModelEnum::Theme);
         CapellCore::registerModelInterceptor($themeModel, interceptorClass: DefaultThemeInterceptor::class);
 
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-default-theme');
+
         CapellCore::registerVendorAsset(
             VendorAssetData::tailwindImport('resources/css/default-theme.css', self::$packageName),
         );
