@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Activity;
 
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Models\Workspace;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;

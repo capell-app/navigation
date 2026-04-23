@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Checks;
 
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Models\Workspace;
 
 /**
  * A pluggable validator run against a workspace before publish. Checks must

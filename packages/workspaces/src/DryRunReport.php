@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
 

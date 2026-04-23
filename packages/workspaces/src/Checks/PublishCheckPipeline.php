@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Checks;
 
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\Config;
 

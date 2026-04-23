@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Models\Workspace;
 use Capell\Workspaces\Actions\CopyOnWriteAction;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

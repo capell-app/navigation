@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Enums\WorkspaceStatusEnum;
-use Capell\Core\Enums\WorkspaceTransitionEnum;
-use Capell\Core\Models\Version;
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Enums\WorkspaceStatusEnum;
+use Capell\Workspaces\Enums\WorkspaceTransitionEnum;
 use Capell\Workspaces\Events\WorkspaceStateChanged;
 use Capell\Workspaces\Exceptions\ReleaseWindowClosedException;
 use Capell\Workspaces\Exceptions\StaleWorkspaceException;
 use Capell\Workspaces\Exceptions\UrlCollisionException;
+use Capell\Workspaces\Models\Version;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;

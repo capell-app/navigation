@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Enums\WorkspaceStatusEnum;
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Enums\WorkspaceStatusEnum;
 use Capell\Workspaces\Exceptions\ReleaseWindowClosedException;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

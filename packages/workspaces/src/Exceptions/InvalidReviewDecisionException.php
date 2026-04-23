@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Exceptions;
 
-use Capell\Core\Models\WorkspaceReviewAssignment;
+use Capell\Workspaces\Models\WorkspaceReviewAssignment;
 use RuntimeException;
 
 class InvalidReviewDecisionException extends RuntimeException

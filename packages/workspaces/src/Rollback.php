@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Models\Version;
 use Capell\Workspaces\Events\VersionRolledBack;
 use Capell\Workspaces\Exceptions\StaleWorkspaceException;
+use Capell\Workspaces\Models\Version;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

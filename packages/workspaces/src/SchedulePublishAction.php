@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
-use Capell\Core\Enums\WorkspaceStatusEnum;
-use Capell\Core\Enums\WorkspaceTransitionEnum;
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Enums\WorkspaceStatusEnum;
+use Capell\Workspaces\Enums\WorkspaceTransitionEnum;
 use Capell\Workspaces\Events\WorkspaceStateChanged;
 use Capell\Workspaces\Exceptions\InvalidScheduleException;
+use Capell\Workspaces\Models\Workspace;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Auth\Authenticatable;
 

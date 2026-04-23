@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Events;
 
-use Capell\Core\Enums\WorkspaceStatusEnum;
-use Capell\Core\Models\Workspace;
+use Capell\Workspaces\Enums\WorkspaceStatusEnum;
+use Capell\Workspaces\Models\Workspace;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
