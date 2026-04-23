@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Capell\Workspaces;
 
 use Capell\Workspaces\Enums\WorkspaceStatusEnum;
+use Capell\Workspaces\Events\WorkspaceEventDispatcher;
 use Capell\Workspaces\Models\Workspace;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -50,9 +52,20 @@ class CloneWorkspaceAction
 
             $clone->save();
 
+            /** @var WorkspaceEventDispatcher $dispatcher */
+            $dispatcher = resolve(WorkspaceEventDispatcher::class);
+
+            // Dispatch beforeClone event
+            if (! $dispatcher->beforeClone($source, $clone)) {
+                throw new Exception('Clone prevented by subscriber');
+            }
+
             if ($options->copyDrafts) {
                 $this->copyDraftableRows($source, $clone);
             }
+
+            // Dispatch afterClone event
+            $dispatcher->afterClone($source, $clone);
 
             return $clone->refresh();
         });

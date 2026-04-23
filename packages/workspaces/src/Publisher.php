@@ -6,12 +6,14 @@ namespace Capell\Workspaces;
 
 use Capell\Workspaces\Enums\WorkspaceStatusEnum;
 use Capell\Workspaces\Enums\WorkspaceTransitionEnum;
+use Capell\Workspaces\Events\WorkspaceEventDispatcher;
 use Capell\Workspaces\Events\WorkspaceStateChanged;
 use Capell\Workspaces\Exceptions\ReleaseWindowClosedException;
 use Capell\Workspaces\Exceptions\StaleWorkspaceException;
 use Capell\Workspaces\Exceptions\UrlCollisionException;
 use Capell\Workspaces\Models\Version;
 use Capell\Workspaces\Models\Workspace;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
@@ -57,6 +59,14 @@ class Publisher
                 $workspace->id,
                 $workspace->status->value,
             ));
+        }
+
+        /** @var WorkspaceEventDispatcher $dispatcher */
+        $dispatcher = resolve(WorkspaceEventDispatcher::class);
+
+        // Dispatch beforePublish event
+        if (! $dispatcher->beforePublish($workspace)) {
+            throw new Exception('Publish prevented by subscriber');
         }
 
         if (! $bypassWindow) {
@@ -152,6 +162,9 @@ class Publisher
 
             return $newVersion;
         });
+
+        // Dispatch afterPublish event
+        $dispatcher->afterPublish($workspace);
 
         event(new WorkspaceStateChanged($workspace, $previousStatus, $workspace->status, WorkspaceTransitionEnum::Published->value, $publishedBy, $notes));
 
