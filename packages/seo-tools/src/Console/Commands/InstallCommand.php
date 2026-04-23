@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class InstallCommand extends Command
 {
-    protected $signature = 'capell:assistant-install';
+    protected $signature = 'capell:seo-tools-install';
 
     public function __construct(private readonly MigrationFilesystemInterface $fileManager)
     {
@@ -53,7 +53,7 @@ class InstallCommand extends Command
         $this->call('migrate');
 
         $this->newLine();
-        $this->info('Capell Assistant installed successfully.');
+        $this->info('Capell SEO Tools installed successfully.');
 
         return Command::SUCCESS;
     }
