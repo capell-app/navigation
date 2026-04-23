@@ -55,83 +55,145 @@ declare(strict_types=1);
         {{ $containerAttributes }}
         x-id="['{{ $dropdownName }}-dropdown-button']"
     >
+        <button
+            @if ($triggerType === 'button')
+                type="button"
+            @endif
+            x-ref="{{ $dropdownName }}_toggle"
+            @if ($stopTriggerClickPropagation)
+                x-on:click.stop="{{ $triggerClick }}"
+            @else
+                x-on:click="{{ $triggerClick }}"
+            @endif
+            @if (! $useFloat)
+                :aria-expanded="isOpen"
+                :aria-controls="$id('{{ $dropdownName }}-dropdown-button')"
+            @endif
+            {{ $trigger->attributes->class([$triggerClass]) }}
+        >
+            {{ $trigger }}
+        </button>
+
+        @if ($panelTag === 'ul')
+            <ul
+                role="menu"
+                tabindex="-1"
+                x-ref="{{ $dropdownName }}_dropdown"
+                x-cloak
+                @if ($panelClickOutside !== '')
+                    x-on:click.outside="{{ $panelClickOutside }}"
+                @endif
+                @if ($useFloat)
+                    x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:leave-end="opacity-0"
+                    wire:ignore
+                @endif
+                @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
+                    x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
+                @endif
+                {{ $panelAttributes }}
+                :id="$id('{{ $dropdownName }}-dropdown-button')"
+            >
+                {{ $slot }}
+            </ul>
+        @else
+            <div
+                role="menu"
+                tabindex="-1"
+                x-ref="{{ $dropdownName }}_dropdown"
+                x-cloak
+                @if ($panelClickOutside !== '')
+                    x-on:click.outside="{{ $panelClickOutside }}"
+                @endif
+                @if ($useFloat)
+                    x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:leave-end="opacity-0"
+                    wire:ignore
+                @endif
+                @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
+                    x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
+                @endif
+                {{ $panelAttributes }}
+                :id="$id('{{ $dropdownName }}-dropdown-button')"
+            >
+                {{ $slot }}
+            </div>
+        @endif
+    </li>
 @else
     <div
         x-data="{{ $dropdownData }}"
         {{ $containerAttributes }}
         x-id="['{{ $dropdownName }}-dropdown-button']"
     >
-@endif
-    <button
-        @if ($triggerType === 'button')
-            type="button"
-        @endif
-        x-ref="{{ $dropdownName }}_toggle"
-        @if ($stopTriggerClickPropagation)
-            x-on:click.stop="{{ $triggerClick }}"
+        <button
+            @if ($triggerType === 'button')
+                type="button"
+            @endif
+            x-ref="{{ $dropdownName }}_toggle"
+            @if ($stopTriggerClickPropagation)
+                x-on:click.stop="{{ $triggerClick }}"
+            @else
+                x-on:click="{{ $triggerClick }}"
+            @endif
+            @if (! $useFloat)
+                :aria-expanded="isOpen"
+                :aria-controls="$id('{{ $dropdownName }}-dropdown-button')"
+            @endif
+            {{ $trigger->attributes->class([$triggerClass]) }}
+        >
+            {{ $trigger }}
+        </button>
+
+        @if ($panelTag === 'ul')
+            <ul
+                role="menu"
+                tabindex="-1"
+                x-ref="{{ $dropdownName }}_dropdown"
+                x-cloak
+                @if ($panelClickOutside !== '')
+                    x-on:click.outside="{{ $panelClickOutside }}"
+                @endif
+                @if ($useFloat)
+                    x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:leave-end="opacity-0"
+                    wire:ignore
+                @endif
+                @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
+                    x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
+                @endif
+                {{ $panelAttributes }}
+                :id="$id('{{ $dropdownName }}-dropdown-button')"
+            >
+                {{ $slot }}
+            </ul>
         @else
-            x-on:click="{{ $triggerClick }}"
+            <div
+                role="menu"
+                tabindex="-1"
+                x-ref="{{ $dropdownName }}_dropdown"
+                x-cloak
+                @if ($panelClickOutside !== '')
+                    x-on:click.outside="{{ $panelClickOutside }}"
+                @endif
+                @if ($useFloat)
+                    x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:leave-end="opacity-0"
+                    wire:ignore
+                @endif
+                @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
+                    x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
+                @endif
+                {{ $panelAttributes }}
+                :id="$id('{{ $dropdownName }}-dropdown-button')"
+            >
+                {{ $slot }}
+            </div>
         @endif
-        @if (! $useFloat)
-            :aria-expanded="isOpen"
-            :aria-controls="$id('{{ $dropdownName }}-dropdown-button')"
-        @endif
-        {{ $trigger->attributes->class([$triggerClass]) }}
-    >
-        {{ $trigger }}
-    </button>
-
-    @if ($panelTag === 'ul')
-        <ul
-            role="menu"
-            tabindex="-1"
-            x-ref="{{ $dropdownName }}_dropdown"
-            x-cloak
-            @if ($panelClickOutside !== '')
-                x-on:click.outside="{{ $panelClickOutside }}"
-            @endif
-            @if ($useFloat)
-                x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
-                x-transition:enter-start="opacity-0"
-                x-transition:leave-end="opacity-0"
-                wire:ignore
-            @endif
-            @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
-                x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
-            @endif
-            {{ $panelAttributes }}
-            :id="$id('{{ $dropdownName }}-dropdown-button')"
-        >
-            {{ $slot }}
-        </ul>
-    @else
-        <div
-            role="menu"
-            tabindex="-1"
-            x-ref="{{ $dropdownName }}_dropdown"
-            x-cloak
-            @if ($panelClickOutside !== '')
-                x-on:click.outside="{{ $panelClickOutside }}"
-            @endif
-            @if ($useFloat)
-                x-float{{ $placement ? ".placement.{$placement}" : '' }}.flip{{ $shift ? '.shift' : '' }}{{ $teleport ? '.teleport' : '' }}{{ $offset ? '.offset' : '' }}="{ offset: {{ $offset }} }"
-                x-transition:enter-start="opacity-0"
-                x-transition:leave-end="opacity-0"
-                wire:ignore
-            @endif
-            @if (! $useFloat && $panelVisibleClass !== '' && $panelHiddenClass !== '')
-                x-bind:class="isOpen ? '{{ $panelVisibleClass }}' : '{{ $panelHiddenClass }}'"
-            @endif
-            {{ $panelAttributes }}
-            :id="$id('{{ $dropdownName }}-dropdown-button')"
-        >
-            {{ $slot }}
-        </div>
-    @endif
-
-@if ($containerTag === 'li')
-    </li>
-@else
     </div>
 @endif
 

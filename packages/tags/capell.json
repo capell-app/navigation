@@ -1,11 +1,11 @@
 {
-  "name": "capell-app/tags",
-  "kind": "package",
-  "capell-version": "^4.0",
-  "contexts": ["admin"],
-  "requires": ["capell-app/admin"],
-  "providers": {
-    "shared": ["Capell\\Tags\\Providers\\TagsServiceProvider"],
-    "admin": ["Capell\\Tags\\Providers\\AdminServiceProvider"]
-  }
+    "name": "capell-app/tags",
+    "kind": "package",
+    "capell-version": "^4.0",
+    "contexts": ["admin"],
+    "requires": ["capell-app/admin"],
+    "providers": {
+        "shared": ["Capell\\Tags\\Providers\\TagsServiceProvider"],
+        "admin": ["Capell\\Tags\\Providers\\AdminServiceProvider"]
+    }
 }

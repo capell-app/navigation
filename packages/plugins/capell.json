@@ -1,21 +1,10 @@
 {
-    "label": "Plugins",
-    "slug": "plugins",
-    "kind": "addon",
-    "order": 50,
-    "dependsOn": [],
-    "description": "Plugin marketplace and management interface.",
-    "icon": null,
-    "url": "https://capell.app",
-    "scopes": [],
-    "commands": {
-        "install": "capell:plugins-install",
-        "afterInstall": null,
-        "afterInstallParams": [],
-        "setup": null,
-        "setupParams": [],
-        "upgrade": null,
-        "demo": null,
-        "demoParams": []
+    "name": "capell-app/plugins",
+    "kind": "package",
+    "capell-version": "^4.0",
+    "contexts": ["admin"],
+    "requires": ["capell-app/admin"],
+    "providers": {
+        "shared": ["Capell\\Plugins\\Providers\\PluginsServiceProvider"]
     }
 }

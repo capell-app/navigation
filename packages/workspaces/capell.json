@@ -1,12 +1,12 @@
 {
-  "name": "capell-app/workspaces",
-  "kind": "package",
-  "capell-version": "^4.0",
-  "contexts": ["admin", "console"],
-  "requires": ["capell-app/core", "capell-app/admin"],
-  "providers": {
-    "shared": ["Capell\\Workspaces\\Providers\\WorkspacesServiceProvider"],
-    "admin": ["Capell\\Workspaces\\Providers\\AdminServiceProvider"],
-    "console": ["Capell\\Workspaces\\Providers\\ConsoleServiceProvider"]
-  }
+    "name": "capell-app/workspaces",
+    "kind": "package",
+    "capell-version": "^4.0",
+    "contexts": ["admin", "console"],
+    "requires": ["capell-app/core", "capell-app/admin"],
+    "providers": {
+        "shared": ["Capell\\Workspaces\\Providers\\WorkspacesServiceProvider"],
+        "admin": ["Capell\\Workspaces\\Providers\\AdminServiceProvider"],
+        "console": ["Capell\\Workspaces\\Providers\\ConsoleServiceProvider"]
+    }
 }
