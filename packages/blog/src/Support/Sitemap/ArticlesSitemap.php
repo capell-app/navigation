@@ -12,8 +12,8 @@ use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Capell\Frontend\Support\Loader\PageLoader;
+use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
 use Exception;
 use Illuminate\Support\Collection;
 

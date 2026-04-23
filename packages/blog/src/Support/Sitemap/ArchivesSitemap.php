@@ -12,8 +12,8 @@ use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Enums\ModelEnum as CoreModelEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Page;
-use Capell\Core\Support\Sitemap\AbstractSitemapPages;
-use Capell\Core\Support\Sitemap\SitemapChainBuilder;
+use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
+use Capell\SeoTools\Support\Sitemap\SitemapChainBuilder;
 use Illuminate\Support\Collection;
 
 class ArchivesSitemap extends AbstractSitemapPages
