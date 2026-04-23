@@ -16,7 +16,9 @@ use Capell\Core\Support\Settings\SettingsSchemaRegistry;
 use Capell\SeoTools\Console\Commands\ClearAiCacheCommand;
 use Capell\SeoTools\Console\Commands\InstallCommand;
 use Capell\SeoTools\Console\Commands\MonitorAiUsageCommand;
+use Capell\SeoTools\Console\Commands\SetupCommand;
 use Capell\SeoTools\Console\Commands\TestOpenAiConnectionCommand;
+use Capell\SeoTools\Console\Commands\XmlSitemapCommand;
 use Capell\SeoTools\Contracts\Schemas\SearchMetaDataSectionExtenderResolverInterface;
 use Capell\SeoTools\Events\AiGenerationCompleted;
 use Capell\SeoTools\Events\AiGenerationFailed;
@@ -70,7 +72,9 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
                 ClearAiCacheCommand::class,
                 InstallCommand::class,
                 MonitorAiUsageCommand::class,
+                SetupCommand::class,
                 TestOpenAiConnectionCommand::class,
+                XmlSitemapCommand::class,
             ]);
     }
 
