@@ -7,9 +7,7 @@ namespace Capell\Blog\Console\Commands;
 use Capell\Blog\Actions\CreateBlogPagesAction;
 use Capell\Blog\Enums\BlogPageTypeEnum;
 use Capell\Blog\Enums\ModelEnum as BlogModelEnum;
-use Capell\Blog\Enums\TagTypeEnum;
 use Capell\Blog\Models\Article;
-use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\Creator\ArticleCreator;
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Core\Console\Commands\Concerns\HasSitesOption;
@@ -23,6 +21,9 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Core\Support\Creator\DemoCreator;
+use Capell\Tags\Enums\ModelEnum as TagsModelEnum;
+use Capell\Tags\Enums\TagTypeEnum;
+use Capell\Tags\Models\Tag;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -399,7 +400,7 @@ class DemoCommand extends Command
 
     private function createPageTag(Pageable $page, Collection $languages): Tag
     {
-        $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
+        $tagModel = CapellCore::getModel(TagsModelEnum::Tag);
 
         $tag_names = [];
         $tag_slugs = [];
@@ -443,7 +444,7 @@ class DemoCommand extends Command
             $root = $page;
         }
 
-        $tagModel = CapellCore::getModel(BlogModelEnum::Tag);
+        $tagModel = CapellCore::getModel(TagsModelEnum::Tag);
 
         $label = $root->translations->firstWhere('language_id', $language->id)->label;
 

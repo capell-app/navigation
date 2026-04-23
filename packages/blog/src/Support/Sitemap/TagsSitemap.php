@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Blog\Support\Sitemap;
 
-use Capell\Blog\Filament\Resources\Tags\TagResource;
-use Capell\Blog\Models\Tag;
 use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Page;
 use Capell\Core\Support\Sitemap\AbstractSitemapPages;
 use Capell\Core\Support\Sitemap\SitemapChainBuilder;
+use Capell\Tags\Filament\Resources\Tags\TagResource;
+use Capell\Tags\Models\Tag;
 use Illuminate\Support\Collection;
 
 class TagsSitemap extends AbstractSitemapPages

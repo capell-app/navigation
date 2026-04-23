@@ -20,14 +20,14 @@ use Capell\Admin\Filament\Contracts\HasPageResource;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Admin\Filament\Contracts\ValidatesDelete;
 use Capell\Admin\Support\Loader\SiteLoader;
-use Capell\Blog\Models\Tag;
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
 use Capell\Core\Actions\PageDeletedAction;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\ModelEnum;
-use Capell\Core\Facades\CapellCore; // adjust if different namespace
-use Capell\Core\Models\Language;
+use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Language; // adjust if different namespace
 use Capell\Core\Models\Page;
+use Capell\Tags\Models\Tag;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

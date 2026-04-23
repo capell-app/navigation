@@ -7,8 +7,6 @@ namespace Capell\Blog\Providers;
 use Capell\Blog\Enums\LivewirePageComponentEnum;
 use Capell\Blog\Listeners\ArticleTranslationSavedListener;
 use Capell\Blog\Models\Article;
-use Capell\Blog\Models\Tag;
-use Capell\Blog\Models\Taggable;
 use Capell\Blog\Support\BlogModelRegistrar;
 use Capell\Blog\Support\Creator\ArticleCreator;
 use Capell\Core\Data\PageTypeData;
@@ -21,6 +19,7 @@ use Capell\Core\Models\Translation;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Mosaic\Enums\ModelEnum;
 use Capell\Mosaic\Models\Section;
+use Capell\Tags\Models\Tag;
 use Capell\Workspaces\WorkspaceRegistry;
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -139,8 +138,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
 
         if (class_exists(WorkspaceRegistry::class)) {
             WorkspaceRegistry::register(Article::class);
-            WorkspaceRegistry::register(Tag::class);
-            WorkspaceRegistry::register(Taggable::class);
         }
 
         return $this;
@@ -150,6 +147,11 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     {
         CapellCore::registerModelRelations(CoreModelEnum::Page, 'tags');
         CapellCore::registerModelRelations(ModelEnum::Section, 'tags');
+
+        Tag::resolveRelationUsing(
+            'articles',
+            fn (Tag $tag): MorphToMany => $tag->morphedByMany(Article::class, 'taggable', 'taggables'),
+        );
 
         return $this;
     }

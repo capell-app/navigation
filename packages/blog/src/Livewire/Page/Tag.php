@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Capell\Blog\Livewire\Page;
 
 use Capell\Blog\Enums\ModelEnum;
-use Capell\Blog\Models\Tag as TagModel;
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Livewire\Page\AbstractPage;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Frontend\Support\State\FrontendState;
+use Capell\Tags\Enums\ModelEnum as TagsModelEnum;
+use Capell\Tags\Models\Tag as TagModel;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -38,7 +39,7 @@ class Tag extends AbstractPage
         $site = Frontend::site();
 
         /** @var class-string<TagModel> $model */
-        $model = CapellCore::getModel(ModelEnum::Tag);
+        $model = CapellCore::getModel(TagsModelEnum::Tag);
 
         $tag = $model::query()->where('type', 'page')
             ->where('slug->' . $language->code, $this->tagSlug)
