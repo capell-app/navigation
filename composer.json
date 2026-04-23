@@ -91,6 +91,7 @@
         "capell-app/admin": "^2.0",
         "capell-app/core": "^2.0",
         "capell-app/frontend": "^2.0",
+        "capell-app/workspaces": "*",
         "capell-app/capell-theme-agency": "@dev",
         "capell-app/capell-theme-corporate": "@dev",
         "capell-app/capell-theme-saas": "@dev",
@@ -167,6 +168,7 @@
     },
     "autoload": {
         "psr-4": {
+            "Capell\\Workspaces\\": "packages/workspaces/src",
             "Capell\\Address\\": "packages/address/src",
             "Capell\\Address\\Database\\Factories\\": "packages/address/database/factories",
             "Capell\\Assistant\\": "packages/assistant/src",

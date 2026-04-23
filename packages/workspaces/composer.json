@@ -1,0 +1,28 @@
+{
+    "name": "capell-app/workspaces",
+    "description": "Workspace drafting system for Capell",
+    "keywords": ["capell", "workspaces", "laravel", "cms"],
+    "homepage": "https://github.com/capell-app/workspaces",
+    "license": "proprietary",
+    "authors": [
+        {"name": "Howdu", "email": "cms.multi2@gmail.com", "role": "Developer"}
+    ],
+    "require": {
+        "php": "^8.2",
+        "capell-app/admin": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Capell\\Workspaces\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Capell\\Workspaces\\Providers\\WorkspacesServiceProvider"
+            ]
+        }
+    },
+    "config": {"sort-packages": true},
+    "prefer-stable": true
+}
