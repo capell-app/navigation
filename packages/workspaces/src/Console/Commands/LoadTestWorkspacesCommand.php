@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Console\Commands;
 
-use Capell\Tests\Core\Integration\Workspaces\Fixtures\WorkspaceDraftableFixture;
+use Capell\Tests\Workspaces\Integration\Fixtures\WorkspaceDraftableFixture;
 use Capell\Workspaces\Enums\WorkspaceStatusEnum;
 use Capell\Workspaces\Models\Workspace;
 use Capell\Workspaces\Publisher;
