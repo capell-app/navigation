@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Providers;
 
+use Capell\Blog\Models\Article;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Layout;
@@ -16,6 +17,9 @@ use Capell\Core\Models\SiteDomain;
 use Capell\Core\Models\Theme;
 use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
+use Capell\Mosaic\Models\Section;
+use Capell\Mosaic\Models\Widget;
+use Capell\Mosaic\Models\WidgetAsset;
 use Capell\Workspaces\Actions\CopyOnWriteAction;
 use Capell\Workspaces\BelongsToWorkspace;
 use Capell\Workspaces\Http\Middleware\ResolveWorkspaceContext;
@@ -138,7 +142,30 @@ class WorkspacesServiceProvider extends ServiceProvider
             return $draftRow;
         });
 
+        $this->registerExternalModels();
+
         return $this;
+    }
+
+    private function registerExternalModels(): void
+    {
+        // Blog package models — registered here so the blog package has no workspace dependency.
+        if (class_exists(Article::class)) {
+            WorkspaceRegistry::register(Article::class);
+        }
+
+        // Mosaic package models — registered here so the mosaic package has no workspace dependency.
+        if (class_exists(Section::class)) {
+            WorkspaceRegistry::register(Section::class);
+        }
+
+        if (class_exists(Widget::class)) {
+            WorkspaceRegistry::register(Widget::class);
+        }
+
+        if (class_exists(WidgetAsset::class)) {
+            WorkspaceRegistry::register(WidgetAsset::class);
+        }
     }
 
     private function applyBehaviorToExternalModels(): self

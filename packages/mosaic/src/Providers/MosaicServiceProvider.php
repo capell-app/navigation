@@ -50,14 +50,11 @@ use Capell\Mosaic\Listeners\LayoutSavingListener;
 use Capell\Mosaic\Listeners\SiteTreeRebuilt;
 use Capell\Mosaic\Listeners\TypeValidated;
 use Capell\Mosaic\Models\Section;
-use Capell\Mosaic\Models\Widget;
-use Capell\Mosaic\Models\WidgetAsset;
 use Capell\Mosaic\Support\CapellLayoutManager;
 use Capell\Mosaic\Support\Interceptors\Layouts\DefaultLayoutInterceptor;
 use Capell\Mosaic\Support\Interceptors\Layouts\HomeLayoutInterceptor;
 use Capell\Mosaic\Support\Interceptors\Layouts\ResultsLayoutInterceptor;
 use Capell\Mosaic\Support\LayoutModelRegistrar;
-use Capell\Workspaces\WorkspaceRegistry;
 use Composer\InstalledVersions;
 use Exception;
 use Filament\Facades\Filament;
@@ -439,12 +436,6 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
     private function registerModels(): self
     {
         LayoutModelRegistrar::register();
-
-        if (class_exists(WorkspaceRegistry::class)) {
-            WorkspaceRegistry::register(Section::class);
-            WorkspaceRegistry::register(Widget::class);
-            WorkspaceRegistry::register(WidgetAsset::class);
-        }
 
         return $this;
     }
