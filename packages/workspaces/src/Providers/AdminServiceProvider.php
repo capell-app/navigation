@@ -33,6 +33,12 @@ class AdminServiceProvider extends ServiceProvider
         Livewire::component('capell-workspaces::workspace-context-banner', WorkspaceContextBanner::class);
         Livewire::component('capell-workspaces::workspace-approval-history', WorkspaceApprovalHistory::class);
 
+        Livewire::addNamespace(
+            namespace: 'capell-workspaces',
+            classNamespace: 'Capell\\Workspaces\\Livewire',
+            classPath: __DIR__ . '/../Livewire',
+        );
+
         return $this;
     }
 
