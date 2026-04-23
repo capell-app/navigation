@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Providers;
 
-use Capell\Admin\Contracts\Extenders\PageTableExtender;
 use Capell\Blog\Models\Article;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Language;
@@ -24,7 +23,6 @@ use Capell\Mosaic\Models\WidgetAsset;
 use Capell\Workspaces\Actions\CopyOnWriteAction;
 use Capell\Workspaces\BelongsToWorkspace;
 use Capell\Workspaces\Events\WorkspaceEventDispatcher;
-use Capell\Workspaces\Extenders\WorkspacesPageTableExtender;
 use Capell\Workspaces\Http\Middleware\ResolveWorkspaceContext;
 use Capell\Workspaces\Listeners\StampWorkspaceOnActivity;
 use Capell\Workspaces\Models\PreviewLink;
@@ -53,8 +51,6 @@ class WorkspacesServiceProvider extends ServiceProvider
     {
         $this->app->singleton(WorkspacesManager::class, fn (): WorkspacesManager => new WorkspacesManager);
         $this->app->singleton(WorkspaceEventDispatcher::class);
-
-        $this->app->tag([WorkspacesPageTableExtender::class], PageTableExtender::TAG);
     }
 
     public function boot(): void
