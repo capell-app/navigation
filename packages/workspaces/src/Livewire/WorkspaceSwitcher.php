@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Livewire;
 
-use Capell\Core\Http\Middleware\ResolveWorkspaceContext;
 use Capell\Workspaces\Enums\WorkspaceStatusEnum;
 use Capell\Workspaces\Filament\Resources\Workspaces\WorkspaceResource;
+use Capell\Workspaces\Http\Middleware\ResolveWorkspaceContext;
 use Capell\Workspaces\Models\Workspace;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;

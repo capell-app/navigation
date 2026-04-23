@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Actions;
 
-use Capell\Core\Http\Middleware\ResolveWorkspaceContext;
+use Capell\Workspaces\Http\Middleware\ResolveWorkspaceContext;
 use Capell\Workspaces\Models\PreviewLink;
 use Capell\Workspaces\Models\Workspace;
 use Illuminate\Contracts\Auth\Authenticatable;

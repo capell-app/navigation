@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Http\Middleware;
 
-use Capell\Core\Models\PreviewLink;
+use Capell\Workspaces\Models\PreviewLink;
 use Capell\Workspaces\Models\Workspace;
 use Capell\Workspaces\WorkspaceContext;
 use Carbon\CarbonImmutable;
