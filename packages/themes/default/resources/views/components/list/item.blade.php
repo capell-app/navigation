@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Capell\Core\Data\NavigationItemData;
+use Capell\Navigation\Data\NavigationItemData;
 
 /**
  * @var NavigationItemData $item

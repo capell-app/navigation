@@ -13,7 +13,7 @@ declare(strict_types=1);
     'item',
 ])
 @php
-    use Capell\Core\Data\NavigationItemData;
+    use Capell\Navigation\Data\NavigationItemData;
 
     /** @var NavigationItemData $item */
     $currentDropdownName = $dropdownName . '-' . ($id !== null ? (string) $id : hash('sha256', $item->label));

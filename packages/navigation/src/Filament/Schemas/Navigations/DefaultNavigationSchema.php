@@ -25,6 +25,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Support\CapellCoreHelper;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationHandle;
+use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
 use Filament\Actions\Action;
@@ -311,9 +312,7 @@ class DefaultNavigationSchema implements TypeSchemaInterface
         return [
             Select::make('target')
                 ->label(__('capell-admin::form.url_target'))
-                ->options([
-                    '_blank' => __('capell-admin::generic.new_tab'),
-                ]),
+                ->options(NavigationItemTarget::class),
             Group::make()
                 ->dense()
                 ->schema([

@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 @php
     use Capell\Core\Actions\ColorConverterAction;
-    use Capell\Core\Enums\NavigationHandle;
     use Capell\Core\Models\Language;
     use Capell\Core\Models\Page;
     use Capell\Frontend\Actions\GetLayoutContainerWidthAction;
@@ -14,6 +13,7 @@ declare(strict_types=1);
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Support\Loader\SiteLoader;
     use Capell\Frontend\Support\Render\RenderHookRegistry;
+    use Capell\Navigation\Enums\NavigationHandle;
     use Capell\Navigation\Models\Navigation;
     use Capell\Navigation\Support\Loader\NavigationItemsLoader;
     use Capell\Navigation\Support\Loader\NavigationLoader;

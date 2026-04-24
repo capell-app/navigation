@@ -8,7 +8,7 @@ declare(strict_types=1);
     'itemClass',
 ])
 @php
-    use Capell\Core\Data\NavigationItemData;
+    use Capell\Navigation\Data\NavigationItemData;
 
     /**
      * @var NavigationItemData $item

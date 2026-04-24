@@ -7,7 +7,6 @@ namespace Capell\Mosaic\Support\Creator;
 use Capell\Core\Enums\ContainerWidthEnum;
 use Capell\Core\Enums\DefaultColorEnum;
 use Capell\Core\Models\Language;
-use Capell\Core\Models\Navigation;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Mosaic\Enums\AssetEnum;
@@ -15,6 +14,7 @@ use Capell\Mosaic\Enums\LivewireComponentsEnum;
 use Capell\Mosaic\Enums\WidgetComponentEnum;
 use Capell\Mosaic\Filament\Schemas\Widgets\CarouselWidgetSchema;
 use Capell\Mosaic\Models\Widget;
+use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Collection;
 
 class WidgetCreator

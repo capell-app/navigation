@@ -5,7 +5,7 @@
     'menuSubItemClass' => 'focus:text-primary py-1 text-xs font-medium leading-tight text-gray-100 hover:text-gray-400 xl:text-sm',
 ])
 @php
-    use Capell\Core\Data\NavigationItemData;
+    use Capell\Navigation\Data\NavigationItemData;
     use Illuminate\Support\Collection;
 
     /**
