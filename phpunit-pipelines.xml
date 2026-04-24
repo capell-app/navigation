@@ -47,6 +47,10 @@
             <directory>./storage</directory>
             <directory>./database</directory>
             <directory>./.temp</directory>
+            <directory suffix=".php">./packages/*/tests</directory>
+            <directory suffix=".php">./packages/themes/*/tests</directory>
+            <directory suffix=".php">./packages/*/resources</directory>
+            <directory suffix=".php">./packages/*/config</directory>
         </exclude>
     </source>
     <php>
