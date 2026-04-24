@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
+use Capell\Workspaces\Checks\PublishCheckResult;
 use Capell\Workspaces\Models\Workspace;
 use Illuminate\Database\Eloquent\Model;
 use Throwable;
@@ -18,6 +19,7 @@ final readonly class DryRunReport
     /**
      * @param  array<int, array{site_id: int, language_id: int, url: string}>  $collisions
      * @param  array<class-string<Model>, int>  $rowCounts
+     * @param  array<int, PublishCheckResult>  $checkResults
      */
     public function __construct(
         public Workspace $workspace,
@@ -26,6 +28,7 @@ final readonly class DryRunReport
         public array $collisions,
         public array $rowCounts,
         public ?Throwable $failure = null,
+        public array $checkResults = [],
     ) {}
 
     public function totalRows(): int
@@ -41,5 +44,16 @@ final readonly class DryRunReport
     public function hasConflicts(): bool
     {
         return $this->rebaseReport instanceof RebaseReport && $this->rebaseReport->hasConflicts();
+    }
+
+    public function hasBlockingCheckErrors(): bool
+    {
+        foreach ($this->checkResults as $result) {
+            if ($result->isError() && ! $result->isClean()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

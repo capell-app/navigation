@@ -169,6 +169,7 @@
     "autoload": {
         "psr-4": {
             "Capell\\Workspaces\\": "packages/workspaces/src",
+            "Capell\\Workspaces\\Database\\Factories\\": "packages/workspaces/database/factories",
             "Capell\\Address\\": "packages/address/src",
             "Capell\\Address\\Database\\Factories\\": "packages/address/database/factories",
             "Capell\\Assistant\\": "packages/assistant/src",
@@ -181,7 +182,11 @@
             "Capell\\Themes\\Agency\\": "packages/themes/agency/src",
             "Capell\\Themes\\Core\\": "packages/themes-core/src",
             "Capell\\Themes\\Corporate\\": "packages/themes/corporate/src",
-            "Capell\\Themes\\Saas\\": "packages/themes/saas/src"
+            "Capell\\Themes\\Saas\\": "packages/themes/saas/src",
+            "Capell\\Tags\\": "packages/tags/src",
+            "Capell\\Tags\\Database\\Factories\\": "packages/tags/database/factories",
+            "Capell\\SeoTools\\": "packages/seo-tools/src",
+            "Capell\\SeoTools\\Database\\Factories\\": "packages/seo-tools/database/factories"
         }
     },
     "autoload-dev": {

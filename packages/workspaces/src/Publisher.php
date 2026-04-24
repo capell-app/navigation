@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces;
 
+use Capell\Workspaces\Checks\PublishCheckPipeline;
 use Capell\Workspaces\Enums\WorkspaceStatusEnum;
 use Capell\Workspaces\Enums\WorkspaceTransitionEnum;
 use Capell\Workspaces\Events\WorkspaceEventDispatcher;
 use Capell\Workspaces\Events\WorkspaceStateChanged;
+use Capell\Workspaces\Exceptions\PublishBlockedByChecksException;
 use Capell\Workspaces\Exceptions\ReleaseWindowClosedException;
 use Capell\Workspaces\Exceptions\StaleWorkspaceException;
 use Capell\Workspaces\Exceptions\UrlCollisionException;
@@ -51,6 +53,7 @@ class Publisher
         ?string $notes = null,
         bool $makeLive = true,
         bool $bypassWindow = false,
+        bool $bypassChecks = false,
     ): Version {
         if ($workspace->status !== WorkspaceStatusEnum::Approved
             && $workspace->status !== WorkspaceStatusEnum::Scheduled) {
@@ -59,6 +62,14 @@ class Publisher
                 $workspace->id,
                 $workspace->status->value,
             ));
+        }
+
+        if (! $bypassChecks) {
+            $pipeline = app(PublishCheckPipeline::class);
+            $checkResults = $pipeline->run($workspace);
+            if ($pipeline->hasBlockingErrors($checkResults)) {
+                throw new PublishBlockedByChecksException($checkResults);
+            }
         }
 
         /** @var WorkspaceEventDispatcher $dispatcher */
@@ -181,6 +192,8 @@ class Publisher
         $rebaseReport = (new Rebaser($this->registry))->analyse($workspace);
         $collisions = $this->detectUrlCollisions($workspace);
         $rowCounts = $this->countWorkspaceRows($workspace);
+        $checkPipeline = app(PublishCheckPipeline::class);
+        $checkResults = $checkPipeline->run($workspace);
 
         if ($workspace->status !== WorkspaceStatusEnum::Approved
             && $workspace->status !== WorkspaceStatusEnum::Scheduled) {
@@ -195,6 +208,7 @@ class Publisher
                     $workspace->id,
                     $workspace->status->value,
                 )),
+                checkResults: $checkResults,
             );
         }
 
@@ -203,7 +217,7 @@ class Publisher
 
         try {
             DB::transaction(function () use ($workspace, &$wouldPublish): void {
-                $this->publish($workspace);
+                $this->publish($workspace, bypassChecks: true);
 
                 $wouldPublish = true;
 
@@ -224,6 +238,7 @@ class Publisher
             collisions: $collisions,
             rowCounts: $rowCounts,
             failure: $failure,
+            checkResults: $checkResults,
         );
     }
 
