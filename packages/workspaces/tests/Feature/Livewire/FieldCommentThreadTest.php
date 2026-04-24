@@ -43,7 +43,7 @@ it('resolves a comment and sets resolved_at', function (): void {
 
     $workspace = Workspace::factory()->create();
 
-    $comment = WorkspaceFieldComment::create([
+    $comment = WorkspaceFieldComment::query()->create([
         'workspace_id' => $workspace->id,
         'entity_type' => 'page',
         'entity_uuid' => 'test-uuid-2',
@@ -70,7 +70,7 @@ it('reopens a resolved comment and clears resolved_at', function (): void {
 
     $workspace = Workspace::factory()->create();
 
-    $comment = WorkspaceFieldComment::create([
+    $comment = WorkspaceFieldComment::query()->create([
         'workspace_id' => $workspace->id,
         'entity_type' => 'page',
         'entity_uuid' => 'test-uuid-3',
@@ -98,7 +98,7 @@ it('returns unresolved comments before resolved ones in getComments', function (
 
     $workspace = Workspace::factory()->create();
 
-    $resolvedComment = WorkspaceFieldComment::create([
+    $resolvedComment = WorkspaceFieldComment::query()->create([
         'workspace_id' => $workspace->id,
         'entity_type' => 'page',
         'entity_uuid' => 'test-uuid-4',
@@ -109,7 +109,7 @@ it('returns unresolved comments before resolved ones in getComments', function (
         'resolved_at' => now(),
     ]);
 
-    $openComment = WorkspaceFieldComment::create([
+    $openComment = WorkspaceFieldComment::query()->create([
         'workspace_id' => $workspace->id,
         'entity_type' => 'page',
         'entity_uuid' => 'test-uuid-4',

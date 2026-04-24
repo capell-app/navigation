@@ -132,7 +132,7 @@ class ArticleResource extends PageResource
         /* @var class-string<\Capell\Core\Models\Site> $model */
         $model = Site::class;
 
-        $site = $model::query()->find($siteId) ?? $model::default()->first();
+        $site = $model::query()->find($siteId) ?? $model::query()->default()->first();
 
         if ($site === null) {
             return;

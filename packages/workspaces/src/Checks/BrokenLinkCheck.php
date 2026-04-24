@@ -69,7 +69,7 @@ class BrokenLinkCheck implements PublishCheck
                 foreach ($pageData['hrefs'] as $href) {
                     if (! array_key_exists($href, $existingUrls)) {
                         $pageIdentifier = $pageData['slug'] ?? $pageUuid;
-                        $messages[] = "Page '{$pageIdentifier}' contains broken link: {$href}";
+                        $messages[] = sprintf("Page '%s' contains broken link: %s", $pageIdentifier, $href);
                         $entityRefs[] = ['model' => 'Page', 'uuid' => $pageUuid];
                     }
                 }

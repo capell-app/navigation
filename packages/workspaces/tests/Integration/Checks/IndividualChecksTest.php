@@ -25,6 +25,7 @@ function ensurePagesSeoColumns(): void
         if (! Schema::hasColumn('pages', 'meta_title')) {
             $table->string('meta_title')->nullable();
         }
+
         if (! Schema::hasColumn('pages', 'meta_description')) {
             $table->text('meta_description')->nullable();
         }

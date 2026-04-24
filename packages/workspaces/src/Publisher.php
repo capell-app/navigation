@@ -65,11 +65,9 @@ class Publisher
         }
 
         if (! $bypassChecks) {
-            $pipeline = app(PublishCheckPipeline::class);
+            $pipeline = resolve(PublishCheckPipeline::class);
             $checkResults = $pipeline->run($workspace);
-            if ($pipeline->hasBlockingErrors($checkResults)) {
-                throw new PublishBlockedByChecksException($checkResults);
-            }
+            throw_if($pipeline->hasBlockingErrors($checkResults), PublishBlockedByChecksException::class, $checkResults);
         }
 
         /** @var WorkspaceEventDispatcher $dispatcher */
@@ -192,7 +190,7 @@ class Publisher
         $rebaseReport = (new Rebaser($this->registry))->analyse($workspace);
         $collisions = $this->detectUrlCollisions($workspace);
         $rowCounts = $this->countWorkspaceRows($workspace);
-        $checkPipeline = app(PublishCheckPipeline::class);
+        $checkPipeline = resolve(PublishCheckPipeline::class);
         $checkResults = $checkPipeline->run($workspace);
 
         if ($workspace->status !== WorkspaceStatusEnum::Approved

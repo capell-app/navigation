@@ -47,7 +47,7 @@ class SeoMetaCheck implements PublishCheck
         $messages = $pages->map(function (object $page): string {
             $identifier = $page->slug ?? (string) $page->id;
 
-            return "Page '{$identifier}' is missing meta title or meta description.";
+            return sprintf("Page '%s' is missing meta title or meta description.", $identifier);
         })->all();
 
         return new PublishCheckResult(

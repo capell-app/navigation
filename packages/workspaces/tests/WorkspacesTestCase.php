@@ -14,6 +14,7 @@ use Capell\Admin\Providers\Filament\AdminPanelProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
+use Capell\Media\Models\Media;
 use Capell\Tests\AbstractTestCase;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Capell\Workspaces\Providers\AdminServiceProvider as WorkspacesAdminServiceProvider;
@@ -30,6 +31,7 @@ use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Guava\IconPicker\IconPickerServiceProvider;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Gate;
@@ -56,7 +58,7 @@ class WorkspacesTestCase extends AbstractTestCase
         // NavigationServiceProvider is excluded from providers to avoid duplicate migrations
         // (BuildsOrderedMigrationWorkspace also discovers navigation's migrations). Register
         // the view namespace here so capell-navigation:: references resolve in tests.
-        $this->app['view']->addNamespace(
+        $this->app->make(Factory::class)->addNamespace(
             'capell-navigation',
             realpath(__DIR__ . '/../../../packages/navigation/resources/views') ?: '',
         );
@@ -92,7 +94,7 @@ class WorkspacesTestCase extends AbstractTestCase
      * @return class-string[]
      */
     #[Override]
-    protected function getPackageProviders($app): array
+    protected function getPackageProviders(mixed $app): array
     {
         return [
             ...parent::getPackageProviders($app),
@@ -129,7 +131,7 @@ class WorkspacesTestCase extends AbstractTestCase
     }
 
     #[Override]
-    protected function getEnvironmentSetUp($app): void
+    protected function getEnvironmentSetUp(mixed $app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -144,6 +146,8 @@ class WorkspacesTestCase extends AbstractTestCase
 
         CapellCore::registerPackage('capell-app/tags', path: realpath(__DIR__ . '/../../../packages/tags'));
         CapellCore::forcePackageInstalled('capell-app/tags');
+
+        $app->make('config')->set('media-library.media_model', Media::class);
 
         // Shield's super_admin Gate::before bypass is normally registered by FilamentShieldPlugin.
         // Since AdminPanelProvider does not include that plugin, we register the bypass here so

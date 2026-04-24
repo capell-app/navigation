@@ -9,6 +9,7 @@ use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Admin\Providers\Filament\AdminPanelProvider;
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Providers\FrontendServiceProvider;
+use Capell\Media\Models\Media;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Foundation\Application;
@@ -64,5 +65,7 @@ class MosaicTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
+
+        $app->make('config')->set('media-library.media_model', Media::class);
     }
 }

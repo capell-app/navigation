@@ -46,7 +46,7 @@ class AccessibilityCheck implements PublishCheck
                 $pageIdentifier = $page->slug ?? $page->uuid;
 
                 foreach ($pageIssues as $issue) {
-                    $messages[] = "Page '{$pageIdentifier}': {$issue}";
+                    $messages[] = sprintf("Page '%s': %s", $pageIdentifier, $issue);
                 }
 
                 $entityRefs[] = ['model' => 'Page', 'uuid' => $page->uuid];
@@ -84,7 +84,7 @@ class AccessibilityCheck implements PublishCheck
         $emptyAnchorCount = count($anchorMatches[0]);
 
         if ($emptyAnchorCount > 0) {
-            $issues[] = "Found {$emptyAnchorCount} anchor(s) with no text content.";
+            $issues[] = sprintf('Found %d anchor(s) with no text content.', $emptyAnchorCount);
         }
 
         // Detect images used as links without alt text: <a ...><img ...></a>
@@ -99,7 +99,7 @@ class AccessibilityCheck implements PublishCheck
         }
 
         if ($missingAltLinkCount > 0) {
-            $issues[] = "Found {$missingAltLinkCount} image(s) used as links without alt text.";
+            $issues[] = sprintf('Found %d image(s) used as links without alt text.', $missingAltLinkCount);
         }
 
         return $issues;

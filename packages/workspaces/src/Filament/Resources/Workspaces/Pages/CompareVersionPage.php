@@ -91,7 +91,7 @@ class CompareVersionPage extends Page
      */
     public function getCheckResults(): array
     {
-        return app(PublishCheckPipeline::class)->run($this->getWorkspace());
+        return resolve(PublishCheckPipeline::class)->run($this->getWorkspace());
     }
 
     public function checkSeverityColor(PublishCheckSeverity $severity): string

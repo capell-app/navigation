@@ -279,7 +279,6 @@ class ImportPagesPage extends Page implements HasForms
             $reviewRows = (new BuildPageReviewRows)->run(
                 $package,
                 $resolutionMap,
-                excludeWorkspaceId: (int) $workspace->getKey(),
             );
 
             $this->reviewRows = array_map(
@@ -419,15 +418,15 @@ class ImportPagesPage extends Page implements HasForms
         $resolutionMap = $this->hydrateResolutionMap(is_array($session->resolution_map) ? $session->resolution_map : []);
 
         $workspace = Workspace::query()->find($session->workspace_id);
-        $excludeWorkspaceId = $workspace instanceof Workspace ? (int) $workspace->getKey() : null;
+        if ($workspace instanceof Workspace) {
+            $workspace->getKey();
+        }
 
         $summary = (new BuildImportValidationSummaryAction)->run(
             package: $package,
             map: $resolutionMap,
             pageDecisions: $this->sanitizedPageDecisions(),
             relationDecisions: $this->sanitizedRelationDecisions(),
-            workspace: $workspace instanceof Workspace ? $workspace : null,
-            excludeWorkspaceId: $excludeWorkspaceId,
         );
 
         $session->forceFill([

@@ -44,7 +44,7 @@ class MissingAltTextCheck implements PublishCheck
 
             if ($offendingCount > 0) {
                 $identifier = $page->slug ?? $page->uuid;
-                $messages[] = "Page '{$identifier}' has {$offendingCount} image(s) missing alt text.";
+                $messages[] = sprintf("Page '%s' has %d image(s) missing alt text.", $identifier, $offendingCount);
                 $entityRefs[] = ['model' => 'Page', 'uuid' => $page->uuid];
             }
         }
