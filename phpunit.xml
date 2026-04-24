@@ -47,23 +47,6 @@
             <directory>./storage</directory>
             <directory>./database</directory>
             <directory>./.temp</directory>
-            <directory suffix=".php">./packages/*/tests</directory>
-            <directory suffix=".php">./packages/themes/*/tests</directory>
-            <directory suffix=".php">./packages/*/resources</directory>
-            <directory suffix=".php">./packages/*/config</directory>
-            <!-- ServiceProviders, Install commands, and seeders are integration-level; excluded from unit coverage -->
-            <file>./packages/themes/corporate/src/CorporateThemeServiceProvider.php</file>
-            <file>./packages/themes/agency/src/AgencyThemeServiceProvider.php</file>
-            <file>./packages/themes/saas/src/SaasThemeServiceProvider.php</file>
-            <file>./packages/themes-admin/src/ThemesAdminServiceProvider.php</file>
-            <directory suffix=".php">./packages/themes/corporate/src/Actions</directory>
-            <directory suffix=".php">./packages/themes/agency/src/Actions</directory>
-            <directory suffix=".php">./packages/themes/saas/src/Actions</directory>
-            <directory suffix=".php">./packages/themes/corporate/src/Console</directory>
-            <directory suffix=".php">./packages/themes/agency/src/Console</directory>
-            <directory suffix=".php">./packages/themes/saas/src/Console</directory>
-            <directory suffix=".php">./packages/themes-core/src/Console</directory>
-            <directory suffix=".php">./packages/themes-core/src/Middleware</directory>
         </exclude>
     </source>
     <php>
