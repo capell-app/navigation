@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Capell\Workspaces\Filament\Resources\Workspaces\Pages;
 
 use BackedEnum;
+use Capell\Workspaces\Checks\PublishCheckResult;
+use Capell\Workspaces\Checks\PublishCheckSeverity;
 use Capell\Workspaces\Filament\Resources\Workspaces\WorkspaceResource;
 use Capell\Workspaces\Models\Workspace;
+use Capell\Workspaces\Publisher;
 use Capell\Workspaces\Services\WorkspaceDiffService;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
@@ -83,11 +86,29 @@ class CompareVersionPage extends Page
         return str_contains($value, "\n") || strlen($value) > 120;
     }
 
+    /**
+     * @return array<int, PublishCheckResult>
+     */
+    public function getCheckResults(): array
+    {
+        return app(Publisher::class)->dryRun($this->getWorkspace())->checkResults;
+    }
+
+    public function checkSeverityColor(PublishCheckSeverity $severity): string
+    {
+        return match ($severity) {
+            PublishCheckSeverity::Error => 'danger',
+            PublishCheckSeverity::Warn => 'warning',
+            PublishCheckSeverity::Info => 'info',
+        };
+    }
+
     protected function getViewData(): array
     {
         return [
             'diffs' => $this->getDiffs(),
             'workspace' => $this->getWorkspace(),
+            'checkResults' => $this->getCheckResults(),
         ];
     }
 }
