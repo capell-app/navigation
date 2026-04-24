@@ -31,11 +31,11 @@ test('plugin row casts enums and JSON arrays correctly', function (): void {
 
 test('license row encrypts the key and decrypts on read', function (): void {
     $plugin = MarketplacePlugin::query()->create([
-        'slug' => 'assistant',
-        'composer_name' => 'capell-app/assistant',
-        'name' => 'Assistant',
+        'slug' => 'seo-tools',
+        'composer_name' => 'capell-app/seo-tools',
+        'name' => 'SEO Tools',
         'vendor' => 'capell',
-        'description' => 'AI helper',
+        'description' => 'SEO tools and AI helpers',
         'kind' => PluginKind::Integration,
         'license_model' => LicenseModel::PaidSubscription,
     ]);

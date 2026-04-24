@@ -39,14 +39,14 @@ class FirstPartyPluginsSeeder extends Seeder
             'sort_order' => 20,
         ]);
 
-        MarketplacePlugin::query()->updateOrCreate(['slug' => 'assistant'], [
-            'composer_name' => 'capell-app/capell-assistant',
-            'name' => 'Assistant',
+        MarketplacePlugin::query()->updateOrCreate(['slug' => 'seo-tools'], [
+            'composer_name' => 'capell-app/seo-tools',
+            'name' => 'SEO Tools',
             'vendor' => 'capell',
-            'description' => 'OpenAI-powered title, meta, and content drafting with audit logging.',
+            'description' => 'AI-powered SEO content generation, structured data builders, and sitemap management.',
             'kind' => PluginKind::Full,
             'license_model' => LicenseModel::Free,
-            'categories' => ['ai', 'content-tools'],
+            'categories' => ['ai', 'seo', 'content-tools'],
             'capabilities' => ['admin_pages', 'queue_jobs', 'external_api_calls'],
             'is_visible' => true,
             'sort_order' => 30,
