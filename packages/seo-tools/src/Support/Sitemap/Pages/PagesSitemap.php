@@ -8,6 +8,7 @@ use Capell\Core\Enums\CacheEnum;
 use Capell\Core\Models\Page;
 use Capell\SeoTools\Data\SitemapPageData;
 use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
+use Capell\SeoTools\Support\Sitemap\Queries\PagesForSitemap;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use LogicException;
@@ -22,12 +23,10 @@ class PagesSitemap extends AbstractSitemapPages
 
         $cacheKey = CacheEnum::sitemapPages($this->site->id, $this->language->id);
 
-        return Cache::remember($cacheKey, 3600, function (): Collection {
-            /** @var class-string<Page> $model */
-            $model = Page::class;
-
-            return $model::getPagesForSitemap($this->site, $this->language)->toTree()->map(fn (Page $page): SitemapPageData => $this->format($page));
-        });
+        return Cache::remember($cacheKey, 3600, fn (): Collection => app(PagesForSitemap::class)
+            ->get($this->site, $this->language)
+            ->toTree()
+            ->map(fn (Page $page): SitemapPageData => $this->format($page)));
     }
 
     public function format(Page $page): SitemapPageData
