@@ -48,6 +48,8 @@ use Capell\SeoTools\Support\PrismProvider;
 use Capell\SeoTools\Support\PromptRepository;
 use Capell\SeoTools\Support\Schemas\SearchMetaDataSectionExtenderResolver;
 use Capell\SeoTools\Support\SectionRegistry;
+use Capell\SeoTools\Support\Sitemap\Pages\PagesSitemap;
+use Capell\SeoTools\Support\Sitemap\SitemapPageRegistry;
 use Capell\SeoTools\Targets\FlatJsonTarget;
 use Composer\InstalledVersions;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -227,6 +229,17 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
+    protected function registerSitemapRegistry(): self
+    {
+        $this->app->singleton(SitemapPageRegistry::class);
+
+        /** @var SitemapPageRegistry $registry */
+        $registry = $this->app->make(SitemapPageRegistry::class);
+        $registry->register('default', PagesSitemap::class);
+
+        return $this;
+    }
+
     private function bootInstalledPackage(): self
     {
         return $this
@@ -235,6 +248,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
             ->registerAiServices()
             ->registerAiEventListeners()
             ->registerSettingsSchema()
+            ->registerSitemapRegistry()
             ->registerFrontendViews();
     }
 

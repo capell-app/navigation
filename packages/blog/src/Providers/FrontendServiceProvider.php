@@ -18,6 +18,7 @@ use Capell\Core\Support\StaticSite\StaticSiteExtensionRegistry;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\SeoTools\Support\Sitemap\SitemapPageRegistry;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 
@@ -36,9 +37,10 @@ final class FrontendServiceProvider extends ServiceProvider
 
     private function registerSitemapPages(): void
     {
-        CapellCore::addSitemapPages('archives', ArchivesSitemap::class);
-        CapellCore::addSitemapPages('articles', ArticlesSitemap::class);
-        CapellCore::addSitemapPages('tags', TagsSitemap::class);
+        $registry = app(SitemapPageRegistry::class);
+        $registry->register('archives', ArchivesSitemap::class);
+        $registry->register('articles', ArticlesSitemap::class);
+        $registry->register('tags', TagsSitemap::class);
     }
 
     private function registerRenderHooks(): void

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\SeoTools\Support\Sitemap;
 
-use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
@@ -35,7 +34,7 @@ class SitemapBuilder
         /**
          * @var class-string<Sitemapable> $sitemapPageType
          */
-        foreach (CapellCore::getSitemapPages() as $sitemapPageType) {
+        foreach (app(SitemapPageRegistry::class)->all() as $sitemapPageType) {
             $this->addPages(
                 new $sitemapPageType(
                     language: $this->language,
