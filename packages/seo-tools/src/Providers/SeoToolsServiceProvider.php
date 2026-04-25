@@ -8,6 +8,7 @@ use Capell\Admin\Contracts\Extenders\PageHeaderActionExtender;
 use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
 use Capell\Admin\Contracts\Extenders\ResourceHeaderActionExtender;
 use Capell\Admin\Contracts\Extenders\SiteHeaderActionExtender;
+use Capell\Admin\Contracts\Extenders\SiteRecordActionExtender;
 use Capell\Admin\Contracts\Extenders\SiteSchemaExtender;
 use Capell\Admin\Filament\Resources\Pages\Pages\EditPage;
 use Capell\Admin\Support\AdminEventRegistry;
@@ -38,6 +39,7 @@ use Capell\SeoTools\Filament\Extenders\Page\SearchMetaSchemaExtender;
 use Capell\SeoTools\Filament\Extenders\Page\SitemapResourceHeaderActionExtender;
 use Capell\SeoTools\Filament\Extenders\Site\SiteDetailsMetaExtender;
 use Capell\SeoTools\Filament\Extenders\Site\SitemapSiteHeaderActionExtender;
+use Capell\SeoTools\Filament\Extenders\Site\SitemapSiteRecordActionExtender;
 use Capell\SeoTools\Filament\Extenders\Site\SiteTranslationMetaExtender;
 use Capell\SeoTools\Filament\Pages\SitemapPage;
 use Capell\SeoTools\Filament\Settings\AssistantSettingsSchema;
@@ -243,6 +245,10 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         $this->app->tag([
             SitemapResourceHeaderActionExtender::class,
         ], ResourceHeaderActionExtender::TAG);
+
+        $this->app->tag([
+            SitemapSiteRecordActionExtender::class,
+        ], SiteRecordActionExtender::TAG);
 
         return $this;
     }
