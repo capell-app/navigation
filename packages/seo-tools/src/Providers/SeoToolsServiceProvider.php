@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\SeoTools\Providers;
 
+use Capell\Admin\Contracts\AdminTools\AdminToolItem;
 use Capell\Admin\Contracts\Extenders\PageHeaderActionExtender;
 use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
 use Capell\Admin\Contracts\Extenders\ResourceHeaderActionExtender;
@@ -53,6 +54,7 @@ use Capell\SeoTools\Listeners\Sitemap\RegenerateSitemapsOnPageDeleted;
 use Capell\SeoTools\Listeners\Sitemap\RegenerateSitemapsOnPageSaved;
 use Capell\SeoTools\Listeners\Sitemap\RegenerateSitemapsOnSiteCreated;
 use Capell\SeoTools\Livewire\Page\Sitemap as SitemapLivewireComponent;
+use Capell\SeoTools\Livewire\Tools\SitemapTool;
 use Capell\SeoTools\Models\AiCreatorContext;
 use Capell\SeoTools\Models\AiCreatorSession;
 use Capell\SeoTools\Models\AIGenerationHistory;
@@ -62,6 +64,7 @@ use Capell\SeoTools\Support\Admin\AiCreatorPageExtender;
 use Capell\SeoTools\Support\Admin\AiCreatorSiteExtender;
 use Capell\SeoTools\Support\Admin\PageContentEditorConfigurator;
 use Capell\SeoTools\Support\Admin\PageTitleWithSlugInputExtender;
+use Capell\SeoTools\Support\AdminTools\SitemapAdminTool;
 use Capell\SeoTools\Support\AiFeatureRegistry;
 use Capell\SeoTools\Support\AiRateLimiter;
 use Capell\SeoTools\Support\AiResponseParser;
@@ -250,6 +253,10 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
             SitemapSiteRecordActionExtender::class,
         ], SiteRecordActionExtender::TAG);
 
+        $this->app->tag([
+            SitemapAdminTool::class,
+        ], AdminToolItem::TAG);
+
         return $this;
     }
 
@@ -310,6 +317,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
     protected function registerLivewireComponents(): self
     {
         Livewire::component('capell::page.sitemap', SitemapLivewireComponent::class);
+        Livewire::component('capell-seo-tools.tools.sitemap-tool', SitemapTool::class);
 
         return $this;
     }
