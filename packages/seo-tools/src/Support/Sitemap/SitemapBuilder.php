@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Capell\SeoTools\Support\Sitemap;
 
 use Capell\Core\Contracts\Sitemapable;
-use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\SeoTools\Data\SitemapPageData;
 use Illuminate\Support\Collection;
 
 class SitemapBuilder

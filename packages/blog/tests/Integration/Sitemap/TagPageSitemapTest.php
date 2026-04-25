@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use Capell\Blog\Support\Creator\BlogCreator;
 use Capell\Blog\Support\Sitemap\TagsSitemap;
-use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\SeoTools\Data\SitemapPageData;
 use Capell\Tags\Enums\TagTypeEnum;
 use Capell\Tags\Models\Tag;
 use Capell\Tests\Support\Concerns\TestingFrontend;

@@ -6,8 +6,8 @@ namespace Capell\Blog\Support\Sitemap;
 
 use Capell\Blog\Support\Loader\TagLoader;
 use Capell\Core\Contracts\Pageable;
-use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Page;
+use Capell\SeoTools\Data\SitemapPageData;
 use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
 use Capell\SeoTools\Support\Sitemap\SitemapChainBuilder;
 use Capell\Tags\Filament\Resources\Tags\TagResource;

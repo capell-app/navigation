@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\SeoTools\Support\Sitemap\Pages;
 
-use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Enums\CacheEnum;
 use Capell\Core\Models\Page;
+use Capell\SeoTools\Data\SitemapPageData;
 use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;

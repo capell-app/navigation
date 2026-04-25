@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Capell\SeoTools\Support\Sitemap;
 
 use Capell\Core\Actions\GetEditPageResourceUrlAction;
-use Capell\Core\Data\SitemapPageData;
 use Capell\Core\Models\Page;
+use Capell\SeoTools\Data\SitemapPageData;
 use Illuminate\Support\Collection;
 
 final class SitemapChainBuilder

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\SeoTools\Support\Sitemap;
 
-use Capell\Core\Data\SitemapUrlItemData;
+use Capell\SeoTools\Data\SitemapUrlItemData;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Storage;
 
