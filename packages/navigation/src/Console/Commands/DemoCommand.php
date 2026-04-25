@@ -22,7 +22,7 @@ class DemoCommand extends Command
     public function handle(): int
     {
         try {
-            $navigationDemoCreator = app(NavigationDemoCreator::class);
+            $navigationDemoCreator = resolve(NavigationDemoCreator::class);
 
             $sites = $this->resolveSites();
             $languageCodes = $this->resolveLanguageCodes();

@@ -13,6 +13,7 @@ use Capell\DefaultTheme\Providers\DefaultThemeServiceProvider;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
 use Capell\Tests\AbstractTestCase;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use Override;
@@ -71,6 +72,6 @@ class MosaicTestCase extends AbstractTestCase
         CapellCore::registerPackage('capell-app/navigation', path: realpath(__DIR__ . '/../../../packages/navigation'));
         CapellCore::forcePackageInstalled('capell-app/navigation');
 
-        $app->make('config')->set('media-library.media_model', Media::class);
+        $app->make(Repository::class)->set('media-library.media_model', Media::class);
     }
 }

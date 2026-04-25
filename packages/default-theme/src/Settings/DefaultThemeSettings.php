@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\DefaultTheme\Settings;
 
 use Capell\Core\Contracts\SettingsContract;
+use Capell\DefaultTheme\Settings\theme\src\Filament\Settings\DefaultThemeSettingsSchema;
 use Spatie\LaravelSettings\Settings;
 
 class DefaultThemeSettings extends Settings implements SettingsContract
@@ -20,6 +21,6 @@ class DefaultThemeSettings extends Settings implements SettingsContract
 
     public static function schema(): string
     {
-        return theme\src\Filament\Settings\DefaultThemeSettingsSchema::class;
+        return DefaultThemeSettingsSchema::class;
     }
 }

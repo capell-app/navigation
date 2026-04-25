@@ -31,6 +31,7 @@ use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Guava\IconPicker\IconPickerServiceProvider;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
@@ -147,7 +148,7 @@ class WorkspacesTestCase extends AbstractTestCase
         CapellCore::registerPackage('capell-app/tags', path: realpath(__DIR__ . '/../../../packages/tags'));
         CapellCore::forcePackageInstalled('capell-app/tags');
 
-        $app->make('config')->set('media-library.media_model', Media::class);
+        $app->make(Repository::class)->set('media-library.media_model', Media::class);
 
         // Shield's super_admin Gate::before bypass is normally registered by FilamentShieldPlugin.
         // Since AdminPanelProvider does not include that plugin, we register the bypass here so

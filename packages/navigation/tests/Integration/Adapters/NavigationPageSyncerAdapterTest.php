@@ -33,7 +33,7 @@ it('removes a page from all navigations when the page is deleted via the syncer'
         ],
     ]);
 
-    app(NavigationPageSyncer::class)->removePageFromAllNavigations($page);
+    resolve(NavigationPageSyncer::class)->removePageFromAllNavigations($page);
 
     $navigation->refresh();
 

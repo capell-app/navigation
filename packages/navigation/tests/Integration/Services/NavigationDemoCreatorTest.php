@@ -16,7 +16,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 it('sets up main, footer, and sub-footer navigation', function (): void {
     $demoCreator = new DemoCreator;
-    $navigationDemoCreator = app(NavigationDemoCreator::class);
+    $navigationDemoCreator = resolve(NavigationDemoCreator::class);
 
     $language = Language::factory()->default()->create();
 
@@ -38,7 +38,7 @@ it('sets up main, footer, and sub-footer navigation', function (): void {
 
 it('merges generated footer items into an existing navigation with persisted items', function (): void {
     $demoCreator = new DemoCreator;
-    $navigationDemoCreator = app(NavigationDemoCreator::class);
+    $navigationDemoCreator = resolve(NavigationDemoCreator::class);
 
     $language = Language::factory()->english()->create();
 
@@ -142,7 +142,7 @@ it('merges generated footer items into an existing navigation with persisted ite
 });
 
 it('creates main navigation with the home page and eligible nested pages only', function (): void {
-    $navigationDemoCreator = app(NavigationDemoCreator::class);
+    $navigationDemoCreator = resolve(NavigationDemoCreator::class);
 
     $language = Language::factory()->english()->create();
 

@@ -23,7 +23,7 @@ class PagesSitemap extends AbstractSitemapPages
 
         $cacheKey = CacheEnum::sitemapPages($this->site->id, $this->language->id);
 
-        return Cache::remember($cacheKey, 3600, fn (): Collection => app(PagesForSitemap::class)
+        return Cache::remember($cacheKey, 3600, fn (): Collection => resolve(PagesForSitemap::class)
             ->get($this->site, $this->language)
             ->toTree()
             ->map(fn (Page $page): SitemapPageData => $this->format($page)));

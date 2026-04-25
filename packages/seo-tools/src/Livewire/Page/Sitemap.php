@@ -68,7 +68,7 @@ class Sitemap extends AbstractPage
         $fileContents = $storage->get($filePath);
         throw_if($fileContents === false, RuntimeException::class, 'Unable to read file contents.');
 
-        $etagDigest = hash('sha256', $fileContents);
+        $etagDigest = hash('sha256', (string) $fileContents);
         $weakEtag = 'W/"' . $etagDigest . '"';
         $strongEtag = '"' . $etagDigest . '"';
         $etag = $weakEtag;

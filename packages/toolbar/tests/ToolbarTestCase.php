@@ -29,7 +29,7 @@ class ToolbarTestCase extends AbstractTestCase
         return 'capell-frontend-toolbar';
     }
 
-    protected function getEnvironmentSetUp($app): void
+    protected function getEnvironmentSetUp(mixed $app): void
     {
         parent::getEnvironmentSetUp($app);
 

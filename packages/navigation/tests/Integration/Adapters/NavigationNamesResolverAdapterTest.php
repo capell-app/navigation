@@ -21,7 +21,7 @@ it('resolves navigation names for a given site and language', function (): void 
         'language_id' => $language->id,
     ]);
 
-    $names = app(NavigationNamesResolver::class)->resolve($site->id, [$language->id]);
+    $names = resolve(NavigationNamesResolver::class)->resolve($site->id, [$language->id]);
 
     expect($names)->toHaveKey($navigation->id)
         ->and($names[$navigation->id])->toBe('Main Navigation');
@@ -37,13 +37,13 @@ it('includes navigations without a site when resolving by site', function (): vo
         'language_id' => null,
     ]);
 
-    $names = app(NavigationNamesResolver::class)->resolve($site->id, [$language->id]);
+    $names = resolve(NavigationNamesResolver::class)->resolve($site->id, [$language->id]);
 
     expect($names)->toHaveKey($globalNavigation->id);
 });
 
 it('returns empty array when no navigations match', function (): void {
-    $names = app(NavigationNamesResolver::class)->resolve(99999, [99999]);
+    $names = resolve(NavigationNamesResolver::class)->resolve(99999, [99999]);
 
     expect($names)->toBeEmpty();
 });

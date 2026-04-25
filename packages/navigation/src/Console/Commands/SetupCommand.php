@@ -42,7 +42,7 @@ class SetupCommand extends Command
                 $navigationCreator->footerNavigation(site: $site);
                 $navigationCreator->subFooterNavigation(
                     site: $site,
-                    pages: $sitemapPage !== null ? new Collection([$sitemapPage]) : null,
+                    pages: $sitemapPage instanceof Page ? new Collection([$sitemapPage]) : null,
                 );
             });
         } catch (Throwable $throwable) {

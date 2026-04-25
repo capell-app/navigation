@@ -171,12 +171,17 @@ class NavigationDemoCreator
         }
 
         foreach ($pages as $page) {
-            if (! $page instanceof Page || ! $page->relationLoaded('children')) {
+            if (! $page instanceof Page) {
                 continue;
             }
-
+            if (! $page->relationLoaded('children')) {
+                continue;
+            }
             $children = $page->children;
-            if (! $children instanceof Collection || $children->isEmpty()) {
+            if (! $children instanceof Collection) {
+                continue;
+            }
+            if ($children->isEmpty()) {
                 continue;
             }
 

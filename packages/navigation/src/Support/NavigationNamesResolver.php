@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class NavigationNamesResolver
 {
-    public function __construct(private Repository $cache) {}
+    public function __construct(private readonly Repository $cache) {}
 
     /**
      * Resolve navigation names for given site and languages, with caching.

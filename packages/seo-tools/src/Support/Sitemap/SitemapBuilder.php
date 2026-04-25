@@ -34,7 +34,7 @@ class SitemapBuilder
         /**
          * @var class-string<Sitemapable> $sitemapPageType
          */
-        foreach (app(SitemapPageRegistry::class)->all() as $sitemapPageType) {
+        foreach (resolve(SitemapPageRegistry::class)->all() as $sitemapPageType) {
             $this->addPages(
                 new $sitemapPageType(
                     language: $this->language,
