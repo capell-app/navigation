@@ -41,6 +41,7 @@ use Capell\SeoTools\Filament\Settings\AssistantSettingsSchema;
 use Capell\SeoTools\Filament\Settings\SeoSettingsSchema;
 use Capell\SeoTools\Filament\Settings\StructuredDataSettingsSchema;
 use Capell\SeoTools\Handlers\ClearCircuitBreakerHandler;
+use Capell\SeoTools\Http\Controllers\LlmsTxtController;
 use Capell\SeoTools\Listeners\LogAiGeneration;
 use Capell\SeoTools\Listeners\NotifyAiFailure;
 use Capell\SeoTools\Listeners\Sitemap\RegenerateSitemapsOnPageDeleted;
@@ -79,6 +80,7 @@ use Composer\InstalledVersions;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 
@@ -358,6 +360,17 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
+    protected function registerLlmsTxtRoute(): self
+    {
+        Route::name('capell-frontend.')
+            ->middleware(['web', 'frontend.resolve'])
+            ->group(function (): void {
+                Route::get('llms.txt', LlmsTxtController::class)->name('llms-txt');
+            });
+
+        return $this;
+    }
+
     private function bootInstalledPackage(): self
     {
         return $this
@@ -375,7 +388,8 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
             ->registerFilamentPages()
             ->registerLivewireComponents()
             ->registerFrontendViews()
-            ->registerRenderHooks();
+            ->registerRenderHooks()
+            ->registerLlmsTxtRoute();
     }
 
     private function isPackageInstalled(): bool
