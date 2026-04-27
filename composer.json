@@ -135,8 +135,7 @@
         "tanmuhittin/laravel-google-translate": "^2.4",
         "tapp/filament-authentication-log": "^4.0",
         "torann/geoip": "^3.0",
-        "voku/html-min": "^4.5",
-        "wildside/userstamps": "^2.3"
+        "voku/html-min": "^4.5"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "*",
