@@ -8,6 +8,7 @@ use Capell\Admin\Filament\Pages\SystemHealthPage;
 use Capell\Core\Database\Factories\TypeFactory;
 use Capell\Core\Support\Creator\DemoCreator;
 use Capell\Workspaces\Providers\WorkspacesServiceProvider;
+use Capell\Workspaces\Tests\WorkspacesTestCase;
 
 arch()
     ->expect('Capell\Blog')
@@ -20,6 +21,7 @@ arch()
         Capell\Mosaic\Console\Commands\Hero\DemoCommand::class,
         SystemHealthPage::class,
         WorkspacesServiceProvider::class,
+        WorkspacesTestCase::class,
     ]);
 
 arch()

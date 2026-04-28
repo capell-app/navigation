@@ -16,6 +16,7 @@ use Capell\DefaultTheme\Providers\DefaultThemeServiceProvider;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
+use Capell\SeoTools\Providers\SeoToolsServiceProvider;
 use Capell\Tags\Models\Tag;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Contracts\Config\Repository;
@@ -67,6 +68,7 @@ class BlogTestCase extends AbstractTestCase
             DefaultThemeServiceProvider::class,
             AdminPanelProvider::class,
             LivewireServiceProvider::class,
+            SeoToolsServiceProvider::class,
         ];
     }
 
@@ -82,6 +84,7 @@ class BlogTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(SeoToolsServiceProvider::$packageName);
 
         CapellCore::registerPackage('capell-app/navigation', path: realpath(__DIR__ . '/../../../packages/navigation'));
         CapellCore::forcePackageInstalled('capell-app/navigation');

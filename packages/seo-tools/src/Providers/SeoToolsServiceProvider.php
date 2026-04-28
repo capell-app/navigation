@@ -316,7 +316,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
 
     protected function registerLivewireComponents(): self
     {
-        Livewire::component('capell::page.sitemap', SitemapLivewireComponent::class);
+        Livewire::component(SitemapPageType::ComponentView, SitemapLivewireComponent::class);
         Livewire::component('capell-seo-tools.tools.sitemap-tool', SitemapTool::class);
 
         return $this;

@@ -14,15 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-/**
- * Base test case for the capell-app/media-curator plugin.
- *
- * Boots the Curator service provider and the Capell bridge provider,
- * creates an in-memory SQLite database with the `curator` table and a
- * minimal `test_curator_owners` fixture table, and fakes the `public`
- * storage disk so uploaded files never touch the filesystem.
- */
-class TestCase extends OrchestraTestCase
+class MediaCuratorTestCase extends OrchestraTestCase
 {
     protected function setUp(): void
     {
@@ -64,13 +56,11 @@ class TestCase extends OrchestraTestCase
             'prefix' => '',
         ]);
 
-        // Curator reads its glide token from the environment.
         $app->make(Repository::class)->set('curator.glide_token', 'test-token');
     }
 
     protected function defineDatabaseMigrations(): void
     {
-        // Create the Curator media table (mirrors the migration stub).
         $this->app->make(ConnectionResolverInterface::class)->getSchemaBuilder()->create('curator', function (Blueprint $table): void {
             $table->id();
             $table->string('disk');
@@ -93,7 +83,6 @@ class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
-        // Owner fixture table — one FK column per media collection.
         $this->app->make(ConnectionResolverInterface::class)->getSchemaBuilder()->create('test_curator_owners', function (Blueprint $table): void {
             $table->id();
             $table->string('name');

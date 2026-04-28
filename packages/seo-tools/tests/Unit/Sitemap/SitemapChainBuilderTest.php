@@ -5,10 +5,7 @@ declare(strict_types=1);
 use Capell\Core\Models\Page;
 use Capell\SeoTools\Data\SitemapPageData;
 use Capell\SeoTools\Support\Sitemap\SitemapChainBuilder;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Illuminate\Support\Collection;
-
-uses(SeoToolsTestCase::class);
 
 it('builds a single node without ancestors', function (): void {
     $page = Page::factory()

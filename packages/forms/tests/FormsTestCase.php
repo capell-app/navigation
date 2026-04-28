@@ -7,6 +7,7 @@ namespace Capell\Forms\Tests;
 use Capell\Core\Facades\CapellCore;
 use Capell\Forms\Providers\FormsServiceProvider;
 use Capell\Tests\AbstractTestCase;
+use Livewire\LivewireServiceProvider;
 use Override;
 
 class FormsTestCase extends AbstractTestCase
@@ -25,6 +26,7 @@ class FormsTestCase extends AbstractTestCase
         return [
             ...parent::getPackageProviders($app),
             FormsServiceProvider::class,
+            LivewireServiceProvider::class,
         ];
     }
 

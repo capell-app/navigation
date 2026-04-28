@@ -8,10 +8,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Core\Models\Type;
 use Capell\SeoTools\Support\Sitemap\XmlSitemapGenerator;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Illuminate\Support\Facades\Storage;
-
-uses(SeoToolsTestCase::class);
 
 beforeEach(function (): void {
     config(['capell.sitemap.disk' => 'local', 'capell.sitemap.directory' => 'sitemaps_test']);

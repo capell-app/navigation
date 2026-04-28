@@ -63,11 +63,11 @@ class NavigationTestCase extends AbstractTestCase
         return [
             ...parent::getPackageProviders($app),
             AdminServiceProvider::class,
-            AdminPanelProvider::class,
             FrontendServiceProvider::class,
             LivewireServiceProvider::class,
             PaginateRouteServiceProvider::class,
             NavigationServiceProvider::class,
+            AdminPanelProvider::class,
         ];
     }
 

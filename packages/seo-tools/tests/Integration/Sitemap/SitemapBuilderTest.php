@@ -6,13 +6,12 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\SiteDomain;
 use Capell\SeoTools\Support\Sitemap\SitemapBuilder;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
-
-uses(SeoToolsTestCase::class);
 
 beforeEach(function (): void {
     Date::setTestNow(Date::create(2024, 1, 1, 0, 0, 0));
+    Cache::flush();
 });
 
 describe('SitemapBuilder', function (): void {
@@ -32,6 +31,7 @@ describe('SitemapBuilder', function (): void {
             ])
             ->create();
 
+        Cache::flush();
         $builder = new SitemapBuilder(site: $siteDomain->site, domain: $siteDomain, language: $language);
         $result = $builder->build();
         expect($result->toArray())->toMatchSnapshot();
@@ -51,6 +51,7 @@ describe('SitemapBuilder', function (): void {
             ])
             ->create();
 
+        Cache::flush();
         $builder = new SitemapBuilder(site: $siteDomain->site, domain: $siteDomain, language: $language, withEditUrl: true);
         $result = $builder->build();
         expect($result)

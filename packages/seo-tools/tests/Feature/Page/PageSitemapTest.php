@@ -38,6 +38,13 @@ test('sitemap html page', function (): void {
     $childPage = Page::factory()->site($site)->parent($parentPage)->withTranslations($languages)->create();
     $homepage = Page::factory()->site($site)->home()->withTranslations($languages, slug: '/')->create();
 
+    // PageSaved listeners populate the sitemap cache during page creation,
+    // but afterCreating hooks (translations, pageUrl) run after the listener
+    // fires — so the cache may exclude the most recently created pages until
+    // the next save invalidates it. Flush before requesting to ensure the
+    // sitemap reflects the final DB state.
+    Cache::flush();
+
     $siteMapUrls = [
         $homepage->pageUrl->full_url,
         $sitemapPage->pageUrl->full_url,

@@ -6,14 +6,17 @@ use Capell\Admin\Filament\Resources\Sites\Pages\EditSite;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Filament\Resources\Sites\RelationManagers\NavigationsRelationManager;
 use Capell\Navigation\Models\Navigation;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 
 use function Pest\Livewire\livewire;
+
+uses(CreatesAdminUser::class);
 
 it('can list navigations', function (): void {
     test()->actingAsAdmin();
 
     $site = Site::factory()
-        ->has(Navigation::factory()->count(10))
+        ->has(Navigation::factory()->count(10), 'navigations')
         ->create();
 
     $navigation = $site->navigations->first();
@@ -32,7 +35,7 @@ it('can search navigations', function (): void {
     test()->actingAsAdmin();
 
     $site = Site::factory()
-        ->has(Navigation::factory()->count(10))
+        ->has(Navigation::factory()->count(10), 'navigations')
         ->create();
 
     $navigation = $site->navigations->random();

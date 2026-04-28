@@ -20,27 +20,12 @@ it('no two packages ship a migration file with the same basename', function (): 
 
     $duplicates = array_filter($byBasename, fn (array $paths): bool => count($paths) > 1);
 
-    // Tracked in docs/test-coverage-plan.md §4a — `alter_tags_table.php` is
-    // identical in both `blog` and `tags`. When the duplicate is removed
-    // (likely from blog, since tags owns the table), drop this expected
-    // entry and the test will continue to guard against new collisions.
-    $expected = [
-        'alter_tags_table' => [
-            'blog/database/migrations/alter_tags_table.php',
-            'tags/database/migrations/alter_tags_table.php',
-        ],
-    ];
-
     foreach (array_keys($duplicates) as $name) {
         sort($duplicates[$name]);
     }
 
-    foreach (array_keys($expected) as $name) {
-        sort($expected[$name]);
-    }
-
     expect($duplicates)->toBe(
-        $expected,
+        [],
         "New migration filename collision detected across packages — Laravel's batch runner uses the basename as the key:" .
         "\n" . json_encode($duplicates, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
     );

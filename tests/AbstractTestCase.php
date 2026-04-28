@@ -44,7 +44,6 @@ use Illuminate\Support\Facades\Http;
 use LaraZeus\SpatieTranslatable\SpatieTranslatableServiceProvider;
 use Lorisleiva\Actions\ActionServiceProvider;
 use MichalOravec\PaginateRoute\PaginateRouteServiceProvider;
-use Oddvalue\LaravelDrafts\LaravelDraftsServiceProvider;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Orchestra\Workbench\WorkbenchServiceProvider;
@@ -54,7 +53,6 @@ use Silber\PageCache\LaravelServiceProvider;
 use Sinnbeck\DomAssertions\DomAssertionsServiceProvider;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\LaravelData\LaravelDataServiceProvider;
-use Spatie\LaravelRay\RayServiceProvider;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
@@ -173,8 +171,6 @@ abstract class AbstractTestCase extends TestCase
             LaravelServiceProvider::class,
             PermissionServiceProvider::class,
             IconPickerServiceProvider::class,
-            LaravelDraftsServiceProvider::class,
-            RayServiceProvider::class,
             DomAssertionsServiceProvider::class,
             SpatieLaravelSettingsPluginServiceProvider::class,
             CapellServiceProvider::class,

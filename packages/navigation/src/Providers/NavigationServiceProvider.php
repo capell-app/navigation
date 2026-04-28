@@ -6,6 +6,7 @@ namespace Capell\Navigation\Providers;
 
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Exchanger\Enums\RelationOwnership;
 use Capell\Core\Exchanger\Policy\OwnershipMap;
 use Capell\Core\Models\Language;
@@ -18,13 +19,16 @@ use Capell\Navigation\Console\Commands\DemoCommand;
 use Capell\Navigation\Console\Commands\SetupCommand;
 use Capell\Navigation\Contracts\NavigationNamesResolver;
 use Capell\Navigation\Contracts\NavigationPageSyncer;
+use Capell\Navigation\Enums\NavigationSchemaTypeEnum;
 use Capell\Navigation\Filament\Extenders\NavigationPageSchemaExtender;
 use Capell\Navigation\Filament\Extenders\NavigationSiteExtender;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
+use Capell\Navigation\Listeners\ReplicateSiteNavigationsListener;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
 use Capell\Navigation\Support\Creator\NavigationDemoCreator;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -42,7 +46,16 @@ class NavigationServiceProvider extends ServiceProvider
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
 
         $this->commands([DemoCommand::class, SetupCommand::class]);
-        $this->app->singleton(\Capell\Navigation\Support\NavigationNamesResolver::class, fn ($app): \Capell\Navigation\Support\NavigationNamesResolver => new \Capell\Navigation\Support\NavigationNamesResolver($app['cache']));
+        $this->app->singleton(
+            \Capell\Navigation\Support\NavigationNamesResolver::class,
+            fn ($app): \Capell\Navigation\Support\NavigationNamesResolver => new \Capell\Navigation\Support\NavigationNamesResolver($app['cache']->store()),
+        );
+
+        CapellAdmin::registerResource('Navigation', NavigationResource::class);
+
+        foreach (NavigationSchemaTypeEnum::getAllSchemas() as $type => $schemas) {
+            CapellAdmin::registerSchemas($type, $schemas, defaultSchemas: true);
+        }
     }
 
     public function boot(): void
@@ -59,11 +72,11 @@ class NavigationServiceProvider extends ServiceProvider
 
         Gate::policy(Navigation::class, NavigationPolicy::class);
 
-        CapellAdmin::registerResource('Navigation', NavigationResource::class);
-
         OwnershipMap::register(Navigation::class, RelationOwnership::Shared);
 
         Site::resolveRelationUsing('navigations', fn (Site $site): HasMany => $site->hasMany(Navigation::class));
+
+        Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
 
         $this->registerDemoCreatorMacros();
     }

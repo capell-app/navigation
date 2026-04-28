@@ -131,7 +131,7 @@ final class PluginsPageTest extends PluginsTestCase
 
         $plugin = MarketplacePlugin::factory()->create([
             'is_visible' => true,
-            'composer_name' => 'vendor/paid-plugin-' . uniqid(),
+            'composer_name' => 'vendor/paid-plugin-' . fake()->uuid(),
             'anystack_product_id' => 'prod_xyz',
             'price_once' => 99,
             'name' => 'Paid Plugin',

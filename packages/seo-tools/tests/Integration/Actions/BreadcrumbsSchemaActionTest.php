@@ -6,9 +6,6 @@ use Capell\Core\Database\Factories\LanguageFactory;
 use Capell\Core\Database\Factories\PageFactory;
 use Capell\Core\Database\Factories\SiteFactory;
 use Capell\SeoTools\Actions\BreadcrumbsSchemaAction;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
-
-uses(SeoToolsTestCase::class);
 
 it('generates breadcrumbs for a page with ancestors', function (): void {
     $language = LanguageFactory::new()->create([

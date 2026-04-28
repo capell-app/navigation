@@ -8,9 +8,6 @@ use Capell\Core\Database\Factories\SiteFactory;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\SeoTools\Actions\PageMetaSchemaAction;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
-
-uses(SeoToolsTestCase::class);
 
 it('generates correct schema for a simple page', function (): void {
     $language = LanguageFactory::new()->create([

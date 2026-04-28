@@ -14,7 +14,7 @@ $language = Frontend::language();
         <ul>
             @if ($this->results)
                 @foreach ($this->results as $sitemapPage)
-                    <x-capell::sitemap.sitemap-page :$sitemapPage :level="1" />
+                    @include('capell::sitemap.sitemap-page', ['sitemapPage' => $sitemapPage, 'level' => 1])
                 @endforeach
             @endif
         </ul>

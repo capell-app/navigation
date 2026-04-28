@@ -767,15 +767,15 @@ trait ManagesAssets
     protected function filterContainerWidgetAssets(Collection $assets, string $containerKey, int $widgetOccurrence): SupportCollection|Enumerable
     {
         return $assets->filter(function (WidgetAsset $widgetAsset) use ($containerKey, $widgetOccurrence): bool {
+            if ((int) $widgetAsset->occurrence !== $widgetOccurrence) {
+                return false;
+            }
+
             if ($widgetAsset->container === null) {
                 return true;
             }
 
             if ($widgetAsset->container !== $containerKey) {
-                return false;
-            }
-
-            if ((int) $widgetAsset->occurrence !== $widgetOccurrence) {
                 return false;
             }
 

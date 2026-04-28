@@ -11,6 +11,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Tags\Models\Tag;
+use Capell\Tags\Providers\AdminServiceProvider as TagsAdminServiceProvider;
 use Capell\Tags\Providers\TagsServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Contracts\Config\Repository;
@@ -56,6 +57,7 @@ class TagsTestCase extends AbstractTestCase
             AdminServiceProvider::class,
             FrontendServiceProvider::class,
             TagsServiceProvider::class,
+            TagsAdminServiceProvider::class,
             AdminPanelProvider::class,
             LivewireServiceProvider::class,
         ];

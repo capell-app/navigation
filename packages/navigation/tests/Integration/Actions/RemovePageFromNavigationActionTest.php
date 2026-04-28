@@ -35,7 +35,7 @@ it('removes a page from navigation', function (): void {
 
     $navigation->refresh();
 
-    $pageIds = collect($navigation->items)
+    $pageIds = $navigation->items->toCollection()
         ->map(static fn (NavigationItemData $item): ?int => $item->data['pageable_id'] ?? null)
         ->all();
 
@@ -77,7 +77,7 @@ it('leaves other pages intact when removing one page', function (): void {
 
     $navigation->refresh();
 
-    $pageIds = collect($navigation->items)
+    $pageIds = $navigation->items->toCollection()
         ->map(static fn (NavigationItemData $item): ?int => isset($item->data['pageable_id']) ? (int) $item->data['pageable_id'] : null)
         ->filter()
         ->values()

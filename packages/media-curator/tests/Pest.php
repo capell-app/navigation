@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-use Capell\MediaCurator\Tests\TestCase;
+use Capell\MediaCurator\Tests\MediaCuratorTestCase;
 
-pest()->extend(TestCase::class)->in('Integration', 'Feature');
+pest()->extend(MediaCuratorTestCase::class)->in('Integration', 'Feature');

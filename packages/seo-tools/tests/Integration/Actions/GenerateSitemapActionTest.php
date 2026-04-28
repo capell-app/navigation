@@ -7,10 +7,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\SeoTools\Actions\GenerateSitemapAction;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Illuminate\Support\Facades\Storage;
-
-uses(SeoToolsTestCase::class);
 
 it('handles the sitemap generation', function (): void {
     $storage = Storage::fake(config('capell.sitemap.disk'));

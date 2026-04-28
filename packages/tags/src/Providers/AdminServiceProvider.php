@@ -10,10 +10,10 @@ use Illuminate\Support\ServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
 {
-    public function boot(): void
+    public function register(): void
     {
         CapellAdmin::registerResource(ResourceEnum::Tag->name, class: ResourceEnum::Tag->value);
     }
 
-    public function register(): void {}
+    public function boot(): void {}
 }

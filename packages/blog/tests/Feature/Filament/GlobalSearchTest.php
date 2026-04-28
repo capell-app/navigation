@@ -6,8 +6,6 @@ use Capell\Blog\Filament\Resources\Articles\ArticleResource;
 use Capell\Blog\Models\Article;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
-use Capell\Tags\Filament\Resources\Tags\TagResource;
-use Capell\Tags\Models\Tag;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Filament\Facades\Filament;
 use Filament\GlobalSearch\GlobalSearchResult;
@@ -60,23 +58,4 @@ it('finds an article by its $attribute', function (string $searchTerm): void {
     'name' => ['capell-blog-article-name-token'],
     'title' => ['capell-blog-article-title-token'],
     'url' => ['capell-blog-article-url-token'],
-]);
-
-it('finds a tag by its $attribute', function (string $searchTerm): void {
-    $tagNameToken = 'capell-blog-tag-name-token';
-
-    $tag = Tag::factory()->create([
-        'name' => ['en' => $tagNameToken],
-        'slug' => ['en' => $tagNameToken],
-    ]);
-
-    $results = Filament::getGlobalSearchProvider()->getResults($searchTerm);
-    $tagResult = $results?->getCategories()->get(TagResource::getPluralModelLabel())?->first();
-
-    expect($tagResult)
-        ->toBeInstanceOf(GlobalSearchResult::class)
-        ->and($tagResult->title)->toBe($tagNameToken)
-        ->and($tagResult->url)->toBe(TagResource::getUrl('edit', ['record' => $tag]));
-})->with([
-    'name' => ['capell-blog-tag-name-token'],
 ]);

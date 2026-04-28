@@ -15,6 +15,7 @@ use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
 use Capell\SeoTools\Providers\SeoToolsServiceProvider;
+use Capell\Tags\Providers\TagsServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
@@ -58,6 +59,7 @@ class PackagesTestCase extends AbstractTestCase
             MosaicServiceProvider::class,
             BlogServiceProvider::class,
             SeoToolsServiceProvider::class,
+            TagsServiceProvider::class,
             FrontendServiceProvider::class,
             CapellServiceProvider::class,
             AdminPanelProvider::class,
@@ -76,8 +78,8 @@ class PackagesTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(SeoToolsServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(TagsServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
-        CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
     }

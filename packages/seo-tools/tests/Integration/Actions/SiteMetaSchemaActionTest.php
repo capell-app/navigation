@@ -5,10 +5,7 @@ declare(strict_types=1);
 use Capell\Core\Database\Factories\LanguageFactory;
 use Capell\Core\Database\Factories\SiteFactory;
 use Capell\SeoTools\Actions\SiteMetaSchemaAction;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Illuminate\Support\Arr;
-
-uses(SeoToolsTestCase::class);
 
 it('generates correct schema for site with meta data', function (): void {
     $language = LanguageFactory::new()->create([

@@ -46,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -87,6 +88,7 @@ class Article extends Model implements HasMedia, Pageable, PageCacheable, Publis
         'meta',
         'name',
         'order',
+        'uuid',
         'visible_from',
         'visible_until',
         'site_id',
@@ -262,6 +264,15 @@ class Article extends Model implements HasMedia, Pageable, PageCacheable, Publis
             })
             ->orderByRaw($effectivePublishDateExpression . ' desc')
             ->orderBy('id', 'desc');
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $article): void {
+            if ($article->uuid === null || $article->uuid === '') {
+                $article->uuid = Str::uuid()->toString();
+            }
+        });
     }
 
     /** @return array<string, mixed>|null */

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 use Capell\SeoTools\Data\SitemapUrlItemData;
 use Capell\SeoTools\Support\Sitemap\SitemapStateStore;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Storage;
-
-uses(SeoToolsTestCase::class);
 
 beforeEach(function (): void {
     Storage::fake('local');

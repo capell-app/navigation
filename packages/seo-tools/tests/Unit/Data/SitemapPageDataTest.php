@@ -3,10 +3,7 @@
 declare(strict_types=1);
 
 use Capell\SeoTools\Data\SitemapPageData;
-use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Carbon\CarbonImmutable;
-
-uses(SeoToolsTestCase::class);
 
 it('serializes last modified dates with atom formatting', function (): void {
     $lastModified = CarbonImmutable::parse('2026-03-15 09:30:00', 'UTC');

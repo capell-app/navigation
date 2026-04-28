@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Support\NavigationNamesResolver;
+use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Factory;
 
 test('resolves navigation names for site and languages', function (): void {
@@ -11,7 +12,7 @@ test('resolves navigation names for site and languages', function (): void {
     $typeId = $this->connection()->table('types')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
-
+        'type' => 'navigation',
     ]);
 
     // Insert Navigations
@@ -37,7 +38,8 @@ test('resolves navigation names for site and languages', function (): void {
         'updated_at' => now(),
     ]);
 
-    $cache = resolve(Factory::class);
+    /** @var Repository $cache */
+    $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
     $result = $resolver->resolve(1, [1, 2]);
 
@@ -52,7 +54,7 @@ test('caches result with correct key', function (): void {
     $typeId = $this->connection()->table('types')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
-
+        'type' => 'navigation',
     ]);
 
     $this->connection()->table('navigations')->insert([
@@ -66,7 +68,8 @@ test('caches result with correct key', function (): void {
         'updated_at' => now(),
     ]);
 
-    $cache = resolve(Factory::class);
+    /** @var Repository $cache */
+    $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
     $cacheKey = NavigationCacheEnum::navigationNamesKey(1, [1]);
 
@@ -80,7 +83,7 @@ test('includes navigations with null site id', function (): void {
     $typeId = $this->connection()->table('types')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
-
+        'type' => 'navigation',
     ]);
 
     $this->connection()->table('navigations')->insert([
@@ -105,7 +108,8 @@ test('includes navigations with null site id', function (): void {
         'updated_at' => now(),
     ]);
 
-    $cache = resolve(Factory::class);
+    /** @var Repository $cache */
+    $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
     $result = $resolver->resolve(1, [1]);
 
@@ -117,7 +121,7 @@ test('handles string site id', function (): void {
     $typeId = $this->connection()->table('types')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
-
+        'type' => 'navigation',
     ]);
 
     $this->connection()->table('navigations')->insert([
@@ -131,7 +135,8 @@ test('handles string site id', function (): void {
         'updated_at' => now(),
     ]);
 
-    $cache = resolve(Factory::class);
+    /** @var Repository $cache */
+    $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
     $result = $resolver->resolve('1', [1]);
 
@@ -143,7 +148,7 @@ test('returns id name mapping', function (): void {
     $typeId = $this->connection()->table('types')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
-
+        'type' => 'navigation',
     ]);
 
     $navId = $this->connection()->table('navigations')->insertGetId([
@@ -157,7 +162,8 @@ test('returns id name mapping', function (): void {
         'updated_at' => now(),
     ]);
 
-    $cache = resolve(Factory::class);
+    /** @var Repository $cache */
+    $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
     $result = $resolver->resolve(1, [1]);
 

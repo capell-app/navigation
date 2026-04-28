@@ -20,7 +20,7 @@ class ToolbarTestCase extends AbstractTestCase
 
         $this->registerAndMigrateSettings(
             resolve(SettingsMigrationProviderInterface::class)->getSettingMigrations(),
-            __DIR__ . '/../../../packages/frontend/database/settings',
+            __DIR__ . '/../../../vendor/capell-app/frontend/database/settings',
         );
     }
 

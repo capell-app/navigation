@@ -110,6 +110,8 @@ class XmlSitemapGenerator
         ?Closure $checkpoint = null,
         ?Closure $end = null,
     ): void {
+        $site->loadMissing('siteDomains.language');
+
         $site->siteDomains->each(function (SiteDomain $domain) use ($site, $start, $prepare, $checkpoint, $end): void {
             $this->generateForDomain($site, $domain, $start, $prepare, $checkpoint, $end);
         });
@@ -129,6 +131,8 @@ class XmlSitemapGenerator
         ?Closure $checkpoint = null,
         ?Closure $end = null,
     ): void {
+        $site->loadMissing('siteDomains.language');
+
         $site->siteDomains->each(function (SiteDomain $domain) use ($site, $start, $prepare, $checkpoint, $end): void {
             $this->generateForDomainIncremental($site, $domain, $start, $prepare, $checkpoint, $end);
         });

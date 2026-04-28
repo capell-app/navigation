@@ -364,7 +364,7 @@ class DefaultNavigationSchema implements TypeSchemaInterface
 
                 $language = $this->getLanguageById($languageId, $siteId);
 
-                $page = $this->getCachedPageItem($navigationItem->data, $pageCache, true, $language->id);
+                $page = $this->getCachedPageItem($navigationItem->data, $pageCache, true, $language?->id);
 
                 if (! $page instanceof Pageable) {
                     return null;
@@ -380,7 +380,7 @@ class DefaultNavigationSchema implements TypeSchemaInterface
         return $url;
     }
 
-    protected function getLanguageById(?int $languageId, int $siteId): Language
+    protected function getLanguageById(?int $languageId, int $siteId): ?Language
     {
         return CapellCoreHelper::getLanguageByIdOrSite($languageId, $siteId);
     }

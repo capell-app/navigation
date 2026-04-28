@@ -12,7 +12,6 @@ use Capell\Core\Enums\PageOrderEnum;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\SeoTools\Data\SitemapPageData;
 use Capell\SeoTools\Support\Sitemap\AbstractSitemapPages;
-use Exception;
 use Illuminate\Support\Collection;
 
 class ArticlesSitemap extends AbstractSitemapPages
@@ -22,7 +21,7 @@ class ArticlesSitemap extends AbstractSitemapPages
         // Locate the Blog page for the site & language
         $blogPage = BlogLoader::getBlogPage($this->site);
         if (! $blogPage instanceof Pageable) {
-            throw new Exception('Blog page not found for site: ' . $this->site->name);
+            return collect();
         }
 
         // Build recursive node: blog page with articles children

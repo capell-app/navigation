@@ -16,6 +16,7 @@ use Capell\Blog\Enums\WidgetSchemaEnum;
 use Capell\Blog\Filament\Schemas\Articles\ArticlePageSchema;
 use Capell\Blog\Filament\Schemas\Widgets\ArticleWidgetSchema;
 use Capell\Blog\Models\Article;
+use Capell\Core\Actions\SetupPageUrlsAction;
 use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Enums\LayoutGroupEnum;
 use Capell\Core\Enums\PageTypeEnum;
@@ -708,6 +709,8 @@ class BlogCreator
                 ],
             ]);
         });
+
+        SetupPageUrlsAction::run($page);
 
         return $page;
     }

@@ -19,7 +19,7 @@ final class SitemapPageType
 {
     public const Key = 'sitemap';
 
-    public const ComponentView = 'capell::page.sitemap';
+    public const ComponentView = 'capell-seo-tools.page.sitemap';
 
     public static function createType(): Type
     {
