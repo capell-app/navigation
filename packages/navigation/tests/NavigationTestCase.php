@@ -13,6 +13,7 @@ use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Navigation\Providers\NavigationServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use MichalOravec\PaginateRoute\PaginateRouteServiceProvider;
@@ -50,7 +51,7 @@ class NavigationTestCase extends AbstractTestCase
      */
     protected function connection(): Connection
     {
-        return $this->app['db']->connection();
+        return $this->app->make(ConnectionResolverInterface::class)->connection();
     }
 
     /**

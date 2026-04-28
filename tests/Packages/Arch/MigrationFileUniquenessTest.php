@@ -31,10 +31,11 @@ it('no two packages ship a migration file with the same basename', function (): 
         ],
     ];
 
-    foreach ($duplicates as $name => $paths) {
+    foreach (array_keys($duplicates) as $name) {
         sort($duplicates[$name]);
     }
-    foreach ($expected as $name => $paths) {
+
+    foreach (array_keys($expected) as $name) {
         sort($expected[$name]);
     }
 

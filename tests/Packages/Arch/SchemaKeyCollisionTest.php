@@ -29,6 +29,7 @@ it('no two TypeSchemaInterface implementations share the same key for the same t
         if (! preg_match('/^namespace\s+([^;]+);/m', $contents, $namespaceMatch)) {
             continue;
         }
+
         if (! preg_match('/(?:^|\s)class\s+(\w+)/m', $contents, $classMatch)) {
             continue;
         }
@@ -40,8 +41,10 @@ it('no two TypeSchemaInterface implementations share the same key for the same t
         }
 
         $reflection = new ReflectionClass($class);
-
-        if ($reflection->isAbstract() || ! $reflection->implementsInterface(TypeSchemaInterface::class)) {
+        if ($reflection->isAbstract()) {
+            continue;
+        }
+        if (! $reflection->implementsInterface(TypeSchemaInterface::class)) {
             continue;
         }
 

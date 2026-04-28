@@ -65,7 +65,7 @@ class WorkspacePageDraftHandler
 
     public function countDrafts(Pageable $record): int
     {
-        if (! isset($record->uuid) || $record->uuid === null || $record->uuid === '') {
+        if (in_array($record->uuid, [null, null, ''], true)) {
             return 0;
         }
 

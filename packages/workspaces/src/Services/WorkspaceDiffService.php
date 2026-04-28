@@ -9,6 +9,7 @@ use Capell\Workspaces\WorkspaceRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Jfcherng\Diff\DiffHelper;
 
 /**
  * Produces attribute-level diffs of every workspace-scoped record against
@@ -190,8 +191,8 @@ class WorkspaceDiffService
         $beforeStr = $this->stringify($before);
         $afterStr = $this->stringify($after);
 
-        if (class_exists(\Jfcherng\Diff\DiffHelper::class)) {
-            return \Jfcherng\Diff\DiffHelper::calculate(
+        if (class_exists(DiffHelper::class)) {
+            return DiffHelper::calculate(
                 $beforeStr,
                 $afterStr,
                 'SideBySide',

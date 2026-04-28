@@ -78,10 +78,11 @@ it('no two packages declare the same name in their capell.json manifest', functi
         ],
     ];
 
-    foreach ($duplicates as $name => $paths) {
+    foreach (array_keys($duplicates) as $name) {
         sort($duplicates[$name]);
     }
-    foreach ($expected as $name => $paths) {
+
+    foreach (array_keys($expected) as $name) {
         sort($expected[$name]);
     }
 

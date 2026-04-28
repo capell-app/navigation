@@ -50,9 +50,9 @@ it('every registered admin schema points to a real class implementing TypeSchema
 
     foreach ($schemas as $type => $perType) {
         foreach ($perType as $key => $class) {
-            expect(class_exists($class))->toBeTrue("Schema class {$class} for type {$type}/{$key} does not exist");
+            expect(class_exists($class))->toBeTrue(sprintf('Schema class %s for type %s/%s does not exist', $class, $type, $key));
             expect(is_a($class, TypeSchemaInterface::class, true))
-                ->toBeTrue("Schema class {$class} does not implement TypeSchemaInterface");
+                ->toBeTrue(sprintf('Schema class %s does not implement TypeSchemaInterface', $class));
         }
     }
 });
@@ -69,7 +69,7 @@ it('every SchemaTypeEnum value resolves to a non-empty schema list when implemen
         foreach ($registered as $key => $class) {
             expect($key)->toBeString();
             expect(is_string($class) && class_exists($class))->toBeTrue(
-                "Schema {$class} registered under {$case->value}/{$key} is not a loadable class",
+                sprintf('Schema %s registered under %s/%s is not a loadable class', $class, $case->value, $key),
             );
         }
     }
