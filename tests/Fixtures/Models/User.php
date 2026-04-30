@@ -6,6 +6,7 @@ namespace Capell\Tests\Fixtures\Models;
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Capell\Core\Database\Factories\UserFactory;
+use Capell\Core\Models\Concerns\HasSitePermissions;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,6 +22,7 @@ class User extends Authenticatable implements FilamentUser
 
     use HasPanelShield;
     use HasRoles;
+    use HasSitePermissions;
     use LogsActivity;
     use Notifiable;
 

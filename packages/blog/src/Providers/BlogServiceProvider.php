@@ -49,7 +49,6 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     public function registeringPackage(): void
     {
         $this
-            ->registerModels()
             ->registerRelationships()
             ->registerPackageMetadata()
             ->registerPackageAssets()
@@ -72,6 +71,7 @@ class BlogServiceProvider extends AbstractPackageServiceProvider
     private function bootInstalledPackage(): self
     {
         return $this
+            ->registerModels()
             ->registerModelRelations()
             ->registerAboutCommand()
             ->registerBladeComponents()
