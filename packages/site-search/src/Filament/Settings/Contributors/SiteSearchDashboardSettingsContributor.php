@@ -14,10 +14,26 @@ final class SiteSearchDashboardSettingsContributor implements DashboardSettingsC
     public function settingsKeys(): array
     {
         return [
-            ['key' => 'site_search_overview', 'label' => 'Search overview', 'group' => 'Site search'],
-            ['key' => 'top_searches', 'label' => 'Top searches', 'group' => 'Site search'],
-            ['key' => 'trending_searches', 'label' => 'Trending searches', 'group' => 'Site search'],
-            ['key' => 'zero_result_searches', 'label' => 'Zero result searches', 'group' => 'Site search'],
+            [
+                'key' => 'site_search_overview',
+                'label' => __('capell-site-search::dashboard.search_overview'),
+                'group' => __('capell-site-search::dashboard.group'),
+            ],
+            [
+                'key' => 'top_searches',
+                'label' => __('capell-site-search::dashboard.top_searches'),
+                'group' => __('capell-site-search::dashboard.group'),
+            ],
+            [
+                'key' => 'trending_searches',
+                'label' => __('capell-site-search::dashboard.trending_searches'),
+                'group' => __('capell-site-search::dashboard.group'),
+            ],
+            [
+                'key' => 'zero_result_searches',
+                'label' => __('capell-site-search::dashboard.zero_result_searches'),
+                'group' => __('capell-site-search::dashboard.group'),
+            ],
         ];
     }
 }

@@ -38,9 +38,9 @@ final class BuildTrendingSearchesQueryAction
                 );
             })
             ->filter(fn (SearchTermSummaryData $summary): bool => $summary->trendPercentage > 0.0)
-            ->sortByDesc([
-                fn (SearchTermSummaryData $summary): float => $summary->trendPercentage,
-                fn (SearchTermSummaryData $summary): int => $summary->searches,
+            ->sortBy([
+                ['trendPercentage', 'desc'],
+                ['searches', 'desc'],
             ])
             ->values();
 
