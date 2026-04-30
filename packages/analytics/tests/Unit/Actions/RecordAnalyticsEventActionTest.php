@@ -58,6 +58,32 @@ it('stores granular uk or europe events when latest consent allows analytics', f
         ->and($event?->visit_id)->toBe($visit->getKey());
 });
 
+it('skips uk or europe events when the latest consent revokes analytics', function (): void {
+    $visit = AnalyticsVisit::factory()->create([
+        'consent_region' => AnalyticsConsentRegion::UkOrEurope,
+        'consent_status' => AnalyticsConsentStatus::RejectedNonEssential,
+    ]);
+
+    AnalyticsConsent::factory()->create([
+        'visit_id' => $visit->getKey(),
+        'status' => AnalyticsConsentStatus::Granular,
+        'categories' => new AnalyticsConsentData(analytics: true),
+        'decided_at' => now()->subMinute()->toImmutable(),
+    ]);
+
+    AnalyticsConsent::factory()->create([
+        'visit_id' => $visit->getKey(),
+        'status' => AnalyticsConsentStatus::RejectedNonEssential,
+        'categories' => new AnalyticsConsentData(analytics: false),
+        'decided_at' => now()->toImmutable(),
+    ]);
+
+    $event = RecordAnalyticsEventAction::run($visit->uuid, analyticsEventData());
+
+    expect($event)->toBeNull()
+        ->and(AnalyticsEvent::query()->count())->toBe(0);
+});
+
 it('requires consent for outside-region events when configured globally', function (): void {
     config()->set('capell-analytics.require_consent_for_all_regions', true);
 

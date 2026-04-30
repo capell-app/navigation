@@ -10,6 +10,7 @@ use Capell\Analytics\Actions\RecordCustomActionAction;
 use Capell\Analytics\Actions\RecordPageViewAction;
 use Capell\Analytics\Data\AnalyticsEventData;
 use Capell\Analytics\Enums\AnalyticsEventType;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
@@ -22,7 +23,7 @@ class AnalyticsBeaconController
             'visit_id' => ['nullable', 'string', 'max:80'],
             'events' => ['required', 'array', 'max:25'],
             'events.*.type' => ['required', Rule::enum(AnalyticsEventType::class)],
-            'events.*.url' => ['required', 'url', 'max:2048'],
+            'events.*.url' => ['required', 'url', 'max:512', $this->pathMaxRule()],
             'events.*.title' => ['nullable', 'string', 'max:255'],
             'events.*.occurred_at' => ['nullable', 'date'],
             'events.*.event_name' => ['nullable', 'string', 'max:100'],
@@ -33,7 +34,8 @@ class AnalyticsBeaconController
             'events.*.viewport_y' => ['nullable', 'integer'],
             'events.*.document_x' => ['nullable', 'integer'],
             'events.*.document_y' => ['nullable', 'integer'],
-            'events.*.metadata' => ['nullable', 'array'],
+            'events.*.metadata' => ['nullable', 'array:nearest_landmark'],
+            'events.*.metadata.nearest_landmark' => ['nullable', 'string', 'max:255'],
         ]);
 
         $visitUuid = isset($validated['visit_id']) && is_string($validated['visit_id'])
@@ -58,5 +60,20 @@ class AnalyticsBeaconController
         }
 
         return response()->noContent();
+    }
+
+    private function pathMaxRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            if (! is_string($value)) {
+                return;
+            }
+
+            $path = parse_url($value, PHP_URL_PATH);
+
+            if (is_string($path) && mb_strlen($path) > 512) {
+                $fail("The {$attribute} path must not be greater than 512 characters.");
+            }
+        };
     }
 }

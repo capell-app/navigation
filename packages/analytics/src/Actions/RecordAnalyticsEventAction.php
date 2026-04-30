@@ -114,11 +114,15 @@ final class RecordAnalyticsEventAction
 
     private function hasAnalyticsConsent(AnalyticsVisit $visit): bool
     {
-        return $visit->consent_status === AnalyticsConsentStatus::AcceptedAll
-            || $visit->consents()
-                ->latest('decided_at')
-                ->get()
-                ->contains(fn (AnalyticsConsent $consent): bool => $consent->categories->analytics);
+        $latestConsent = $visit->consents()
+            ->latest('decided_at')
+            ->first();
+
+        if ($latestConsent instanceof AnalyticsConsent) {
+            return $latestConsent->categories->analytics;
+        }
+
+        return $visit->consent_status === AnalyticsConsentStatus::AcceptedAll;
     }
 
     private function occurredAt(?string $occurredAt): Carbon
