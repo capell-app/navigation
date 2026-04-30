@@ -41,8 +41,32 @@ Version 1 excludes:
 - Public form analytics.
 - Drag-and-drop layout controls beyond a simple field ordering UI.
 - Built-in CRM, email marketing, or webhook delivery.
+- Mosaic widgets and newsletter-specific behavior inside the core Forms package.
 
 Those exclusions keep the package focused and make future additions deliberate.
+
+## Dependent Packages
+
+Forms should support dependent packages that need a submission pipeline without forcing those features into the core package.
+
+The first dependent package should be **Newsletter**:
+
+- Composer package: `capell-app/newsletter`
+- Namespace: `Capell\Newsletter`
+- Package directory: `packages/newsletter`
+- Depends on: `capell-app/forms` and `capell-app/mosaic`
+
+Newsletter owns the page-builder experience for newsletter signup:
+
+- Registers a Mosaic widget for newsletter signup.
+- Creates or resolves a default `newsletter-signup` form.
+- Renders the signup widget through Mosaic while submitting through Forms.
+- Stores submissions in the Forms inbox.
+- Adds newsletter-specific metadata such as source widget key, page URL, and optional audience/tag values.
+
+Newsletter should not ship email marketing provider integrations in version 1. It can dispatch a newsletter-specific event after a successful Forms submission so projects can connect Mailchimp, Campaign Monitor, HubSpot, or another provider in application code.
+
+This establishes the package pattern for future Mosaic-dependent form experiences: keep Forms generic, and put specialised widgets in separate packages that depend on Forms and Mosaic.
 
 ## Architecture
 
@@ -214,6 +238,7 @@ vendor/bin/pest packages/forms/tests
 7. Add Filament resources for forms and inbox.
 8. Add frontend rendering and submission handling.
 9. Add package translations and docs.
+10. Add the separate Newsletter package with a Mosaic newsletter signup widget.
 
 This order keeps the model and action layer stable before the admin and frontend surfaces are added.
 

@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the existing `capell-app/forms` stub into a small Capell package for editor-managed forms, Livewire-backed frontend submission, stored submissions, and an admin submission inbox.
+**Goal:** Build the existing `capell-app/forms` stub into a small Capell package for editor-managed forms, Livewire-backed frontend submission, stored submissions, and an admin submission inbox, then add a separate Newsletter package that depends on Forms and Mosaic for the newsletter signup widget.
 
-**Architecture:** Keep all behavior in Actions, all cross-layer structures in Spatie Data objects, all persisted option values in enums, and all admin UI in the established Filament Resource/Schemas/Tables/Pages split. The frontend surface is a Blade component that mounts one package Livewire component; projects customise markup by overriding views and customise side effects by listening to `FormSubmitted`.
+**Architecture:** Keep all Forms behavior in Actions, all cross-layer structures in Spatie Data objects, all persisted option values in enums, and all admin UI in the established Filament Resource/Schemas/Tables/Pages split. The Forms frontend surface is a Blade component that mounts one package Livewire component; projects customise markup by overriding views and customise side effects by listening to `FormSubmitted`. Mosaic-specific form experiences live in dependent packages, starting with `capell-app/newsletter`, so Forms does not depend on Mosaic.
 
 **Tech Stack:** PHP 8.2, Laravel, Capell Core/Admin/Frontend, Filament, Livewire, Spatie Laravel Data, Lorisleiva Actions, Pest.
 
@@ -77,6 +77,20 @@
 - `packages/forms/tests/Integration/Models/SubmissionModelTest.php`
 - `packages/forms/tests/Unit/Actions/BuildFormValidationRulesActionTest.php`
 - `packages/forms/tests/Unit/Data/FormFieldDataTest.php`
+- `packages/newsletter/composer.json`
+- `packages/newsletter/capell.json`
+- `packages/newsletter/resources/lang/en/generic.php`
+- `packages/newsletter/resources/lang/en/package.php`
+- `packages/newsletter/resources/views/components/widget/newsletter-signup.blade.php`
+- `packages/newsletter/src/Actions/CreateNewsletterSignupFormAction.php`
+- `packages/newsletter/src/Actions/CreateNewsletterSignupWidgetAction.php`
+- `packages/newsletter/src/Events/NewsletterSignupSubmitted.php`
+- `packages/newsletter/src/Filament/Configurators/Widgets/NewsletterSignupWidgetConfigurator.php`
+- `packages/newsletter/src/Listeners/DispatchNewsletterSignupSubmittedListener.php`
+- `packages/newsletter/src/Providers/NewsletterServiceProvider.php`
+- `packages/newsletter/tests/NewsletterTestCase.php`
+- `packages/newsletter/tests/Integration/CreateNewsletterSignupWidgetActionTest.php`
+- `packages/newsletter/tests/Unit/ManifestRequirementsTest.php`
 
 ---
 
@@ -2772,9 +2786,562 @@ git commit -m "docs: document forms package"
 
 ---
 
+## Task 10: Newsletter Signup Package
+
+**Files:**
+
+- Create: `packages/newsletter/composer.json`
+- Create: `packages/newsletter/capell.json`
+- Create: `packages/newsletter/resources/lang/en/generic.php`
+- Create: `packages/newsletter/resources/lang/en/package.php`
+- Create: `packages/newsletter/resources/views/components/widget/newsletter-signup.blade.php`
+- Create: `packages/newsletter/src/Actions/CreateNewsletterSignupFormAction.php`
+- Create: `packages/newsletter/src/Actions/CreateNewsletterSignupWidgetAction.php`
+- Create: `packages/newsletter/src/Events/NewsletterSignupSubmitted.php`
+- Create: `packages/newsletter/src/Filament/Configurators/Widgets/NewsletterSignupWidgetConfigurator.php`
+- Create: `packages/newsletter/src/Listeners/DispatchNewsletterSignupSubmittedListener.php`
+- Create: `packages/newsletter/src/Providers/NewsletterServiceProvider.php`
+- Create: `packages/newsletter/tests/NewsletterTestCase.php`
+- Create: `packages/newsletter/tests/Integration/CreateNewsletterSignupWidgetActionTest.php`
+- Create: `packages/newsletter/tests/Unit/ManifestRequirementsTest.php`
+
+- [ ] **Step 1: Create package manifests**
+
+Create `packages/newsletter/composer.json`:
+
+```json
+{
+    "name": "capell-app/newsletter",
+    "description": "Newsletter signup widgets for Capell",
+    "keywords": [
+        "capell",
+        "newsletter",
+        "forms",
+        "mosaic",
+        "laravel",
+        "cms"
+    ],
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "capell-app/forms": "*",
+        "capell-app/mosaic": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Capell\\Newsletter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Capell\\Newsletter\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Capell\\Newsletter\\Providers\\NewsletterServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "prefer-stable": true
+}
+```
+
+Create `packages/newsletter/capell.json`:
+
+```json
+{
+    "name": "capell-app/newsletter",
+    "kind": "package",
+    "capell-version": "^4.0",
+    "contexts": ["admin", "frontend"],
+    "requires": ["capell-app/forms", "capell-app/mosaic"],
+    "providers": {
+        "shared": ["Capell\\Newsletter\\Providers\\NewsletterServiceProvider"]
+    }
+}
+```
+
+- [ ] **Step 2: Write manifest tests**
+
+Create `packages/newsletter/tests/Unit/ManifestRequirementsTest.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+it('declares forms and mosaic as package requirements', function (): void {
+    $manifest = json_decode(
+        file_get_contents(__DIR__ . '/../../capell.json'),
+        associative: true,
+    );
+
+    expect($manifest['requires'])->toContain('capell-app/forms')
+        ->and($manifest['requires'])->toContain('capell-app/mosaic');
+});
+```
+
+- [ ] **Step 3: Add package translations**
+
+Create `packages/newsletter/resources/lang/en/generic.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'newsletter' => 'Newsletter',
+    'newsletter_signup' => 'Newsletter signup',
+    'email' => 'Email address',
+    'intro' => 'Intro',
+    'submit' => 'Subscribe',
+    'success' => 'You are signed up.',
+];
+```
+
+Create `packages/newsletter/resources/lang/en/package.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'description' => 'Newsletter signup widgets powered by Forms and Mosaic.',
+];
+```
+
+- [ ] **Step 4: Add service provider**
+
+Create `packages/newsletter/src/Providers/NewsletterServiceProvider.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Providers;
+
+use Capell\Core\Data\VendorAssetData;
+use Capell\Core\Facades\CapellCore;
+use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
+use Capell\Forms\Events\FormSubmitted;
+use Capell\Newsletter\Listeners\DispatchNewsletterSignupSubmittedListener;
+use Composer\InstalledVersions;
+use Illuminate\Support\Facades\Event;
+use Spatie\LaravelPackageTools\Package;
+
+class NewsletterServiceProvider extends AbstractPackageServiceProvider
+{
+    public static string $name = 'capell-newsletter';
+
+    public static string $packageName = 'capell-app/newsletter';
+
+    public function configurePackage(Package $package): void
+    {
+        $package
+            ->name(self::$name)
+            ->hasViews(self::$name)
+            ->hasTranslations();
+    }
+
+    public function registeringPackage(): void
+    {
+        $this
+            ->registerPackageMetadata()
+            ->registerPackageAssets()
+            ->registerListeners();
+    }
+
+    private function registerPackageMetadata(): self
+    {
+        CapellCore::registerPackage(
+            static::$packageName,
+            type: static::getType(),
+            serviceProviderClass: static::class,
+            path: realpath(__DIR__ . '/../..'),
+            version: $this->getVersion(),
+            description: fn (): string => __('capell-newsletter::package.description'),
+        );
+
+        return $this;
+    }
+
+    private function registerPackageAssets(): self
+    {
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindSource('resources/views/**/*.blade.php', static::$packageName),
+        );
+
+        return $this;
+    }
+
+    private function registerListeners(): self
+    {
+        Event::listen(FormSubmitted::class, DispatchNewsletterSignupSubmittedListener::class);
+
+        return $this;
+    }
+
+    private function getVersion(): string
+    {
+        if (! class_exists(InstalledVersions::class)) {
+            return 'dev';
+        }
+
+        if (! InstalledVersions::isInstalled(static::$packageName)) {
+            return 'dev';
+        }
+
+        return InstalledVersions::getPrettyVersion(static::$packageName) ?? 'dev';
+    }
+}
+```
+
+- [ ] **Step 5: Create default newsletter form action**
+
+Create `packages/newsletter/src/Actions/CreateNewsletterSignupFormAction.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Actions;
+
+use Capell\Forms\Models\Form;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+class CreateNewsletterSignupFormAction
+{
+    use AsAction;
+
+    public function handle(?int $siteId = null): Form
+    {
+        return Form::query()->updateOrCreate([
+            'site_id' => $siteId,
+            'handle' => 'newsletter-signup',
+        ], [
+            'name' => __('capell-newsletter::generic.newsletter_signup'),
+            'description' => null,
+            'schema' => [
+                [
+                    'key' => 'email',
+                    'label' => __('capell-newsletter::generic.email'),
+                    'type' => 'email',
+                    'required' => true,
+                    'validation_rules' => ['email'],
+                ],
+            ],
+            'settings' => [
+                'success_message' => __('capell-newsletter::generic.success'),
+                'store_submissions' => true,
+            ],
+            'is_active' => true,
+        ]);
+    }
+}
+```
+
+- [ ] **Step 6: Create newsletter Mosaic widget action**
+
+Create `packages/newsletter/src/Actions/CreateNewsletterSignupWidgetAction.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Actions;
+
+use Capell\Core\Models\Type;
+use Capell\Mosaic\Enums\LayoutTypeEnum;
+use Capell\Mosaic\Enums\WidgetTypeEnum;
+use Capell\Mosaic\Filament\Configurators\Types\WidgetTypeConfigurator;
+use Capell\Mosaic\Models\Widget;
+use Capell\Newsletter\Filament\Configurators\Widgets\NewsletterSignupWidgetConfigurator;
+use Lorisleiva\Actions\Concerns\AsAction;
+
+class CreateNewsletterSignupWidgetAction
+{
+    use AsAction;
+
+    public function handle(): Widget
+    {
+        return Widget::query()->updateOrCreate([
+            'key' => 'newsletter-signup',
+        ], [
+            'name' => __('capell-newsletter::generic.newsletter_signup'),
+            'type_id' => $this->widgetType()->id,
+            'meta' => [
+                'component' => 'capell-newsletter::widget.newsletter-signup',
+                'form_handle' => 'newsletter-signup',
+            ],
+            'admin' => [
+                'icon' => 'heroicon-o-envelope',
+                'configurator' => NewsletterSignupWidgetConfigurator::getKey(),
+            ],
+        ]);
+    }
+
+    private function widgetType(): Type
+    {
+        return Type::query()->firstOrCreate([
+            'key' => WidgetTypeEnum::Default,
+            'type' => LayoutTypeEnum::Widget,
+        ], [
+            'name' => __('capell-newsletter::generic.newsletter'),
+            'admin' => [
+                'type_configurator' => WidgetTypeConfigurator::getKey(),
+                'configurator' => NewsletterSignupWidgetConfigurator::getKey(),
+                'icon' => 'heroicon-o-envelope',
+            ],
+        ]);
+    }
+}
+```
+
+- [ ] **Step 7: Add widget configurator**
+
+Create `packages/newsletter/src/Filament/Configurators/Widgets/NewsletterSignupWidgetConfigurator.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Filament\Configurators\Widgets;
+
+use Capell\Mosaic\Filament\Configurators\Widgets\DefaultWidgetConfigurator;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Tabs\Tab;
+
+class NewsletterSignupWidgetConfigurator extends DefaultWidgetConfigurator
+{
+    protected function detailsTab(): Tab
+    {
+        return Tab::make('details')
+            ->label(__('capell-admin::tab.details'))
+            ->icon('heroicon-o-information-circle')
+            ->statePath('meta')
+            ->schema([
+                TextInput::make('heading')
+                    ->label(__('capell-newsletter::generic.newsletter_signup')),
+                Textarea::make('intro')
+                    ->label(__('capell-newsletter::generic.intro')),
+                TextInput::make('form_handle')
+                    ->label(__('capell-forms::form.handle'))
+                    ->default('newsletter-signup')
+                    ->required(),
+                TextInput::make('submit_label')
+                    ->label(__('capell-newsletter::generic.submit'))
+                    ->default(fn (): string => __('capell-newsletter::generic.submit')),
+            ]);
+    }
+}
+```
+
+The configurator stores values in widget meta and does not create submissions itself.
+
+- [ ] **Step 8: Add widget view**
+
+Create `packages/newsletter/resources/views/components/widget/newsletter-signup.blade.php`:
+
+```blade
+@props([
+    'widget',
+    'widgetData' => [],
+])
+
+@php
+    $formHandle = $widgetData['form_handle'] ?? ($widget->meta['form_handle'] ?? 'newsletter-signup');
+@endphp
+
+<section {{ $attributes }}>
+    @if (! empty($widgetData['heading']))
+        <h2>{{ $widgetData['heading'] }}</h2>
+    @endif
+
+    @if (! empty($widgetData['intro']))
+        <p>{{ $widgetData['intro'] }}</p>
+    @endif
+
+    <x-capell-forms::form :handle="$formHandle" />
+</section>
+```
+
+- [ ] **Step 9: Add newsletter event**
+
+Create `packages/newsletter/src/Events/NewsletterSignupSubmitted.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Events;
+
+use Capell\Forms\Models\Submission;
+use Illuminate\Foundation\Events\Dispatchable;
+
+class NewsletterSignupSubmitted
+{
+    use Dispatchable;
+
+    public function __construct(
+        public Submission $submission,
+    ) {}
+}
+```
+
+Create `packages/newsletter/src/Listeners/DispatchNewsletterSignupSubmittedListener.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Listeners;
+
+use Capell\Forms\Events\FormSubmitted;
+use Capell\Newsletter\Events\NewsletterSignupSubmitted;
+
+class DispatchNewsletterSignupSubmittedListener
+{
+    public function handle(FormSubmitted $event): void
+    {
+        if ($event->form->handle !== 'newsletter-signup') {
+            return;
+        }
+
+        NewsletterSignupSubmitted::dispatch($event->submission);
+    }
+}
+```
+
+Do not add email marketing provider integrations.
+
+- [ ] **Step 10: Add action tests**
+
+Create `packages/newsletter/tests/NewsletterTestCase.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Newsletter\Tests;
+
+use Capell\Admin\Providers\AdminServiceProvider;
+use Capell\Core\Facades\CapellCore;
+use Capell\Forms\Providers\FormsServiceProvider;
+use Capell\Frontend\Providers\FrontendServiceProvider;
+use Capell\Mosaic\Providers\MosaicServiceProvider;
+use Capell\Newsletter\Providers\NewsletterServiceProvider;
+use Capell\Tests\AbstractTestCase;
+use Livewire\LivewireServiceProvider;
+use Override;
+
+class NewsletterTestCase extends AbstractTestCase
+{
+    protected function getPackageServiceName(): string
+    {
+        return 'capell-newsletter';
+    }
+
+    /**
+     * @return class-string[]
+     */
+    #[Override]
+    protected function getPackageProviders(mixed $app): array
+    {
+        return [
+            ...parent::getPackageProviders($app),
+            AdminServiceProvider::class,
+            FrontendServiceProvider::class,
+            FormsServiceProvider::class,
+            MosaicServiceProvider::class,
+            NewsletterServiceProvider::class,
+            LivewireServiceProvider::class,
+        ];
+    }
+
+    #[Override]
+    protected function getEnvironmentSetUp(mixed $app): void
+    {
+        parent::getEnvironmentSetUp($app);
+
+        CapellCore::registerPackage(FormsServiceProvider::$packageName, path: realpath(__DIR__ . '/../../forms'));
+        CapellCore::registerPackage(MosaicServiceProvider::$packageName, path: realpath(__DIR__ . '/../../mosaic'));
+        CapellCore::registerPackage(NewsletterServiceProvider::$packageName, path: realpath(__DIR__ . '/..'));
+
+        CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(FormsServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(NewsletterServiceProvider::$packageName);
+    }
+}
+```
+
+Create `packages/newsletter/tests/Integration/CreateNewsletterSignupWidgetActionTest.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Capell\Forms\Models\Form;
+use Capell\Mosaic\Models\Widget;
+use Capell\Newsletter\Actions\CreateNewsletterSignupFormAction;
+use Capell\Newsletter\Actions\CreateNewsletterSignupWidgetAction;
+
+it('creates the default newsletter signup form', function (): void {
+    $form = CreateNewsletterSignupFormAction::run();
+
+    expect($form)->toBeInstanceOf(Form::class)
+        ->and($form->handle)->toBe('newsletter-signup')
+        ->and($form->schema->first()->key)->toBe('email');
+});
+
+it('creates the newsletter signup mosaic widget', function (): void {
+    $widget = CreateNewsletterSignupWidgetAction::run();
+
+    expect($widget)->toBeInstanceOf(Widget::class)
+        ->and($widget->key)->toBe('newsletter-signup')
+        ->and($widget->meta['component'])->toBe('capell-newsletter::widget.newsletter-signup')
+        ->and($widget->meta['form_handle'])->toBe('newsletter-signup');
+});
+```
+
+Run:
+
+```bash
+vendor/bin/pest packages/newsletter/tests
+```
+
+Expected: pass.
+
+- [ ] **Step 11: Commit**
+
+```bash
+git add packages/newsletter
+git commit -m "feat: add newsletter signup package"
+```
+
+---
+
 ## Self-Review Checklist
 
 - The plan implements every spec item: editor-managed forms, compact field types, frontend rendering, validation, stored submissions, inbox workflows, events, translations, docs, and tests.
+- The Newsletter package is separate from Forms and depends on both Forms and Mosaic for the signup widget.
 - The plan keeps excluded v1 features out: uploads, payments, multi-step forms, analytics, conditional logic, and CRM/webhook delivery.
 - The plan uses Capell conventions: strict types, Actions, Data objects, enums for persisted values, package translations, Filament labels via methods/configurators, and direct package test commands.
 - The plan does not modify unrelated packages.
