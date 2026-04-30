@@ -10,9 +10,11 @@ use Capell\Analytics\Models\AnalyticsEvent;
 use Capell\Analytics\Models\AnalyticsVisit;
 use Capell\Analytics\Settings\AnalyticsSettings;
 use Capell\Analytics\Settings\AnalyticsSettingsMigrationProvider;
+use Capell\Analytics\Support\RenderHooks\RegisterAnalyticsTrackerHook;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Capell\Core\Support\Settings\SettingsSchemaRegistry;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Spatie\LaravelPackageTools\Package;
 
 class AnalyticsServiceProvider extends AbstractPackageServiceProvider
@@ -53,6 +55,10 @@ class AnalyticsServiceProvider extends AbstractPackageServiceProvider
 
     public function packageBooted(): void
     {
+        if ((bool) config('capell-analytics.enabled', true) && $this->app->bound(RenderHookRegistry::class)) {
+            $this->app->make(RegisterAnalyticsTrackerHook::class)->register();
+        }
+
         if (! $this->app->runningInConsole()) {
             return;
         }
