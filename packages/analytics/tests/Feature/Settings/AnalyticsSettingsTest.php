@@ -12,9 +12,28 @@ uses(AnalyticsTestCase::class);
 it('loads analytics settings defaults', function (): void {
     /** @var SettingsMigrator $settingsMigrator */
     $settingsMigrator = app(SettingsMigrator::class);
+    $expectedKeys = [
+        'analytics.enabled',
+        'analytics.track_page_views',
+        'analytics.track_clicks',
+        'analytics.track_forms',
+        'analytics.automatic_click_tracking',
+        'analytics.require_consent_for_all_regions',
+        'analytics.default_consent_region',
+        'analytics.policy_version',
+        'analytics.retention_days',
+        'analytics.hash_visitor_data',
+        'analytics.hash_salt',
+        'analytics.ignored_paths',
+        'analytics.ignored_selectors',
+        'analytics.route_prefix',
+    ];
 
-    expect($settingsMigrator->exists('analytics.enabled'))->toBeTrue()
-        ->and(app(AnalyticsSettings::class)->retention_days)->toBe(365);
+    foreach ($expectedKeys as $expectedKey) {
+        expect($settingsMigrator->exists($expectedKey))->toBeTrue();
+    }
+
+    expect(app(AnalyticsSettings::class)->retention_days)->toBe(365);
 });
 
 it('normalizes textarea settings lists', function (): void {
