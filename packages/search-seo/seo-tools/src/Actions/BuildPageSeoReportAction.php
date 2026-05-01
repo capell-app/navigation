@@ -111,7 +111,7 @@ final class BuildPageSeoReportAction
             socialPreview: $socialPreview,
             issues: $issues,
             passedChecks: [],
-            internalLinkSuggestions: [],
+            internalLinkSuggestions: SuggestInternalLinksAction::run($page, $site, $language),
             schemaReports: [],
             redirectOpportunities: [],
             searchConsoleInsights: [],
