@@ -16,7 +16,12 @@ final class BuildSEOAuditQueryAction
     public function handle(): Builder
     {
         $query = Page::query()
-            ->with(['site', 'translations'])
+            ->with([
+                'pageUrl.siteDomain',
+                'site.language',
+                'translation.language',
+                'translations.language',
+            ])
             ->where(function (Builder $query): void {
                 $query->whereDoesntHave('translations')
                     ->orWhereHas('translations', function (Builder $query): void {
