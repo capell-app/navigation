@@ -13,6 +13,7 @@ use Capell\Workspaces\Models\Workspace;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 final class BuildContentSchedulerEventsAction
@@ -67,7 +68,7 @@ final class BuildContentSchedulerEventsAction
                     $events[] = new SchedulerEventData(
                         id: 'page-' . $page->id . '-publish',
                         sourceType: 'page',
-                        sourceId: (int) $page->id,
+                        sourceId: $page->id,
                         title: $page->name,
                         eventType: SchedulerEventTypeEnum::Publish,
                         scheduledFor: $page->visible_from,
@@ -81,7 +82,7 @@ final class BuildContentSchedulerEventsAction
                     $events[] = new SchedulerEventData(
                         id: 'page-' . $page->id . '-unpublish',
                         sourceType: 'page',
-                        sourceId: (int) $page->id,
+                        sourceId: $page->id,
                         title: $page->name,
                         eventType: SchedulerEventTypeEnum::Unpublish,
                         scheduledFor: $page->visible_until,
@@ -100,36 +101,64 @@ final class BuildContentSchedulerEventsAction
      */
     private function workspaceEvents(): Collection
     {
+        $schedulerColumns = $this->workspaceSchedulerColumns();
+
+        if ($schedulerColumns === []) {
+            return collect();
+        }
+
         return Workspace::query()
-            ->where(function (Builder $query): void {
-                $query->where('publish_at', '>', now())
-                    ->orWhere('unpublish_at', '>', now())
-                    ->orWhere('embargo_until', '>', now())
-                    ->orWhere('review_reminder_at', '>', now());
+            ->where(function (Builder $query) use ($schedulerColumns): void {
+                foreach (array_values($schedulerColumns) as $index => $column) {
+                    if ($index === 0) {
+                        $query->where($column, '>', now());
+
+                        continue;
+                    }
+
+                    $query->orWhere($column, '>', now());
+                }
             })
             ->get()
-            ->flatMap(function (Workspace $workspace): array {
+            ->flatMap(function (Workspace $workspace) use ($schedulerColumns): array {
                 $events = [];
-                $recordUrl = WorkspaceResource::getUrl('index');
+                $recordUrl = WorkspaceResource::getUrl('index', [
+                    'tableSearch' => $workspace->name,
+                ]);
 
-                if ($workspace->publish_at !== null && $workspace->publish_at->isFuture()) {
+                if (in_array('publish_at', $schedulerColumns, true) && $workspace->publish_at !== null && $workspace->publish_at->isFuture()) {
                     $events[] = $this->workspaceEvent($workspace, SchedulerEventTypeEnum::Publish, $workspace->publish_at, 'workspace_publish', $recordUrl);
                 }
 
-                if ($workspace->unpublish_at !== null && $workspace->unpublish_at->isFuture()) {
-                    $events[] = $this->workspaceEvent($workspace, SchedulerEventTypeEnum::Unpublish, $workspace->unpublish_at, 'workspace_unpublish', $recordUrl);
+                if (in_array('unpublish_at', $schedulerColumns, true) && $workspace->unpublish_at !== null && $workspace->unpublish_at->isFuture()) {
+                    $events[] = $this->workspaceEvent($workspace, SchedulerEventTypeEnum::Unpublish, $workspace->unpublish_at, 'workspace_takedown_reminder', $recordUrl);
                 }
 
-                if ($workspace->embargo_until !== null && $workspace->embargo_until->isFuture()) {
+                if (in_array('embargo_until', $schedulerColumns, true) && $workspace->embargo_until !== null && $workspace->embargo_until->isFuture()) {
                     $events[] = $this->workspaceEvent($workspace, SchedulerEventTypeEnum::Embargo, $workspace->embargo_until, 'workspace_embargo', $recordUrl);
                 }
 
-                if ($workspace->review_reminder_at !== null && $workspace->review_reminder_at->isFuture()) {
+                if (in_array('review_reminder_at', $schedulerColumns, true) && $workspace->review_reminder_at !== null && $workspace->review_reminder_at->isFuture()) {
                     $events[] = $this->workspaceEvent($workspace, SchedulerEventTypeEnum::ReviewReminder, $workspace->review_reminder_at, 'workspace_review_reminder', $recordUrl);
                 }
 
                 return $events;
             });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function workspaceSchedulerColumns(): array
+    {
+        $columns = Schema::getColumnListing((new Workspace)->getTable());
+
+        return array_values(array_intersect([
+            'publish_at',
+            'unpublish_at',
+            'embargo_until',
+            'review_reminder_at',
+        ], $columns));
     }
 
     private function workspaceEvent(
@@ -142,7 +171,7 @@ final class BuildContentSchedulerEventsAction
         return new SchedulerEventData(
             id: 'workspace-' . $workspace->id . '-' . $eventType->value,
             sourceType: 'workspace',
-            sourceId: (int) $workspace->id,
+            sourceId: $workspace->id,
             title: $workspace->name,
             eventType: $eventType,
             scheduledFor: $scheduledFor,

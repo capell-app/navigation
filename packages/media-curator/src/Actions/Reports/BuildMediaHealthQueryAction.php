@@ -102,16 +102,27 @@ final class BuildMediaHealthQueryAction
 
             $table = $configuredOwnerForeignKey['table'] ?? null;
             $column = $configuredOwnerForeignKey['column'] ?? null;
-
-            if (! is_string($table) || ! is_string($column)) {
+            if (! is_string($table)) {
                 continue;
             }
 
-            if (! $this->isSafeIdentifier($table) || ! $this->isSafeIdentifier($column)) {
+            if (! is_string($column)) {
                 continue;
             }
 
-            if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
+            if (! $this->isSafeIdentifier($table)) {
+                continue;
+            }
+
+            if (! $this->isSafeIdentifier($column)) {
+                continue;
+            }
+
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
+
+            if (! Schema::hasColumn($table, $column)) {
                 continue;
             }
 
@@ -126,7 +137,7 @@ final class BuildMediaHealthQueryAction
 
     private function isSafeIdentifier(string $identifier): bool
     {
-        return preg_match('/^[A-Za-z0-9_]+$/', $identifier) === 1;
+        return preg_match('/^\w+$/', $identifier) === 1;
     }
 
     /**

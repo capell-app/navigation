@@ -54,7 +54,7 @@ function executeGenerateContentPipelineWithHtml(string $html): string
                 return 'keyword';
             }
 
-            public function getPageId(): int|string
+            public function getPageId(): int
             {
                 return 1;
             }

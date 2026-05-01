@@ -54,9 +54,9 @@ it('has concrete translations for analytics widget labels', function (): void {
     ];
 
     foreach ($translationKeys as $translationKey) {
-        $translated = __("capell-analytics::widgets.{$translationKey}");
+        $translated = __('capell-analytics::widgets.' . $translationKey);
 
-        expect($translated)->toBeString()->not->toBe("capell-analytics::widgets.{$translationKey}");
+        expect($translated)->toBeString()->not->toBe('capell-analytics::widgets.' . $translationKey);
     }
 });
 

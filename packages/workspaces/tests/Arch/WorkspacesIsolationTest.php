@@ -6,6 +6,7 @@ use Capell\Core\Console\Commands\DoctorCommand;
 use Capell\Core\Models\Page;
 use Capell\Core\Observers\PageUrlObserver;
 use Capell\Core\Support\Upgrade\EnsureMorphMapUpgradeStep;
+use Symfony\Component\Finder\Finder;
 
 arch('core does not reference Capell\\Workspaces namespace')
     ->expect('Capell\Core')
@@ -27,10 +28,43 @@ arch('workspaces does not import unrelated packages')
     ->not->toUse([
         'Capell\Address',
         'Capell\Assistant',
+        'Capell\Blog',
         'Capell\Forms',
+        'Capell\Mosaic',
+        'Capell\Navigation',
         'Capell\SeoTools',
         'Capell\Themes',
     ]);
+
+it('workspaces source contains no direct plugin package references', function (): void {
+    $packagePath = dirname(__DIR__, 2);
+    $forbiddenNamespaces = [
+        'Capell\\Blog',
+        'Capell\\Mosaic',
+        'Capell\\Navigation',
+    ];
+    $violations = [];
+
+    $files = (new Finder)
+        ->files()
+        ->in($packagePath . '/src')
+        ->name('*.php');
+
+    foreach ($files as $file) {
+        $relativePath = str_replace($packagePath . '/', '', $file->getPathname());
+        $contents = $file->getContents();
+
+        foreach ($forbiddenNamespaces as $namespace) {
+            if (! str_contains($contents, $namespace)) {
+                continue;
+            }
+
+            $violations[] = sprintf('%s references %s', $relativePath, $namespace);
+        }
+    }
+
+    expect($violations)->toBeEmpty();
+});
 
 arch()
     ->expect('Capell\Workspaces')

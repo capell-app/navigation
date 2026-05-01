@@ -32,9 +32,9 @@ final class CampaignCtaBlockResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string $formConfigurator = CampaignCtaBlockForm::class;
+    private static string $formConfigurator = CampaignCtaBlockForm::class;
 
-    protected static string $tableConfigurator = CampaignCtaBlocksTable::class;
+    private static string $tableConfigurator = CampaignCtaBlocksTable::class;
 
     #[Override]
     public static function form(Schema $configurator): Schema

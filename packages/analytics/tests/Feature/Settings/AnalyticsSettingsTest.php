@@ -8,7 +8,7 @@ use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 it('loads analytics settings defaults', function (): void {
     /** @var SettingsMigrator $settingsMigrator */
-    $settingsMigrator = app(SettingsMigrator::class);
+    $settingsMigrator = resolve(SettingsMigrator::class);
     $expectedKeys = [
         'analytics.enabled',
         'analytics.track_page_views',
@@ -30,7 +30,7 @@ it('loads analytics settings defaults', function (): void {
         expect($settingsMigrator->exists($expectedKey))->toBeTrue();
     }
 
-    expect(app(AnalyticsSettings::class)->retention_days)->toBe(365);
+    expect(resolve(AnalyticsSettings::class)->retention_days)->toBe(365);
 });
 
 it('normalizes textarea settings lists', function (): void {

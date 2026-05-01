@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Campaigns\Filament\Resources\CampaignConversionGoals\Schemas;
 
+use Capell\Admin\Data\Configurators\ConfiguratorContextData;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Capell\Campaigns\Enums\ConversionGoalType;
 use Filament\Forms\Components\Select;
@@ -13,7 +14,7 @@ use Filament\Schemas\Schema;
 
 final class CampaignConversionGoalForm implements FormConfigurator
 {
-    public static function configure(Schema $configurator): Schema
+    public static function configure(Schema $configurator, ?ConfiguratorContextData $context = null): Schema
     {
         return $configurator
             ->columns(['default' => 1, 'lg' => 2])

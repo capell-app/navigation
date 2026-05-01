@@ -15,6 +15,6 @@ enum AnalyticsConsentCategory: string implements HasLabel
 
     public function getLabel(): string
     {
-        return __("capell-analytics::consent.categories.{$this->value}");
+        return __('capell-analytics::consent.categories.' . $this->value);
     }
 }

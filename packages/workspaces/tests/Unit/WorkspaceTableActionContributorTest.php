@@ -28,7 +28,6 @@ it('inserts tagged contributor actions after preview and before validate', funct
 
     $tableReflection = new ReflectionClass(WorkspacesTable::class);
     $recordActionsMethod = $tableReflection->getMethod('getRecordActions');
-    $recordActionsMethod->setAccessible(true);
 
     $actionNames = collect($recordActionsMethod->invoke(null))
         ->filter(fn (object $action): bool => method_exists($action, 'getName'))

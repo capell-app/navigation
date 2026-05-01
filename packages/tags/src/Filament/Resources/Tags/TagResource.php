@@ -85,7 +85,7 @@ class TagResource extends Resource
     #[Override]
     public static function getEloquentQuery(): Builder
     {
-        return static::applySiteScope(parent::getEloquentQuery());
+        return self::applySiteScope(parent::getEloquentQuery());
     }
 
     public static function getGloballySearchableAttributes(): array
@@ -95,7 +95,7 @@ class TagResource extends Resource
 
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return static::applySiteScope(parent::getGlobalSearchEloquentQuery())
+        return self::applySiteScope(parent::getGlobalSearchEloquentQuery())
             ->with(['site:id,name']);
     }
 

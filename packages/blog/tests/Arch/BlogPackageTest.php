@@ -9,10 +9,6 @@ use Symfony\Component\Finder\Finder;
 
 it('keeps blog package references inside the blog source package except intentional bridges', function (): void {
     $rootPath = dirname(__DIR__, 4);
-    $allowedPaths = [
-        'packages/mosaic/src/Console/Commands/Hero/DemoCommand.php',
-        'packages/workspaces/src/Providers/WorkspacesServiceProvider.php',
-    ];
     $violations = [];
 
     $files = (new Finder)
@@ -26,10 +22,6 @@ it('keeps blog package references inside the blog source package except intentio
         $relativePath = str_replace($rootPath . '/', '', $file->getPathname());
 
         if (str_starts_with($relativePath, 'packages/blog/src/')) {
-            continue;
-        }
-
-        if (in_array($relativePath, $allowedPaths, true)) {
             continue;
         }
 

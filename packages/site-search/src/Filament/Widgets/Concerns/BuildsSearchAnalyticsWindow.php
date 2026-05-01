@@ -10,7 +10,7 @@ trait BuildsSearchAnalyticsWindow
 {
     protected function getAnalyticsWindow(): SearchAnalyticsWindowData
     {
-        $days = (int) config('capell-site-search.dashboard.default_days', 30);
+        $days = config('capell-site-search.dashboard.default_days', 30);
 
         return new SearchAnalyticsWindowData(
             start: now()->subDays(max(1, $days))->toImmutable(),

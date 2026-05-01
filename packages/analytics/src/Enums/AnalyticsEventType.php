@@ -16,6 +16,6 @@ enum AnalyticsEventType: string implements HasLabel
 
     public function getLabel(): string
     {
-        return __("capell-analytics::settings.event_types.{$this->value}");
+        return __('capell-analytics::settings.event_types.' . $this->value);
     }
 }

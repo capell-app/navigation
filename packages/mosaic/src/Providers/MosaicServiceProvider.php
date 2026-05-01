@@ -59,6 +59,7 @@ use Capell\Mosaic\Support\Interceptors\Layouts\HomeLayoutInterceptor;
 use Capell\Mosaic\Support\Interceptors\Layouts\ResultsLayoutInterceptor;
 use Capell\Mosaic\Support\LayoutModelRegistrar;
 use Capell\Mosaic\Support\Makers\MosaicWidgetMaker;
+use Capell\Workspaces\WorkspaceRegistry;
 use Composer\InstalledVersions;
 use Exception;
 use Filament\Facades\Filament;
@@ -158,7 +159,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
             ->registerPublishCommands()
             ->registerLivewireComponents()
             ->registerBladeComponents()
-            ->registerVendorAssets();
+            ->registerVendorAssets()
+            ->registerWorkspaces();
     }
 
     private function registerModelEvents(): self
@@ -199,8 +201,8 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
             serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             version: $this->getVersion(),
-            setupCommand: 'capell:mosaic-setup',
             description: fn (): string => __('capell-mosaic::package.description'),
+            setupCommand: 'capell:mosaic-setup',
         );
 
         $package = CapellCore::getPackage(static::$packageName);
@@ -458,6 +460,19 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
     private function registerModels(): self
     {
         LayoutModelRegistrar::register();
+
+        return $this;
+    }
+
+    private function registerWorkspaces(): self
+    {
+        if (! class_exists(WorkspaceRegistry::class)) {
+            return $this;
+        }
+
+        WorkspaceRegistry::register(Section::class);
+        WorkspaceRegistry::register(Widget::class);
+        WorkspaceRegistry::register(WidgetAsset::class);
 
         return $this;
     }

@@ -16,7 +16,7 @@ final class ResolveSiteSearchSettingAction
     {
         try {
             if (class_exists(SiteSearchSettings::class)) {
-                $settings = app(SiteSearchSettings::class);
+                $settings = resolve(SiteSearchSettings::class);
                 $settingsValue = data_get($settings, $settingKey);
 
                 if ($settingsValue !== null) {

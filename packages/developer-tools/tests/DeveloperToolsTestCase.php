@@ -10,11 +10,14 @@ use Capell\Core\Facades\CapellCore;
 use Capell\DeveloperTools\Providers\AdminServiceProvider as DeveloperToolsAdminServiceProvider;
 use Capell\DeveloperTools\Providers\DeveloperToolsServiceProvider;
 use Capell\Tests\AbstractTestCase;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Livewire\LivewireServiceProvider;
 use Override;
 
 class DeveloperToolsTestCase extends AbstractTestCase
 {
+    use CreatesAdminUser;
+
     protected function getPackageServiceName(): string
     {
         return 'capell-developer-tools';

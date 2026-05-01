@@ -6,6 +6,8 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use RectorLaravel\Rector\MethodCall\ContainerBindConcreteWithClosureOnlyRector;
 use RectorLaravel\Set\LaravelSetList;
@@ -59,9 +61,13 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         PostIncDecToPreIncDecRector::class,
+        ReadOnlyClassRector::class,
+        ReadOnlyPropertyRector::class,
         // Fix issue in php8.2
         ContainerBindConcreteWithClosureOnlyRector::class,
         NullToStrictStringFuncCallArgRector::class => [
+            __DIR__ . '/packages/analytics/routes/web.php',
+            __DIR__ . '/packages/mosaic/src/Livewire/Filament/Concerns/ManagesAssets.php',
             __DIR__ . '/packages/mosaic/src/Livewire/Widget/Pages.php',
         ],
         __DIR__ . '/tests/.pest',

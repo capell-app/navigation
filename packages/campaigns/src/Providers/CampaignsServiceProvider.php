@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Capell\Campaigns\Providers;
 
+use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
+use Capell\Campaigns\Console\Commands\InstallCampaignLayoutsCommand;
+use Capell\Campaigns\Enums\CampaignWidgetComponentEnum;
+use Capell\Campaigns\Filament\Extenders\Page\CampaignPageSchemaExtender;
 use Capell\Campaigns\Listeners\RecordFormSubmissionConversion;
+use Capell\Campaigns\Listeners\SyncCampaignLandingPageFromPage;
 use Capell\Campaigns\Models\CampaignConversion;
 use Capell\Campaigns\Models\CampaignConversionGoal;
 use Capell\Campaigns\Models\CampaignCtaBlock;
 use Capell\Campaigns\Models\CampaignGroup;
 use Capell\Campaigns\Models\CampaignLandingPage;
 use Capell\Core\Data\VendorAssetData;
+use Capell\Core\Events\PageSaved;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
 use Composer\InstalledVersions;
@@ -30,6 +36,7 @@ final class CampaignsServiceProvider extends AbstractPackageServiceProvider
             ->hasConfigFile('capell-campaigns')
             ->hasTranslations()
             ->hasViews(self::$name)
+            ->hasCommand(InstallCampaignLayoutsCommand::class)
             ->hasMigrations([
                 'create_campaign_groups_table',
                 'create_campaign_landing_pages_table',
@@ -44,6 +51,8 @@ final class CampaignsServiceProvider extends AbstractPackageServiceProvider
         $this
             ->registerPackageMetadata()
             ->registerModels()
+            ->registerComponents()
+            ->registerSchemaExtenders()
             ->registerPackageAssets()
             ->registerProtectedTables()
             ->registerListeners();
@@ -85,6 +94,21 @@ final class CampaignsServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
+    private function registerComponents(): self
+    {
+        CapellCore::registerComponents('Widget', CampaignWidgetComponentEnum::cases());
+
+        return $this;
+    }
+
+    private function registerSchemaExtenders(): self
+    {
+        $this->app->singleton(CampaignPageSchemaExtender::class);
+        $this->app->tag(CampaignPageSchemaExtender::class, PageSchemaExtender::TAG);
+
+        return $this;
+    }
+
     private function registerProtectedTables(): self
     {
         $tableNames = config('capell-campaigns.tables', []);
@@ -97,9 +121,11 @@ final class CampaignsServiceProvider extends AbstractPackageServiceProvider
             if (! is_string($tableName)) {
                 continue;
             }
+
             if ($tableName === '') {
                 continue;
             }
+
             CapellCore::registerProtectedTable(fn (): string => $tableName);
         }
 
@@ -108,8 +134,12 @@ final class CampaignsServiceProvider extends AbstractPackageServiceProvider
 
     private function registerListeners(): self
     {
-        if (class_exists('Capell\\Forms\\Events\\FormSubmitted')) {
-            Event::listen('Capell\\Forms\\Events\\FormSubmitted', RecordFormSubmissionConversion::class);
+        Event::listen(PageSaved::class, SyncCampaignLandingPageFromPage::class);
+
+        $formSubmittedEvent = implode('\\', ['Capell', 'Forms', 'Events', 'FormSubmitted']);
+
+        if (class_exists($formSubmittedEvent)) {
+            Event::listen($formSubmittedEvent, RecordFormSubmissionConversion::class);
         }
 
         return $this;

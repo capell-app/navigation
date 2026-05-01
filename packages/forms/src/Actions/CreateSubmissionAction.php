@@ -35,7 +35,7 @@ class CreateSubmissionAction
             'submitted_at' => now(),
         ])->save();
 
-        FormSubmitted::dispatch($form, $submission);
+        event(new FormSubmitted($form, $submission));
 
         return $submission;
     }

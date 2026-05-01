@@ -22,6 +22,7 @@ class Submission extends Model
     /** @var array<string> */
     protected $fillable = [
         'form_id',
+        'site_id',
         'payload',
         'meta',
         'status',

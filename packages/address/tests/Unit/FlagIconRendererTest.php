@@ -25,15 +25,15 @@ it('resolves a published blade country flag asset from an iso code', function ()
 });
 
 it('renders a published country flag through the admin renderer contract', function (): void {
-    if (! interface_exists('Capell\\Admin\\Contracts\\Support\\FlagIconRenderer')) {
+    if (! interface_exists(Capell\Admin\Contracts\Support\FlagIconRenderer::class)) {
         $this->markTestSkipped('The installed admin package does not expose the flag renderer contract.');
     }
 
-    app()->singleton('Capell\\Admin\\Contracts\\Support\\FlagIconRenderer', FlagIconRenderer::class);
+    app()->singleton(Capell\Admin\Contracts\Support\FlagIconRenderer::class, FlagIconRenderer::class);
     File::ensureDirectoryExists(public_path('vendor/blade-country-flags'));
     File::put(public_path('vendor/blade-country-flags/4x3-fr.svg'), '<svg></svg>');
 
-    $html = app('Capell\\Admin\\Contracts\\Support\\FlagIconRenderer')
+    $html = resolve(Capell\Admin\Contracts\Support\FlagIconRenderer::class)
         ->render('flag-4x3-fr', 'France', attributes: ['class' => 'h-4'])
         ->toHtml();
 

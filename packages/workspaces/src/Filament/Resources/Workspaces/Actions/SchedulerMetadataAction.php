@@ -27,7 +27,7 @@ class SchedulerMetadataAction extends Action
             ->visible(fn (Workspace $record): bool => ! $record->status->isTerminal())
             ->schema([
                 DateTimePicker::make('unpublish_at')
-                    ->label(__('capell-workspaces::scheduler.fields.unpublish_at'))
+                    ->label(__('capell-workspaces::scheduler.fields.takedown_reminder_at'))
                     ->seconds(false)
                     ->default(fn (Workspace $record): ?CarbonImmutable => $record->unpublish_at),
                 DateTimePicker::make('embargo_until')

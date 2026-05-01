@@ -11,8 +11,12 @@ First-party add-ons for [Capell CMS](https://github.com/capell-app/capell). Inst
 | Drafts, previews, approvals, scheduled publishing | Workspaces         | `capell-app/workspaces`                                                                               |
 | Sitemaps, structured data, AI-assisted SEO        | SEO Tools          | `capell-app/seo-tools`                                                                                |
 | Header, footer, and sidebar menus                 | Navigation         | `capell-app/navigation`                                                                               |
+| Public site keyword search                        | Site Search        | `capell-app/site-search`                                                                              |
+| 301/302 redirects and broken URL reporting        | Redirects          | `capell-app/redirects`                                                                                |
 | Shared tagging across content types               | Tags               | `capell-app/tags`                                                                                     |
 | Editor-managed forms and submissions              | Forms              | `capell-app/forms`                                                                                    |
+| Campaign landing pages and conversion goals       | Campaigns          | `capell-app/campaigns`                                                                                |
+| Content package export, import, and restore       | Backup             | `capell-app/backup`                                                                                   |
 | Country and address fields                        | Address            | `capell-app/address`                                                                                  |
 | Login and activity visibility                     | Authentication Log | `capell-app/authentication-log`                                                                       |
 | Curator instead of Spatie MediaLibrary            | Media Curator      | `capell-app/media-curator`                                                                            |
@@ -53,8 +57,12 @@ Then configure SEO Tools and Workspaces from the Capell admin.
 | Workspaces         | Workspace switcher, approvals, preview links, publish checks |
 | SEO Tools          | SEO settings, AI-assist panels, sitemap and metadata tools   |
 | Navigation         | Menu builders and site/page navigation extenders             |
+| Site Search        | Search contracts, database/Scout drivers, optional analytics |
+| Redirects          | Redirect manager, CSV import/export, broken URL reports      |
 | Tags               | Shared tag management used by packages such as Blog          |
 | Forms              | Form and submission records                                  |
+| Campaigns          | Campaign records, CTA blocks, conversion goals, reports      |
+| Backup             | Import sessions, package validation, recovery workflows      |
 | Address            | Countries, Addresses, Site address fields                    |
 | Authentication Log | Dashboard authentication activity                            |
 | Themes Admin       | Settings -> Theme                                            |

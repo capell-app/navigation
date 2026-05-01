@@ -17,6 +17,7 @@ use Capell\Core\Models\Site;
 use Capell\Navigation\Filament\Components\Tables\Columns\Navigation\NavigationItemsColumn;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\ListNavigations;
 use Capell\Navigation\Models\Navigation;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -58,8 +59,11 @@ class NavigationsTable implements TableConfigurator
             ->filtersFormColumns(3)
             ->recordActions([
                 EditAction::make('edit'),
-                ReplicateAction::make('replicate'),
-                DeleteAction::make('delete'),
+                ActionGroup::make([
+                    ReplicateAction::make('replicate'),
+                    DeleteAction::make('delete'),
+                ])
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make('delete'),

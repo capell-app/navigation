@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('campaign_conversion_goal_id')->constrained($goalsTableName)->cascadeOnDelete();
             $table->unsignedBigInteger('analytics_visit_id')->nullable()->index();
             $table->unsignedBigInteger('analytics_event_id')->nullable()->index();
+            $table->nullableMorphs('source');
             $table->unsignedBigInteger('site_id')->nullable()->index();
             $table->unsignedBigInteger('language_id')->nullable()->index();
             $table->json('attribution')->nullable();
@@ -31,6 +32,8 @@ return new class extends Migration
                 'campaign_conversion_goal_id',
                 'analytics_visit_id',
                 'analytics_event_id',
+                'source_type',
+                'source_id',
             ], 'campaign_conversions_goal_visit_event_unique');
         });
     }

@@ -29,7 +29,7 @@ final class BuildTopLandingPagesQueryAction
                 landingPageId: (int) $landingPage->getKey(),
                 landingPageName: $landingPage->headline ?? ('#' . $landingPage->page_id),
                 campaignName: $landingPage->campaignGroup?->name ?? '',
-                conversions: (int) $landingPage->conversions_count,
+                conversions: $landingPage->conversions_count,
             ))
             ->values();
     }

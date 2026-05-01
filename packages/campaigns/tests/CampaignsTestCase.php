@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Campaigns\Tests;
 
 use Capell\Admin\Providers\AdminServiceProvider;
+use Capell\Analytics\Providers\AnalyticsServiceProvider;
 use Capell\Campaigns\Providers\AdminServiceProvider as CampaignsAdminServiceProvider;
 use Capell\Campaigns\Providers\CampaignsServiceProvider;
 use Capell\Campaigns\Providers\FrontendServiceProvider as CampaignsFrontendServiceProvider;
@@ -58,9 +59,9 @@ class CampaignsTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(MosaicServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FormsServiceProvider::$packageName);
 
-        if (class_exists('Capell\\Analytics\\Providers\\AnalyticsServiceProvider')) {
+        if (class_exists(AnalyticsServiceProvider::class)) {
             /** @var class-string $analyticsServiceProvider */
-            $analyticsServiceProvider = 'Capell\\Analytics\\Providers\\AnalyticsServiceProvider';
+            $analyticsServiceProvider = AnalyticsServiceProvider::class;
 
             CapellCore::forcePackageInstalled($analyticsServiceProvider::$packageName);
         }
@@ -73,10 +74,10 @@ class CampaignsTestCase extends AbstractTestCase
      */
     private function optionalAnalyticsProviders(): array
     {
-        if (! class_exists('Capell\\Analytics\\Providers\\AnalyticsServiceProvider')) {
+        if (! class_exists(AnalyticsServiceProvider::class)) {
             return [];
         }
 
-        return ['Capell\\Analytics\\Providers\\AnalyticsServiceProvider'];
+        return [AnalyticsServiceProvider::class];
     }
 }

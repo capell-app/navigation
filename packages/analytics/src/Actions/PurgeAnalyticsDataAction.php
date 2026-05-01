@@ -39,7 +39,7 @@ final class PurgeAnalyticsDataAction
     {
         if (app()->bound(AnalyticsSettings::class)) {
             /** @var AnalyticsSettings $settings */
-            $settings = app(AnalyticsSettings::class);
+            $settings = resolve(AnalyticsSettings::class);
 
             return $settings->retention_days;
         }

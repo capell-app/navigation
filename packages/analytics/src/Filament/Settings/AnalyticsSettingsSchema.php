@@ -56,13 +56,13 @@ final class AnalyticsSettingsSchema implements HasSchema
                         ->required(),
                     Textarea::make('ignored_paths')
                         ->label(__('capell-analytics::settings.ignored_paths'))
-                        ->formatStateUsing([self::class, 'listToTextarea'])
-                        ->dehydrateStateUsing([self::class, 'textareaToList'])
+                        ->formatStateUsing(self::listToTextarea(...))
+                        ->dehydrateStateUsing(self::textareaToList(...))
                         ->rows(3),
                     Textarea::make('ignored_selectors')
                         ->label(__('capell-analytics::settings.ignored_selectors'))
-                        ->formatStateUsing([self::class, 'listToTextarea'])
-                        ->dehydrateStateUsing([self::class, 'textareaToList'])
+                        ->formatStateUsing(self::listToTextarea(...))
+                        ->dehydrateStateUsing(self::textareaToList(...))
                         ->rows(3),
                     TextInput::make('route_prefix')
                         ->label(__('capell-analytics::settings.route_prefix'))

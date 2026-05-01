@@ -1,0 +1,37 @@
+{
+    "name": "capell-app/redirects",
+    "description": "Redirect and broken URL management for Capell.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "capell-app/core": "self.version",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "lorisleiva/laravel-actions": "^2.8",
+        "spatie/laravel-data": "^4.5",
+        "spatie/laravel-package-tools": "^1.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "Capell\\Redirects\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Capell\\Redirects\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Capell\\Redirects\\Providers\\RedirectsServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

@@ -24,6 +24,7 @@ use Capell\Mosaic\Actions\ReplicateContentAction;
 use Capell\Mosaic\Enums\LayoutTypeEnum;
 use Capell\Mosaic\Filament\Components\Tables\Columns\Content\ContentNameColumn;
 use Capell\Mosaic\Models\Section;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -81,9 +82,12 @@ class SectionsTable implements TableConfigurator
             ->columnManagerColumns(3)
             ->recordActions([
                 EditAction::make('edit'),
-                ReplicateAction::make('replicate')
-                    ->replicaModelAction(ReplicateContentAction::class),
-                DeleteAction::make('delete'),
+                ActionGroup::make([
+                    ReplicateAction::make('replicate')
+                        ->replicaModelAction(ReplicateContentAction::class),
+                    DeleteAction::make('delete'),
+                ])
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make('delete'),

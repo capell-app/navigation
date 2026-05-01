@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Capell\Campaigns\Models;
 
+use Capell\Analytics\Models\AnalyticsEvent;
+use Capell\Analytics\Models\AnalyticsVisit;
 use Capell\Campaigns\Data\ConversionAttributionData;
 use Capell\Campaigns\Database\Factories\CampaignConversionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class CampaignConversion extends Model
 {
@@ -22,6 +25,8 @@ class CampaignConversion extends Model
         'campaign_conversion_goal_id',
         'analytics_visit_id',
         'analytics_event_id',
+        'source_type',
+        'source_id',
         'site_id',
         'language_id',
         'attribution',
@@ -54,12 +59,17 @@ class CampaignConversion extends Model
 
     public function visit(): BelongsTo
     {
-        return $this->belongsTo('Capell\\Analytics\\Models\\AnalyticsVisit', 'analytics_visit_id');
+        return $this->belongsTo(AnalyticsVisit::class, 'analytics_visit_id');
     }
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo('Capell\\Analytics\\Models\\AnalyticsEvent', 'analytics_event_id');
+        return $this->belongsTo(AnalyticsEvent::class, 'analytics_event_id');
+    }
+
+    public function source(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**

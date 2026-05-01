@@ -13,7 +13,7 @@ final class ResolveAuthenticationLogIpAddressAction
 
     public function handle(Request $request): ?string
     {
-        if (! app(ShouldTrackUserIpAddressesAction::class)->handle()) {
+        if (! resolve(ShouldTrackUserIpAddressesAction::class)->handle()) {
             return null;
         }
 

@@ -13,6 +13,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\NameColumn;
 use Capell\Admin\Filament\Components\Tables\Columns\StatusIconColumn;
 use Capell\Admin\Filament\Components\Tables\Filters\StatusFilter;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -30,9 +31,12 @@ class CountriesTable implements TableConfigurator
             ->columns(static::getTableColumns())
             ->recordActions([
                 EditAction::make('edit'),
-                ReplicateAction::make('replicate')
-                    ->schema(fn (Schema $configurator): Schema => CountryForm::configure($configurator)),
-                DeleteAction::make('delete'),
+                ActionGroup::make([
+                    ReplicateAction::make('replicate')
+                        ->schema(fn (Schema $configurator): Schema => CountryForm::configure($configurator)),
+                    DeleteAction::make('delete'),
+                ])
+                    ->color('gray'),
             ])
             ->filters([
                 StatusFilter::make('status'),

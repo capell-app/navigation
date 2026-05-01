@@ -32,9 +32,9 @@ final class CampaignConversionGoalResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string $formConfigurator = CampaignConversionGoalForm::class;
+    private static string $formConfigurator = CampaignConversionGoalForm::class;
 
-    protected static string $tableConfigurator = CampaignConversionGoalsTable::class;
+    private static string $tableConfigurator = CampaignConversionGoalsTable::class;
 
     #[Override]
     public static function form(Schema $configurator): Schema

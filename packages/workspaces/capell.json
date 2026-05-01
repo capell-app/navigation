@@ -8,5 +8,8 @@
         "shared": ["Capell\\Workspaces\\Providers\\WorkspacesServiceProvider"],
         "admin": ["Capell\\Workspaces\\Providers\\AdminServiceProvider"],
         "console": ["Capell\\Workspaces\\Providers\\ConsoleServiceProvider"]
+    },
+    "commands": {
+        "install": "capell:workspaces-install"
     }
 }

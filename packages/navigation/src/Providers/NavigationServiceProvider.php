@@ -6,8 +6,6 @@ namespace Capell\Navigation\Providers;
 
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
-use Capell\Backup\Enums\RelationOwnership;
-use Capell\Backup\Policy\OwnershipMap;
 use Capell\Core\Data\PageTypeData;
 use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
@@ -59,6 +57,7 @@ class NavigationServiceProvider extends ServiceProvider
             model: Navigation::class,
             label: 'Navigation',
         ));
+        CapellCore::registerModels([Navigation::class]);
 
         foreach (NavigationConfiguratorTypeEnum::getAllConfigurators() as $type => $configurators) {
             CapellAdmin::registerConfigurators($type, $configurators, defaultConfigurators: true);
@@ -78,8 +77,6 @@ class NavigationServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
 
         Gate::policy(Navigation::class, NavigationPolicy::class);
-
-        OwnershipMap::register(Navigation::class, RelationOwnership::Shared);
 
         Site::resolveRelationUsing('navigations', fn (Site $site): HasMany => $site->hasMany(Navigation::class));
 

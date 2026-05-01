@@ -64,6 +64,7 @@ class WorkspaceResource extends Resource
                 WorkspaceStatusEnum::Open->value,
                 WorkspaceStatusEnum::InReview->value,
                 WorkspaceStatusEnum::Approved->value,
+                WorkspaceStatusEnum::Scheduled->value,
             ])
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,

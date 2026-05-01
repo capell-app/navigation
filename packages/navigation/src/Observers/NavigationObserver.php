@@ -70,7 +70,11 @@ class NavigationObserver
         ]);
 
         foreach ($cacheKeys as $cacheKey) {
-            if (! is_string($cacheKey['key']) || ! is_numeric($cacheKey['site_id'])) {
+            if (! is_string($cacheKey['key'])) {
+                continue;
+            }
+
+            if (! is_numeric($cacheKey['site_id'])) {
                 continue;
             }
 

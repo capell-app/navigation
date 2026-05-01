@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Core\Models\Page;
 use Capell\Workspaces\Actions\Reports\BuildContentSchedulerEventsAction;
+use Capell\Workspaces\Data\SchedulerEventData;
 use Capell\Workspaces\Enums\SchedulerEventTypeEnum;
 use Capell\Workspaces\Models\Workspace;
 use Carbon\CarbonImmutable;
@@ -43,6 +44,8 @@ test('returns calendar-ready scheduler events for pages and workspaces', functio
             SchedulerEventTypeEnum::Publish->value,
             SchedulerEventTypeEnum::Unpublish->value,
         ])
+        ->and($events->first(fn (SchedulerEventData $event): bool => $event->title === 'Summer campaign' && $event->eventType === SchedulerEventTypeEnum::Unpublish)?->description)
+        ->toContain('does not automatically unpublish')
         ->and($events->first()->title)->toBe('Spring launch page');
 });
 

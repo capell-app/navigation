@@ -38,8 +38,8 @@ final class ThemesAdminServiceProvider extends AbstractPackageServiceProvider
             type: self::getType(),
             serviceProviderClass: self::class,
             path: realpath(__DIR__ . '/..'),
-            setting: ThemeAdminSettings::class,
             version: CapellCore::getInstalledPrettyVersion(self::$packageName),
+            setting: ThemeAdminSettings::class,
             description: fn (): string => __('capell-themes-admin::package.description'),
         );
 

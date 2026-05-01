@@ -29,4 +29,12 @@ return [
     'value_amount' => 'Value amount',
     'cta_block' => 'CTA block',
     'form' => 'Form',
+    'actions' => 'Actions',
+    'add_action' => 'Add action',
+    'action_label' => 'Action label',
+    'action_style' => 'Action style',
+    'action_url' => 'Action URL',
+    'goal_key' => 'Goal key',
+    'utm_parameters' => 'UTM parameters',
+    'default_utm' => 'Default UTM',
 ];

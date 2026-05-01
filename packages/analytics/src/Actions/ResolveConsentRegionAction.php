@@ -14,6 +14,6 @@ final class ResolveConsentRegionAction
 
     public function handle(): AnalyticsConsentRegion
     {
-        return app(ConsentRegionResolver::class)->resolve();
+        return resolve(ConsentRegionResolver::class)->resolve();
     }
 }

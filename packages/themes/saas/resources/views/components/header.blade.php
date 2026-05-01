@@ -12,7 +12,7 @@
     'signInUrl' => '/login',
 ])
 
-{!! app(\Capell\Frontend\Support\Render\RenderHookRegistry::class)->renderAll(\Capell\Frontend\Enums\RenderHookLocation::HeaderBefore) !!}
+{!! app(RenderHookRegistry::class)->renderAll(RenderHookLocation::HeaderBefore) !!}
 
 <header
     role="banner"
@@ -50,7 +50,7 @@
 
         <div class="flex items-center gap-3">
             {{ $slot ?? '' }}
-            {!! app(\Capell\Frontend\Support\Render\RenderHookRegistry::class)->renderAll(\Capell\Frontend\Enums\RenderHookLocation::HeaderAfter) !!}
+            {!! app(RenderHookRegistry::class)->renderAll(RenderHookLocation::HeaderAfter) !!}
             <a
                 href="{{ $signInUrl }}"
                 class="hidden text-sm font-medium text-[var(--color-fg-muted)] transition hover:text-[var(--color-fg)] md:inline-block"

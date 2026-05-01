@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 test('preview middleware validates request paths against leading slash tokens', function (): void {
     $preview = new PreviewMode(secretKey: 'my-app-key');
     $token = $preview->generateToken('/page/my-draft', expiresInMinutes: 60);
-    $request = Request::create('/page/my-draft', 'GET', [
+    $request = Request::create('/page/my-draft', Symfony\Component\HttpFoundation\Request::METHOD_GET, [
         $preview->tokenParam() => $token,
     ]);
 

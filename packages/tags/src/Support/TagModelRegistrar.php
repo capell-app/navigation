@@ -6,6 +6,7 @@ namespace Capell\Tags\Support;
 
 use Capell\Core\Facades\CapellCore;
 use Capell\Tags\Models\Tag;
+use Capell\Tags\Models\Taggable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 
@@ -14,6 +15,7 @@ class TagModelRegistrar
     /** @var list<class-string> */
     private const MODELS = [
         Tag::class,
+        Taggable::class,
     ];
 
     public static function register(): void

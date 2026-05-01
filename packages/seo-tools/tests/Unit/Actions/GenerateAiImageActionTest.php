@@ -6,6 +6,7 @@ use Capell\SeoTools\Actions\GenerateAiImageAction;
 use Capell\SeoTools\DataObjects\AiImageData;
 use Capell\SeoTools\Models\AIGenerationHistory;
 use Capell\SeoTools\Support\AiRateLimiter;
+use Capell\SeoTools\Support\Cache\RateLimitCache;
 use Prism\Prism\Enums\Provider;
 
 function makeAiImageRateLimiter(?Throwable $exception = null): AiRateLimiter
@@ -15,7 +16,10 @@ function makeAiImageRateLimiter(?Throwable $exception = null): AiRateLimiter
         /** @var array<int, array{identifier: string, feature: string|null}> */
         public array $checks = [];
 
-        public function __construct(private readonly ?Throwable $exception) {}
+        public function __construct(private readonly ?Throwable $exception)
+        {
+            parent::__construct(new RateLimitCache('array'), ['enabled' => false]);
+        }
 
         public function checkLimit(string $identifier = 'global', ?string $feature = null): void
         {

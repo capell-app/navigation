@@ -6,6 +6,7 @@ namespace Capell\Campaigns\Actions;
 
 use Capell\Campaigns\Data\Dashboard\CampaignConversionSummaryData;
 use Capell\Campaigns\Models\CampaignGroup;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -25,13 +26,18 @@ final class BuildTopCampaignsQueryAction
             ->orderBy('name')
             ->limit($limit)
             ->get()
-            ->map(fn (CampaignGroup $campaignGroup): CampaignConversionSummaryData => new CampaignConversionSummaryData(
-                campaignGroupId: (int) $campaignGroup->getKey(),
-                campaignName: $campaignGroup->name,
-                conversions: (int) $campaignGroup->conversions_count,
-                visits: $this->visitCount($campaignGroup),
-                conversionRate: $this->conversionRate($campaignGroup),
-            ))
+            ->map(function (CampaignGroup $campaignGroup): CampaignConversionSummaryData {
+                $visits = $this->visitCount($campaignGroup);
+                $conversions = $campaignGroup->conversions_count;
+
+                return new CampaignConversionSummaryData(
+                    campaignGroupId: (int) $campaignGroup->getKey(),
+                    campaignName: $campaignGroup->name,
+                    conversions: $conversions,
+                    visits: $visits,
+                    conversionRate: $this->conversionRate($conversions, $visits),
+                );
+            })
             ->values();
     }
 
@@ -43,17 +49,14 @@ final class BuildTopCampaignsQueryAction
             return 0;
         }
 
-        return (int) app('db')
+        return resolve(ConnectionResolverInterface::class)
             ->table($visitsTableName)
             ->where('utm_campaign', $campaignGroup->utm_campaign ?? $campaignGroup->slug)
             ->count();
     }
 
-    private function conversionRate(CampaignGroup $campaignGroup): float
+    private function conversionRate(int $conversions, int $visits): float
     {
-        $visits = $this->visitCount($campaignGroup);
-        $conversions = (int) $campaignGroup->conversions_count;
-
         return $visits > 0 ? round(($conversions / $visits) * 100, 2) : 0.0;
     }
 }

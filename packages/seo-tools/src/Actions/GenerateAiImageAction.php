@@ -73,7 +73,7 @@ class GenerateAiImageAction
             'input' => $data->prompt,
             'output' => $output,
             'duration' => $duration,
-            'failed' => $throwable !== null,
+            'failed' => $throwable instanceof Throwable,
             'error_message' => $throwable?->getMessage(),
             'metadata' => [
                 'provider' => $providerName,

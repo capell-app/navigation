@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Capell\Admin\Actions\Dashboard\BuildConfigDriftAction;
-use Capell\Admin\Actions\Dashboard\BuildMigrationsHealthAction;
-use Capell\Admin\Actions\Dashboard\BuildPackagesInstalledAction;
-use Capell\Admin\Actions\Dashboard\BuildRegistryHealthAction;
-use Capell\Admin\Actions\Dashboard\BuildTailwindBuildStatusAction;
+use Capell\DeveloperTools\Actions\Dashboard\BuildConfigDriftAction;
+use Capell\DeveloperTools\Actions\Dashboard\BuildMigrationsHealthAction;
+use Capell\DeveloperTools\Actions\Dashboard\BuildPackagesInstalledAction;
+use Capell\DeveloperTools\Actions\Dashboard\BuildRegistryHealthAction;
+use Capell\DeveloperTools\Actions\Dashboard\BuildTailwindBuildStatusAction;
 use Capell\Workspaces\Actions\Dashboard\BuildWorkspaceMergeHistoryAction;
 use Illuminate\Support\Facades\DB;
 use Spatie\LaravelData\DataCollection;

@@ -26,7 +26,7 @@ final class BuildTrendingSearchesQueryAction
 
         $trendingSummaries = $currentSummaries
             ->map(function (SearchTermSummaryData $summary) use ($previousSearchCounts): SearchTermSummaryData {
-                $previousSearches = (int) ($previousSearchCounts[$summary->normalizedQuery] ?? 0);
+                $previousSearches = $previousSearchCounts[$summary->normalizedQuery] ?? 0;
                 $trendPercentage = $this->calculateTrendPercentage($summary->searches, $previousSearches);
 
                 return new SearchTermSummaryData(

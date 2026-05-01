@@ -38,11 +38,11 @@ class SubmitAiCreatorDraftAction
         throw_unless($session->status === 'review', AuthorizationException::class, 'AI creator session is not ready for submission.');
 
         if ($userId !== null) {
-            throw_unless((int) $session->user_id === $userId, AuthorizationException::class, 'AI creator session does not belong to the current user.');
+            throw_unless($session->user_id === $userId, AuthorizationException::class, 'AI creator session does not belong to the current user.');
         }
 
         if ($siteId !== null) {
-            throw_unless((int) $session->site_id === $siteId, AuthorizationException::class, 'AI creator session does not belong to the current site.');
+            throw_unless($session->site_id === $siteId, AuthorizationException::class, 'AI creator session does not belong to the current site.');
         }
     }
 }

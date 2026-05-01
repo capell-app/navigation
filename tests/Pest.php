@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Address\Tests\AddressTestCase;
 use Capell\Analytics\Tests\AnalyticsTestCase;
+use Capell\Backup\Tests\BackupTestCase;
 use Capell\Blog\Tests\BlogTestCase;
 use Capell\Campaigns\Tests\CampaignsTestCase;
 use Capell\DeveloperTools\Tests\DeveloperToolsTestCase;
@@ -12,6 +13,7 @@ use Capell\Forms\Tests\FormsTestCase;
 use Capell\MediaCurator\Tests\MediaCuratorTestCase;
 use Capell\Mosaic\Tests\MosaicTestCase;
 use Capell\Navigation\Tests\NavigationTestCase;
+use Capell\Redirects\Tests\RedirectsTestCase;
 use Capell\SeoTools\Tests\SeoToolsTestCase;
 use Capell\SiteSearch\Tests\SiteSearchTestCase;
 use Capell\Tags\Tests\TagsTestCase;
@@ -24,6 +26,7 @@ use Capell\Workspaces\Tests\WorkspacesTestCase;
 
 pest()->extend(AddressTestCase::class)->in('../packages/address/tests');
 pest()->extend(AnalyticsTestCase::class)->in('../packages/analytics/tests');
+pest()->extend(BackupTestCase::class)->group('backup')->in('../packages/backup/tests');
 pest()->extend(PackagesTestCase::class)->in('../packages/authentication-log/tests');
 pest()->extend(BlogTestCase::class)->in('../packages/blog/tests');
 pest()->extend(CampaignsTestCase::class)->in('../packages/campaigns/tests');
@@ -34,12 +37,13 @@ pest()->extend(MediaCuratorTestCase::class)->in('../packages/media-curator/tests
 pest()->extend(MosaicTestCase::class)->in('../packages/mosaic/tests');
 pest()->extend(NavigationTestCase::class)->in('../packages/navigation/tests');
 pest()->extend(PackagesTestCase::class)->in('Packages');
+pest()->extend(RedirectsTestCase::class)->group('redirects')->in('../packages/redirects/tests');
 pest()->extend(SeoToolsTestCase::class)->in('../packages/seo-tools/tests');
 pest()->extend(SiteSearchTestCase::class)->in('../packages/site-search/tests');
 pest()->extend(TagsTestCase::class)->in('../packages/tags/tests');
 pest()->extend(ThemesAdminTestCase::class)->in('../packages/themes-admin/tests');
-pest()->extend(ThemesTestCase::class)->in('../packages/themes/tests');
 pest()->extend(ThemesCoreTestCase::class)->in('../packages/themes-core/tests');
+pest()->extend(ThemesTestCase::class)->in('../packages/themes/tests');
 pest()->extend(ToolbarTestCase::class)->in('../packages/toolbar/tests');
 pest()->extend(WorkspacesTestCase::class)->in('../packages/workspaces/tests');
 

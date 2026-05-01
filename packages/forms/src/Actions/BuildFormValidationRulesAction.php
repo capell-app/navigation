@@ -70,7 +70,7 @@ class BuildFormValidationRulesAction
     {
         return array_values(array_filter(
             $rules,
-            fn (string $rule): bool => preg_match('/^(min|max|size):[0-9]+$/', $rule) === 1
+            fn (string $rule): bool => preg_match('/^(min|max|size):\d+$/', $rule) === 1
                 || in_array($rule, ['email', 'url', 'alpha', 'alpha_dash', 'alpha_num'], true),
         ));
     }

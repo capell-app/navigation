@@ -23,7 +23,7 @@ final class PurgeAnalyticsDataCommand extends Command
 
         $deletedRecords = PurgeAnalyticsDataAction::run($retentionDays);
 
-        $this->info("Purged {$deletedRecords} analytics records.");
+        $this->info(sprintf('Purged %s analytics records.', $deletedRecords));
 
         return self::SUCCESS;
     }

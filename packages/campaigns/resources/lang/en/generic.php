@@ -32,4 +32,8 @@ return [
         'first_touch' => 'First touch',
         'last_touch' => 'Last touch',
     ],
+    'action_styles' => [
+        'primary' => 'Primary',
+        'secondary' => 'Secondary',
+    ],
 ];

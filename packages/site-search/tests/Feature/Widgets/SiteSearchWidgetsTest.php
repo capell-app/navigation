@@ -10,6 +10,7 @@ use Capell\SiteSearch\Filament\Widgets\ZeroResultSearchesWidget;
 use Capell\SiteSearch\Models\SiteSearchLog;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Livewire\Livewire;
 
 beforeEach(function (): void {
     config()->set('capell-site-search.logs.table_name', 'site_search_logs');
@@ -59,7 +60,7 @@ test('dashboard settings contributor exposes site search widget keys', function 
 });
 
 test('site search dashboard widgets render', function (string $widgetClass): void {
-    livewire($widgetClass)->assertOk();
+    Livewire::test($widgetClass)->assertOk();
 })->with([
     SearchOverviewStatsWidget::class,
     TopSearchesWidget::class,

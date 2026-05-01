@@ -31,7 +31,7 @@ test('controller returns the search page view with an empty paginator for a blan
         }
     });
 
-    $request = Request::create('/search', 'GET', ['q' => '   ']);
+    $request = Request::create('/search', Symfony\Component\HttpFoundation\Request::METHOD_GET, ['q' => '   ']);
     $view = (new SearchController)($request);
 
     expect($view->name())->toBe('capell-site-search::pages.search');
@@ -69,7 +69,7 @@ test('controller passes normalized valid searches to the site search service', f
         }
     });
 
-    $request = Request::create('/search', 'GET', ['q' => '  Laravel   Search  ', 'page' => '2']);
+    $request = Request::create('/search', Symfony\Component\HttpFoundation\Request::METHOD_GET, ['q' => '  Laravel   Search  ', 'page' => '2']);
     $view = (new SearchController)($request);
 
     expect($recordedSearch->queries)->toBe(['laravel search']);

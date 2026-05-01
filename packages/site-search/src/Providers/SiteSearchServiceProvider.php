@@ -88,22 +88,22 @@ final class SiteSearchServiceProvider extends AbstractPackageServiceProvider
 
             if ($driver === 'scout' && class_exists(ScoutSiteSearch::class)) {
                 return new ScoutSiteSearch(
-                    modelClass: (string) config('capell-site-search.scout.model'),
-                    urlColumn: (string) config('capell-site-search.scout.url_column', 'slug'),
-                    typeColumn: (string) config('capell-site-search.scout.type_column', 'type'),
-                    excerptLength: (int) config('capell-site-search.excerpt_length', 200),
+                    modelClass: config('capell-site-search.scout.model'),
+                    urlColumn: config('capell-site-search.scout.url_column', 'slug'),
+                    typeColumn: config('capell-site-search.scout.type_column', 'type'),
+                    excerptLength: config('capell-site-search.excerpt_length', 200),
                 );
             }
 
             return new DatabaseSiteSearch(
                 db: $app->make(ConnectionResolverInterface::class)->connection(),
-                table: (string) config('capell-site-search.database.table', 'pages'),
-                columns: (array) config('capell-site-search.database.columns', ['title', 'excerpt', 'body']),
-                urlColumn: (string) config('capell-site-search.database.url_column', 'slug'),
-                typeColumn: (string) config('capell-site-search.database.type_column', 'type'),
-                titleColumn: (string) config('capell-site-search.database.title_column', 'title'),
-                excerptColumn: (string) config('capell-site-search.database.excerpt_column', 'excerpt'),
-                bodyColumn: (string) config('capell-site-search.database.body_column', 'body'),
+                table: config('capell-site-search.database.table', 'pages'),
+                columns: config('capell-site-search.database.columns', ['title', 'excerpt', 'body']),
+                urlColumn: config('capell-site-search.database.url_column', 'slug'),
+                typeColumn: config('capell-site-search.database.type_column', 'type'),
+                titleColumn: config('capell-site-search.database.title_column', 'title'),
+                excerptColumn: config('capell-site-search.database.excerpt_column', 'excerpt'),
+                bodyColumn: config('capell-site-search.database.body_column', 'body'),
             );
         });
 

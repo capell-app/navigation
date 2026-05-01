@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Workspaces\Providers;
 
+use Capell\Workspaces\Console\Commands\InstallCommand;
 use Capell\Workspaces\Console\Commands\LoadTestWorkspacesCommand;
 use Capell\Workspaces\Console\Commands\PruneAbandonedWorkspacesCommand;
 use Capell\Workspaces\PublishScheduledWorkspacesJob;
@@ -18,6 +19,7 @@ class ConsoleServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                InstallCommand::class,
                 LoadTestWorkspacesCommand::class,
                 PruneAbandonedWorkspacesCommand::class,
             ]);

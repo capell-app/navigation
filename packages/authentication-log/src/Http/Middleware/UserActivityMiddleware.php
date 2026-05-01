@@ -26,7 +26,7 @@ class UserActivityMiddleware
 
     private function updateUserActivity(Request $request): void
     {
-        $ipAddress = app(ResolveAuthenticationLogIpAddressAction::class)->handle($request);
+        $ipAddress = resolve(ResolveAuthenticationLogIpAddressAction::class)->handle($request);
 
         $userAgent = $request->userAgent();
 

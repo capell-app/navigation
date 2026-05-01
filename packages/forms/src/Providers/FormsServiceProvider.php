@@ -14,6 +14,7 @@ use Capell\Forms\Enums\ResourceEnum;
 use Capell\Forms\Models\Form;
 use Capell\Forms\Models\Submission;
 use Composer\InstalledVersions;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
@@ -34,6 +35,8 @@ class FormsServiceProvider extends AbstractPackageServiceProvider
             ->hasMigrations([
                 'create_forms_table',
                 'create_submissions_table',
+                'z_add_structure_to_forms_table',
+                'z_add_meta_to_submissions_table',
                 'encrypt_submission_payload_and_meta',
             ]);
     }
@@ -53,6 +56,14 @@ class FormsServiceProvider extends AbstractPackageServiceProvider
 
             $this->bootInstalledPackage();
         });
+    }
+
+    public function packageBooted(): void
+    {
+        Relation::morphMap([
+            'form' => Form::class,
+            'form_submission' => Submission::class,
+        ], merge: true);
     }
 
     private function bootInstalledPackage(): self
@@ -125,7 +136,11 @@ class FormsServiceProvider extends AbstractPackageServiceProvider
     {
         if ($this->isLivewireV3()) {
             foreach (LivewireComponentEnum::getComponents() as $name => $component) {
-                if (! $component || ! class_exists($component)) {
+                if (! $component) {
+                    continue;
+                }
+
+                if (! class_exists($component)) {
                     continue;
                 }
 

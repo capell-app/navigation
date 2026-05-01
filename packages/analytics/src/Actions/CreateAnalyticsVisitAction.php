@@ -25,7 +25,7 @@ final class CreateAnalyticsVisitAction
             'language_id' => $this->integerInput($request, 'language_id'),
             'consent_region' => $region,
             'consent_status' => AnalyticsConsentStatus::Pending,
-            'landing_url' => $referer !== null ? $referer : $request->fullUrl(),
+            'landing_url' => $referer ?? $request->fullUrl(),
             'referrer_url' => $referer,
             'utm_source' => $this->stringInput($request, 'utm_source'),
             'utm_medium' => $this->stringInput($request, 'utm_medium'),

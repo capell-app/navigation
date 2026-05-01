@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Campaigns\Filament\Resources\CampaignLandingPages\Schemas;
 
+use Capell\Admin\Data\Configurators\ConfiguratorContextData;
 use Capell\Admin\Filament\Contracts\FormConfigurator;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -12,7 +13,7 @@ use Filament\Schemas\Schema;
 
 final class CampaignLandingPageForm implements FormConfigurator
 {
-    public static function configure(Schema $configurator): Schema
+    public static function configure(Schema $configurator, ?ConfiguratorContextData $context = null): Schema
     {
         return $configurator
             ->columns(['default' => 1, 'lg' => 2])

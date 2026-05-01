@@ -70,7 +70,6 @@ it('is hidden for users who can update the page but cannot publish the workspace
     Gate::define('update', fn (mixed $actor, Page $record): bool => true);
 
     $method = new ReflectionMethod(PublishPageAction::class, 'userCanPublish');
-    $method->setAccessible(true);
 
     expect($user->can('update', $draft))->toBeTrue()
         ->and($method->invoke(PublishPageAction::make(), $draft))->toBeFalse();

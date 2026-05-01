@@ -24,7 +24,7 @@ final class BuildJourneyTimelineAction
 
         return $visit->events()
             ->orderBy('sequence')
-            ->orderBy('occurred_at')
+            ->oldest('occurred_at')
             ->get()
             ->map(function (AnalyticsEvent $event) use (&$previousOccurredAt): AnalyticsJourneyStepData {
                 $occurredAt = $event->occurred_at instanceof CarbonImmutable

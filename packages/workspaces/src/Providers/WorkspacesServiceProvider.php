@@ -8,7 +8,6 @@ use Capell\Admin\Contracts\Extenders\PageEditExtender;
 use Capell\Admin\Contracts\Extenders\PageExportExtender;
 use Capell\Admin\Contracts\Extenders\PageResourcePageExtender;
 use Capell\Admin\Contracts\Extenders\PageTableExtender;
-use Capell\Blog\Models\Article;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\AssetRelation;
 use Capell\Core\Models\Language;
@@ -23,10 +22,6 @@ use Capell\Core\Models\Translation;
 use Capell\Core\Models\Type;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
-use Capell\Mosaic\Models\Section;
-use Capell\Mosaic\Models\Widget;
-use Capell\Mosaic\Models\WidgetAsset;
-use Capell\Navigation\Models\Navigation;
 use Capell\Workspaces\Actions\CopyOnWriteAction;
 use Capell\Workspaces\BelongsToWorkspace;
 use Capell\Workspaces\Events\WorkspaceEventDispatcher;
@@ -59,11 +54,22 @@ use Spatie\Activitylog\Models\Activity;
 
 class WorkspacesServiceProvider extends ServiceProvider
 {
+    /** @var array<class-string<Model>, true> */
+    private array $workspaceBehaviorApplied = [];
+
     public function register(): void
     {
         $this->app->register(AdminServiceProvider::class);
 
         CapellCore::registerPackage('capell-app/workspaces', path: realpath(__DIR__ . '/../..'));
+        CapellCore::registerModels([
+            PreviewLink::class,
+            Version::class,
+            Workspace::class,
+            WorkspaceApproval::class,
+            WorkspaceFieldComment::class,
+            WorkspaceReviewAssignment::class,
+        ]);
 
         $this->app->singleton(WorkspacesManager::class, fn (): WorkspacesManager => new WorkspacesManager);
         $this->app->singleton(WorkspaceEventDispatcher::class);
@@ -86,11 +92,17 @@ class WorkspacesServiceProvider extends ServiceProvider
         }
 
         $this->registerWorkspaceDraftables()
-            ->applyBehaviorToExternalModels()
+            ->applyBehaviorToDraftableModels()
             ->registerBuilderMacros()
             ->registerMiddleware()
             ->registerEventListeners()
             ->registerFrontendRenderHooks();
+
+        $this->app->booted(function (): void {
+            $this
+                ->registerPageTypeDraftables()
+                ->applyBehaviorToDraftableModels();
+        });
     }
 
     private function registerMorphMap(): self
@@ -110,7 +122,6 @@ class WorkspacesServiceProvider extends ServiceProvider
     private function registerWorkspaceDraftables(): self
     {
         $simpleModels = [
-            Navigation::class,
             Site::class,
             SiteDomain::class,
             Type::class,
@@ -123,7 +134,7 @@ class WorkspacesServiceProvider extends ServiceProvider
         ];
 
         foreach ($simpleModels as $modelClass) {
-            WorkspaceRegistry::register($modelClass);
+            $this->registerDraftableModel($modelClass);
         }
 
         // Page requires a finalizeOnPublish hook to retarget PageUrl + Translation rows.
@@ -190,7 +201,10 @@ class WorkspacesServiceProvider extends ServiceProvider
                 ->where('translatable_type', $morphClass)
                 ->where('translatable_id', $oldLiveId)
                 ->where('workspace_id', 0)
-                ->when($coveredLanguageIds !== [], static fn ($query) => $query->whereNotIn('language_id', $coveredLanguageIds))
+                ->when(
+                    $coveredLanguageIds !== [],
+                    static fn (Builder $query): Builder => $query->whereNotIn('language_id', $coveredLanguageIds),
+                )
                 ->update(['translatable_id' => $draftPageId]);
 
             return $draftRow;
@@ -199,37 +213,45 @@ class WorkspacesServiceProvider extends ServiceProvider
         // Translation is registered AFTER Page so that Publisher processes Page first
         // during publish. Page's finalizeOnPublish retargets and deletes conflicting
         // live translations before Translation rows are flipped to workspace_id = 0.
-        WorkspaceRegistry::register(Translation::class);
-
-        $this->registerExternalModels();
+        $this->registerDraftableModel(Translation::class);
 
         return $this;
     }
 
-    private function registerExternalModels(): void
+    private function registerPageTypeDraftables(): self
     {
-        // Blog package models — registered here so the blog package has no workspace dependency.
-        if (class_exists(Article::class)) {
-            WorkspaceRegistry::register(Article::class);
-        }
+        CapellCore::getPageTypes()
+            ->pluck('model')
+            ->filter(fn (mixed $modelClass): bool => is_string($modelClass) && class_exists($modelClass))
+            ->each(function (string $modelClass): void {
+                /** @var class-string<Model> $modelClass */
+                $this->registerDraftableModel($modelClass);
+            });
 
-        // Mosaic package models — registered here so the mosaic package has no workspace dependency.
-        if (class_exists(Section::class)) {
-            WorkspaceRegistry::register(Section::class);
-        }
-
-        if (class_exists(Widget::class)) {
-            WorkspaceRegistry::register(Widget::class);
-        }
-
-        if (class_exists(WidgetAsset::class)) {
-            WorkspaceRegistry::register(WidgetAsset::class);
-        }
+        return $this;
     }
 
-    private function applyBehaviorToExternalModels(): self
+    /**
+     * @param  class-string<Model>  $modelClass
+     */
+    private function registerDraftableModel(string $modelClass): void
+    {
+        if (WorkspaceRegistry::isRegistered($modelClass)) {
+            return;
+        }
+
+        WorkspaceRegistry::register($modelClass);
+    }
+
+    private function applyBehaviorToDraftableModels(): self
     {
         foreach (WorkspaceRegistry::modelClasses() as $modelClass) {
+            if (isset($this->workspaceBehaviorApplied[$modelClass])) {
+                continue;
+            }
+
+            $this->workspaceBehaviorApplied[$modelClass] = true;
+
             if (in_array(BelongsToWorkspace::class, class_uses_recursive($modelClass), true)) {
                 continue;
             }

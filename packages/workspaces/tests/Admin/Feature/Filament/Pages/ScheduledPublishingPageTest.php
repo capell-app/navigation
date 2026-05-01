@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\Core\Models\Page;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Capell\Workspaces\Filament\Pages\ScheduledPublishingPage;
+use Capell\Workspaces\Filament\Resources\Workspaces\WorkspaceResource;
 use Capell\Workspaces\Models\Workspace;
 
 use function Pest\Livewire\livewire;
@@ -56,4 +57,42 @@ test('shows a navigation badge for upcoming scheduler events', function (): void
     ]);
 
     expect(ScheduledPublishingPage::getNavigationBadge())->toBe('1');
+});
+
+test('searches scheduler rows from the array data source', function (): void {
+    Page::factory()->create([
+        'visible_from' => now()->addDays(3),
+        'name' => 'Spring sale',
+    ]);
+    Workspace::factory()->scheduled(now()->addDays(5))->create([
+        'name' => 'Campaign workspace',
+    ]);
+
+    livewire(ScheduledPublishingPage::class)
+        ->searchTable('Campaign')
+        ->assertSee('Campaign workspace')
+        ->assertDontSee('Spring sale');
+});
+
+test('sorts scheduler rows from the array data source', function (): void {
+    Page::factory()->create([
+        'visible_from' => now()->addDays(3),
+        'name' => 'Beta launch',
+    ]);
+    Workspace::factory()->scheduled(now()->addDays(5))->create([
+        'name' => 'Alpha campaign',
+    ]);
+
+    livewire(ScheduledPublishingPage::class)
+        ->sortTable('title')
+        ->assertSeeInOrder(['Alpha campaign', 'Beta launch']);
+});
+
+test('scheduled workspaces are visible from workspace resource queries', function (): void {
+    $scheduled = Workspace::factory()->scheduled(now()->addDays(5))->create([
+        'name' => 'Campaign workspace',
+    ]);
+
+    expect(WorkspaceResource::getEloquentQuery()->pluck('id')->all())
+        ->toContain($scheduled->id);
 });

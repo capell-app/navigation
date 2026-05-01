@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Capell\SiteSearch\Http\Controllers;
 
+use Capell\Core\Contracts\Pageable;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Layout;
+use Capell\Core\Models\Site;
+use Capell\Core\Models\Theme;
 use Capell\Frontend\Facades\Frontend;
 use Capell\SiteSearch\Actions\RecordSiteSearchAction;
 use Capell\SiteSearch\Actions\ResolveSiteSearchSettingAction;
@@ -68,11 +73,11 @@ final class SearchController
     private function canRenderFrontendShell(): bool
     {
         try {
-            return Frontend::language() !== null
-                && Frontend::layout() !== null
-                && Frontend::page() !== null
-                && Frontend::site() !== null
-                && Frontend::theme() !== null;
+            return Frontend::language() instanceof Language
+                && Frontend::layout() instanceof Layout
+                && Frontend::page() instanceof Pageable
+                && Frontend::site() instanceof Site
+                && Frontend::theme() instanceof Theme;
         } catch (Throwable) {
             return false;
         }

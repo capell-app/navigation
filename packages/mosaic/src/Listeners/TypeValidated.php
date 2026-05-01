@@ -6,7 +6,6 @@ namespace Capell\Mosaic\Listeners;
 
 use Capell\Admin\Contracts\ValidationSubscriber;
 use Capell\Admin\Enums\ListenerEnum;
-use Capell\Core\Models\Type;
 
 class TypeValidated implements ValidationSubscriber
 {
@@ -30,14 +29,6 @@ class TypeValidated implements ValidationSubscriber
      */
     public function validate(string $event, object $context): bool
     {
-        if ($event !== ListenerEnum::ValidateCustomType->value) {
-            return true;
-        }
-
-        if (! $context instanceof Type) {
-            return true;
-        }
-
-        return true;
+        return $event !== ListenerEnum::ValidateCustomType->value;
     }
 }

@@ -6,6 +6,7 @@ use Capell\SiteSearch\Actions\RecordSearchResultClickAction;
 use Capell\SiteSearch\Actions\RecordSiteSearchAction;
 use Capell\SiteSearch\Data\SearchRequestData;
 use Capell\SiteSearch\Models\SiteSearchLog;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -38,7 +39,7 @@ afterEach(function (): void {
 });
 
 test('logs valid searches with normalized query and hashed visitor data', function (): void {
-    $request = Request::create('/search', 'GET', server: [
+    $request = Request::create('/search', Symfony\Component\HttpFoundation\Request::METHOD_GET, server: [
         'REMOTE_ADDR' => '203.0.113.10',
         'HTTP_USER_AGENT' => 'Capell Test Browser',
     ]);
@@ -61,7 +62,7 @@ test('logs valid searches with normalized query and hashed visitor data', functi
     expect($log->results_count)->toBe(7);
     expect($log->ip_hash)->toBe(hash('sha256', '203.0.113.10|' . config('app.key')));
     expect($log->user_agent_hash)->toBe(hash('sha256', 'Capell Test Browser|' . config('app.key')));
-    expect($log->searched_at)->toBeInstanceOf(Carbon\CarbonImmutable::class);
+    expect($log->searched_at)->toBeInstanceOf(CarbonImmutable::class);
 });
 
 test('skips blank searches', function (): void {
@@ -107,7 +108,7 @@ test('omits visitor hashes when visitor hashing is disabled', function (): void 
     $log = RecordSiteSearchAction::run(
         new SearchRequestData(query: 'Laravel Search'),
         1,
-        Request::create('/search', 'GET', server: [
+        Request::create('/search', Symfony\Component\HttpFoundation\Request::METHOD_GET, server: [
             'REMOTE_ADDR' => '203.0.113.10',
             'HTTP_USER_AGENT' => 'Capell Test Browser',
         ]),

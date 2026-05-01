@@ -13,6 +13,6 @@ enum SearchDriver: string implements HasLabel
 
     public function getLabel(): string
     {
-        return __("capell-site-search::settings.driver_options.{$this->value}");
+        return __('capell-site-search::settings.driver_options.' . $this->value);
     }
 }

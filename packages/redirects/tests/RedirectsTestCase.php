@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Redirects\Tests;
+
+use Capell\Core\Facades\CapellCore;
+use Capell\Redirects\Providers\RedirectsServiceProvider;
+use Capell\Tests\AbstractTestCase;
+use Override;
+
+abstract class RedirectsTestCase extends AbstractTestCase
+{
+    protected function getPackageServiceName(): string
+    {
+        return 'capell-redirects';
+    }
+
+    /** @return array<int, class-string> */
+    #[Override]
+    protected function getPackageProviders(mixed $app): array
+    {
+        return [
+            ...parent::getPackageProviders($app),
+            RedirectsServiceProvider::class,
+        ];
+    }
+
+    #[Override]
+    protected function getEnvironmentSetUp(mixed $app): void
+    {
+        parent::getEnvironmentSetUp($app);
+
+        CapellCore::registerPackage(
+            RedirectsServiceProvider::$packageName,
+            path: realpath(__DIR__ . '/../'),
+        );
+        CapellCore::forcePackageInstalled(RedirectsServiceProvider::$packageName);
+    }
+}

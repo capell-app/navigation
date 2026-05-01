@@ -72,7 +72,7 @@ class AnalyticsBeaconController
             $path = parse_url($value, PHP_URL_PATH);
 
             if (is_string($path) && mb_strlen($path) > 512) {
-                $fail("The {$attribute} path must not be greater than 512 characters.");
+                $fail(sprintf('The %s path must not be greater than 512 characters.', $attribute));
             }
         };
     }

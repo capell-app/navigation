@@ -32,7 +32,7 @@ class AdminActivityMiddleware
             return;
         }
 
-        $ipAddress = app(ResolveAuthenticationLogIpAddressAction::class)->handle($request);
+        $ipAddress = resolve(ResolveAuthenticationLogIpAddressAction::class)->handle($request);
 
         $userAgent = (string) $request->userAgent();
 

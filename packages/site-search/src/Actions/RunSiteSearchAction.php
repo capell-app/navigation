@@ -10,11 +10,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-final class RunSiteSearchAction
+final readonly class RunSiteSearchAction
 {
     use AsAction;
 
-    public function __construct(private readonly SiteSearch $search) {}
+    public function __construct(private SiteSearch $search) {}
 
     public function handle(SearchRequestData $data): LengthAwarePaginator
     {
@@ -25,7 +25,7 @@ final class RunSiteSearchAction
             2,
         );
 
-        if ($normalizedQuery === '' || mb_strlen($normalizedQuery) < $minimumLength) {
+        if ($normalizedQuery === '' || mb_strlen((string) $normalizedQuery) < $minimumLength) {
             return new Paginator([], 0, $data->perPage, $data->page);
         }
 

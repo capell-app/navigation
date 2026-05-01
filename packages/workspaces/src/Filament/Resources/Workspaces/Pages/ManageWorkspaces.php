@@ -46,6 +46,10 @@ class ManageWorkspaces extends ManageRecords
                 ->modifyQueryUsing(
                     fn (Builder $query): Builder => $query->where('status', WorkspaceStatusEnum::Approved->value),
                 ),
+            'scheduled' => Tab::make(WorkspaceStatusEnum::Scheduled->getLabel())
+                ->modifyQueryUsing(
+                    fn (Builder $query): Builder => $query->where('status', WorkspaceStatusEnum::Scheduled->value),
+                ),
         ];
     }
 

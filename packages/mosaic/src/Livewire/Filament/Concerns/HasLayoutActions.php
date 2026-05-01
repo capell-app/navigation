@@ -22,6 +22,7 @@ use Capell\Mosaic\Models\WidgetAsset;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TableSelect;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;

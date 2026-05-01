@@ -97,7 +97,7 @@ class NavigationResource extends Resource
     #[Override]
     public static function getEloquentQuery(): Builder
     {
-        return static::applySiteScope(parent::getEloquentQuery())
+        return self::applySiteScope(parent::getEloquentQuery())
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
@@ -116,7 +116,7 @@ class NavigationResource extends Resource
 
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return static::applySiteScope(parent::getGlobalSearchEloquentQuery())
+        return self::applySiteScope(parent::getGlobalSearchEloquentQuery())
             ->with([
                 'site' => fn (BuilderContract $query): BuilderContract => $query->select(['id', 'name']),
             ])

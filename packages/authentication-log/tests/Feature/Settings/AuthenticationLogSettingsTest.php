@@ -11,7 +11,7 @@ use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 function seedAuthenticationLogSetting(string $settingName, mixed $value): void
 {
     /** @var SettingsMigrator $settingsMigrator */
-    $settingsMigrator = app(SettingsMigrator::class);
+    $settingsMigrator = resolve(SettingsMigrator::class);
     $settingKey = 'authentication_log.' . $settingName;
 
     if ($settingsMigrator->exists($settingKey)) {

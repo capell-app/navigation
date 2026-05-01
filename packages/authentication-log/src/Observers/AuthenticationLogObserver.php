@@ -11,7 +11,7 @@ class AuthenticationLogObserver
 {
     public function saving(AuthenticationLog $authenticationLog): void
     {
-        if (app(ShouldTrackUserIpAddressesAction::class)->handle()) {
+        if (resolve(ShouldTrackUserIpAddressesAction::class)->handle()) {
             return;
         }
 

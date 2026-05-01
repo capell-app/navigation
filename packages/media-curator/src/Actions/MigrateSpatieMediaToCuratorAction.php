@@ -282,7 +282,7 @@ final class MigrateSpatieMediaToCuratorAction
             'manipulations' => $manipulations,
             'generated_conversions' => $generatedConversions,
             'responsive_images' => $responsiveImages,
-        ], static fn (mixed $value): bool => $value !== null && $value !== [] && $value !== '');
+        ], static fn (mixed $value): bool => ! in_array($value, [null, [], ''], true));
 
         if ($spatieMetadata !== []) {
             $exif['spatie_media_library'] = $spatieMetadata;

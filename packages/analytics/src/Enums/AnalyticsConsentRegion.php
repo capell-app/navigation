@@ -14,6 +14,6 @@ enum AnalyticsConsentRegion: string implements HasLabel
 
     public function getLabel(): string
     {
-        return __("capell-analytics::consent.regions.{$this->value}");
+        return __('capell-analytics::consent.regions.' . $this->value);
     }
 }

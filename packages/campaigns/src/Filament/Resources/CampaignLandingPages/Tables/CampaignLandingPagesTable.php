@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Campaigns\Filament\Resources\CampaignLandingPages\Tables;
 
 use Capell\Admin\Filament\Contracts\TableConfigurator;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -31,7 +32,10 @@ final class CampaignLandingPagesTable implements TableConfigurator
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    DeleteAction::make(),
+                ])
+                    ->color('gray'),
             ])
             ->toolbarActions([
                 DeleteBulkAction::make(),

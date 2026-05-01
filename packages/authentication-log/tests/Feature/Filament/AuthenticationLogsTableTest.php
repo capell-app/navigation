@@ -11,7 +11,6 @@ use Illuminate\Support\HtmlString;
 function authenticationLogAuthenticatableColumn(): TextColumn
 {
     $reflectionMethod = new ReflectionMethod(AuthenticationLogsTable::class, 'getTableColumns');
-    $reflectionMethod->setAccessible(true);
 
     /** @var array<int, mixed> $columns */
     $columns = $reflectionMethod->invoke(null);
@@ -23,7 +22,6 @@ function formatAuthenticationLogAuthenticatableColumn(TextColumn $column, Authen
 {
     foreach (['getStateUsing', 'formatStateUsing'] as $propertyName) {
         $reflectionProperty = new ReflectionProperty($column, $propertyName);
-        $reflectionProperty->setAccessible(true);
 
         $callback = $reflectionProperty->getValue($column);
 

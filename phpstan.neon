@@ -40,10 +40,13 @@ parameters:
         - packages/themes/saas/database/migrations
         - packages/workspaces/database/migrations
     configDirectories:
+        - packages/backup/config
         - packages/default-theme/config
         - packages/mosaic/config
         - packages/plugins/config
+        - packages/redirects/config
         - packages/seo-tools/config
+        - packages/site-search/config
         - packages/tags/publishes/config
         - packages/themes/agency/config
         - packages/themes/corporate/config

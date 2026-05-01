@@ -37,8 +37,10 @@ final class BuildCampaignOverviewStatsAction
             return 0;
         }
 
+        $groupsTableName = (new CampaignGroup)->getTable();
+
         return CampaignGroup::query()
-            ->join($visitsTableName, 'campaign_groups.utm_campaign', '=', $visitsTableName . '.utm_campaign')
+            ->join($visitsTableName, $groupsTableName . '.utm_campaign', '=', $visitsTableName . '.utm_campaign')
             ->count($visitsTableName . '.id');
     }
 }

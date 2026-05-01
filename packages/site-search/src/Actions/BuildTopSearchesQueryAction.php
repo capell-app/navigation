@@ -38,10 +38,10 @@ final class BuildTopSearchesQueryAction
         return $query
             ->get()
             ->map(fn (SiteSearchLog $log): SearchTermSummaryData => new SearchTermSummaryData(
-                query: (string) $log->query,
-                normalizedQuery: (string) $log->normalized_query,
-                searches: (int) $log->searches,
-                resultsCount: (int) $log->results_count,
+                query: $log->query,
+                normalizedQuery: $log->normalized_query,
+                searches: $log->searches,
+                resultsCount: $log->results_count,
             ))
             ->values();
     }

@@ -16,7 +16,7 @@ final class ShouldTrackUserIpAddressesAction
     {
         try {
             /** @var AuthenticationLogSettings $settings */
-            $settings = app(AuthenticationLogSettings::class);
+            $settings = resolve(AuthenticationLogSettings::class);
 
             return $settings->track_user_ip_addresses;
         } catch (Throwable) {

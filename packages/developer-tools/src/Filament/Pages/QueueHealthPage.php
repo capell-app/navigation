@@ -54,10 +54,19 @@ class QueueHealthPage extends Page implements HasActions, HasTable
             // Role system not available; fall back to developer-tools permissions.
         }
 
-        return Gate::allows('accessDeveloperTools')
-            || Gate::allows('viewDeveloperTools')
-            || $user->can('accessDeveloperTools') === true
-            || $user->can('viewDeveloperTools') === true;
+        if (Gate::allows('accessDeveloperTools')) {
+            return true;
+        }
+
+        if (Gate::allows('viewDeveloperTools')) {
+            return true;
+        }
+
+        if ($user->can('accessDeveloperTools') === true) {
+            return true;
+        }
+
+        return $user->can('viewDeveloperTools') === true;
     }
 
     public static function getNavigationGroup(): ?string

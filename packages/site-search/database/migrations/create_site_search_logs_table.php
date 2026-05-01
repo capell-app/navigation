@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $tableName = (string) config('capell-site-search.logs.table_name', 'site_search_logs');
+        $tableName = config('capell-site-search.logs.table_name', 'site_search_logs');
 
         if (Schema::hasTable($tableName)) {
             return;
@@ -33,6 +33,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists((string) config('capell-site-search.logs.table_name', 'site_search_logs'));
+        Schema::dropIfExists(config('capell-site-search.logs.table_name', 'site_search_logs'));
     }
 };

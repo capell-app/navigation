@@ -483,7 +483,11 @@ trait ManagesAssets
     protected function getCurrentWorkspaceId(): ?int
     {
         foreach ([$this->page, $this->layout] as $record) {
-            if (! $record instanceof Model || ! array_key_exists('workspace_id', $record->getAttributes())) {
+            if (! $record instanceof Model) {
+                continue;
+            }
+
+            if (! array_key_exists('workspace_id', $record->getAttributes())) {
                 continue;
             }
 

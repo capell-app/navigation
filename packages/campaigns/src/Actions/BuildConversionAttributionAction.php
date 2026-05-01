@@ -41,12 +41,12 @@ final class BuildConversionAttributionAction
     {
         $metadata = $event?->getAttribute('metadata');
 
-        if (is_array($metadata) && isset($metadata[$key]) && is_string($metadata[$key])) {
-            return $metadata[$key];
+        if (is_object($metadata)) {
+            $metadata = get_object_vars($metadata);
         }
 
-        if (is_object($metadata) && isset($metadata->{$key}) && is_string($metadata->{$key})) {
-            return $metadata->{$key};
+        if (is_array($metadata) && isset($metadata[$key]) && is_string($metadata[$key])) {
+            return $metadata[$key];
         }
 
         return null;

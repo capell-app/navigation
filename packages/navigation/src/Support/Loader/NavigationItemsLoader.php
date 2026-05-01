@@ -60,7 +60,11 @@ class NavigationItemsLoader
 
             switch ($item->type) {
                 case NavigationItemType::Link:
-                    if (! isset($item->data['url']) || $item->data['url'] === '') {
+                    if (! isset($item->data['url'])) {
+                        continue 2;
+                    }
+
+                    if ($item->data['url'] === '') {
                         continue 2;
                     }
 

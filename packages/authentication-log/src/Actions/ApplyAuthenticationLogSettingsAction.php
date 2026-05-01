@@ -17,7 +17,7 @@ final class ApplyAuthenticationLogSettingsAction
     {
         try {
             /** @var AuthenticationLogSettings $settings */
-            $settings = app(AuthenticationLogSettings::class);
+            $settings = resolve(AuthenticationLogSettings::class);
             $retentionDays = $settings->retention_days;
         } catch (Throwable) {
             return;

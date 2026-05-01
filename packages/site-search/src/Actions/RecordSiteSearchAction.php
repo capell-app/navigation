@@ -30,7 +30,7 @@ final class RecordSiteSearchAction
             2,
         );
 
-        if ($normalizedQuery === '' || mb_strlen($normalizedQuery) < $minimumLength) {
+        if ($normalizedQuery === '' || mb_strlen((string) $normalizedQuery) < $minimumLength) {
             return null;
         }
 

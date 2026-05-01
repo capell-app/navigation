@@ -12,7 +12,7 @@ test('provider binds the configured database search driver', function (): void {
     app()->register(SiteSearchServiceProvider::class);
     config()->set('capell-site-search.driver', SearchDriver::Database->value);
 
-    expect(app(SiteSearch::class))->toBeInstanceOf(DatabaseSiteSearch::class);
+    expect(resolve(SiteSearch::class))->toBeInstanceOf(DatabaseSiteSearch::class);
 });
 
 test('provider prefers the settings driver over config', function (): void {
@@ -21,9 +21,10 @@ test('provider prefers the settings driver over config', function (): void {
 
     app()->instance(SiteSearchSettings::class, $settings);
     app()->register(SiteSearchServiceProvider::class);
+
     config()->set('capell-site-search.driver', SearchDriver::Scout->value);
 
-    expect(app(SiteSearch::class))->toBeInstanceOf(DatabaseSiteSearch::class);
+    expect(resolve(SiteSearch::class))->toBeInstanceOf(DatabaseSiteSearch::class);
 });
 
 test('site search settings expose defaults', function (): void {

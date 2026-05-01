@@ -26,7 +26,7 @@ return [
         'page_publish' => 'Page becomes visible.',
         'page_unpublish' => 'Page stops being visible.',
         'workspace_publish' => 'Workspace is queued for publishing.',
-        'workspace_unpublish' => 'Workspace has a campaign takedown date.',
+        'workspace_takedown_reminder' => 'Campaign takedown reminder. This does not automatically unpublish live content.',
         'workspace_embargo' => 'Workspace cannot publish before this date.',
         'workspace_review_reminder' => 'Editorial review reminder is due.',
     ],
@@ -48,7 +48,8 @@ return [
         'manage' => 'Scheduler',
     ],
     'fields' => [
-        'unpublish_at' => 'Unpublish At',
+        'unpublish_at' => 'Takedown Reminder At',
+        'takedown_reminder_at' => 'Takedown Reminder At',
         'embargo_until' => 'Embargo Until',
         'review_reminder_at' => 'Review Reminder At',
     ],

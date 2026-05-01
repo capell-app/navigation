@@ -32,7 +32,7 @@ final class SiteSearchLog extends Model
 
     public function getTable(): string
     {
-        return (string) config('capell-site-search.logs.table_name', 'site_search_logs');
+        return config('capell-site-search.logs.table_name', 'site_search_logs');
     }
 
     /**

@@ -41,7 +41,7 @@ final class WorkspacePeekPreviewAction extends Action
         Peek::registerPreviewModal();
     }
 
-    public static function getDefaultName(): ?string
+    public static function getDefaultName(): string
     {
         return 'workspacePeekPreview';
     }

@@ -6,6 +6,7 @@ namespace Capell\MediaCurator;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Contracts\Media\MediaFieldFactory;
+use Capell\Core\Facades\CapellCore;
 use Capell\MediaCurator\Console\MigrateSpatieToCuratorCommand;
 use Capell\MediaCurator\Filament\Components\CuratorMediaFieldFactory;
 use Capell\MediaCurator\Filament\Pages\MediaHealthPage;
@@ -25,6 +26,8 @@ final class CapellMediaCuratorServiceProvider extends ServiceProvider
     {
         config()->set('capell.media.backend', 'curator');
         config()->set('capell.media.model', CuratorMedia::class);
+
+        CapellCore::registerModels([CuratorMedia::class]);
 
         $this->app->bind(MediaFieldFactory::class, CuratorMediaFieldFactory::class);
 
