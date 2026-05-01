@@ -20,7 +20,7 @@
         "lint": "pint --parallel packages tests",
         "analyze": "phpstan analyse --memory-limit=-1 --configuration=phpstan.neon",
         "prettier": "npx prettier --write \"packages/**/*.{css,js,yml,json,md,blade.php}\"",
-        "eslint": "npx eslint 'packages/*/*/resources/js/**/*.js' 'packages/*/themes/*/resources/js/**/*.js' --max-warnings=0 --no-error-on-unmatched-pattern",
+        "eslint": "npx eslint 'packages/**/resources/js/**/*.js' --max-warnings=0",
         "preflight": [
             "@prettier",
             "@eslint",
