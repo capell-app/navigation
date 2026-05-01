@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Address\Tests\AddressTestCase;
 use Capell\Blog\Tests\BlogTestCase;
+use Capell\Campaigns\Tests\CampaignsTestCase;
 use Capell\DeveloperTools\Tests\DeveloperToolsTestCase;
 use Capell\Forms\Tests\FormsTestCase;
 use Capell\MediaCurator\Tests\MediaCuratorTestCase;
@@ -22,6 +23,7 @@ use Capell\Workspaces\Tests\WorkspacesTestCase;
 pest()->extend(AddressTestCase::class)->in('../packages/address/tests');
 pest()->extend(PackagesTestCase::class)->in('../packages/authentication-log/tests');
 pest()->extend(BlogTestCase::class)->in('../packages/blog/tests');
+pest()->extend(CampaignsTestCase::class)->in('../packages/campaigns/tests');
 pest()->extend(DeveloperToolsTestCase::class)->in('../packages/developer-tools/tests');
 pest()->extend(FormsTestCase::class)->in('../packages/forms/tests');
 pest()->extend(MediaCuratorTestCase::class)->in('../packages/media-curator/tests');
