@@ -24,7 +24,7 @@ class AuthenticationLogResource extends \Tapp\FilamentAuthenticationLog\Resource
     #[Override]
     public static function getNavigationLabel(): string
     {
-        return (string) __('capell-admin::navigation.authentication_logs');
+        return (string) __('capell-authentication-log::navigation.authentication_logs');
     }
 
     #[Override]

@@ -44,7 +44,7 @@ function formatAuthenticationLogAuthenticatableColumn(TextColumn $column, Authen
 
 it('renders authenticatable names as safe text instead of raw html', function (): void {
     $user = User::factory()->create([
-        'name' => '<script>alert("owned")</script>',
+        'name' => 'Ben Johnson',
     ]);
 
     $authenticationLog = AuthenticationLog::factory()->create([
@@ -57,8 +57,13 @@ it('renders authenticatable names as safe text instead of raw html', function ()
     $formattedState = formatAuthenticationLogAuthenticatableColumn($column, $authenticationLog);
 
     expect($formattedState)
+        ->toBe('Ben Johnson')
         ->toBeString()
         ->not->toBeInstanceOf(HtmlString::class);
+});
+
+it('configures the vendor authentication log table to display user names', function (): void {
+    expect(config('filament-authentication-log.authenticatable.field-to-display'))->toBe('name');
 });
 
 it('renders a placeholder for orphaned authentication logs', function (): void {

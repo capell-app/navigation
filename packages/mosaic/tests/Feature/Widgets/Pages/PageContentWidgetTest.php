@@ -8,6 +8,8 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Frontend\Actions\RenderContentAction;
 use Capell\Mosaic\Database\Factories\LayoutFactory;
+use Capell\Mosaic\Enums\ContainerAlignmentEnum;
+use Capell\Mosaic\Enums\ResponsiveVisibilityEnum;
 use Capell\Mosaic\Enums\WidgetComponentEnum;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Support\Creator\WidgetCreator;
@@ -57,6 +59,32 @@ it('renders page content widget on page', function (): void {
                     fn (AssertElement $titleElm, int $index): BaseAssert => $titleElm->containsText($paragraphs[$index]),
                 ),
         );
+});
+
+it('renders container alignment and responsive visibility classes', function (): void {
+    $site = Site::factory()->withTranslations()->create();
+    $creator = resolve(WidgetCreator::class);
+    $widget = $creator->pageContentWidget();
+    $layout = (new LayoutFactory)->widgets([$widget])->create();
+
+    $containers = $layout->containers;
+    $containers['main']['meta'] = [
+        'alignment' => ContainerAlignmentEnum::Center->value,
+        'hidden_on' => [
+            ResponsiveVisibilityEnum::Mobile->value,
+            ResponsiveVisibilityEnum::Tablet->value,
+        ],
+    ];
+
+    $layout->update(['containers' => $containers]);
+
+    $page = Page::factory()->site($site)->layout($layout)->withTranslations()->create();
+
+    get($page->pageUrl->full_url)
+        ->assertOk()
+        ->assertSee('id="layout-container-main"', false)
+        ->assertSee('justify-self-center', false)
+        ->assertSee('hidden lg:block', false);
 });
 
 it('renders page content widget on page blocks', function (): void {

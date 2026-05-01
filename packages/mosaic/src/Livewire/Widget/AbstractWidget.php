@@ -139,5 +139,9 @@ abstract class AbstractWidget extends Component
     protected function initializeWidget(): void
     {
         $this->mountWidget();
+
+        if ($this->skipRender) {
+            $this->skipRender('<div style="display: none"></div>');
+        }
     }
 }

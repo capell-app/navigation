@@ -199,8 +199,14 @@ class MosaicServiceProvider extends AbstractPackageServiceProvider
             serviceProviderClass: static::class,
             path: realpath(__DIR__ . '/../..'),
             version: $this->getVersion(),
+            setupCommand: 'capell:mosaic-setup',
             description: fn (): string => __('capell-mosaic::package.description'),
         );
+
+        $package = CapellCore::getPackage(static::$packageName);
+        $package->installCommand = 'capell:mosaic-install';
+        $package->demoCommand = 'capell:mosaic-demo';
+        $package->demoParams = ['sites', 'user'];
 
         return $this;
     }

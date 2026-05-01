@@ -8,6 +8,8 @@ use Capell\Admin\Contracts\ConfiguratorInterface;
 use Capell\Admin\Contracts\ConfiguratorTypeEnumInterface;
 use Capell\Admin\Filament\Concerns\HasConfigurator;
 use Capell\Mosaic\Enums\ConfiguratorTypeEnum;
+use Capell\Mosaic\Enums\ContainerAlignmentEnum;
+use Capell\Mosaic\Enums\ResponsiveVisibilityEnum;
 use Capell\Mosaic\Enums\SchemaExtenderEnum;
 use Capell\Mosaic\Filament\Components\Forms\BackgroundSchema;
 use Capell\Mosaic\Filament\Components\Forms\ColumnInput;
@@ -17,6 +19,8 @@ use Capell\Mosaic\Filament\Components\Forms\MarginSelect;
 use Capell\Mosaic\Filament\Components\Forms\PaddingSelect;
 use Capell\Mosaic\Filament\Components\Forms\SpacingSelect;
 use Capell\Mosaic\Filament\Components\Forms\TagSelect;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -51,6 +55,15 @@ class DefaultLayoutContainerConfigurator implements ConfiguratorInterface
                     ColumnInput::make('column_start')
                         ->label(__('capell-mosaic::form.column_start')),
                     ContainerWidthSelect::make(),
+                    Select::make('alignment')
+                        ->label(__('capell-mosaic::form.alignment'))
+                        ->options(ContainerAlignmentEnum::class)
+                        ->default(ContainerAlignmentEnum::Stretch->value),
+                    CheckboxList::make('hidden_on')
+                        ->label(__('capell-mosaic::form.hide_on'))
+                        ->options(ResponsiveVisibilityEnum::class)
+                        ->default([])
+                        ->columns(3),
                     HtmlClassInput::make('html_class'),
                     PaddingSelect::make('padding'),
                     MarginSelect::make('margin'),

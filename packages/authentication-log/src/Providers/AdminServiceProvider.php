@@ -25,6 +25,7 @@ class AdminServiceProvider extends ServiceProvider
             'filament-authentication-log.resources.AuthenticationLogResource',
             AuthenticationLogResource::class,
         );
+        Config::set('filament-authentication-log.authenticatable.field-to-display', 'name');
 
         $this->app->tag([AuthenticationLogAdminPanelExtender::class], AdminPanelExtender::TAG);
         $this->app->tag([AuthenticationLogDashboardSettingsContributor::class], DashboardSettingsContributor::TAG);

@@ -19,6 +19,10 @@ final class BuildMediaHealthQueryAction
      */
     public function handle(?array $ownerForeignKeys = null): Builder
     {
+        if (! Schema::hasTable('curator')) {
+            return $this->emptyCuratorQuery();
+        }
+
         $staleThreshold = now()->subDays(90);
         $knownOwnerForeignKeys = $this->knownOwnerForeignKeys(
             $ownerForeignKeys ?? config('capell.media_curator.owner_foreign_keys', []),
@@ -38,6 +42,46 @@ final class BuildMediaHealthQueryAction
                     $nestedCuratorQuery->orWhereRaw('(' . $usageCountExpression . ') = 0');
                 }
             });
+    }
+
+    private function emptyCuratorQuery(): Builder
+    {
+        $query = CuratorMedia::query();
+        $emptyCuratorTable = DB::query()
+            ->selectRaw($this->emptyCuratorColumns())
+            ->whereRaw('1 = 0');
+
+        $query->getQuery()->fromSub($emptyCuratorTable, 'curator');
+
+        return $query
+            ->select('curator.*')
+            ->selectRaw('0 as usage_count');
+    }
+
+    private function emptyCuratorColumns(): string
+    {
+        return implode(', ', [
+            'null as id',
+            'null as disk',
+            'null as directory',
+            'null as visibility',
+            'null as name',
+            'null as path',
+            'null as width',
+            'null as height',
+            'null as size',
+            'null as type',
+            'null as ext',
+            'null as alt',
+            'null as title',
+            'null as description',
+            'null as caption',
+            'null as pretty_name',
+            'null as exif',
+            'null as curations',
+            'null as created_at',
+            'null as updated_at',
+        ]);
     }
 
     /**

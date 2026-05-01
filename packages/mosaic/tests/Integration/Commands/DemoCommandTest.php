@@ -62,11 +62,11 @@ it('runs the demo command and creates demo layouts for a site', function (): voi
     artisan('capell:mosaic-demo', [
         '--sites' => $site->name,
     ])
-        ->doesntExpectOutput('Running hero demo...')
+        ->expectsOutput('Running hero demo...')
         ->assertExitCode(0);
 });
 
-it('runs mosaic demo with --include-hero and delegates to hero demo', function (): void {
+it('runs mosaic demo with --skip-hero without delegating to hero demo', function (): void {
     $capellDirectory = storage_path('app/capell');
     $demoDirectory = $capellDirectory . '/demo';
 
@@ -96,8 +96,8 @@ it('runs mosaic demo with --include-hero and delegates to hero demo', function (
 
     artisan('capell:mosaic-demo', [
         '--sites' => $site->name,
-        '--include-hero' => true,
+        '--skip-hero' => true,
     ])
-        ->expectsOutput('Running hero demo...')
+        ->doesntExpectOutput('Running hero demo...')
         ->assertExitCode(0);
 });

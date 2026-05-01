@@ -17,13 +17,11 @@ use Capell\Mosaic\Filament\Resources\Pages\Tables\PageSelectionTable;
 use Capell\Mosaic\Filament\Resources\Sections\Tables\SectionSelectionTable;
 use Capell\Mosaic\Filament\Resources\Widgets\Schemas\WidgetAssetForm;
 use Capell\Mosaic\Filament\Resources\Widgets\Schemas\WidgetForm;
-use Capell\Mosaic\Filament\Resources\Widgets\Tables\WidgetSelectionTable;
 use Capell\Mosaic\Models\Widget;
 use Capell\Mosaic\Models\WidgetAsset;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TableSelect;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
@@ -83,8 +81,11 @@ trait HasLayoutActions
                 static fn (self $livewire, Schema $configurator, array $arguments): Schema => $configurator->operation('createOption')
                     ->schema($livewire->getContainerSchema($configurator, $arguments)),
             )
-            ->action(function (Action $action, self $livewire, array $data): void {
-                $livewire->saveContainer($data);
+            ->action(function (Action $action, self $livewire, array $data, array $arguments): void {
+                $livewire->saveContainer(
+                    $data,
+                    position: isset($arguments['position']) ? (int) $arguments['position'] : null,
+                );
 
                 $action->success();
             });
@@ -132,6 +133,21 @@ trait HasLayoutActions
             ->grouped()
             ->action(function (Action $action, self $livewire, array $arguments): void {
                 $livewire->removeContainer($arguments['containerKey']);
+
+                $action->success();
+            });
+    }
+
+    public function duplicateContainerAction(): Action
+    {
+        return Action::make('duplicateContainer')
+            ->label(__('capell-mosaic::button.duplicate_container'))
+            ->groupedIcon('heroicon-o-square-2-stack')
+            ->color('gray')
+            ->size(Size::Small)
+            ->grouped()
+            ->action(function (Action $action, self $livewire, array $arguments): void {
+                $livewire->duplicateContainer($arguments['containerKey']);
 
                 $action->success();
             });
@@ -198,8 +214,8 @@ trait HasLayoutActions
                 'class' => 'capell-mosaic-builder-assets-table',
             ])
             ->closeModalByClickingAway(false)
-            ->schema(function (Schema $configurator, array $arguments): Schema {
-                $containerOptions = self::getContainerOptions();
+            ->schema(function (Schema $configurator, array $arguments, self $livewire): Schema {
+                $containerOptions = $livewire->getContainerOptions();
                 $containerKey = $arguments['containerKey'] ?? null;
 
                 $components = [];
@@ -213,15 +229,23 @@ trait HasLayoutActions
                         ->options($containerOptions);
                 }
 
-                $components[] = TableSelect::make('widgets')
-                    ->tableConfiguration(WidgetSelectionTable::class)
+                $components[] = Select::make('widgets')
+                    ->label(__('capell-mosaic::button.widget'))
+                    ->options(
+                        $livewire->getWidgetQuery(withRelations: false)
+                            ->ordered()
+                            ->pluck('name', 'id')
+                            ->all(),
+                    )
                     ->multiple()
-                    ->hiddenLabel();
+                    ->searchable()
+                    ->preload()
+                    ->required();
 
                 return $configurator->schema($components);
             })
             ->action(function (array $data, array $arguments, self $livewire): void {
-                $containerOptions = self::getContainerOptions();
+                $containerOptions = $livewire->getContainerOptions();
                 $containerKey = $arguments['containerKey'] ?? null;
 
                 if (! $containerKey) {

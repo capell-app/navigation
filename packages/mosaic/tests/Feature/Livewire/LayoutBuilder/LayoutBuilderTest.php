@@ -350,6 +350,107 @@ test('it increments occurrence when adding an existing widget again', function (
         ]);
 });
 
+test('it filters widget palette results by widget fields and translation title', function (string $searchTerm, string $expectedWidgetName): void {
+    $language = Language::factory()->create();
+
+    $nameMatch = Widget::factory()->state([
+        'name' => 'Palette Name Match',
+        'key' => 'palette-name-match',
+        'order' => 1,
+    ])->create();
+
+    $keyMatch = Widget::factory()->state([
+        'name' => 'Palette Key Label',
+        'key' => 'palette-key-token',
+        'order' => 2,
+    ])->create();
+
+    $translationMatch = Widget::factory()->state([
+        'name' => 'Palette Translation Label',
+        'key' => 'palette-translation-label',
+        'order' => 3,
+    ])->create();
+
+    $translationMatch->translations()->create([
+        'language_id' => $language->id,
+        'title' => 'Palette Translation Token',
+    ]);
+
+    Widget::factory()->state([
+        'name' => 'Palette Hidden Result',
+        'key' => 'palette-hidden-result',
+        'order' => 4,
+    ])->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => ['main' => ['widgets' => []]],
+    ])->create();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->set('widgetPaletteSearch', $searchTerm)
+        ->assertSet('widgetPalettePage', 1)
+        ->assertSeeText($expectedWidgetName)
+        ->assertDontSeeText('Palette Hidden Result');
+})->with([
+    'name' => ['Name Match', 'Palette Name Match'],
+    'key' => ['key-token', 'Palette Key Label'],
+    'translation title' => ['Translation Token', 'Palette Translation Label'],
+]);
+
+test('it paginates widget palette results without navigation', function (): void {
+    Widget::factory()->state(['name' => 'Palette Page One A', 'key' => 'palette-page-one-a', 'order' => 1])->create();
+    Widget::factory()->state(['name' => 'Palette Page One B', 'key' => 'palette-page-one-b', 'order' => 2])->create();
+    Widget::factory()->state(['name' => 'Palette Page Two A', 'key' => 'palette-page-two-a', 'order' => 3])->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => ['main' => ['widgets' => []]],
+    ])->create();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->set('widgetPalettePerPage', 2)
+        ->assertSet('widgetPalettePage', 1)
+        ->assertSeeText('Palette Page One A')
+        ->assertDontSeeText('Palette Page Two A')
+        ->call('nextWidgetPalettePage')
+        ->assertSet('widgetPalettePage', 2)
+        ->assertSeeText('Palette Page Two A')
+        ->assertDontSeeText('Palette Page One A')
+        ->call('previousWidgetPalettePage')
+        ->assertSet('widgetPalettePage', 1)
+        ->assertSeeText('Palette Page One A');
+});
+
+test('it adds a widget from the palette to a container at a position', function (): void {
+    Widget::factory()->state(['key' => 'first'])->create();
+    Widget::factory()->state(['key' => 'second'])->create();
+    $widget = Widget::factory()->state(['key' => 'palette-inserted'])->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => [
+            'main' => [
+                'widgets' => [
+                    ['widget_key' => 'first', 'occurrence' => 1],
+                    ['widget_key' => 'second', 'occurrence' => 1],
+                ],
+            ],
+        ],
+    ])->create();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->call('addPaletteWidgetToContainer', widgetId: $widget->id, containerKey: 'main', position: 1)
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    expect(array_column($layout->containers['main']['widgets'], 'widget_key'))
+        ->toBe(['first', 'palette-inserted', 'second'])
+        ->and($layout->containers['main']['widgets'][1]['occurrence'])
+        ->toBe(1);
+});
+
 test('it removes a specific widget from a container and persists the change', function (): void {
     Widget::factory()->state(['key' => 'keep-a'])->create();
     Widget::factory()->state(['key' => 'remove-me'])->create();
@@ -412,6 +513,42 @@ test('it duplicates a widget within the same container', function (): void {
             'widget_key' => $widget->key,
             'occurrence' => 3,
         ]);
+});
+
+test('it duplicates a container with its widgets and meta', function (): void {
+    Widget::factory()->state(['key' => 'first'])->create();
+    Widget::factory()->state(['key' => 'second'])->create();
+
+    $layout = (new LayoutFactory)->state([
+        'containers' => [
+            'main' => [
+                'widgets' => [
+                    ['widget_key' => 'first', 'occurrence' => 1],
+                    ['widget_key' => 'second', 'occurrence' => 1],
+                ],
+                'meta' => [
+                    'colspan' => 6,
+                ],
+            ],
+        ],
+    ])->create();
+
+    livewire(LayoutBuilder::class, ['layout' => $layout])
+        ->assertSuccessful()
+        ->callAction('duplicateContainer', arguments: [
+            'containerKey' => 'main',
+        ])
+        ->assertHasNoFormErrors()
+        ->call('saveLayout');
+
+    $layout->refresh();
+
+    expect($layout->containers)
+        ->toHaveKeys(['main', 'container-2'])
+        ->and($layout->containers['container-2']['meta'])
+        ->toBe(['colspan' => 6])
+        ->and($layout->containers['container-2']['widgets'])
+        ->toEqual($layout->containers['main']['widgets']);
 });
 
 test('it edits a widget name', function (): void {

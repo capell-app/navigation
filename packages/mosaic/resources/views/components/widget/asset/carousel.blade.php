@@ -164,7 +164,7 @@
                             :class="'swiper-slide-img object-cover h-64 mx-auto bg-gray-50 transition-transform duration-300 group-hover:scale-105 group-focus:scale-105' . ($theme->withDarkMode ? ' dark:bg-gray-900' : '')"
                             :$loop
                             :media="$media"
-                            :alt="$widgetAsset->asset->translation->label"
+                            :alt="$widgetAsset->asset->translation?->label"
                             :width="$width"
                             :height="$height"
                             sizes="(max-width: 640px) 80vw, 20w"

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\MediaCurator\Actions\Reports\BuildMediaHealthQueryAction;
 use Capell\MediaCurator\Tests\Fixtures\TestCuratorOwner;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 test('media_health_query_uses_curator_rows_and_known_owner_foreign_keys', function (): void {
     config()->set('capell.media_curator.owner_foreign_keys', [
@@ -26,6 +27,12 @@ test('media_health_query_uses_curator_rows_and_known_owner_foreign_keys', functi
     expect($records->keys()->all())->toContain($missingAltMediaId, $unusedMediaId, $staleMediaId);
     expect((int) $records->get($missingAltMediaId)->usage_count)->toBe(1);
     expect((int) $records->get($unusedMediaId)->usage_count)->toBe(0);
+});
+
+test('media_health_query_is_empty_when_curator_table_has_not_been_installed', function (): void {
+    Schema::dropIfExists('curator');
+
+    expect(BuildMediaHealthQueryAction::run()->get())->toHaveCount(0);
 });
 
 function insertCuratorHealthMedia(string $name, ?string $alt, DateTimeInterface $updatedAt): int
