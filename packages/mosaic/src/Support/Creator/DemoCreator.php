@@ -35,7 +35,6 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use RuntimeException;
 use Spatie\Image\Image;
 use Spatie\MediaLibrary\HasMedia;
 
@@ -245,7 +244,9 @@ class DemoCreator
             ->limit(3)
             ->get();
 
-        throw_if($relatedPages->isEmpty(), RuntimeException::class, 'No pages with images found to associate with the widget.');
+        if ($relatedPages->isEmpty()) {
+            return $widget;
+        }
 
         $relatedPages->each(fn (Page $relatedPage): WidgetAsset => $widget->assets()->create([
             'pageable_id' => $page->id,

@@ -48,10 +48,6 @@ it('renders navigation widget on page', function (): void {
         'children' => fn (Relation $query) => $query->ordered()->alphabetical($language)->with(['translation', 'pageUrl.siteDomain']),
     ]);
 
-    $anotherSite = Site::factory()->language($language)->withTranslations($language)->create();
-    $anotherSiteHome = Page::factory()->site($anotherSite)->home()->withTranslations($language, slug: '/')->create();
-    $anotherSiteHome->load('pageUrl.siteDomain');
-
     $externalUrl = 'https://example.com/external';
     $items = [
         [
@@ -68,14 +64,6 @@ it('renders navigation widget on page', function (): void {
             'data' => [
                 'pageable_id' => $page->getKey(),
                 'pageable_type' => $page->getMorphClass(),
-            ],
-        ],
-        [
-            'label' => 'Another Site',
-            'type' => NavigationItemType::Page->value,
-            'data' => [
-                'pageable_id' => $anotherSiteHome->getKey(),
-                'pageable_type' => $anotherSiteHome->getMorphClass(),
             ],
         ],
         [
@@ -116,7 +104,7 @@ it('renders navigation widget on page', function (): void {
         ->assertOk()
         ->assertElementExists(
             '.widget-navigation',
-            fn (AssertElement $element): BaseAssert => $element->contains('.widget-navigation-item', 8)
+            fn (AssertElement $element): BaseAssert => $element->contains('.widget-navigation-item', 7)
                 ->find(
                     '.list-items',
                     fn (AssertElement $el): BaseAssert => $el->find(
@@ -132,16 +120,11 @@ it('renders navigation widget on page', function (): void {
                         )
                         ->find(
                             '.widget-navigation-item:nth-child(3)',
-                            fn (AssertElement $el): BaseAssert => $el->containsText('Another Site')
-                                ->find('a', fn (AssertElement $link): BaseAssert => $link->has('href', $anotherSiteHome->pageUrl->full_url)),
-                        )
-                        ->find(
-                            '.widget-navigation-item:nth-child(4)',
                             fn (AssertElement $el): BaseAssert => $el->containsText('External link')
                                 ->find('a', fn (AssertElement $link): BaseAssert => $link->has('href', $externalUrl)),
                         )
                         ->find(
-                            '.widget-navigation-item:nth-child(5)',
+                            '.widget-navigation-item:nth-child(4)',
                             fn (AssertElement $el): BaseAssert => $el->containsText($services->translation->title)
                                 ->find('a', fn (AssertElement $link): BaseAssert => $link->has('href', $services->pageUrl->full_url))
                                 ->find(

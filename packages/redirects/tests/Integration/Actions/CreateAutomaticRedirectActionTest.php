@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Core\Enums\UrlTypeEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageUrl;
 use Capell\Redirects\Actions\CreateAutomaticRedirectAction;
-use Capell\Redirects\Enums\RedirectStatusCodeEnum;
 
 it('creates a permanent automatic redirect from an old url to a page', function (): void {
     $language = Language::factory()->create();

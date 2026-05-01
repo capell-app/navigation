@@ -1,6 +1,6 @@
 # Redirect Manager
 
-The redirects package manages 301 and 302 redirects, broken URL reporting, import/export, and automatic redirects when page slugs change. It keeps using Capell's existing `page_urls` table for redirect storage.
+The redirects package manages 301 and 302 redirects, import/export, and automatic redirects when page slugs change. It keeps using Capell's existing `page_urls` table for redirect storage.
 
 ---
 
@@ -49,20 +49,12 @@ The redirects package registers this resource with Capell Admin from `RedirectsS
 
 Frontend page resolution delegates redirect decisions to `RedirectResolver`. The default `PageUrlRedirectResolver` resolves active `page_urls` rows of `type = redirect` and issues a `301` or `302` according to the row's `status_code`. Hit count and `last_hit_at` are updated on every match.
 
-## Broken URL reporting
-
-`VisitUrlAction` can report broken URLs through `BrokenUrlReporter` when it receives page context. The default `DatabaseBrokenUrlReporter` writes to `broken_links` unless `redirects.broken_urls.enabled` is disabled.
-
 ## Configuration
 
 ```php
 'auto_redirects' => [
     'enabled' => env('CAPELL_REDIRECTS_AUTO_ENABLED', true),
     'status_code' => 301,
-],
-
-'broken_urls' => [
-    'enabled' => env('CAPELL_REDIRECTS_BROKEN_URLS_ENABLED', true),
 ],
 ```
 
@@ -78,4 +70,3 @@ Frontend page resolution delegates redirect decisions to `RedirectResolver`. The
 | Validation action   | `packages/redirects/src/Actions/ValidateRedirectAction.php`                                                                    |
 | Automatic redirects | `packages/redirects/src/Actions/CreateAutomaticRedirectAction.php`                                                             |
 | Status enum         | `packages/redirects/src/Enums/RedirectStatusCodeEnum.php`                                                                      |
-| Broken reporter     | `packages/redirects/src/Support/DatabaseBrokenUrlReporter.php`                                                                 |

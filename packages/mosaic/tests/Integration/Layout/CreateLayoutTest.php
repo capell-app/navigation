@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Capell\Core\Enums\LayoutEnum;
 use Capell\Core\Support\Creator\LayoutCreator;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 it('creates the default layout with correct containers and widgets', function (): void {
     $layout = (new LayoutCreator)->create(LayoutEnum::Default);
@@ -57,4 +59,14 @@ it('creates the home layout with correct containers and widgets', function (): v
     expect($mainWidgets)->toBeArray();
     expect(collect($mainWidgets)->pluck('widget_key')->all())
         ->toBe(['page-content']);
+});
+
+it('can create core layouts before mosaic layout columns exist', function (): void {
+    Schema::table('layouts', function (Blueprint $table): void {
+        $table->dropColumn(['containers', 'widgets']);
+    });
+
+    $layout = (new LayoutCreator)->create(LayoutEnum::Default);
+
+    expect($layout->key)->toBe('default');
 });

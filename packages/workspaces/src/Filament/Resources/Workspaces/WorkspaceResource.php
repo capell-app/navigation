@@ -21,6 +21,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Override;
 
 class WorkspaceResource extends Resource
@@ -74,6 +75,11 @@ class WorkspaceResource extends Resource
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'slug', 'description'];
+    }
+
+    public static function canGloballySearch(): bool
+    {
+        return SchemaFacade::hasTable('workspaces') && parent::canGloballySearch();
     }
 
     /**

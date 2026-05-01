@@ -30,6 +30,10 @@ final class WorkspaceContextScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
+        if (! $this->modelHasWorkspaceColumns($model)) {
+            return;
+        }
+
         $activeWorkspaceId = WorkspaceContext::currentId();
         $workspaceColumn = $model->qualifyColumn('workspace_id');
         $shadowedColumn = $model->qualifyColumn('shadowed_by_workspace_id');
@@ -53,5 +57,14 @@ final class WorkspaceContextScope implements Scope
                     );
             },
         );
+    }
+
+    private function modelHasWorkspaceColumns(Model $model): bool
+    {
+        $schema = $model->getConnection()->getSchemaBuilder();
+        $table = $model->getTable();
+
+        return $schema->hasColumn($table, 'workspace_id')
+            && $schema->hasColumn($table, 'shadowed_by_workspace_id');
     }
 }

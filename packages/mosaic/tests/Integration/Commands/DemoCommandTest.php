@@ -101,3 +101,37 @@ it('runs mosaic demo with --skip-hero without delegating to hero demo', function
         ->doesntExpectOutput('Running hero demo...')
         ->assertExitCode(0);
 });
+
+it('runs mosaic demo when no pages with images exist yet', function (): void {
+    $capellDirectory = storage_path('app/capell');
+    $demoDirectory = $capellDirectory . '/demo';
+
+    File::deleteDirectory($demoDirectory);
+
+    $sourceDemoDirectory = realpath(__DIR__ . '/../../../../../demo');
+
+    throw_if($sourceDemoDirectory === false, RuntimeException::class, 'Demo fixtures directory not found.');
+
+    $demoCopiedToStorage = File::copyDirectory($sourceDemoDirectory, $demoDirectory);
+
+    expect($demoCopiedToStorage)->toBeTrue();
+
+    $demoImgPath = $demoDirectory . DIRECTORY_SEPARATOR . 'img';
+
+    File::spy();
+    $dummyFile = new SplFileInfo($demoImgPath . DIRECTORY_SEPARATOR . 'home.jpg');
+    File::shouldReceive('files')->with($demoImgPath)->andReturn([$dummyFile]);
+    File::shouldReceive('exists')->with(Mockery::on(fn (string $path): bool => str_starts_with($path, $demoImgPath)))->andReturn(false);
+
+    $language = Language::factory()->english()->create();
+    $site = Site::factory()->recycle($language)->withTranslations($language)->state(['name' => 'Test'])->create();
+    Type::factory()->page()->default()->create();
+    Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+
+    artisan('capell:mosaic-demo', [
+        '--sites' => $site->name,
+        '--skip-hero' => true,
+    ])
+        ->doesntExpectOutput('Running hero demo...')
+        ->assertExitCode(0);
+});

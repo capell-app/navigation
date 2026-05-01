@@ -41,12 +41,14 @@ it('records form conversions with submission source and landing page attribution
             'utm_content' => 'hero',
             'utm_term' => 'launch',
         ]);
-    $form = Form::query()->create([
+    $form = Form::factory()->create([
+        'site_id' => $page->site_id,
         'name' => 'Lead form',
         'handle' => 'lead-form',
     ]);
     $submission = $form->submissions()->create([
-        'data' => ['email' => 'ben@example.com'],
+        'site_id' => $form->site_id,
+        'payload' => ['values' => ['email' => 'ben@example.com']],
         'meta' => new SubmissionMetaData(
             url: 'https://capell.test/signup?utm_campaign=spring-launch&utm_source=newsletter&utm_medium=email',
             referer: 'https://example.test/',
@@ -70,7 +72,7 @@ it('records form conversions with submission source and landing page attribution
     expect(CampaignConversion::query()->count())->toBe(1)
         ->and($conversion->campaign_conversion_goal_id)->toBe($goal->getKey())
         ->and($conversion->campaign_landing_page_id)->toBe($landingPage->getKey())
-        ->and($conversion->source_type)->toBe('form_submission')
+        ->and($conversion->source_type)->toBe($submission->getMorphClass())
         ->and($conversion->source_id)->toBe($submission->getKey())
         ->and($conversion->attribution->landingUrl)->toBe('https://capell.test/signup?utm_campaign=spring-launch&utm_source=newsletter&utm_medium=email')
         ->and($conversion->attribution->referrerUrl)->toBe('https://example.test/')

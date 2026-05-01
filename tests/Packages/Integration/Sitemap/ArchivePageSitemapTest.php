@@ -38,9 +38,9 @@ it('builds recursive sitemap for archive page with parent chain and month childr
 
     $archiveUrl = $archivePage->pageUrl->full_url;
     $archivesUrl = collect([
-        $archiveUrl . '/2023-1',
-        $archiveUrl . '/2023-2',
-        $archiveUrl . '/2023-3',
+        $archiveUrl . '/2023-01',
+        $archiveUrl . '/2023-02',
+        $archiveUrl . '/2023-03',
     ]);
 
     $sitemap = new ArchivesSitemap(site: $site, domain: $domain, language: $language);

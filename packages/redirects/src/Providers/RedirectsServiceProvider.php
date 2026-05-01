@@ -8,13 +8,11 @@ use Capell\Admin\Support\CapellAdminManager;
 use Capell\Core\Events\PageSaved;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Support\Packages\AbstractPackageServiceProvider;
-use Capell\Redirects\Contracts\BrokenUrlReporter;
 use Capell\Redirects\Contracts\RedirectRecorder;
 use Capell\Redirects\Contracts\RedirectResolver;
 use Capell\Redirects\Filament\Resources\Redirects\RedirectResource;
 use Capell\Redirects\Listeners\CreateRedirectsForChangedPageUrls;
 use Capell\Redirects\Policies\RedirectPolicy;
-use Capell\Redirects\Support\DatabaseBrokenUrlReporter;
 use Capell\Redirects\Support\PageUrlRedirectRecorder;
 use Capell\Redirects\Support\PageUrlRedirectResolver;
 use Illuminate\Support\Facades\Event;
@@ -32,7 +30,6 @@ class RedirectsServiceProvider extends AbstractPackageServiceProvider
         $package
             ->name(self::$name)
             ->hasConfigFile('redirects')
-            ->hasMigration('create_broken_links_table')
             ->hasTranslations();
     }
 
@@ -40,7 +37,6 @@ class RedirectsServiceProvider extends AbstractPackageServiceProvider
     {
         $this->app->singleton(RedirectResolver::class, PageUrlRedirectResolver::class);
         $this->app->singleton(RedirectRecorder::class, PageUrlRedirectRecorder::class);
-        $this->app->singleton(BrokenUrlReporter::class, DatabaseBrokenUrlReporter::class);
 
         Event::listen(PageSaved::class, [CreateRedirectsForChangedPageUrls::class, 'handle']);
 

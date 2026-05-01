@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Capell\Core\Actions\PageSavedAction;
+use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\PageUrl;
-use Capell\Redirects\Enums\RedirectStatusCodeEnum;
 
 it('creates redirects for previous page urls carried by page saved form data', function (): void {
     $language = Language::factory()->create();

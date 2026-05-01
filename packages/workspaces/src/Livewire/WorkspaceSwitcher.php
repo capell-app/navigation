@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -61,6 +62,10 @@ class WorkspaceSwitcher extends Component
     #[Computed]
     public function currentWorkspace(): ?Workspace
     {
+        if (! $this->hasWorkspacesTable()) {
+            return null;
+        }
+
         $workspaceId = Session::get(ResolveWorkspaceContext::SESSION_KEY);
 
         if (! is_int($workspaceId) && ! (is_string($workspaceId) && ctype_digit($workspaceId))) {
@@ -76,7 +81,7 @@ class WorkspaceSwitcher extends Component
     {
         $user = Auth::user();
 
-        if ($user === null || $user->cannot('viewAny', Workspace::class)) {
+        if ($user === null || ! $this->hasWorkspacesTable() || $user->cannot('viewAny', Workspace::class)) {
             /** @var Collection<int, Workspace> $empty */
             $empty = new Collection;
 
@@ -98,7 +103,7 @@ class WorkspaceSwitcher extends Component
     {
         $user = Auth::user();
 
-        if ($user === null || $user->cannot('create', Workspace::class)) {
+        if ($user === null || ! $this->hasWorkspacesTable() || $user->cannot('create', Workspace::class)) {
             return null;
         }
 
@@ -108,5 +113,10 @@ class WorkspaceSwitcher extends Component
     public function render(): View
     {
         return view('capell-workspaces::livewire.header.workspace-switcher');
+    }
+
+    private function hasWorkspacesTable(): bool
+    {
+        return Schema::hasTable('workspaces');
     }
 }

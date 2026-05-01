@@ -11,6 +11,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Navigation\Providers\NavigationServiceProvider;
+use Capell\Navigation\Support\Loader\NavigationItemsLoader;
 use Capell\Tests\AbstractTestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -23,6 +24,8 @@ class NavigationTestCase extends AbstractTestCase
 {
     protected function setUp(): void
     {
+        NavigationItemsLoader::flushPageCache();
+
         parent::setUp();
 
         $this->registerAndMigrateSettings(

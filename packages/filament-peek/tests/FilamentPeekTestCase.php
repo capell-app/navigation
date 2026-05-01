@@ -9,6 +9,7 @@ use Capell\FilamentPeek\Providers\FilamentPeekServiceProvider;
 use Capell\Tests\AbstractTestCase;
 use Livewire\LivewireServiceProvider;
 use Override;
+use Pboivin\FilamentPeek\FilamentPeekServiceProvider as BaseFilamentPeekServiceProvider;
 
 abstract class FilamentPeekTestCase extends AbstractTestCase
 {
@@ -25,6 +26,7 @@ abstract class FilamentPeekTestCase extends AbstractTestCase
     {
         return [
             ...parent::getPackageProviders($app),
+            BaseFilamentPeekServiceProvider::class,
             FilamentPeekServiceProvider::class,
             LivewireServiceProvider::class,
         ];
@@ -35,6 +37,11 @@ abstract class FilamentPeekTestCase extends AbstractTestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        CapellCore::registerPackage(
+            'capell-app/workspaces',
+            path: realpath(__DIR__ . '/../../../packages/workspaces'),
+        );
+        CapellCore::forcePackageInstalled('capell-app/workspaces');
         CapellCore::forcePackageInstalled(FilamentPeekServiceProvider::$packageName);
     }
 }

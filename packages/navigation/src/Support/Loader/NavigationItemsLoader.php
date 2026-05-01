@@ -32,6 +32,11 @@ class NavigationItemsLoader
         public SiteDomain $siteDomain,
     ) {}
 
+    public static function flushPageCache(): void
+    {
+        self::$pagesByMorphKeyCache = [];
+    }
+
     /**
      * @return Collection<int, NavigationItemData>
      */

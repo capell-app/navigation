@@ -7,6 +7,7 @@ namespace Capell\SiteSearch\Actions;
 use Capell\SiteSearch\Data\SearchRequestData;
 use Capell\SiteSearch\Models\SiteSearchLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 final class RecordSiteSearchAction
@@ -31,6 +32,10 @@ final class RecordSiteSearchAction
         );
 
         if ($normalizedQuery === '' || mb_strlen((string) $normalizedQuery) < $minimumLength) {
+            return null;
+        }
+
+        if (! SchemaFacade::hasTable((new SiteSearchLog)->getTable())) {
             return null;
         }
 

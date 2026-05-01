@@ -1,3 +1,7 @@
+@php
+    use Capell\Forms\Enums\FormFieldType;
+@endphp
+
 <div class="capell-form">
     @if ($form)
         @if ($submitted)

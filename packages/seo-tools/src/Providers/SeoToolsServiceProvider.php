@@ -308,6 +308,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
     {
         /** @var CapellAdminManager $adminManager */
         $adminManager = $this->app->make(CapellAdminManager::class);
+
         $adminManager->registerPage(NotFoundUrlsPage::class);
         $adminManager->registerPage(BrokenLinksPage::class);
         $adminManager->registerPage(SEOAuditPage::class);

@@ -66,7 +66,9 @@ class SitemapGenerator
             $urlset->appendChild($urlElement);
         }
 
-        return $document->saveXML() ?: '';
+        $xml = $document->saveXML();
+
+        return $xml === false ? '' : $xml;
     }
 
     public function writeTo(string $path): bool

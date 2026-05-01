@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\Workspaces\Models\Workspace;
 use Capell\Workspaces\Tests\Integration\Fixtures\WorkspaceDraftableFixture;
 use Capell\Workspaces\WorkspaceContext;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -45,6 +46,32 @@ it('filters to live rows by default when no workspace is active', function (): v
     $rows = WorkspaceDraftableFixture::query()->pluck('name')->all();
 
     expect($rows)->toBe(['live-only']);
+});
+
+it('skips workspace filtering before workspace columns are migrated', function (): void {
+    Schema::dropIfExists('workspace_draftable_fixtures');
+
+    Schema::create('workspace_draftable_fixtures', function (Blueprint $table): void {
+        $table->id();
+        $table->uuid('uuid');
+        $table->string('name');
+        $table->timestamps();
+    });
+
+    Model::clearBootedModels();
+
+    WorkspaceDraftableFixture::query()->create([
+        'uuid' => (string) Str::uuid(),
+        'name' => 'pending-migration',
+    ]);
+
+    $workspace = new Workspace;
+    $workspace->forceFill(['id' => 123]);
+    WorkspaceContext::set($workspace);
+
+    $rows = WorkspaceDraftableFixture::query()->pluck('name')->all();
+
+    expect($rows)->toBe(['pending-migration']);
 });
 
 it('unions live and active workspace rows when a workspace is active', function (): void {

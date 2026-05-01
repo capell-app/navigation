@@ -31,11 +31,13 @@ $theme = Frontend::theme();
             'dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800' => $darkMode && $theme->withDarkMode,
         ])
     >
-        <x-dynamic-component
+        <img
             class="h-4 w-4"
-            :component="'flag-4x3-' . $language->flag"
-            :x-tooltip.raw="$language->name"
-            :title="$language->name"
+            src="{{ asset("vendor/blade-country-flags/4x3-{$language->flag}.svg") }}"
+            alt="{{ $language->name }}"
+            x-tooltip.raw="{{ $language->name }}"
+            title="{{ $language->name }}"
+            loading="lazy"
         />
         <span class="{{ $dropdownLabelClass }}">
             <span>{{ $language->name }}</span>

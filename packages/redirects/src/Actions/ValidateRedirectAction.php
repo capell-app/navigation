@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Redirects\Actions;
 
+use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Core\Enums\UrlTypeEnum;
 use Capell\Core\Models\PageUrl;
-use Capell\Redirects\Enums\RedirectStatusCodeEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Lorisleiva\Actions\Concerns\AsObject;
 

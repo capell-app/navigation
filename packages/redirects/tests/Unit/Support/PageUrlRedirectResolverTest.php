@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Core\Enums\UrlTypeEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
@@ -9,7 +10,6 @@ use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Redirects\Contracts\RedirectRecorder;
 use Capell\Redirects\Data\RedirectDecisionData;
-use Capell\Redirects\Enums\RedirectStatusCodeEnum;
 use Capell\Redirects\Support\PageUrlRedirectResolver;
 
 it('returns manual target urls with configured status code', function (): void {
