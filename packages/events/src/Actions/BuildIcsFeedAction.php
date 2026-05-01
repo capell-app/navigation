@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Events\Actions;
 
 use Capell\Core\Models\Language;
+use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Events\Models\EventOccurrence;
 use Carbon\CarbonImmutable;
@@ -19,14 +20,14 @@ class BuildIcsFeedAction
         $feedUntil = CarbonImmutable::now()->addMonths(config('capell-events.feed_months', 12));
 
         $events = EventOccurrence::query()
-            ->with(['event.pageUrl'])
+            ->with(['event.pageUrls.siteDomain'])
             ->where('site_id', $site->id)
             ->published()
             ->notCancelled()
             ->between(CarbonImmutable::now(), $feedUntil)
             ->orderBy('starts_at')
             ->get()
-            ->map(fn (EventOccurrence $occurrence): string => $this->buildEvent($occurrence))
+            ->map(fn (EventOccurrence $occurrence): string => $this->buildEvent($occurrence, $language))
             ->implode("\r\n");
 
         return implode("\r\n", array_filter([
@@ -39,9 +40,10 @@ class BuildIcsFeedAction
         ], fn (string $line): bool => $line !== ''));
     }
 
-    private function buildEvent(EventOccurrence $occurrence): string
+    private function buildEvent(EventOccurrence $occurrence, ?Language $language): string
     {
         $event = $occurrence->event;
+        $pageUrl = $this->getPageUrl($occurrence, $language);
 
         return implode("\r\n", array_filter([
             'BEGIN:VEVENT',
@@ -51,9 +53,30 @@ class BuildIcsFeedAction
             $occurrence->ends_at ? 'DTEND:' . $this->formatDate(CarbonImmutable::instance($occurrence->ends_at)) : null,
             'SUMMARY:' . $this->escapeText($event->name),
             isset($occurrence->location['name']) ? 'LOCATION:' . $this->escapeText((string) $occurrence->location['name']) : null,
-            $event->pageUrl?->exists ? 'URL:' . $this->escapeText($event->pageUrl->full_url) : null,
+            $pageUrl instanceof PageUrl ? 'URL:' . $this->escapeText($pageUrl->full_url) : null,
             'END:VEVENT',
         ], fn (?string $line): bool => $line !== null && $line !== ''));
+    }
+
+    private function getPageUrl(EventOccurrence $occurrence, ?Language $language): ?PageUrl
+    {
+        $event = $occurrence->event;
+
+        if (! $event->relationLoaded('pageUrls')) {
+            return null;
+        }
+
+        if ($language instanceof Language) {
+            $pageUrl = $event->pageUrls->firstWhere('language_id', $language->id);
+
+            if ($pageUrl instanceof PageUrl) {
+                return $pageUrl;
+            }
+        }
+
+        $pageUrl = $event->pageUrls->first();
+
+        return $pageUrl instanceof PageUrl ? $pageUrl : null;
     }
 
     private function formatDate(CarbonImmutable $date): string

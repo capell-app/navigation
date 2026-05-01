@@ -30,7 +30,7 @@ class BuildEventSchemaAction
             'eventStatus' => 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => $this->getAttendanceMode($location['type'] ?? EventLocationTypeEnum::Physical->value),
             'location' => $this->getLocationSchema($location),
-            'url' => $event->pageUrl?->full_url,
+            'url' => $event->pageUrl?->exists ? $event->pageUrl->full_url : null,
         ];
 
         if (isset($booking['url']) && $booking['url'] !== '') {

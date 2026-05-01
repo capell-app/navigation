@@ -32,32 +32,14 @@ class EventFactory extends Factory
         return [
             'name' => fn (): string => $this->faker->sentence(4),
             'layout_id' => fn (): int => Layout::factory()->create()->id,
-            'type_id' => fn (): int => Type::factory()->page()->type(TypeEnum::Page)->create([
+            'type_id' => fn (): int => Type::query()->firstOrCreate([
                 'key' => 'event',
+                'type' => TypeEnum::Page,
+            ], [
                 'name' => 'Event',
             ])->id,
             'site_id' => Site::factory()->withTranslations(),
-            'meta' => [
-                'schedule' => [
-                    'starts_at' => now()->addMonth()->format('Y-m-d H:i:s'),
-                    'ends_at' => now()->addMonth()->addHour()->format('Y-m-d H:i:s'),
-                    'timezone' => 'Europe/London',
-                    'recurrence' => [
-                        'frequency' => 'none',
-                        'interval' => 1,
-                        'weekdays' => [],
-                        'month_day' => null,
-                        'until' => null,
-                        'count' => null,
-                    ],
-                    'generate_until' => null,
-                ],
-                'location' => [
-                    'type' => 'physical',
-                    'name' => 'Town Hall',
-                ],
-                'booking' => [],
-            ],
+            'meta' => [],
             'created_at' => fn () => $this->faker->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => fn (array $attributes) => $this->faker->dateTimeBetween($attributes['created_at']),
         ];

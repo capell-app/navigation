@@ -28,7 +28,7 @@ class GenerateEventOccurrencesAction
     ];
 
     /** @return Collection<int, EventOccurrence> */
-    public function handle(Event $event): Collection
+    public function handle(Event $event, ?CarbonImmutable $minimumStartsAt = null): Collection
     {
         $schedule = $this->getSchedule($event);
 
@@ -39,11 +39,18 @@ class GenerateEventOccurrencesAction
         $startsAt = $schedule->startsAt;
         $endsAt = $schedule->endsAt;
         $durationSeconds = $endsAt instanceof CarbonImmutable ? $endsAt->diffInSeconds($startsAt, true) : null;
-        $dates = $this->buildDates($schedule);
+        $dates = $this->buildDates($schedule)
+            ->when(
+                $minimumStartsAt instanceof CarbonImmutable,
+                fn (Collection $dates): Collection => $dates
+                    ->filter(fn (CarbonImmutable $occurrenceStartsAt): bool => $occurrenceStartsAt->greaterThanOrEqualTo($minimumStartsAt))
+                    ->values(),
+            );
 
-        return $dates->map(fn (CarbonImmutable $occurrenceStartsAt): EventOccurrence => $event->occurrences()->create([
-            'site_id' => $event->site_id,
+        return $dates->map(fn (CarbonImmutable $occurrenceStartsAt): EventOccurrence => $event->occurrences()->updateOrCreate([
             'starts_at' => $occurrenceStartsAt,
+        ], [
+            'site_id' => $event->site_id,
             'ends_at' => $durationSeconds !== null ? $occurrenceStartsAt->addSeconds($durationSeconds) : null,
             'timezone' => $schedule->timezone,
             'status' => EventOccurrenceStatusEnum::Scheduled->value,

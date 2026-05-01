@@ -30,6 +30,7 @@ use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Type;
 use Capell\Events\Database\Factories\EventFactory;
+use Capell\Events\Enums\EventOccurrenceStatusEnum;
 use Capell\Events\Enums\EventPageTypeEnum;
 use Capell\Events\Observers\EventObserver;
 use Capell\Workspaces\BelongsToWorkspace;
@@ -207,10 +208,11 @@ class Event extends Model implements HasMedia, Pageable, PageCacheable, Publisha
 
     public function nextOccurrence(): HasOne
     {
-        return $this->hasOne(EventOccurrence::class)->ofMany('starts_at', 'min', function (Builder $query): void {
-            $query->where('starts_at', '>=', now())
-                ->where('is_cancelled', false);
-        });
+        return $this->hasOne(EventOccurrence::class)
+            ->where('starts_at', '>=', now())
+            ->where('is_cancelled', false)
+            ->where('status', '!=', EventOccurrenceStatusEnum::Cancelled->value)
+            ->ofMany('starts_at', 'min');
     }
 
     protected static function booted(): void

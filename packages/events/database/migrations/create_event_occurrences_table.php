@@ -25,6 +25,7 @@ return new class extends Migration
             $table->timestamps();
             $table->index(['site_id', 'starts_at']);
             $table->index(['event_id', 'starts_at']);
+            $table->unique(['event_id', 'starts_at']);
         });
     }
 

@@ -6,6 +6,7 @@ namespace Capell\Events\Actions;
 
 use Capell\Events\Models\Event;
 use Capell\Events\Models\EventOccurrence;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -14,10 +15,12 @@ class SyncEventOccurrencesAction
     use AsObject;
 
     /** @return Collection<int, EventOccurrence> */
-    public function handle(Event $event): Collection
+    public function handle(Event $event, ?CarbonImmutable $from = null): Collection
     {
-        DeleteFutureEventOccurrencesAction::run($event);
+        $from ??= CarbonImmutable::now();
 
-        return GenerateEventOccurrencesAction::run($event);
+        DeleteFutureEventOccurrencesAction::run($event, $from);
+
+        return GenerateEventOccurrencesAction::run($event, $from);
     }
 }
