@@ -4,7 +4,7 @@
 
 **Goal:** Add thorough Pest arch tests for every package in this monorepo, ensuring self-containment boundaries are enforced and cross-package dependency violations are caught automatically.
 
-**Architecture:** Two complementary test patterns are used: `toOnlyBeUsedIn` for leaf packages (nothing else in the monorepo should import from them), and `not->toUse` for shared packages (they must not reverse-import their dependents). Both patterns use Pest's `arch()` macro, which scans the source paths declared in `phpunit.xml` (`packages/*/src` and `packages/themes/*/src`).
+**Architecture:** Two complementary test patterns are used: `toOnlyBeUsedIn` for leaf packages (nothing else in the monorepo should import from them), and `not->toUse` for shared packages (they must not reverse-import their dependents). Both patterns use Pest's `arch()` macro, which scans the grouped source paths declared in `phpunit.xml` (`packages/*/*/src` and `packages/*/themes/*/src`).
 
 **Tech Stack:** PHP 8.2, Pest arch() macro, phpunit.xml source path config
 
@@ -45,14 +45,14 @@ arch()->expect('Capell\X')->classes()->toUseStrictEquality();
 
 ### Known violations (discovered via research, verified before writing this plan)
 
-| File                                                              | Violation                                                                                           | Resolution                                                                                    |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `packages/blog/src/Support/Sitemap/*.php`                         | imports `Capell\SeoTools` but blog's `composer.json` does not declare `capell-app/seo-tools`        | Add dep to composer.json                                                                      |
-| `packages/themes-core/src/Console/GenerateSitemapCommand.php`     | imports `Capell\SeoTools` but themes-core's `composer.json` does not declare `capell-app/seo-tools` | Add dep to composer.json                                                                      |
-| `packages/blog/src/Models/Article.php`                            | imports `Capell\Workspaces\BelongsToWorkspace` but blog does not declare `capell-app/workspaces`    | Add dep to blog's composer.json                                                               |
-| `packages/tags/src/Providers/TagsServiceProvider.php`             | imports `Capell\Workspaces\WorkspaceRegistry` but tags does not declare `capell-app/workspaces`     | Add dep to tags' composer.json                                                                |
-| `packages/mosaic/src/Console/Commands/Hero/DemoCommand.php`       | imports `Capell\Blog` but mosaic does not depend on blog (blog depends on mosaic)                   | `ignoring(DemoCommand::class)` — demo-only tool                                               |
-| `packages/workspaces/src/Providers/WorkspacesServiceProvider.php` | imports `Capell\Blog\Models\Article` and `Capell\Mosaic\Models\*`                                   | Intentional by design (see comment in file). Use `ignoring(WorkspacesServiceProvider::class)` |
+| File                                                                             | Violation                                                                                           | Resolution                                                                                    |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `packages/foundation/blog/src/Support/Sitemap/*.php`                             | imports `Capell\SeoTools` but blog's `composer.json` does not declare `capell-app/seo-tools`        | Add dep to composer.json                                                                      |
+| `packages/theme-studio/themes-core/src/Console/GenerateSitemapCommand.php`       | imports `Capell\SeoTools` but themes-core's `composer.json` does not declare `capell-app/seo-tools` | Add dep to composer.json                                                                      |
+| `packages/foundation/blog/src/Models/Article.php`                                | imports `Capell\Workspaces\BelongsToWorkspace` but blog does not declare `capell-app/workspaces`    | Add dep to blog's composer.json                                                               |
+| `packages/foundation/tags/src/Providers/TagsServiceProvider.php`                 | imports `Capell\Workspaces\WorkspaceRegistry` but tags does not declare `capell-app/workspaces`     | Add dep to tags' composer.json                                                                |
+| `packages/foundation/mosaic/src/Console/Commands/Hero/DemoCommand.php`           | imports `Capell\Blog` but mosaic does not depend on blog (blog depends on mosaic)                   | `ignoring(DemoCommand::class)` — demo-only tool                                               |
+| `packages/publishing-pro/workspaces/src/Providers/WorkspacesServiceProvider.php` | imports `Capell\Blog\Models\Article` and `Capell\Mosaic\Models\*`                                   | Intentional by design (see comment in file). Use `ignoring(WorkspacesServiceProvider::class)` |
 
 ---
 
@@ -76,9 +76,9 @@ arch()->expect('Capell\X')->classes()->toUseStrictEquality();
 
 **Modified production files (fix violations):**
 
-- `packages/blog/composer.json` — add `capell-app/seo-tools` and `capell-app/workspaces`
-- `packages/tags/composer.json` — add `capell-app/workspaces`
-- `packages/themes-core/composer.json` — add `capell-app/seo-tools`
+- `packages/foundation/blog/composer.json` — add `capell-app/seo-tools` and `capell-app/workspaces`
+- `packages/foundation/tags/composer.json` — add `capell-app/workspaces`
+- `packages/theme-studio/themes-core/composer.json` — add `capell-app/seo-tools`
 
 ---
 
@@ -313,12 +313,12 @@ Blog and themes-core both import from `Capell\SeoTools` but neither declares `ca
 
 **Files:**
 
-- Modify: `packages/blog/composer.json`
-- Modify: `packages/themes-core/composer.json`
+- Modify: `packages/foundation/blog/composer.json`
+- Modify: `packages/theme-studio/themes-core/composer.json`
 
 - [ ] **Step 1: Add seo-tools to blog's composer.json**
 
-In `packages/blog/composer.json`, add `"capell-app/seo-tools": "*"` to the `require` object:
+In `packages/foundation/blog/composer.json`, add `"capell-app/seo-tools": "*"` to the `require` object:
 
 ```json
 {
@@ -336,7 +336,7 @@ In `packages/blog/composer.json`, add `"capell-app/seo-tools": "*"` to the `requ
 
 - [ ] **Step 2: Add seo-tools to themes-core's composer.json**
 
-In `packages/themes-core/composer.json`, add `"capell-app/seo-tools": "*"` to the `require` object:
+In `packages/theme-studio/themes-core/composer.json`, add `"capell-app/seo-tools": "*"` to the `require` object:
 
 ```json
 {
@@ -360,7 +360,7 @@ Expected: all pass.
 - [ ] **Step 4: Commit**
 
 ```bash
-git add packages/blog/composer.json packages/themes-core/composer.json
+git add packages/foundation/blog/composer.json packages/theme-studio/themes-core/composer.json
 git commit -m "fix(deps): declare capell-app/seo-tools as explicit dependency in blog and themes-core"
 ```
 
@@ -445,12 +445,12 @@ git commit -m "test(arch): add isolation and boundary tests for ThemesAdmin and 
 
 ## Task 6: Fix missing Workspaces dep in blog and tags, then add Workspaces self-containment test
 
-`packages/blog/src/Models/Article.php` uses `Capell\Workspaces\BelongsToWorkspace` and `packages/tags/src/Providers/TagsServiceProvider.php` uses `Capell\Workspaces\WorkspaceRegistry`. Neither package declares `capell-app/workspaces`. First fix the deps, then add the arch test that would catch regressions.
+`packages/foundation/blog/src/Models/Article.php` uses `Capell\Workspaces\BelongsToWorkspace` and `packages/foundation/tags/src/Providers/TagsServiceProvider.php` uses `Capell\Workspaces\WorkspaceRegistry`. Neither package declares `capell-app/workspaces`. First fix the deps, then add the arch test that would catch regressions.
 
 **Files:**
 
-- Modify: `packages/blog/composer.json`
-- Modify: `packages/tags/composer.json`
+- Modify: `packages/foundation/blog/composer.json`
+- Modify: `packages/foundation/tags/composer.json`
 - Modify: `tests/src/Workspaces/Arch/WorkspacesIsolationTest.php`
 
 - [ ] **Step 1: Add workspaces to blog's composer.json**
@@ -574,8 +574,8 @@ Expected: all five assertions pass. If `toOnlyBeUsedIn` lists additional namespa
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/blog/composer.json \
-        packages/tags/composer.json \
+git add packages/foundation/blog/composer.json \
+        packages/foundation/tags/composer.json \
         tests/src/Workspaces/Arch/WorkspacesIsolationTest.php
 git commit -m "fix(deps): declare capell-app/workspaces in blog and tags; add workspaces self-containment arch test"
 ```
@@ -688,6 +688,6 @@ No TBD, TODO, or vague steps present.
 
 ### Type/name consistency
 
-- `WorkspacesServiceProvider::class` used in Task 6 matches the actual class at `packages/workspaces/src/Providers/WorkspacesServiceProvider.php`.
+- `WorkspacesServiceProvider::class` used in Task 6 matches the actual class at `packages/publishing-pro/workspaces/src/Providers/WorkspacesServiceProvider.php`.
 - `DemoCommand::class` in Task 1 refers to `Capell\Mosaic\Console\Commands\Hero\DemoCommand`, imported at the top of the test file.
 - All namespace strings match confirmed source paths from exploration.

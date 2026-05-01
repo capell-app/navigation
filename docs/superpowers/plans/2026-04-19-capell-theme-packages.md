@@ -4,7 +4,7 @@
 
 **Goal:** Create three production-ready CMS theme packages (Corporate, Agency, SaaS) for Capell with comprehensive CMS features, exceptional flexibility, and high-standard testing (90%+ coverage, WCAG 2.1 AA, performance budgets, E2E, security tests).
 
-**Architecture:** Three self-contained theme packages in `packages/themes/{corporate,agency,saas}/` sharing unified `ThemeSettings` in `packages/themes-core/`. Each theme provides 7-9 Blade components that work as static templates OR Mosaic widgets (when installed). All components include SEO, accessibility, dark mode, and form handling. Comprehensive test suite covers unit, integration, E2E, accessibility, performance, and security.
+**Architecture:** Three self-contained theme packages in `packages/themes/{corporate,agency,saas}/` sharing unified `ThemeSettings` in `packages/theme-studio/themes-core/`. Each theme provides 7-9 Blade components that work as static templates OR Mosaic widgets (when installed). All components include SEO, accessibility, dark mode, and form handling. Comprehensive test suite covers unit, integration, E2E, accessibility, performance, and security.
 
 **Tech Stack:** Laravel 10+, Blade, Tailwind CSS 4, Filament 4, Pest 3, Mosaic (optional), Lighthouse CI, WCAG testing, E2E (Playwright).
 
@@ -15,6 +15,7 @@
 **Repo:** `capell-packages-4` (branch `feat/theme-packages`, worktree at `../capell-packages-4-themes`)
 
 **Completed phases:**
+
 - ✅ **Phase 1: Infrastructure & shared settings** — Tasks 1-3
 - ✅ **Phase 2: Corporate Theme** — Tasks 4-20 (51 files, 5 commits)
 - ✅ **Phase 3: Agency Theme** — Tasks 21-35 (32 PHP files, 5 commits)
@@ -28,18 +29,18 @@
 1. **Working directory:** `/Users/ben/Sites/packages/capell/capell-packages-4-themes`
 2. **Branch:** `feat/theme-packages`
 3. **First steps:**
-   - Run `composer install` and `npm install` so Pint/Prettier are available (pre-commit hooks require them)
-   - Inspect the Phase 5 partial files under `packages/themes-core/src/` — these were written by a subagent that was killed mid-task. Many are likely OK but need spec-compliance + code-quality review per the subagent-driven-development skill
-   - Resume execution at **Phase 5 Task 51** (see below), treating already-present files as starting points
+    - Run `composer install` and `npm install` so Pint/Prettier are available (pre-commit hooks require them)
+    - Inspect the Phase 5 partial files under `packages/theme-studio/themes-core/src/` — these were written by a subagent that was killed mid-task. Many are likely OK but need spec-compliance + code-quality review per the subagent-driven-development skill
+    - Resume execution at **Phase 5 Task 51** (see below), treating already-present files as starting points
 4. **Namespaces (important — differ from original plan due to collision with vendored `Capell\Core\` and `Capell\Admin\`):**
-   - `Capell\Themes\Core\*` (from `packages/themes-core/`)
-   - `Capell\Themes\Admin\*` (from `packages/themes-admin/`)
-   - `Capell\Themes\Corporate\*`, `Capell\Themes\Agency\*`, `Capell\Themes\Saas\*`
+    - `Capell\Themes\Core\*` (from `packages/theme-studio/themes-core/`)
+    - `Capell\Themes\Admin\*` (from `packages/theme-studio/themes-admin/`)
+    - `Capell\Themes\Corporate\*`, `Capell\Themes\Agency\*`, `Capell\Themes\Saas\*`
 5. **Filament 4 API note:** `Tabs` lives at `Filament\Schemas\Components\Tabs` (not `Filament\Forms\Components\Tabs`). The tests use `Orchestra\Testbench\TestCase` with Filament providers registered, not `Filament\Tests\TestCase` which does not exist in Filament 4 dist.
 6. **Remaining work:**
-   - Phase 5 (review partial files + complete Tasks 51-65 — multi-lang hreflang partial exists, analytics partial exists, email partial exists, etc.; still missing: SEO structured data builder, sitemap, canonical, OG cards, spam protection, preview mode, mobile menu, accessibility helpers, and Filament admin page wiring)
-   - Phase 6 (Testing & QA, Tasks 66-80)
-   - Phase 7 (Documentation & release, Tasks 81-85)
+    - Phase 5 (review partial files + complete Tasks 51-65 — multi-lang hreflang partial exists, analytics partial exists, email partial exists, etc.; still missing: SEO structured data builder, sitemap, canonical, OG cards, spam protection, preview mode, mobile menu, accessibility helpers, and Filament admin page wiring)
+    - Phase 6 (Testing & QA, Tasks 66-80)
+    - Phase 7 (Documentation & release, Tasks 81-85)
 
 ## Known Deviations & Defects to Address
 
@@ -181,58 +182,61 @@ packages/
 ## Task 1: Create Package Structure & composer.json Files
 
 **Files:**
-- Create: `packages/themes/corporate/composer.json`
-- Create: `packages/themes/agency/composer.json`
-- Create: `packages/themes/saas/composer.json`
-- Create: `packages/themes/corporate/README.md`
-- Create: `packages/themes/corporate/.gitignore`
+
+- Create: `packages/theme-studio/themes/corporate/composer.json`
+- Create: `packages/theme-studio/themes/agency/composer.json`
+- Create: `packages/theme-studio/themes/saas/composer.json`
+- Create: `packages/theme-studio/themes/corporate/README.md`
+- Create: `packages/theme-studio/themes/corporate/.gitignore`
 
 - [ ] **Step 1: Create corporate package composer.json**
 
-Create `packages/themes/corporate/composer.json`:
+Create `packages/theme-studio/themes/corporate/composer.json`:
+
 ```json
 {
-  "name": "capell-app/capell-theme-corporate",
-  "description": "Professional corporate theme for Capell CMS",
-  "type": "library",
-  "license": "MIT",
-  "require": {
-    "php": "^8.2",
-    "laravel/framework": "^10.0",
-    "capell-app/capell": "^4.0",
-    "spatie/laravel-data": "^4.0"
-  },
-  "require-dev": {
-    "pestphp/pest": "^3.0",
-    "laravel/pint": "^1.25",
-    "phpstan/phpstan": "^1.0"
-  },
-  "suggest": {
-    "capell-app/capell-mosaic": "Enable visual layout editor for theme components"
-  },
-  "autoload": {
-    "psr-4": {
-      "Capell\\Themes\\Corporate\\": "src/"
+    "name": "capell-app/capell-theme-corporate",
+    "description": "Professional corporate theme for Capell CMS",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^10.0",
+        "capell-app/capell": "^4.0",
+        "spatie/laravel-data": "^4.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0",
+        "laravel/pint": "^1.25",
+        "phpstan/phpstan": "^1.0"
+    },
+    "suggest": {
+        "capell-app/capell-mosaic": "Enable visual layout editor for theme components"
+    },
+    "autoload": {
+        "psr-4": {
+            "Capell\\Themes\\Corporate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Capell\\Themes\\Corporate\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Capell\\Themes\\Corporate\\CorporateThemeServiceProvider"
+            ]
+        }
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Capell\\Themes\\Corporate\\Tests\\": "tests/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Capell\\Themes\\Corporate\\CorporateThemeServiceProvider"
-      ]
-    }
-  }
 }
 ```
 
 - [ ] **Step 2: Create agency & saas composer.json files**
 
 Copy corporate/composer.json to agency/composer.json and saas/composer.json, then edit:
+
 - Replace `capell-theme-corporate` → `capell-theme-agency`
 - Replace `Professional corporate theme` → `Creative agency theme`
 - Replace `Capell\\Themes\\Corporate` → `Capell\\Themes\\Agency`
@@ -242,7 +246,8 @@ Repeat for saas theme.
 
 - [ ] **Step 3: Create .gitignore**
 
-Create `packages/themes/corporate/.gitignore`:
+Create `packages/theme-studio/themes/corporate/.gitignore`:
+
 ```
 /vendor
 /node_modules
@@ -254,8 +259,9 @@ Create `packages/themes/corporate/.gitignore`:
 
 - [ ] **Step 4: Create README.md**
 
-Create `packages/themes/corporate/README.md`:
-```markdown
+Create `packages/theme-studio/themes/corporate/README.md`:
+
+````markdown
 # Capell Corporate Theme
 
 Professional, trust-focused theme for B2B services, consulting firms, and corporate websites.
@@ -275,6 +281,7 @@ Professional, trust-focused theme for B2B services, consulting firms, and corpor
 ```bash
 composer require capell-app/capell-theme-corporate
 ```
+````
 
 ## Documentation
 
@@ -283,28 +290,31 @@ See `docs/` directory for detailed guides.
 ## License
 
 MIT
-```
+
+````
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/themes/corporate/composer.json packages/themes/corporate/README.md packages/themes/corporate/.gitignore
-git add packages/themes/agency/composer.json packages/themes/agency/README.md packages/themes/agency/.gitignore
-git add packages/themes/saas/composer.json packages/themes/saas/README.md packages/themes/saas/.gitignore
+git add packages/theme-studio/themes/corporate/composer.json packages/theme-studio/themes/corporate/README.md packages/theme-studio/themes/corporate/.gitignore
+git add packages/theme-studio/themes/agency/composer.json packages/theme-studio/themes/agency/README.md packages/theme-studio/themes/agency/.gitignore
+git add packages/theme-studio/themes/saas/composer.json packages/theme-studio/themes/saas/README.md packages/theme-studio/themes/saas/.gitignore
 git commit -m "chore: create theme package scaffolding and composer configs"
-```
+````
 
 ---
 
 ## Task 2: Create Shared ThemeSettings Data Object
 
 **Files:**
+
 - Create: `packages/core/src/Data/ThemeSettings.php`
 - Create: `packages/core/tests/Unit/Data/ThemeSettingsTest.php`
 
 - [ ] **Step 1: Write failing test for ThemeSettings**
 
 Create `packages/core/tests/Unit/Data/ThemeSettingsTest.php`:
+
 ```php
 <?php
 
@@ -374,6 +384,7 @@ Expected: FAIL with "Class Capell\Core\Data\ThemeSettings does not exist"
 - [ ] **Step 3: Create ThemeSettings Data class**
 
 Create `packages/core/src/Data/ThemeSettings.php`:
+
 ```php
 <?php
 
@@ -422,12 +433,14 @@ git commit -m "feat: add shared ThemeSettings data object for all themes"
 ## Task 3: Create ThemeSettingsSchema (Filament Form)
 
 **Files:**
+
 - Create: `packages/admin/src/Schemas/ThemeSettingsSchema.php`
 - Create: `packages/admin/tests/Unit/Schemas/ThemeSettingsSchemaTest.php`
 
 - [ ] **Step 1: Write failing test for schema**
 
 Create `packages/admin/tests/Unit/Schemas/ThemeSettingsSchemaTest.php`:
+
 ```php
 <?php
 
@@ -479,6 +492,7 @@ Expected: FAIL with "Class Capell\Admin\Schemas\ThemeSettingsSchema does not exi
 - [ ] **Step 3: Create ThemeSettingsSchema**
 
 Create `packages/admin/src/Schemas/ThemeSettingsSchema.php`:
+
 ```php
 <?php
 
@@ -600,12 +614,14 @@ git commit -m "feat: add ThemeSettingsSchema for admin panel configuration"
 ## Task 4: Create Corporate Theme ServiceProvider
 
 **Files:**
-- Create: `packages/themes/corporate/src/CorporateThemeServiceProvider.php`
-- Create: `packages/themes/corporate/tests/Feature/ServiceProviderTest.php`
+
+- Create: `packages/theme-studio/themes/corporate/src/CorporateThemeServiceProvider.php`
+- Create: `packages/theme-studio/themes/corporate/tests/Feature/ServiceProviderTest.php`
 
 - [ ] **Step 1: Write failing test**
 
-Create `packages/themes/corporate/tests/Feature/ServiceProviderTest.php`:
+Create `packages/theme-studio/themes/corporate/tests/Feature/ServiceProviderTest.php`:
+
 ```php
 <?php
 
@@ -641,7 +657,7 @@ class ServiceProviderTest extends TestCase
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd packages/themes/corporate
+cd packages/theme-studio/themes/corporate
 composer test -- tests/Feature/ServiceProviderTest.php -v
 ```
 
@@ -649,7 +665,8 @@ Expected: FAIL with "Class Capell\Themes\Corporate\CorporateThemeServiceProvider
 
 - [ ] **Step 3: Create ServiceProvider**
 
-Create `packages/themes/corporate/src/CorporateThemeServiceProvider.php`:
+Create `packages/theme-studio/themes/corporate/src/CorporateThemeServiceProvider.php`:
+
 ```php
 <?php
 
@@ -764,12 +781,14 @@ Due to context constraints, here's the remaining task structure for Phases 2-7:
 # PHASE 3-4: Agency & SaaS Themes (Tasks 21-50)
 
 Replicate Phase 2 structure for Agency theme:
+
 - **Portfolio Gallery widget**
 - **Process Flow widget**
 - **Services Grid widget**
 - **Client Testimonials widget**
 
 Replicate for SaaS theme:
+
 - **Pricing Table widget**
 - **Integrations Grid widget**
 - **Use Cases widget**
@@ -834,24 +853,24 @@ Each follows same pattern: Blade component + Widget + Tests
 **This plan has ~85 tasks.** Implementation approach:
 
 1. **Sequential Execution (Recommended for Quality):**
-   - Tasks 1-3 (Infrastructure): ~30 min
-   - Tasks 4-20 (Corporate base): ~8-10 hours
-   - Tasks 21-50 (Agency + SaaS): ~16-20 hours (can parallelize agencies/saas once patterns locked)
-   - Tasks 51-65 (Cross-cutting): ~8-10 hours
-   - Tasks 66-80 (Testing): ~12-15 hours (can parallelize test categories)
-   - Tasks 81-85 (Docs): ~4-5 hours
+    - Tasks 1-3 (Infrastructure): ~30 min
+    - Tasks 4-20 (Corporate base): ~8-10 hours
+    - Tasks 21-50 (Agency + SaaS): ~16-20 hours (can parallelize agencies/saas once patterns locked)
+    - Tasks 51-65 (Cross-cutting): ~8-10 hours
+    - Tasks 66-80 (Testing): ~12-15 hours (can parallelize test categories)
+    - Tasks 81-85 (Docs): ~4-5 hours
 
-   **Total: 50-70 hours solo, ~25-35 hours with parallel agents**
+    **Total: 50-70 hours solo, ~25-35 hours with parallel agents**
 
 2. **Subagent-Driven (Fastest):**
-   - Phase 1 (3 tasks) sequentially
-   - Phase 2 (17 tasks) → dispatch 3-4 subagents in parallel, each handles 4-5 component tasks
-   - Phase 3-4 (30 tasks) → dispatch 6 subagents in parallel (corporate/agency/saas split, 2 agents per theme)
-   - Phase 5 (15 tasks) → dispatch 5 subagents in parallel
-   - Phase 6 (15 tasks) → dispatch 5 subagents in parallel (E2E, accessibility, performance, security, coverage)
-   - Phase 7 (5 tasks) sequentially
+    - Phase 1 (3 tasks) sequentially
+    - Phase 2 (17 tasks) → dispatch 3-4 subagents in parallel, each handles 4-5 component tasks
+    - Phase 3-4 (30 tasks) → dispatch 6 subagents in parallel (corporate/agency/saas split, 2 agents per theme)
+    - Phase 5 (15 tasks) → dispatch 5 subagents in parallel
+    - Phase 6 (15 tasks) → dispatch 5 subagents in parallel (E2E, accessibility, performance, security, coverage)
+    - Phase 7 (5 tasks) sequentially
 
-   **Timeline: ~2-3 days with 6-8 concurrent subagents**
+    **Timeline: ~2-3 days with 6-8 concurrent subagents**
 
 ---
 

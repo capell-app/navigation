@@ -1,0 +1,14 @@
+{
+    "name": "capell-app/capell-theme-saas",
+    "kind": "theme",
+    "capell-version": "^4.0",
+    "productGroup": "Capell Theme Studio",
+    "tier": "premium",
+    "bundle": "theme-studio",
+    "contexts": ["frontend", "admin"],
+    "extends": "capell-app/default-theme",
+    "requires": ["capell-app/themes-core", "capell-app/themes-admin"],
+    "providers": {
+        "shared": ["Capell\\Themes\\Saas\\SaasThemeServiceProvider"]
+    }
+}

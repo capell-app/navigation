@@ -12,7 +12,7 @@ Use **Analytics**:
 
 - Composer package: `capell-app/analytics`
 - Namespace: `Capell\Analytics`
-- Package directory: `packages/analytics`
+- Package directory: `packages/growth/analytics`
 - Translation namespace: `capell-analytics`
 - Config key: `capell-analytics`
 - Admin settings group: `analytics`
@@ -325,7 +325,7 @@ Do not add a new Composer dependency for geolocation in version 1. Use existing 
 
 ## Relationship To Existing Analytics Code
 
-`packages/themes-core` already contains a small GA4 wrapper. Do not delete it during version 1 unless the implementation plan explicitly includes a migration path.
+`packages/theme-studio/themes-core` already contains a small GA4 wrapper. Do not delete it during version 1 unless the implementation plan explicitly includes a migration path.
 
 The new analytics package should coexist with that wrapper. Future work can add an adapter that forwards selected events to GA4 only when marketing consent is granted.
 
@@ -354,13 +354,13 @@ Tests should cover:
 Run the package tests with:
 
 ```bash
-vendor/bin/pest packages/analytics/tests
+vendor/bin/pest packages/growth/analytics/tests
 ```
 
 Run affected frontend/theme tests with:
 
 ```bash
-vendor/bin/pest packages/analytics/tests packages/themes-core/tests
+vendor/bin/pest packages/growth/analytics/tests packages/theme-studio/themes-core/tests
 ```
 
 ## Implementation Sequence

@@ -1,28 +1,40 @@
 # Capell Packages
 
-First-party add-ons for [Capell CMS](https://github.com/capell-app/capell). Install only the packages your project needs: visual page building, blog publishing, SEO, themes, addresses, workspaces, and media alternatives all live here.
+First-party add-ons for [Capell CMS](https://github.com/capell-app/capell). Install only the packages your project needs: foundation CMS features, premium forms, editorial workflows, operations tooling, growth analytics, search/SEO, and Theme Studio all live here.
+
+## Product groups
+
+| Group                 | Tier    | Packages                                                                                                        |
+| --------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| Capell Foundation     | Free    | Mosaic, Blog, Navigation, Tags, Redirects, Address, Media Curator, Frontend Toolbar, HTML Minify, Default Theme |
+| Capell Forms          | Premium | Forms                                                                                                           |
+| Capell Publishing Pro | Premium | Workspaces, Filament Peek                                                                                       |
+| Capell Operations     | Premium | Backup, Developer Tools, Authentication Log                                                                     |
+| Capell Growth         | Premium | Analytics, Campaigns                                                                                            |
+| Capell Search & SEO   | Premium | SEO Tools, Site Search                                                                                          |
+| Capell Theme Studio   | Premium | Themes Core, Themes Admin, SaaS Theme, Corporate Theme, Agency Theme                                            |
 
 ## Pick the package by job
 
-| Need                                              | Package            | Composer package                                                                                      |
-| ------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| Visual page builder                               | Mosaic             | `capell-app/mosaic`                                                                                   |
-| Articles, tags, archives, RSS                     | Blog               | `capell-app/blog`                                                                                     |
-| Drafts, previews, approvals, scheduled publishing | Workspaces         | `capell-app/workspaces`                                                                               |
-| Sitemaps, structured data, AI-assisted SEO        | SEO Tools          | `capell-app/seo-tools`                                                                                |
-| Header, footer, and sidebar menus                 | Navigation         | `capell-app/navigation`                                                                               |
-| Public site keyword search                        | Site Search        | `capell-app/site-search`                                                                              |
-| 301/302 redirects and broken URL reporting        | Redirects          | `capell-app/redirects`                                                                                |
-| Shared tagging across content types               | Tags               | `capell-app/tags`                                                                                     |
-| Editor-managed forms and submissions              | Forms              | `capell-app/forms`                                                                                    |
-| Campaign landing pages and conversion goals       | Campaigns          | `capell-app/campaigns`                                                                                |
-| Content package export, import, and restore       | Backup             | `capell-app/backup`                                                                                   |
-| Country and address fields                        | Address            | `capell-app/address`                                                                                  |
-| Login and activity visibility                     | Authentication Log | `capell-app/authentication-log`                                                                       |
-| Curator instead of Spatie MediaLibrary            | Media Curator      | `capell-app/media-curator`                                                                            |
-| Default Tailwind/frontend pipeline                | Default Theme      | `capell-app/default-theme`                                                                            |
-| Theme settings in Filament                        | Themes Admin       | `capell-app/themes-admin`                                                                             |
-| SaaS, Corporate, or Agency frontend               | Themes             | `capell-app/capell-theme-saas`, `capell-app/capell-theme-corporate`, `capell-app/capell-theme-agency` |
+| Need                                                   | Product group         | Composer package                                                                                                                                           |
+| ------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Visual page builder                                    | Capell Foundation     | `capell-app/mosaic`                                                                                                                                        |
+| Articles, tags, archives, RSS                          | Capell Foundation     | `capell-app/blog`                                                                                                                                          |
+| Header, footer, and sidebar menus                      | Capell Foundation     | `capell-app/navigation`                                                                                                                                    |
+| Shared tagging across content types                    | Capell Foundation     | `capell-app/tags`                                                                                                                                          |
+| 301/302 redirects                                      | Capell Foundation     | `capell-app/redirects`                                                                                                                                     |
+| Country and address fields                             | Capell Foundation     | `capell-app/address`                                                                                                                                       |
+| Curator instead of Spatie MediaLibrary                 | Capell Foundation     | `capell-app/media-curator`                                                                                                                                 |
+| Editor-managed forms and submissions                   | Capell Forms          | `capell-app/forms`                                                                                                                                         |
+| Drafts, previews, approvals, scheduled publishing      | Capell Publishing Pro | `capell-app/workspaces`, `capell-app/filament-peek`                                                                                                        |
+| Content package export, import, and restore            | Capell Operations     | `capell-app/backup`                                                                                                                                        |
+| System, queue, permission, and config health           | Capell Operations     | `capell-app/developer-tools`                                                                                                                               |
+| Login and activity visibility                          | Capell Operations     | `capell-app/authentication-log`                                                                                                                            |
+| Campaign landing pages and conversion goals            | Capell Growth         | `capell-app/campaigns`                                                                                                                                     |
+| First-party analytics and visitor journeys             | Capell Growth         | `capell-app/analytics`                                                                                                                                     |
+| SEO audits, sitemaps, structured data, AI-assisted SEO | Capell Search & SEO   | `capell-app/seo-tools`                                                                                                                                     |
+| Public site keyword search and search analytics        | Capell Search & SEO   | `capell-app/site-search`                                                                                                                                   |
+| Premium frontend themes and theme tooling              | Capell Theme Studio   | `capell-app/themes-core`, `capell-app/themes-admin`, `capell-app/capell-theme-saas`, `capell-app/capell-theme-corporate`, `capell-app/capell-theme-agency` |
 
 ## Common install pattern
 
@@ -50,23 +62,15 @@ Then configure SEO Tools and Workspaces from the Capell admin.
 
 ## Package notes
 
-| Package            | What appears in the admin                                    |
-| ------------------ | ------------------------------------------------------------ |
-| Mosaic             | Contents, Widgets, Layouts, and visual builder fields        |
-| Blog               | Articles, Tags, blog pages, archive pages                    |
-| Workspaces         | Workspace switcher, approvals, preview links, publish checks |
-| SEO Tools          | SEO settings, AI-assist panels, sitemap and metadata tools   |
-| Navigation         | Menu builders and site/page navigation extenders             |
-| Site Search        | Search contracts, database/Scout drivers, optional analytics |
-| Redirects          | Redirect manager, CSV import/export, broken URL reports      |
-| Tags               | Shared tag management used by packages such as Blog          |
-| Forms              | Form and submission records                                  |
-| Campaigns          | Campaign records, CTA blocks, conversion goals, reports      |
-| Backup             | Import sessions, package validation, recovery workflows      |
-| Address            | Countries, Addresses, Site address fields                    |
-| Authentication Log | Dashboard authentication activity                            |
-| Themes Admin       | Settings -> Theme                                            |
-| Media Curator      | Curator picker fields when selected as the media backend     |
+| Product group         | What appears in the admin                                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capell Foundation     | Contents, widgets, layouts, articles, navigation, tags, redirects, address fields, media backend integration                                  |
+| Capell Forms          | Form records, submissions, validation, notifications, and lead capture workflows                                                              |
+| Capell Publishing Pro | Workspace switcher, approvals, preview links, publish checks, scheduled publishing, stale drafts, version comparison                          |
+| Capell Operations     | Import sessions, package validation, recovery workflows, system health, queue health, permission audit, config drift, authentication activity |
+| Capell Growth         | Campaign records, CTA blocks, conversion goals, analytics widgets, attribution reports                                                        |
+| Capell Search & SEO   | SEO settings, AI-assist panels, sitemap tools, audits, broken links, 404 reports, search analytics                                            |
+| Capell Theme Studio   | Theme settings, shared theme tooling, and premium SaaS, Corporate, and Agency themes                                                          |
 
 ## Documentation
 

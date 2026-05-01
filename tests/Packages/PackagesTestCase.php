@@ -100,7 +100,7 @@ class PackagesTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(AuthenticationLogServiceProvider::$packageName);
 
-        CapellCore::registerPackage('capell-app/navigation', path: realpath(__DIR__ . '/../../packages/navigation'));
+        CapellCore::registerPackage('capell-app/navigation', path: realpath(__DIR__ . '/../../packages/foundation/navigation'));
         CapellCore::forcePackageInstalled('capell-app/navigation');
 
         $app->make(Repository::class)->set('tags.tag_model', Tag::class);
@@ -110,11 +110,11 @@ class PackagesTestCase extends AbstractTestCase
     private function registerBlazeOptimizedViews(): void
     {
         foreach ([
-            __DIR__ . '/../../packages/blog/resources/views/components',
-            __DIR__ . '/../../packages/mosaic/resources/views/components',
-            __DIR__ . '/../../packages/seo-tools/resources/views/components/schema',
-            __DIR__ . '/../../packages/default-theme/resources/views/components/button/index.blade.php',
-            __DIR__ . '/../../packages/themes/default/resources/views/components',
+            __DIR__ . '/../../packages/foundation/blog/resources/views/components',
+            __DIR__ . '/../../packages/foundation/mosaic/resources/views/components',
+            __DIR__ . '/../../packages/search-seo/seo-tools/resources/views/components/schema',
+            __DIR__ . '/../../packages/foundation/default-theme/resources/views/components/button/index.blade.php',
+            __DIR__ . '/../../packages/foundation/themes/default/resources/views/components',
         ] as $path) {
             RegisterBlazeOptimizedViewsAction::run($path);
         }

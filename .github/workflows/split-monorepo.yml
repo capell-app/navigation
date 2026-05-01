@@ -11,39 +11,39 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - package_directory: packages/address
+          - package_directory: packages/foundation/address
             repository_name: address
-          - package_directory: packages/authentication-log
+          - package_directory: packages/operations/authentication-log
             repository_name: authentication-log
-          - package_directory: packages/blog
+          - package_directory: packages/foundation/blog
             repository_name: blog
-          - package_directory: packages/default-theme
+          - package_directory: packages/foundation/default-theme
             repository_name: default-theme
-          - package_directory: packages/forms
+          - package_directory: packages/forms/forms
             repository_name: forms
-          - package_directory: packages/media-curator
+          - package_directory: packages/foundation/media-curator
             repository_name: media-curator
-          - package_directory: packages/mosaic
+          - package_directory: packages/foundation/mosaic
             repository_name: mosaic
-          - package_directory: packages/navigation
+          - package_directory: packages/foundation/navigation
             repository_name: navigation
-          - package_directory: packages/seo-tools
+          - package_directory: packages/search-seo/seo-tools
             repository_name: seo-tools
-          - package_directory: packages/tags
+          - package_directory: packages/foundation/tags
             repository_name: tags
-          - package_directory: packages/themes-admin
+          - package_directory: packages/theme-studio/themes-admin
             repository_name: themes-admin
-          - package_directory: packages/themes-core
+          - package_directory: packages/theme-studio/themes-core
             repository_name: themes-core
-          - package_directory: packages/themes/agency
+          - package_directory: packages/theme-studio/themes/agency
             repository_name: capell-theme-agency
-          - package_directory: packages/themes/corporate
+          - package_directory: packages/theme-studio/themes/corporate
             repository_name: capell-theme-corporate
-          - package_directory: packages/themes/saas
+          - package_directory: packages/theme-studio/themes/saas
             repository_name: capell-theme-saas
-          - package_directory: packages/toolbar
+          - package_directory: packages/foundation/toolbar
             repository_name: frontend-toolbar
-          - package_directory: packages/workspaces
+          - package_directory: packages/publishing-pro/workspaces
             repository_name: workspaces
     steps:
       - uses: actions/checkout@v6

@@ -100,7 +100,7 @@ The settings schema is `Capell\SeoTools\Filament\Settings\AssistantSettingsSchem
 
 ## See also
 
-- [SEO Tools README](../packages/seo-tools/README.md)
-- [SEO metadata and discoverability](../packages/seo-tools/docs/seo-meta-and-discoverability.md)
-- [Sitemaps](../packages/seo-tools/docs/sitemaps.md)
+- [SEO Tools README](../packages/search-seo/seo-tools/README.md)
+- [SEO metadata and discoverability](../packages/search-seo/seo-tools/docs/seo-meta-and-discoverability.md)
+- [Sitemaps](../packages/search-seo/seo-tools/docs/sitemaps.md)
 - [Test plan for actions and services](test-plan-actions-services.md)

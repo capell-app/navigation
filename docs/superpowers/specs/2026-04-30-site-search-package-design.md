@@ -12,7 +12,7 @@ Use **Site Search**:
 
 - Composer package: `capell-app/site-search`
 - Namespace: `Capell\SiteSearch`
-- Package directory: `packages/site-search`
+- Package directory: `packages/search-seo/site-search`
 - Translation namespace: `capell-site-search`
 - Config key: `capell-site-search`
 - Admin settings group: `site_search`
@@ -21,14 +21,14 @@ The name is explicit enough for the package registry and short enough for code.
 
 ## Extraction Scope
 
-Move these existing search pieces out of `packages/themes-core`:
+Move these existing search pieces out of `packages/theme-studio/themes-core`:
 
 - `Capell\Themes\Core\Search\SiteSearch`
 - `Capell\Themes\Core\Search\SearchResult`
 - `Capell\Themes\Core\Search\DatabaseSiteSearch`
 - `Capell\Themes\Core\Search\ScoutSiteSearch`
-- `packages/themes-core/resources/views/components/search-results.blade.php`
-- the related search tests under `packages/themes-core/tests/Unit/Search`
+- `packages/theme-studio/themes-core/resources/views/components/search-results.blade.php`
+- the related search tests under `packages/theme-studio/themes-core/tests/Unit/Search`
 
 Their new homes should be:
 
@@ -36,8 +36,8 @@ Their new homes should be:
 - `Capell\SiteSearch\Data\SearchResultData`
 - `Capell\SiteSearch\Drivers\DatabaseSiteSearch`
 - `Capell\SiteSearch\Drivers\ScoutSiteSearch`
-- `packages/site-search/resources/views/components/results.blade.php`
-- `packages/site-search/tests/Unit/Search`
+- `packages/search-seo/site-search/resources/views/components/results.blade.php`
+- `packages/search-seo/site-search/tests/Unit/Search`
 
 Do not keep compatibility aliases in `themes-core` for the first implementation. A full extraction should make search ownership obvious and let tests catch stale imports.
 
@@ -238,13 +238,13 @@ Tests should cover:
 Run the package tests with:
 
 ```bash
-vendor/bin/pest packages/site-search/tests
+vendor/bin/pest packages/search-seo/site-search/tests
 ```
 
 Run affected extraction tests with:
 
 ```bash
-vendor/bin/pest packages/site-search/tests packages/themes-core/tests
+vendor/bin/pest packages/search-seo/site-search/tests packages/theme-studio/themes-core/tests
 ```
 
 ## Implementation Sequence

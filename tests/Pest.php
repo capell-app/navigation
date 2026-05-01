@@ -25,32 +25,32 @@ use Capell\Themes\Tests\ThemesTestCase;
 use Capell\Toolbar\Tests\ToolbarTestCase;
 use Capell\Workspaces\Tests\WorkspacesTestCase;
 
-pest()->extend(AddressTestCase::class)->in('../packages/address/tests');
-pest()->extend(AnalyticsTestCase::class)->in('../packages/analytics/tests');
-pest()->extend(BackupTestCase::class)->group('backup')->in('../packages/backup/tests');
-pest()->extend(PackagesTestCase::class)->in('../packages/authentication-log/tests');
-pest()->extend(BlogTestCase::class)->in('../packages/blog/tests');
-pest()->extend(CampaignsTestCase::class)->in('../packages/campaigns/tests');
-pest()->extend(DeveloperToolsTestCase::class)->in('../packages/developer-tools/tests');
-pest()->extend(FilamentPeekTestCase::class)->in('../packages/filament-peek/tests');
-pest()->extend(FormsTestCase::class)->in('../packages/forms/tests');
-pest()->extend(HtmlMinifyTestCase::class)->in('../packages/html-minify/tests');
-pest()->extend(MediaCuratorTestCase::class)->in('../packages/media-curator/tests');
-pest()->extend(MosaicTestCase::class)->in('../packages/mosaic/tests');
-pest()->extend(NavigationTestCase::class)->in('../packages/navigation/tests');
+pest()->extend(AddressTestCase::class)->in('../packages/foundation/address/tests');
+pest()->extend(AnalyticsTestCase::class)->in('../packages/growth/analytics/tests');
+pest()->extend(BackupTestCase::class)->group('backup')->in('../packages/operations/backup/tests');
+pest()->extend(PackagesTestCase::class)->in('../packages/operations/authentication-log/tests');
+pest()->extend(BlogTestCase::class)->in('../packages/foundation/blog/tests');
+pest()->extend(CampaignsTestCase::class)->in('../packages/growth/campaigns/tests');
+pest()->extend(DeveloperToolsTestCase::class)->in('../packages/operations/developer-tools/tests');
+pest()->extend(FilamentPeekTestCase::class)->in('../packages/publishing-pro/filament-peek/tests');
+pest()->extend(FormsTestCase::class)->in('../packages/forms/forms/tests');
+pest()->extend(HtmlMinifyTestCase::class)->in('../packages/foundation/html-minify/tests');
+pest()->extend(MediaCuratorTestCase::class)->in('../packages/foundation/media-curator/tests');
+pest()->extend(MosaicTestCase::class)->in('../packages/foundation/mosaic/tests');
+pest()->extend(NavigationTestCase::class)->in('../packages/foundation/navigation/tests');
 pest()->extend(PackagesTestCase::class)->in('Packages');
-pest()->extend(RedirectsTestCase::class)->group('redirects')->in('../packages/redirects/tests');
-pest()->extend(SeoToolsTestCase::class)->in('../packages/seo-tools/tests');
-pest()->extend(SiteSearchTestCase::class)->in('../packages/site-search/tests');
-pest()->extend(TagsTestCase::class)->in('../packages/tags/tests');
-pest()->extend(ThemesAdminTestCase::class)->in('../packages/themes-admin/tests');
-pest()->extend(ThemesCoreTestCase::class)->in('../packages/themes-core/tests');
-pest()->extend(ThemesTestCase::class)->in('../packages/themes/tests');
-pest()->extend(ToolbarTestCase::class)->in('../packages/toolbar/tests');
-pest()->extend(WorkspacesTestCase::class)->in('../packages/workspaces/tests');
+pest()->extend(RedirectsTestCase::class)->group('redirects')->in('../packages/foundation/redirects/tests');
+pest()->extend(SeoToolsTestCase::class)->in('../packages/search-seo/seo-tools/tests');
+pest()->extend(SiteSearchTestCase::class)->in('../packages/search-seo/site-search/tests');
+pest()->extend(TagsTestCase::class)->in('../packages/foundation/tags/tests');
+pest()->extend(ThemesAdminTestCase::class)->in('../packages/theme-studio/themes-admin/tests');
+pest()->extend(ThemesCoreTestCase::class)->in('../packages/theme-studio/themes-core/tests');
+pest()->extend(ThemesTestCase::class)->in('../packages/theme-studio/themes/tests');
+pest()->extend(ToolbarTestCase::class)->in('../packages/foundation/toolbar/tests');
+pest()->extend(WorkspacesTestCase::class)->in('../packages/publishing-pro/workspaces/tests');
 
 uses()->in(
-    '../packages/themes/agency/tests/Unit',
-    '../packages/themes/corporate/tests/Unit',
-    '../packages/themes/saas/tests/Unit',
+    '../packages/theme-studio/themes/agency/tests/Unit',
+    '../packages/theme-studio/themes/corporate/tests/Unit',
+    '../packages/theme-studio/themes/saas/tests/Unit',
 );

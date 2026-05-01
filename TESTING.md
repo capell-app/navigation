@@ -12,35 +12,35 @@ composer test             # all packages, parallel
 
 ## Test commands
 
-| Command | Purpose |
-|---|---|
-| `composer test` | Full suite (parallel) |
-| `composer test:unit` | Unit suite only |
-| `composer coverage` | HTML coverage report (min 80%) |
+| Command                    | Purpose                          |
+| -------------------------- | -------------------------------- |
+| `composer test`            | Full suite (parallel)            |
+| `composer test:unit`       | Unit suite only                  |
+| `composer coverage`        | HTML coverage report (min 80%)   |
 | `composer coverage-report` | Coverage summary in the terminal |
 
 Run a single package:
 
 ```bash
-php -d memory_limit=-1 vendor/bin/pest packages/themes-core/tests
+php -d memory_limit=-1 vendor/bin/pest packages/theme-studio/themes-core/tests
 ```
 
 Run a single file:
 
 ```bash
-php -d memory_limit=-1 vendor/bin/pest packages/themes-core/tests/Unit/Search/
+php -d memory_limit=-1 vendor/bin/pest packages/theme-studio/themes-core/tests/Unit/Search/
 ```
 
 ## Test suites
 
 Tests are collected from these directory patterns (configured in `phpunit.xml`):
 
-| Suite | Directories |
-|---|---|
-| **Unit** | `tests/src/*/Unit`, `packages/themes/*/tests/Unit`, `packages/themes-*/tests/Unit` |
-| **Feature** | `tests/src/*/Feature`, `packages/themes/*/tests/Feature`, `packages/themes-*/tests/Feature` |
-| **Architecture** | `tests/src/*/Arch` |
-| **Integration** | `tests/src/*/Integration` |
+| Suite            | Directories                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------- |
+| **Unit**         | `tests/src/*/Unit`, `packages/*/*/tests/Unit`, `packages/*/themes/*/tests/Unit`          |
+| **Feature**      | `tests/src/*/Feature`, `packages/*/*/tests/Feature`, `packages/*/themes/*/tests/Feature` |
+| **Architecture** | `tests/src/*/Arch`                                                                       |
+| **Integration**  | `tests/src/*/Integration`                                                                |
 
 ## Conventions
 
@@ -53,7 +53,7 @@ Tests are collected from these directory patterns (configured in `phpunit.xml`):
 
 ## Coverage
 
-Coverage is measured with pcov scoped to `packages/*/src`:
+Coverage is measured with pcov scoped to grouped package source directories:
 
 ```bash
 composer coverage           # writes HTML to coverage-html/
@@ -82,6 +82,6 @@ PHPStan runs at level 5. Annotate unavoidable suppressions with a comment explai
 ## Adding tests for a new package
 
 1. Create `packages/your-package/tests/Unit/` and place `*Test.php` files there.
-2. The `phpunit.xml` source block includes `packages/*/src` automatically; no config changes needed.
+2. The `phpunit.xml` source block includes grouped `packages/*/*/src` package paths automatically; no config changes needed.
 3. Follow the existing structure: one `*Test.php` per class under test, named after the class.
 4. Add a `beforeAll` or `beforeEach` hook in the test file for any shared setup.

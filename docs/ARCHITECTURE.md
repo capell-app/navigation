@@ -13,25 +13,29 @@ Owns the **CMS rendering pipeline** — the code that turns a Capell page record
 
 ### capell-app/themes-core
 
+Themes Core is part of **Capell Theme Studio**, the premium theme group.
+
 Owns **theme infrastructure** — reusable utilities shared across all themes. Nothing here depends on the CMS page record; everything depends on `ThemeSettings` or is stateless.
 
-| Module | Responsibility |
-|---|---|
-| `Analytics` | GA4 init script (`<script>` tag), UTM param capture; `AnalyticsProvider` interface for swapping backends |
-| `Cache` | Tagged component-level cache wrapper (not full-page) |
-| `SEO` | Default Open Graph/Twitter from ThemeSettings, JSON-LD builder, canonical URL, sitemap writer; `AbstractThemeSchemaGenerator` base for per-theme schema |
-| `Search` | `SiteSearch` contract + `DatabaseSiteSearch` LIKE-query driver + `ScoutSiteSearch` Meilisearch/Algolia driver |
-| `Accessibility` | ARIA attribute string helpers, WCAG 2.1 contrast ratio |
-| `Preview` | HMAC-SHA256 token generation and validation |
-| `Forms` | Honeypot, Cloudflare Turnstile widget + verification |
-| `Language` | Hreflang tag generation, language resolution helpers |
-| `Images` | `srcset`/`sizes` builder |
-| `Performance` | Critical CSS inliner, asset optimizer |
-| `Http` | `ThemeTokensController` — CSS custom property endpoint |
-| `Theme` | `ThemeRegistrar` — dynamic theme discovery for admin UI |
-| `Widgets` | `AbstractThemeWidget` — shared widget base class |
+| Module          | Responsibility                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Analytics`     | GA4 init script (`<script>` tag), UTM param capture; `AnalyticsProvider` interface for swapping backends                                                |
+| `Cache`         | Tagged component-level cache wrapper (not full-page)                                                                                                    |
+| `SEO`           | Default Open Graph/Twitter from ThemeSettings, JSON-LD builder, canonical URL, sitemap writer; `AbstractThemeSchemaGenerator` base for per-theme schema |
+| `Search`        | `SiteSearch` contract + `DatabaseSiteSearch` LIKE-query driver + `ScoutSiteSearch` Meilisearch/Algolia driver                                           |
+| `Accessibility` | ARIA attribute string helpers, WCAG 2.1 contrast ratio                                                                                                  |
+| `Preview`       | HMAC-SHA256 token generation and validation                                                                                                             |
+| `Forms`         | Honeypot, Cloudflare Turnstile widget + verification                                                                                                    |
+| `Language`      | Hreflang tag generation, language resolution helpers                                                                                                    |
+| `Images`        | `srcset`/`sizes` builder                                                                                                                                |
+| `Performance`   | Critical CSS inliner, asset optimizer                                                                                                                   |
+| `Http`          | `ThemeTokensController` — CSS custom property endpoint                                                                                                  |
+| `Theme`         | `ThemeRegistrar` — dynamic theme discovery for admin UI                                                                                                 |
+| `Widgets`       | `AbstractThemeWidget` — shared widget base class                                                                                                        |
 
 ### capell-app/capell-theme-{corporate,agency,saas}
+
+The Corporate, Agency, and SaaS themes are premium **Capell Theme Studio** themes.
 
 Owns **visual presentation** for one named theme:
 
@@ -41,6 +45,8 @@ Owns **visual presentation** for one named theme:
 - **ServiceProvider**: calls `ThemeRegistrar::register(key, label)` in `boot()` so the admin UI discovers it automatically
 
 ### capell-app/themes-admin
+
+Themes Admin is part of **Capell Theme Studio** and owns the admin-facing theme settings experience.
 
 Owns **Filament UI** for the theme system — the settings page and schema form. Reads from `ThemeRegistrar` to populate the active-theme dropdown dynamically; has no rendering logic.
 
