@@ -17,6 +17,9 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Media;
 use Capell\Core\Providers\CapellServiceProvider;
 use Capell\DefaultTheme\Providers\DefaultThemeServiceProvider;
+use Capell\Events\Providers\AdminServiceProvider as EventsAdminServiceProvider;
+use Capell\Events\Providers\EventsServiceProvider;
+use Capell\Events\Providers\FrontendServiceProvider as EventsFrontendServiceProvider;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Mosaic\Providers\MosaicServiceProvider;
@@ -73,6 +76,9 @@ class PackagesTestCase extends AbstractTestCase
             BlogServiceProvider::class,
             BlogAdminServiceProvider::class,
             BlogFrontendServiceProvider::class,
+            EventsServiceProvider::class,
+            EventsAdminServiceProvider::class,
+            EventsFrontendServiceProvider::class,
             SeoToolsServiceProvider::class,
             TagsServiceProvider::class,
             FrontendServiceProvider::class,
@@ -97,6 +103,7 @@ class PackagesTestCase extends AbstractTestCase
         CapellCore::forcePackageInstalled(TagsServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(BlogServiceProvider::$packageName);
+        CapellCore::forcePackageInstalled(EventsServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(AddressServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(AuthenticationLogServiceProvider::$packageName);
 

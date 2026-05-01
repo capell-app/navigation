@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'schedule' => 'Schedule',
+    'starts_at' => 'Starts at',
+    'ends_at' => 'Ends at',
+    'timezone' => 'Timezone',
+    'recurrence' => 'Recurrence',
+    'recurrence_interval' => 'Every',
+    'recurrence_until' => 'Repeat until',
+    'recurrence_count' => 'Occurrence limit',
+    'generate_until' => 'Generate until',
+    'weekdays' => 'Weekdays',
+    'weekday' => [
+        'monday' => 'Monday',
+        'tuesday' => 'Tuesday',
+        'wednesday' => 'Wednesday',
+        'thursday' => 'Thursday',
+        'friday' => 'Friday',
+        'saturday' => 'Saturday',
+        'sunday' => 'Sunday',
+    ],
+    'location' => 'Location',
+    'location_type' => 'Location type',
+    'location_name' => 'Location name',
+    'location_address' => 'Address',
+    'location_url' => 'Location URL',
+    'latitude' => 'Latitude',
+    'longitude' => 'Longitude',
+    'booking' => 'Booking',
+    'booking_url' => 'Booking URL',
+    'booking_label' => 'Booking label',
+    'booking_opens_at' => 'Booking opens at',
+    'booking_closes_at' => 'Booking closes at',
+    'schema' => 'Schema',
+    'organizer' => 'Organizer',
+    'performer' => 'Performer',
+];

@@ -1,0 +1,25 @@
+{
+    "name": "capell-app/events",
+    "kind": "package",
+    "capell-version": "^4.0",
+    "contexts": ["admin", "frontend", "console"],
+    "requires": [
+        "capell-app/core",
+        "capell-app/admin",
+        "capell-app/frontend",
+        "capell-app/mosaic",
+        "capell-app/navigation",
+        "capell-app/workspaces"
+    ],
+    "providers": {
+        "shared": ["Capell\\Events\\Providers\\EventsServiceProvider"],
+        "admin": ["Capell\\Events\\Providers\\AdminServiceProvider"],
+        "frontend": ["Capell\\Events\\Providers\\FrontendServiceProvider"],
+        "console": ["Capell\\Events\\Providers\\ConsoleServiceProvider"]
+    },
+    "commands": {
+        "install": "capell:events-install",
+        "setup": "capell:events-setup",
+        "setupParams": ["sites", "languages"]
+    }
+}
