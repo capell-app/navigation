@@ -17,8 +17,8 @@ return new class extends Migration
         Schema::create('redirect_health_snapshots', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('page_url_id')->constrained('page_urls')->cascadeOnDelete();
-            $table->string('source_url');
-            $table->string('target_url')->nullable();
+            $table->text('source_url');
+            $table->text('target_url')->nullable();
             $table->boolean('has_chain')->default(false);
             $table->boolean('has_loop')->default(false);
             $table->unsignedSmallInteger('warning_count')->default(0);

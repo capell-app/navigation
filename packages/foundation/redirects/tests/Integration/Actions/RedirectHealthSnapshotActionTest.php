@@ -47,3 +47,40 @@ it('stores redirect health for a redirect chain', function (): void {
         ->and($snapshot->warning_count)->toBeGreaterThan(0)
         ->and($targetRedirect->exists)->toBeTrue();
 });
+
+it('does not mark non-chain warnings as redirect chains', function (): void {
+    $language = LanguageFactory::new()->create();
+    $site = SiteFactory::new()->recycle($language)->language($language)->withTranslations($language)->create();
+
+    PageUrl::factory()
+        ->site($site)
+        ->language($language)
+        ->state([
+            'url' => '/conflicting-source',
+            'target_url' => '/automatic-target',
+            'type' => UrlTypeEnum::Redirect,
+            'is_manual' => false,
+            'status_code' => RedirectStatusCodeEnum::Permanent,
+            'status' => true,
+        ])
+        ->create();
+
+    $redirect = PageUrl::factory()
+        ->site($site)
+        ->language($language)
+        ->state([
+            'url' => '/conflicting-source',
+            'target_url' => '/manual-target',
+            'type' => UrlTypeEnum::Redirect,
+            'is_manual' => true,
+            'status_code' => RedirectStatusCodeEnum::Permanent,
+            'status' => true,
+        ])
+        ->create();
+
+    $snapshot = RefreshRedirectHealthSnapshotAction::run($redirect);
+
+    expect($snapshot)->toBeInstanceOf(RedirectHealthSnapshot::class)
+        ->and($snapshot->has_chain)->toBeFalse()
+        ->and($snapshot->warning_count)->toBeGreaterThan(0);
+});

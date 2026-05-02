@@ -12,6 +12,8 @@ class RefreshRedirectHealthSnapshotAction
 {
     use AsAction;
 
+    private const CHAIN_TARGET_PLACEHOLDER = '__CAPELL_REDIRECT_CHAIN_TARGET__';
+
     public function handle(PageUrl $redirect): RedirectHealthSnapshot
     {
         $errors = [];
@@ -37,12 +39,33 @@ class RefreshRedirectHealthSnapshotAction
             [
                 'source_url' => $redirect->url,
                 'target_url' => $redirect->target_url,
-                'has_chain' => $warnings !== [],
+                'has_chain' => $this->hasChainWarning($warnings),
                 'has_loop' => in_array(__('redirects::message.redirect_loop_detected'), $errors, true),
                 'warning_count' => count($warnings),
                 'error_count' => count($errors),
                 'computed_at' => now(),
             ],
         );
+    }
+
+    /**
+     * @param  list<string>  $warnings
+     */
+    private function hasChainWarning(array $warnings): bool
+    {
+        $chainWarningMessage = __('redirects::message.redirect_chain_detected', [
+            'final_target' => self::CHAIN_TARGET_PLACEHOLDER,
+        ]);
+        $chainWarningParts = explode(self::CHAIN_TARGET_PLACEHOLDER, $chainWarningMessage, 2);
+        $chainWarningPrefix = $chainWarningParts[0] ?? '';
+        $chainWarningSuffix = $chainWarningParts[1] ?? '';
+
+        foreach ($warnings as $warning) {
+            if (str_starts_with($warning, $chainWarningPrefix) && str_ends_with($warning, $chainWarningSuffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
