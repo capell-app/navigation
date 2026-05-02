@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 class NavigationSelect extends Select
 {
@@ -84,6 +85,10 @@ class NavigationSelect extends Select
                         function (HintEditAction $action): string {
                             /** @var Navigation $record */
                             $record = $action->getRecord();
+
+                            if (! Route::has('filament.admin.resources.navigations.edit')) {
+                                return '#';
+                            }
 
                             return NavigationResource::getUrl('edit', ['record' => $record->id]);
                         },

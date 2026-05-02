@@ -39,32 +39,89 @@ class NavigationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->registerPackageMetadata();
-        $this->registerSchemaExtender(SchemaExtenderEnum::Page->value, NavigationPageSchemaExtender::class);
-        $this->registerSchemaExtender(SchemaExtenderEnum::Site->value, NavigationSiteExtender::class);
+        $this->commands([DemoCommand::class, SetupCommand::class]);
+    }
 
+    public function boot(): void
+    {
+        if (! $this->isPackageInstalled()) {
+            return;
+        }
+
+        $this
+            ->registerServices()
+            ->registerSchemaExtenders()
+            ->registerResources()
+            ->registerPageTypes()
+            ->registerModels()
+            ->registerConfigurators()
+            ->registerPackageAssets()
+            ->registerPolicies()
+            ->registerRelationships()
+            ->registerEventListeners()
+            ->registerDemoCreatorMacros();
+    }
+
+    private function isPackageInstalled(): bool
+    {
+        return CapellCore::isPackageInstalled(static::$packageName);
+    }
+
+    private function registerServices(): self
+    {
         $this->app->singleton(NavigationPageSyncer::class, NavigationPageSyncerAdapter::class);
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
-
-        $this->commands([DemoCommand::class, SetupCommand::class]);
         $this->app->singleton(
             \Capell\Navigation\Support\NavigationNamesResolver::class,
             fn ($app): \Capell\Navigation\Support\NavigationNamesResolver => new \Capell\Navigation\Support\NavigationNamesResolver($app['cache']->store()),
         );
 
+        return $this;
+    }
+
+    private function registerSchemaExtenders(): self
+    {
+        $this->registerSchemaExtender(SchemaExtenderEnum::Page->value, NavigationPageSchemaExtender::class);
+        $this->registerSchemaExtender(SchemaExtenderEnum::Site->value, NavigationSiteExtender::class);
+
+        return $this;
+    }
+
+    private function registerResources(): self
+    {
         CapellAdmin::registerResource('Navigation', NavigationResource::class);
+
+        return $this;
+    }
+
+    private function registerPageTypes(): self
+    {
         CapellCore::registerPageType(new PageTypeData(
             name: 'navigation',
             model: Navigation::class,
             label: 'Navigation',
         ));
+
+        return $this;
+    }
+
+    private function registerModels(): self
+    {
         CapellCore::registerModels([Navigation::class]);
 
+        return $this;
+    }
+
+    private function registerConfigurators(): self
+    {
         foreach (NavigationConfiguratorTypeEnum::getAllConfigurators() as $type => $configurators) {
             CapellAdmin::registerConfigurators($type, $configurators, defaultConfigurators: true);
         }
+
+        return $this;
     }
 
-    public function boot(): void
+    private function registerPackageAssets(): self
     {
         // Skip auto-loading migrations during unit tests: the ordered migration workspace
         // (BuildsOrderedMigrationWorkspace) copies navigation's migrations into a temp
@@ -76,16 +133,31 @@ class NavigationServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
 
-        Gate::policy(Navigation::class, NavigationPolicy::class);
-
-        Site::resolveRelationUsing('navigations', fn (Site $site): HasMany => $site->hasMany(Navigation::class));
-
-        Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
-
-        $this->registerDemoCreatorMacros();
+        return $this;
     }
 
-    private function registerDemoCreatorMacros(): void
+    private function registerPolicies(): self
+    {
+        Gate::policy(Navigation::class, NavigationPolicy::class);
+
+        return $this;
+    }
+
+    private function registerRelationships(): self
+    {
+        Site::resolveRelationUsing('navigations', fn (Site $site): HasMany => $site->hasMany(Navigation::class));
+
+        return $this;
+    }
+
+    private function registerEventListeners(): self
+    {
+        Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
+
+        return $this;
+    }
+
+    private function registerDemoCreatorMacros(): self
     {
         DemoCreator::macro('setupMainNavigation', function (Site $site, Language $language, Page $home): void {
             resolve(NavigationDemoCreator::class)->setupMainNavigation($site, $language, $home);
@@ -98,6 +170,8 @@ class NavigationServiceProvider extends ServiceProvider
         DemoCreator::macro('subFooterNavigation', function (Site $site, ?Language $language): void {
             resolve(NavigationDemoCreator::class)->setupSubFooterNavigation($site, $language);
         });
+
+        return $this;
     }
 
     private function registerSchemaExtender(string $tag, string $class): void
