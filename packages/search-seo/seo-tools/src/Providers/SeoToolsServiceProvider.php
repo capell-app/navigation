@@ -35,6 +35,7 @@ use Capell\SeoTools\Console\Commands\SetupCommand;
 use Capell\SeoTools\Console\Commands\TestOpenAiConnectionCommand;
 use Capell\SeoTools\Console\Commands\XmlSitemapCommand;
 use Capell\SeoTools\Contracts\Schemas\SearchMetaDataSectionExtenderResolverInterface;
+use Capell\SeoTools\Enums\SchemaTemplateTypeEnum;
 use Capell\SeoTools\Events\AiGenerationCompleted;
 use Capell\SeoTools\Events\AiGenerationFailed;
 use Capell\SeoTools\Filament\Extenders\Page\PageSeoPanelSchemaExtender;
@@ -88,6 +89,9 @@ use Capell\SeoTools\Support\PrismProvider;
 use Capell\SeoTools\Support\PromptRepository;
 use Capell\SeoTools\Support\RenderHooks\RegisterSeoHeadHooks;
 use Capell\SeoTools\Support\Schemas\SearchMetaDataSectionExtenderResolver;
+use Capell\SeoTools\Support\SchemaTemplates\ArticleSchemaTemplate;
+use Capell\SeoTools\Support\SchemaTemplates\SchemaTemplateRegistry;
+use Capell\SeoTools\Support\SchemaTemplates\WebPageSchemaTemplate;
 use Capell\SeoTools\Support\SectionRegistry;
 use Capell\SeoTools\Support\Sitemap\Pages\PagesSitemap;
 use Capell\SeoTools\Support\Sitemap\SitemapPageRegistry;
@@ -132,6 +136,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         $this->registerExtenderResolvers();
         $this->registerModels();
         $this->registerBlazeComponents();
+        $this->bindSchemaTemplateRegistry();
 
         $this->booted(function (): void {
             if (! $this->isPackageInstalled()) {
@@ -394,6 +399,17 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         return $this;
     }
 
+    protected function registerSchemaTemplateRegistry(): self
+    {
+        /** @var SchemaTemplateRegistry $registry */
+        $registry = $this->app->make(SchemaTemplateRegistry::class);
+
+        $registry->registerIfMissing(SchemaTemplateTypeEnum::WebPage, new WebPageSchemaTemplate);
+        $registry->registerIfMissing(SchemaTemplateTypeEnum::Article, new ArticleSchemaTemplate);
+
+        return $this;
+    }
+
     protected function registerSitemapEventListeners(): self
     {
         $events = $this->app->make(Dispatcher::class);
@@ -438,6 +454,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
             ->registerSitemapPageType()
             ->registerSitemapDefaultPage()
             ->registerSitemapRegistry()
+            ->registerSchemaTemplateRegistry()
             ->registerSitemapEventListeners()
             ->registerFilamentPages()
             ->registerLivewireComponents()
@@ -459,6 +476,11 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
             SearchMetaDataSectionExtenderResolverInterface::class,
             fn (): SearchMetaDataSectionExtenderResolver => new SearchMetaDataSectionExtenderResolver,
         );
+    }
+
+    private function bindSchemaTemplateRegistry(): void
+    {
+        $this->app->singleton(SchemaTemplateRegistry::class, fn (): SchemaTemplateRegistry => new SchemaTemplateRegistry);
     }
 
     /**

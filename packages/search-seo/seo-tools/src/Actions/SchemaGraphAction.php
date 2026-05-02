@@ -9,6 +9,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\SeoTools\Enums\SchemaEntityTypeEnum;
+use Capell\SeoTools\Support\SchemaTemplates\SchemaTemplateRegistry;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
@@ -54,6 +55,21 @@ class SchemaGraphAction
         }
 
         $nodes[] = $pageSchema;
+
+        /** @var SchemaTemplateRegistry $schemaTemplateRegistry */
+        $schemaTemplateRegistry = app(SchemaTemplateRegistry::class);
+        $breadcrumbReference = $pageSchema['breadcrumb'] ?? null;
+
+        foreach ($schemaTemplateRegistry->matching($page) as $template) {
+            $templateSchema = $this->stripContext($template->build($page, $site, $language));
+            $templateSchema = $this->normalizeTemplateBreadcrumb($templateSchema, $breadcrumbReference);
+
+            if (! $this->isValidTemplateNode($templateSchema, $template->requiredFields($page, $site, $language))) {
+                continue;
+            }
+
+            $nodes = $this->mergeTemplateNode($nodes, $templateSchema);
+        }
 
         // Filter out any null @id values and empty nodes
         $nodes = array_map(
@@ -105,5 +121,94 @@ class SchemaGraphAction
         unset($configurator['@context']);
 
         return $configurator;
+    }
+
+    /**
+     * @param  array<string, mixed>  $templateSchema
+     * @return array<string, mixed>
+     */
+    private function normalizeTemplateBreadcrumb(array $templateSchema, mixed $breadcrumbReference): array
+    {
+        if (! is_array($breadcrumbReference)) {
+            unset($templateSchema['breadcrumb']);
+
+            return $templateSchema;
+        }
+
+        if (isset($breadcrumbReference['@id'])) {
+            $templateSchema['breadcrumb'] = $breadcrumbReference;
+        }
+
+        return $templateSchema;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $nodes
+     * @param  array<string, mixed>  $templateSchema
+     * @return list<array<string, mixed>>
+     */
+    private function mergeTemplateNode(array $nodes, array $templateSchema): array
+    {
+        foreach ($nodes as $index => $node) {
+            if (($templateSchema['@id'] ?? null) !== null && ($node['@id'] ?? null) === $templateSchema['@id']) {
+                $nodes[$index] = array_replace_recursive($node, $templateSchema);
+
+                return $nodes;
+            }
+
+            if (
+                $this->isBuiltInPageSchemaType($templateSchema['@type'] ?? null)
+                && $this->isBuiltInPageSchemaType($node['@type'] ?? null)
+            ) {
+                $nodes[$index] = array_replace_recursive($node, $templateSchema);
+
+                return $nodes;
+            }
+        }
+
+        $nodes[] = $templateSchema;
+
+        return $nodes;
+    }
+
+    private function isBuiltInPageSchemaType(mixed $type): bool
+    {
+        return is_string($type) && in_array($type, [
+            'Article',
+            'BlogPosting',
+            'NewsArticle',
+            'TechArticle',
+            'Report',
+            'WebPage',
+        ], true);
+    }
+
+    /**
+     * @param  array<string, mixed>  $templateSchema
+     * @param  list<string>  $requiredFields
+     */
+    private function isValidTemplateNode(array $templateSchema, array $requiredFields): bool
+    {
+        if ($templateSchema === []) {
+            return false;
+        }
+
+        foreach ($requiredFields as $requiredField) {
+            if (! array_key_exists($requiredField, $templateSchema)) {
+                return false;
+            }
+
+            $value = $templateSchema[$requiredField];
+
+            if ($value === null || $value === '') {
+                return false;
+            }
+
+            if (is_array($value) && $value === []) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

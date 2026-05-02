@@ -112,7 +112,7 @@ final class BuildPageSeoReportAction
             issues: $issues,
             passedChecks: [],
             internalLinkSuggestions: SuggestInternalLinksAction::run($page, $site, $language),
-            schemaReports: [],
+            schemaReports: BuildSchemaTemplateReportAction::run($page, $site, $language),
             redirectOpportunities: [],
             searchConsoleInsights: [],
         );
