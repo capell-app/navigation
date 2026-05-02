@@ -9,7 +9,9 @@ use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Core\Enums\UrlTypeEnum;
 use Capell\Core\Models\PageUrl;
 use Capell\SeoTools\Actions\CreateRedirectForBrokenLinkAction;
+use Capell\SeoTools\Filament\Actions\CreateRedirectFromBrokenLinkAction;
 use Capell\SeoTools\Models\BrokenLink;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 it('creates a manual redirect from a broken link with redirect validation', function (): void {
@@ -64,3 +66,31 @@ it('rejects invalid redirect targets through the redirects validator', function 
         statusCode: RedirectStatusCodeEnum::Permanent,
     );
 })->throws(ValidationException::class);
+
+it('links to the redirects create page with broken link context', function (): void {
+    Route::get('/admin/redirects')->name('filament.admin.resources.redirects.index');
+
+    $language = LanguageFactory::new()->create(['name' => 'English', 'code' => 'en']);
+    $site = SiteFactory::new()->recycle($language)->language($language)->withTranslations($language)->create();
+    $page = PageFactory::new()->site($site)->withTranslations($language)->create();
+
+    PageUrl::factory()->page($page)->site($site)->language($language)->state(['url' => '/source-page'])->create();
+
+    $brokenLink = BrokenLink::query()->create([
+        'page_id' => $page->id,
+        'target_url' => 'https://example.com/missing-page?utm=tracking',
+        'http_status' => 404,
+        'last_checked_at' => now(),
+    ]);
+
+    $url = CreateRedirectFromBrokenLinkAction::make()
+        ->record($brokenLink)
+        ->getUrl();
+
+    expect($url)
+        ->toContain('create_redirect=1')
+        ->toContain('url=%2Fmissing-page')
+        ->toContain('site_id=' . $site->id)
+        ->toContain('language_id=' . $language->id)
+        ->toContain('status_code=301');
+});

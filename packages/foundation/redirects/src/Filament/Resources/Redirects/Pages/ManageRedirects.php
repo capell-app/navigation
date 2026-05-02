@@ -6,6 +6,7 @@ namespace Capell\Redirects\Filament\Resources\Redirects\Pages;
 
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Filament\Actions\CreateAction;
+use Capell\Core\Enums\RedirectStatusCodeEnum;
 use Capell\Redirects\Filament\Exports\RedirectExporter;
 use Capell\Redirects\Filament\Imports\RedirectImporter;
 use Capell\Redirects\Filament\Resources\Redirects\RedirectResource;
@@ -28,6 +29,46 @@ class ManageRedirects extends ManageRecords
     public function getSubheading(): string|Htmlable|null
     {
         return __('redirects::hints.redirects');
+    }
+
+    #[Override]
+    public function mount(): void
+    {
+        parent::mount();
+
+        if (! request()->boolean('create_redirect')) {
+            return;
+        }
+
+        $createRedirectData = [
+            'site_id' => request()->integer('site_id') ?: null,
+            'language_id' => request()->integer('language_id') ?: null,
+            'url' => request()->string('url')->toString() ?: null,
+            'target_url' => request()->string('target_url')->toString() ?: null,
+            'status_code' => request()->integer('status_code', RedirectStatusCodeEnum::Permanent->value),
+        ];
+
+        $this->mountAction('create', $createRedirectData);
+
+        $mountedActionIndex = array_key_last($this->mountedActions);
+
+        if ($mountedActionIndex === null) {
+            return;
+        }
+
+        $mountedActionData = $this->mountedActions[$mountedActionIndex]['data'] ?? [];
+
+        if (! is_array($mountedActionData)) {
+            $mountedActionData = [];
+        }
+
+        $this->mountedActions[$mountedActionIndex]['data'] = [
+            ...$mountedActionData,
+            ...array_filter(
+                $createRedirectData,
+                static fn (mixed $value): bool => $value !== null,
+            ),
+        ];
     }
 
     protected function getActions(): array
