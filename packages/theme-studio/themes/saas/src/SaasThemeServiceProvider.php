@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\ThemeStudio\Saas;
 
+use Capell\Core\Enums\PackageTypeEnum;
+use Capell\Core\Facades\CapellCore;
 use Capell\ThemeStudio\Core\Data\ThemeDefinitionData;
 use Capell\ThemeStudio\Core\Data\ThemePresetData;
 use Capell\ThemeStudio\Core\Rendering\BladeThemeRenderer;
@@ -14,6 +16,8 @@ use Illuminate\Support\ServiceProvider;
 class SaasThemeServiceProvider extends ServiceProvider
 {
     public const THEME_KEY = 'saas';
+
+    public static string $packageName = 'capell-app/theme-saas';
 
     public static function definition(): ThemeDefinitionData
     {
@@ -75,9 +79,23 @@ class SaasThemeServiceProvider extends ServiceProvider
         );
     }
 
+    public function register(): void
+    {
+        CapellCore::registerPackage(
+            name: self::$packageName,
+            type: PackageTypeEnum::Theme,
+            path: realpath(__DIR__ . '/..'),
+            version: CapellCore::getInstalledPrettyVersion(self::$packageName),
+        );
+    }
+
     public function boot(ThemeRegistry $registry): void
     {
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'capell-theme-saas');
+
+        if (! CapellCore::isPackageInstalled(self::$packageName)) {
+            return;
+        }
 
         $sectionRenderers = $this->sectionRenderers();
 

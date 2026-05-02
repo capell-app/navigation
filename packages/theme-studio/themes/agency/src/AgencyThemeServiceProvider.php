@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\ThemeStudio\Agency;
 
+use Capell\Core\Enums\PackageTypeEnum;
+use Capell\Core\Facades\CapellCore;
 use Capell\ThemeStudio\Core\Data\ThemeDefinitionData;
 use Capell\ThemeStudio\Core\Data\ThemePresetData;
 use Capell\ThemeStudio\Core\Rendering\BladeThemeRenderer;
@@ -14,6 +16,8 @@ use Illuminate\Support\ServiceProvider;
 class AgencyThemeServiceProvider extends ServiceProvider
 {
     public const THEME_KEY = 'agency';
+
+    public static string $packageName = 'capell-app/theme-agency';
 
     public static function definition(): ThemeDefinitionData
     {
@@ -77,9 +81,23 @@ class AgencyThemeServiceProvider extends ServiceProvider
         );
     }
 
+    public function register(): void
+    {
+        CapellCore::registerPackage(
+            name: self::$packageName,
+            type: PackageTypeEnum::Theme,
+            path: realpath(__DIR__ . '/..'),
+            version: CapellCore::getInstalledPrettyVersion(self::$packageName),
+        );
+    }
+
     public function boot(ThemeRegistry $registry): void
     {
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'capell-theme-agency');
+
+        if (! CapellCore::isPackageInstalled(self::$packageName)) {
+            return;
+        }
 
         $sectionRenderers = $this->sectionRenderers();
 
