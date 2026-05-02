@@ -26,18 +26,22 @@
                 </div>
             </div>
 
-            <div
-                class="rounded-md bg-gray-50 px-3 py-2 text-right dark:bg-gray-800"
-            >
+            <div class="flex items-start gap-3">
+                {{ $schemaComponent->getAction('ai_content_brief') }}
+
                 <div
-                    class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                    class="rounded-md bg-gray-50 px-3 py-2 text-right dark:bg-gray-800"
                 >
-                    {{ __('capell-seo-tools::generic.seo_panel_score') }}
-                </div>
-                <div
-                    class="text-2xl font-semibold text-gray-950 dark:text-white"
-                >
-                    {{ $report->score }}
+                    <div
+                        class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                    >
+                        {{ __('capell-seo-tools::generic.seo_panel_score') }}
+                    </div>
+                    <div
+                        class="text-2xl font-semibold text-gray-950 dark:text-white"
+                    >
+                        {{ $report->score }}
+                    </div>
                 </div>
             </div>
         </div>

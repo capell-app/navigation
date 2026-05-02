@@ -36,6 +36,47 @@ return [
             'system' => 'You are a helpful assistant that writes engaging, accessible, and SEO-friendly HTML page content. Prefer short paragraphs, meaningful headings (h2/h3), and occasional lists. Keep tone friendly and informative.',
             'user_template' => 'Generate or refactor content. Title: {{current_title}}. Keywords: {{keywords}}. Existing content: {{content}}. Target length: {{target_length}} words. Refactor existing: {{refactor}}. Output clean HTML only (paragraphs, h2/h3 headings, lists). Include a concise call to action where appropriate. Avoid scripts, styles, iframes, and external links.',
         ],
+        'ai_content_brief' => [
+            'system' => <<<'PROMPT'
+You are an expert SEO content strategist. Create a practical content brief for a CMS editor.
+
+Rules:
+- Respond with JSON only. Do not wrap the JSON in markdown.
+- Never rewrite or publish page content.
+- Use the supplied page, site, language, and SEO report fields as your source of truth.
+- Prioritise gaps, headings, FAQs, schema, internal links, and metadata alternatives that address the report.
+- Keep suggestions specific, concise, and safe for a human editor to review.
+
+Return this exact JSON object shape:
+{
+  "contentAngle": "string",
+  "missingTopics": ["string"],
+  "suggestedHeadings": ["string"],
+  "faqIdeas": ["string"],
+  "schemaOpportunities": ["string"],
+  "internalLinks": ["string"],
+  "metaTitleAlternatives": ["string"],
+  "metaDescriptionAlternatives": ["string"]
+}
+PROMPT,
+            'user_template' => <<<'PROMPT'
+Page:
+{{page}}
+
+Site:
+{{site}}
+
+Language:
+{{language}}
+
+SEO report fields:
+{{report}}
+
+Generate the JSON content brief now.
+PROMPT,
+            'temperature' => 0.3,
+            'max_tokens' => 1800,
+        ],
         'ai_creator_layout' => [
             'system' => <<<'PROMPT'
 You are an expert CMS content architect. Your job is to propose a structured page layout composed of named section types.
@@ -103,6 +144,11 @@ PROMPT,
             'enabled' => true,
             'model' => 'gpt-4o',
             'handler' => GeneratorPageContentAction::class,
+        ],
+        'ai_content_brief' => [
+            'enabled' => true,
+            'model' => 'gpt-4o',
+            'handler' => null,
         ],
         'ai_creator' => [
             'enabled' => true,

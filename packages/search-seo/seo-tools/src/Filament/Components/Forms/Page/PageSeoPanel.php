@@ -9,6 +9,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\SeoTools\Actions\BuildPageSeoReportAction;
 use Capell\SeoTools\Data\PageSeoReportData;
+use Capell\SeoTools\Filament\Actions\AiContentBriefAction;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\View;
 use Throwable;
@@ -21,7 +22,11 @@ class PageSeoPanel extends View
     {
         parent::setUp();
 
-        $this->viewData(fn (Get $get): array => $this->reportViewData($get('language_id')));
+        $this
+            ->registerActions([
+                AiContentBriefAction::make(),
+            ])
+            ->viewData(fn (Get $get): array => $this->reportViewData($get('language_id')));
     }
 
     public static function make(?string $view = null): static
@@ -38,6 +43,36 @@ class PageSeoPanel extends View
     public function getViewData(): array
     {
         return parent::getViewData();
+    }
+
+    /**
+     * @return array{page: Page, site: Site, language: Language}|null
+     */
+    public function resolveAiContentBriefContext(null|int|string $languageId = null): ?array
+    {
+        $record = $this->pageRecord();
+
+        if (! $record instanceof Page || ! $record->exists) {
+            return null;
+        }
+
+        $record->loadMissing([
+            'site.language',
+            'translation.language',
+        ]);
+
+        $site = $record->site;
+        $language = $this->resolveLanguage($record, $site, $languageId);
+
+        if (! $site instanceof Site || ! $language instanceof Language) {
+            return null;
+        }
+
+        return [
+            'page' => $record,
+            'site' => $site,
+            'language' => $language,
+        ];
     }
 
     /**
