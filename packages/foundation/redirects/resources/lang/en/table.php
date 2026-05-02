@@ -7,6 +7,7 @@ return [
     'chain_warning' => 'Chain',
     'chain_warning_detected' => 'Check chain',
     'chain_warning_none' => 'Clear',
+    'chain_warning_unknown' => 'Not checked',
     'hit_count' => 'Hits',
     'hit_count_bucket' => 'Hit Count',
     'hit_count_bucket_any' => 'Has hits',

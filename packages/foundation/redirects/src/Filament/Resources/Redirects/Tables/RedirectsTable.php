@@ -156,9 +156,7 @@ class RedirectsTable implements TableConfigurator
                 ->toggleable(),
             TextColumn::make('chain_warning')
                 ->label(__('redirects::table.chain_warning'))
-                ->state(fn (PageUrl $record): string => self::redirectHealthFor($record)?->has_chain === true
-                    ? __('redirects::table.chain_warning_detected')
-                    : __('redirects::table.chain_warning_none'))
+                ->state(fn (PageUrl $record): string => self::redirectHealthState($record))
                 ->badge()
                 ->color(fn (string $state): string => $state === __('redirects::table.chain_warning_detected') ? 'warning' : 'gray')
                 ->toggleable(),
@@ -168,6 +166,19 @@ class RedirectsTable implements TableConfigurator
             DateColumn::make('created_at')
                 ->toggleable(isToggledHiddenByDefault: true),
         ];
+    }
+
+    private static function redirectHealthState(PageUrl $record): string
+    {
+        $redirectHealth = self::redirectHealthFor($record);
+
+        if ($redirectHealth === null) {
+            return __('redirects::table.chain_warning_unknown');
+        }
+
+        return $redirectHealth->has_chain
+            ? __('redirects::table.chain_warning_detected')
+            : __('redirects::table.chain_warning_none');
     }
 
     private static function redirectHealthFor(PageUrl $record): ?RedirectHealthSnapshot
