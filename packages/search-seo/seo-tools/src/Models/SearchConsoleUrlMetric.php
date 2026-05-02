@@ -6,11 +6,14 @@ namespace Capell\SeoTools\Models;
 
 use Capell\Core\Models\Site;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SearchConsoleUrlMetric extends Model
 {
+    use HasFactory;
+
     protected $guarded = [];
 
     public function site(): BelongsTo
@@ -18,7 +21,7 @@ class SearchConsoleUrlMetric extends Model
         return $this->belongsTo(Site::class);
     }
 
-    public function scopeDecliningPages(Builder $query, int $siteId, int $limit = 10): Builder
+    protected function scopeDecliningPages(Builder $query, int $siteId, int $limit = 10): Builder
     {
         $latestMetric = self::query()
             ->where('site_id', $siteId)

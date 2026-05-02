@@ -183,7 +183,7 @@ class RedirectsTable implements TableConfigurator
 
     private static function redirectHealthFor(PageUrl $record): ?RedirectHealthSnapshot
     {
-        $pageUrlId = (int) $record->id;
+        $pageUrlId = $record->id;
 
         if (! array_key_exists($pageUrlId, self::$redirectHealthCache)) {
             self::$redirectHealthCache[$pageUrlId] = RedirectHealthSnapshot::query()

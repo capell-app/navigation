@@ -22,10 +22,10 @@ class RefreshRedirectHealthSnapshotAction
         if ($redirect->target_url !== null && $redirect->target_url !== '') {
             $result = ValidateRedirectAction::run(
                 sourceUrl: $redirect->url,
-                targetUrl: (string) $redirect->target_url,
-                siteId: (int) $redirect->site_id,
-                languageId: (int) $redirect->language_id,
-                excludeId: (int) $redirect->id,
+                targetUrl: $redirect->target_url,
+                siteId: $redirect->site_id,
+                languageId: $redirect->language_id,
+                excludeId: $redirect->id,
                 statusCode: $redirect->status_code?->value,
                 validateDuplicateSource: false,
             );
