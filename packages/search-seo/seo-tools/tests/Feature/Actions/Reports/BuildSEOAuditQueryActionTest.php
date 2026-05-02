@@ -51,7 +51,7 @@ it('exposes snapshot backed seo audit filters', function (): void {
     );
 });
 
-it('uses the unhealthy translation language for snapshot backed audit columns', function (): void {
+it('uses the site language for snapshot backed audit columns', function (): void {
     $english = LanguageFactory::new()->create(['name' => 'English', 'code' => 'en']);
     $french = LanguageFactory::new()->create(['name' => 'French', 'code' => 'fr']);
     $site = SiteFactory::new()
@@ -123,6 +123,123 @@ it('uses the unhealthy translation language for snapshot backed audit columns', 
     $snapshot = $reflectionMethod->invoke(null, $auditedPage);
 
     expect($snapshot)->toBeInstanceOf(PageSeoSnapshot::class)
-        ->and($snapshot->language_id)->toBe($french->getKey())
-        ->and($snapshot->critical_count)->toBe(2);
+        ->and($snapshot->language_id)->toBe($english->getKey())
+        ->and($snapshot->critical_count)->toBe(0);
+});
+
+it('constrains severity filters to the displayed snapshot language', function (): void {
+    $english = LanguageFactory::new()->create(['name' => 'English', 'code' => 'en']);
+    $french = LanguageFactory::new()->create(['name' => 'French', 'code' => 'fr']);
+    $site = SiteFactory::new()
+        ->recycle($english)
+        ->language($english)
+        ->withTranslations([$english, $french])
+        ->create();
+    $page = PageFactory::new()
+        ->site($site)
+        ->withTranslations([$english, $french])
+        ->create();
+
+    PageSeoSnapshot::query()->create([
+        'page_id' => $page->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => $english->getKey(),
+        'score' => 100,
+        'critical_count' => 0,
+        'warning_count' => 0,
+        'notice_count' => 0,
+        'passed_count' => 3,
+        'issue_keys' => [],
+        'schema_status' => 'passed',
+        'robots_status' => 'passed',
+        'canonical_status' => 'passed',
+        'redirect_opportunities_count' => 0,
+        'search_console_status' => 'unknown',
+        'computed_at' => now(),
+    ]);
+
+    PageSeoSnapshot::query()->create([
+        'page_id' => $page->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => $french->getKey(),
+        'score' => 40,
+        'critical_count' => 1,
+        'warning_count' => 0,
+        'notice_count' => 0,
+        'passed_count' => 0,
+        'issue_keys' => ['meta_title'],
+        'schema_status' => 'missing',
+        'robots_status' => 'passed',
+        'canonical_status' => 'passed',
+        'redirect_opportunities_count' => 0,
+        'search_console_status' => 'unknown',
+        'computed_at' => now(),
+    ]);
+
+    $reflectionMethod = new ReflectionMethod(SEOAuditTable::class, 'whereSeveritySnapshot');
+    $criticalQuery = BuildSEOAuditQueryAction::run()->whereKey($page->getKey());
+    $cleanQuery = BuildSEOAuditQueryAction::run()->whereKey($page->getKey());
+
+    $reflectionMethod->invoke(null, $criticalQuery, 'critical');
+    $reflectionMethod->invoke(null, $cleanQuery, 'clean');
+
+    expect($criticalQuery->exists())->toBeFalse()
+        ->and($cleanQuery->exists())->toBeTrue();
+});
+
+it('constrains issue key filters to the displayed snapshot language', function (): void {
+    $english = LanguageFactory::new()->create(['name' => 'English', 'code' => 'en']);
+    $french = LanguageFactory::new()->create(['name' => 'French', 'code' => 'fr']);
+    $site = SiteFactory::new()
+        ->recycle($english)
+        ->language($english)
+        ->withTranslations([$english, $french])
+        ->create();
+    $page = PageFactory::new()
+        ->site($site)
+        ->withTranslations([$english, $french])
+        ->create();
+
+    PageSeoSnapshot::query()->create([
+        'page_id' => $page->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => $english->getKey(),
+        'score' => 100,
+        'critical_count' => 0,
+        'warning_count' => 0,
+        'notice_count' => 0,
+        'passed_count' => 3,
+        'issue_keys' => [],
+        'schema_status' => 'passed',
+        'robots_status' => 'passed',
+        'canonical_status' => 'passed',
+        'redirect_opportunities_count' => 0,
+        'search_console_status' => 'unknown',
+        'computed_at' => now(),
+    ]);
+
+    PageSeoSnapshot::query()->create([
+        'page_id' => $page->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => $french->getKey(),
+        'score' => 40,
+        'critical_count' => 1,
+        'warning_count' => 0,
+        'notice_count' => 0,
+        'passed_count' => 0,
+        'issue_keys' => ['meta_title'],
+        'schema_status' => 'missing',
+        'robots_status' => 'passed',
+        'canonical_status' => 'passed',
+        'redirect_opportunities_count' => 0,
+        'search_console_status' => 'unknown',
+        'computed_at' => now(),
+    ]);
+
+    $reflectionMethod = new ReflectionMethod(SEOAuditTable::class, 'whereIssueKeySnapshot');
+    $issueKeyQuery = BuildSEOAuditQueryAction::run()->whereKey($page->getKey());
+
+    $reflectionMethod->invoke(null, $issueKeyQuery, 'meta_title');
+
+    expect($issueKeyQuery->exists())->toBeFalse();
 });

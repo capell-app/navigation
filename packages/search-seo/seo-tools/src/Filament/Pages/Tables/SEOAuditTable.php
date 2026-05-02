@@ -103,21 +103,7 @@ class SEOAuditTable implements TableConfigurator
                     'clean' => __('capell-seo-tools::generic.seo_audit_severity_clean'),
                 ])
                 ->query(fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
-                    'critical' => self::whereSnapshot($query, function (QueryBuilder $snapshotQuery): void {
-                        $snapshotQuery->where('critical_count', '>', 0);
-                    }),
-                    'warning' => self::whereSnapshot($query, function (QueryBuilder $snapshotQuery): void {
-                        $snapshotQuery->where('warning_count', '>', 0);
-                    }),
-                    'notice' => self::whereSnapshot($query, function (QueryBuilder $snapshotQuery): void {
-                        $snapshotQuery->where('notice_count', '>', 0);
-                    }),
-                    'clean' => self::whereSnapshot($query, function (QueryBuilder $snapshotQuery): void {
-                        $snapshotQuery
-                            ->where('critical_count', 0)
-                            ->where('warning_count', 0)
-                            ->where('notice_count', 0);
-                    }),
+                    'critical', 'warning', 'notice', 'clean' => self::whereSeveritySnapshot($query, $data['value']),
                     default => $query,
                 }),
             SelectFilter::make('issue_key')
@@ -125,9 +111,7 @@ class SEOAuditTable implements TableConfigurator
                 ->options(SeoCheckKeyEnum::class)
                 ->query(fn (Builder $query, array $data): Builder => $data['value'] === null || $data['value'] === ''
                     ? $query
-                    : self::whereSnapshot($query, function (QueryBuilder $snapshotQuery) use ($data): void {
-                        $snapshotQuery->whereJsonContains('issue_keys', $data['value']);
-                    })),
+                    : self::whereIssueKeySnapshot($query, $data['value'])),
             SelectFilter::make('score_band')
                 ->label(__('capell-seo-tools::generic.seo_audit_score_band'))
                 ->options([
@@ -198,6 +182,69 @@ class SEOAuditTable implements TableConfigurator
         ];
     }
 
+    protected static function whereSeveritySnapshot(Builder $query, string $severity): Builder
+    {
+        return self::whereSnapshot($query, function (QueryBuilder $snapshotQuery) use ($severity): void {
+            match ($severity) {
+                'critical' => $snapshotQuery->where('critical_count', '>', 0),
+                'warning' => $snapshotQuery->where('warning_count', '>', 0),
+                'notice' => $snapshotQuery->where('notice_count', '>', 0),
+                'clean' => $snapshotQuery
+                    ->where('critical_count', 0)
+                    ->where('warning_count', 0)
+                    ->where('notice_count', 0),
+                default => null,
+            };
+        });
+    }
+
+    protected static function whereIssueKeySnapshot(Builder $query, string $issueKey): Builder
+    {
+        return self::whereSnapshot($query, function (QueryBuilder $snapshotQuery) use ($issueKey): void {
+            $snapshotQuery->whereJsonContains('issue_keys', $issueKey);
+        });
+    }
+
+    protected static function whereSnapshot(Builder $query, ?Closure $constraint = null): Builder
+    {
+        return $query->whereExists(function (QueryBuilder $snapshotQuery) use ($constraint): void {
+            $snapshotQuery
+                ->selectRaw('1')
+                ->from('page_seo_snapshots')
+                ->whereColumn('page_seo_snapshots.page_id', 'pages.id')
+                ->whereColumn('page_seo_snapshots.site_id', 'pages.site_id')
+                ->whereExists(function (QueryBuilder $siteQuery): void {
+                    $siteQuery
+                        ->selectRaw('1')
+                        ->from('sites')
+                        ->whereColumn('sites.id', 'pages.site_id')
+                        ->whereColumn('sites.language_id', 'page_seo_snapshots.language_id');
+                });
+
+            if ($constraint instanceof Closure) {
+                $constraint($snapshotQuery);
+            }
+        });
+    }
+
+    protected static function whereMissingSnapshot(Builder $query): Builder
+    {
+        return $query->whereNotExists(function (QueryBuilder $snapshotQuery): void {
+            $snapshotQuery
+                ->selectRaw('1')
+                ->from('page_seo_snapshots')
+                ->whereColumn('page_seo_snapshots.page_id', 'pages.id')
+                ->whereColumn('page_seo_snapshots.site_id', 'pages.site_id')
+                ->whereExists(function (QueryBuilder $siteQuery): void {
+                    $siteQuery
+                        ->selectRaw('1')
+                        ->from('sites')
+                        ->whereColumn('sites.id', 'pages.site_id')
+                        ->whereColumn('sites.language_id', 'page_seo_snapshots.language_id');
+                });
+        });
+    }
+
     private static function snapshotFor(Page $record): ?PageSeoSnapshot
     {
         $record->loadMissing([
@@ -207,7 +254,7 @@ class SEOAuditTable implements TableConfigurator
         ]);
 
         $site = $record->site;
-        $language = self::auditLanguageFor($record) ?? $record->translation?->language ?? $site?->language;
+        $language = $site?->language;
         $cacheKey = sprintf('%s:%s', $record->getKey(), $language?->getKey() ?? 'none');
 
         if (array_key_exists($cacheKey, self::$snapshots)) {
@@ -223,22 +270,6 @@ class SEOAuditTable implements TableConfigurator
             ->where('site_id', $site->getKey())
             ->where('language_id', $language->getKey())
             ->first();
-    }
-
-    private static function auditLanguageFor(Page $record): ?Language
-    {
-        $translation = $record->translations
-            ->first(function (Translation $translation): bool {
-                $title = $translation->getMeta('title');
-                $description = $translation->getMeta('description');
-
-                return $title === null
-                    || $title === ''
-                    || $description === null
-                    || $description === '';
-            });
-
-        return $translation?->language;
     }
 
     private static function searchPreviewTitleFor(Page $record): ?string
@@ -277,30 +308,6 @@ class SEOAuditTable implements TableConfigurator
 
         return self::whereSnapshot($query, function (QueryBuilder $snapshotQuery) use ($column, $value): void {
             $snapshotQuery->where($column, $value);
-        });
-    }
-
-    private static function whereSnapshot(Builder $query, ?Closure $constraint = null): Builder
-    {
-        return $query->whereExists(function (QueryBuilder $snapshotQuery) use ($constraint): void {
-            $snapshotQuery
-                ->selectRaw('1')
-                ->from('page_seo_snapshots')
-                ->whereColumn('page_seo_snapshots.page_id', 'pages.id');
-
-            if ($constraint instanceof Closure) {
-                $constraint($snapshotQuery);
-            }
-        });
-    }
-
-    private static function whereMissingSnapshot(Builder $query): Builder
-    {
-        return $query->whereNotExists(function (QueryBuilder $snapshotQuery): void {
-            $snapshotQuery
-                ->selectRaw('1')
-                ->from('page_seo_snapshots')
-                ->whereColumn('page_seo_snapshots.page_id', 'pages.id');
         });
     }
 }
