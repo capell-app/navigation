@@ -1,11 +1,31 @@
 name: Notify docs site
 
 on:
+  push:
+    branches:
+      - main
+      - 4.x
+    paths:
+      - docs/**
+      - packages/**/docs/**
+      - packages/**/README.md
+      - '!docs/internal/**'
+      - '!docs/specs/**'
+      - '!docs/superpowers/**'
+      - '!packages/**/docs/internal/**'
+      - '!packages/**/docs/specs/**'
+      - '!packages/**/docs/superpowers/**'
   pull_request:
     paths:
       - docs/**
       - packages/**/docs/**
       - packages/**/README.md
+      - '!docs/internal/**'
+      - '!docs/specs/**'
+      - '!docs/superpowers/**'
+      - '!packages/**/docs/internal/**'
+      - '!packages/**/docs/specs/**'
+      - '!packages/**/docs/superpowers/**'
   release:
     types: [published]
   workflow_dispatch:
