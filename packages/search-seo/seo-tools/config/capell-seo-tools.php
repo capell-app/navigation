@@ -18,6 +18,11 @@ return [
     'ai_creator' => [
         'enabled' => env('AI_CREATOR_ENABLED', true),
     ],
+    'search_console' => [
+        'enabled' => env('CAPELL_SEO_TOOLS_SEARCH_CONSOLE_ENABLED', false),
+        'credentials_path' => env('CAPELL_SEO_TOOLS_SEARCH_CONSOLE_CREDENTIALS'),
+        'property_url' => env('CAPELL_SEO_TOOLS_SEARCH_CONSOLE_PROPERTY_URL'),
+    ],
     'prompts' => [
         'title_generation' => [
             'system' => 'You are a helpful assistant that writes concise, SEO-friendly page titles.',

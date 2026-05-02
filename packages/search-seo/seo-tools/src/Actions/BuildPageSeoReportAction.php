@@ -114,7 +114,7 @@ final class BuildPageSeoReportAction
             internalLinkSuggestions: SuggestInternalLinksAction::run($page, $site, $language),
             schemaReports: BuildSchemaTemplateReportAction::run($page, $site, $language),
             redirectOpportunities: [],
-            searchConsoleInsights: [],
+            searchConsoleInsights: BuildPageSearchConsoleInsightsAction::run($page),
         );
     }
 

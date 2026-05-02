@@ -35,6 +35,7 @@ use Capell\SeoTools\Console\Commands\SetupCommand;
 use Capell\SeoTools\Console\Commands\TestOpenAiConnectionCommand;
 use Capell\SeoTools\Console\Commands\XmlSitemapCommand;
 use Capell\SeoTools\Contracts\Schemas\SearchMetaDataSectionExtenderResolverInterface;
+use Capell\SeoTools\Contracts\SearchConsoleClientInterface;
 use Capell\SeoTools\Enums\SchemaTemplateTypeEnum;
 use Capell\SeoTools\Events\AiGenerationCompleted;
 use Capell\SeoTools\Events\AiGenerationFailed;
@@ -92,6 +93,8 @@ use Capell\SeoTools\Support\Schemas\SearchMetaDataSectionExtenderResolver;
 use Capell\SeoTools\Support\SchemaTemplates\ArticleSchemaTemplate;
 use Capell\SeoTools\Support\SchemaTemplates\SchemaTemplateRegistry;
 use Capell\SeoTools\Support\SchemaTemplates\WebPageSchemaTemplate;
+use Capell\SeoTools\Support\SearchConsole\GoogleSearchConsoleClient;
+use Capell\SeoTools\Support\SearchConsole\NullSearchConsoleClient;
 use Capell\SeoTools\Support\SectionRegistry;
 use Capell\SeoTools\Support\Sitemap\Pages\PagesSitemap;
 use Capell\SeoTools\Support\Sitemap\SitemapPageRegistry;
@@ -137,6 +140,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
         $this->registerModels();
         $this->registerBlazeComponents();
         $this->bindSchemaTemplateRegistry();
+        $this->bindSearchConsoleClient();
 
         $this->booted(function (): void {
             if (! $this->isPackageInstalled()) {
@@ -481,6 +485,25 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
     private function bindSchemaTemplateRegistry(): void
     {
         $this->app->singleton(SchemaTemplateRegistry::class, fn (): SchemaTemplateRegistry => new SchemaTemplateRegistry);
+    }
+
+    private function bindSearchConsoleClient(): void
+    {
+        $this->app->singleton(SearchConsoleClientInterface::class, function (): SearchConsoleClientInterface {
+            $config = config('capell-seo-tools.search_console', []);
+
+            if (! is_array($config)) {
+                return new NullSearchConsoleClient;
+            }
+
+            $credentialsPath = $config['credentials_path'] ?? null;
+
+            if (($config['enabled'] ?? false) !== true || ! is_string($credentialsPath) || trim($credentialsPath) === '') {
+                return new NullSearchConsoleClient;
+            }
+
+            return new GoogleSearchConsoleClient($config);
+        });
     }
 
     /**
