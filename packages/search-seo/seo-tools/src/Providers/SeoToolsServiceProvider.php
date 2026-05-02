@@ -36,6 +36,7 @@ use Capell\SeoTools\Console\Commands\TestOpenAiConnectionCommand;
 use Capell\SeoTools\Console\Commands\XmlSitemapCommand;
 use Capell\SeoTools\Contracts\Schemas\SearchMetaDataSectionExtenderResolverInterface;
 use Capell\SeoTools\Contracts\SearchConsoleClientInterface;
+use Capell\SeoTools\Contracts\SeoPublishReportProvider;
 use Capell\SeoTools\Enums\SchemaTemplateTypeEnum;
 use Capell\SeoTools\Events\AiGenerationCompleted;
 use Capell\SeoTools\Events\AiGenerationFailed;
@@ -88,6 +89,7 @@ use Capell\SeoTools\Support\Interceptors\SitemapPageTypeInterceptor;
 use Capell\SeoTools\Support\Pipelines\AiCreatorPipeline;
 use Capell\SeoTools\Support\PrismProvider;
 use Capell\SeoTools\Support\PromptRepository;
+use Capell\SeoTools\Support\Publishing\SeoPublishReportProviderAdapter;
 use Capell\SeoTools\Support\RenderHooks\RegisterSeoHeadHooks;
 use Capell\SeoTools\Support\Schemas\SearchMetaDataSectionExtenderResolver;
 use Capell\SeoTools\Support\SchemaTemplates\ArticleSchemaTemplate;
@@ -447,6 +449,7 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
     private function bootInstalledPackage(): self
     {
         return $this
+            ->bindSeoPublishReportProvider()
             ->registerAdminEvents()
             ->registerAdminExtenders()
             ->registerPageSchemaExtenders()
@@ -504,6 +507,13 @@ class SeoToolsServiceProvider extends AbstractPackageServiceProvider
 
             return new GoogleSearchConsoleClient($config);
         });
+    }
+
+    private function bindSeoPublishReportProvider(): self
+    {
+        $this->app->singleton(SeoPublishReportProvider::class, SeoPublishReportProviderAdapter::class);
+
+        return $this;
     }
 
     /**
