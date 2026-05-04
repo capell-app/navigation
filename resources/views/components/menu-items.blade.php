@@ -1,3 +1,7 @@
+@php
+    use Capell\Navigation\Enums\NavigationItemType;
+@endphp
+
 <ul>
     @foreach ($items as $item)
         <li @class(['is-active' => $item->active])>

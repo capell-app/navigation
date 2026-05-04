@@ -203,11 +203,11 @@ class NavigationServiceProvider extends ServiceProvider
         foreach ($navigations as $navigation) {
             CapellCore::removeCacheKey(FrontendCacheEnum::navigationById((int) $navigation->getKey()));
 
-            if (is_numeric($navigation->site_id)) {
+            if ($navigation->site_id !== null) {
                 CapellCore::removeCacheKey(FrontendCacheEnum::navigation(
                     $navigation->key,
-                    (int) $navigation->site_id,
-                    is_numeric($navigation->language_id) ? (int) $navigation->language_id : null,
+                    $navigation->site_id,
+                    $navigation->language_id,
                 ));
             }
         }
