@@ -19,7 +19,9 @@ class NavigationLoader
     public static function getNavigation(NavigationHandle|string $key, Site $site, ?Language $language = null, bool $siteOnlyFallback = true): ?Navigation
     {
         $navigationKey = $key instanceof NavigationHandle ? $key->value : $key;
-        $navigations = $site->navigations;
+        $navigations = $site->relationLoaded('navigations')
+            ? $site->navigations
+            : new Collection;
 
         $navigation = null;
 
