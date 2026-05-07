@@ -142,7 +142,7 @@ class BuildNavigationRenderModelAction
             $context->navigation->exists ? (string) $context->navigation->getKey() : 'new:' . spl_object_id($context->navigation),
             $context->navigation->key,
             (string) $context->navigation->updated_at?->getTimestamp(),
-            (string) $context->page->getMorphClass(),
+            $context->page->getMorphClass(),
             (string) $context->page->getKey(),
             (string) $context->site->getKey(),
             (string) $context->language->getKey(),
