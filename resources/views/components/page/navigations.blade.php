@@ -1,4 +1,5 @@
 @php
+    use Capell\Admin\Contracts\Support\FlagIconRenderer;
     use Capell\Core\Contracts\Pageable;
     use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
     use Capell\Navigation\Models\Navigation;
@@ -6,6 +7,7 @@
 
     /* @var Pageable $record */
     $record = $getRecord();
+    $flagIconRenderer = app(FlagIconRenderer::class);
 
     /* @var class-string<\Capell\Navigation\Models\Navigation> $model */
     $model = Navigation::class;
@@ -61,10 +63,7 @@
                     >
                         {{ $navigation->name }}
                         @if ($navigation->language && $navigation->language->flag)
-                            <x-dynamic-component
-                                class="ml-2 h-4 w-5"
-                                :component="'flag-4x3-' . $navigation->language->flag"
-                            />
+                            {!! $flagIconRenderer->render('flag-4x3-' . $navigation->language->flag, attributes: ['class' => 'ml-2 h-4 w-5']) !!}
                         @endif
                     </x-filament::link>
                 </li>
