@@ -29,7 +29,7 @@ class NavigationPageSchemaExtender implements PageSchemaExtender
         return [];
     }
 
-    public function extendSettingsTabComponents(): array
+    public function extendSidebarComponents(Schema $schema): array
     {
         return [];
     }
