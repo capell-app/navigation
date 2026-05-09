@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Filament\Resources\Navigations\Pages;
 
-use Capell\Admin\Filament\Notifications\ClearCacheNotification;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Models\Navigation;
 use Filament\Resources\Pages\CreateRecord;
@@ -26,10 +25,5 @@ class CreateNavigation extends CreateRecord
     protected function getFormActions(): array
     {
         return [];
-    }
-
-    protected function afterCreate(): void
-    {
-        ClearCacheNotification::make()->send();
     }
 }

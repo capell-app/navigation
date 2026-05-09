@@ -66,8 +66,6 @@ class EditNavigation extends EditRecord
 
     protected function afterSave(): void
     {
-        $this->notifyPageCached($this->record);
-
         $this->recordSwitcherAfterSave();
     }
 }
