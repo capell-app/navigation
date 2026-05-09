@@ -1,4 +1,5 @@
 {
+    "manifest-version": 2,
     "name": "capell-app/navigation",
     "kind": "package",
     "capell-version": "^4.0",
@@ -6,15 +7,55 @@
     "tier": "free",
     "bundle": "foundation",
     "description": "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.",
-    "contexts": ["admin", "frontend", "console"],
-    "requires": ["capell-app/core", "capell-app/admin", "capell-app/frontend"],
+    "surfaces": [
+        "admin",
+        "frontend",
+        "console"
+    ],
+    "dependencies": {
+        "requires": [
+            "capell-app/core",
+            "capell-app/admin",
+            "capell-app/frontend"
+        ],
+        "optional": [],
+        "conflicts": []
+    },
+    "lifecycle": {
+        "activation": "manual",
+        "defaultStatus": "available",
+        "requiresInstallCommand": false
+    },
     "providers": {
-        "shared": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"]
+        "metadata": [],
+        "install": [],
+        "runtime": [
+            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
+        ],
+        "admin": [],
+        "frontend": []
+    },
+    "database": {
+        "migrations": true,
+        "settings": false,
+        "requiredTables": []
     },
     "commands": {
+        "install": null,
         "setup": "capell:navigation-setup",
-        "setupParams": ["sites"],
+        "setupParams": [
+            "sites"
+        ],
         "demo": "capell:navigation-demo",
-        "demoParams": ["sites", "languages"]
-    }
+        "demoParams": [
+            "sites",
+            "languages"
+        ],
+        "health": null
+    },
+    "settings": [],
+    "permissions": [],
+    "capabilities": [],
+    "assets": [],
+    "healthChecks": []
 }
