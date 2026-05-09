@@ -7,11 +7,7 @@
     "tier": "free",
     "bundle": "foundation",
     "description": "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.",
-    "surfaces": [
-        "admin",
-        "frontend",
-        "console"
-    ],
+    "surfaces": ["admin", "frontend", "console"],
     "dependencies": {
         "requires": [
             "capell-app/core",
@@ -29,9 +25,7 @@
     "providers": {
         "metadata": [],
         "install": [],
-        "runtime": [
-            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
-        ],
+        "runtime": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"],
         "admin": [],
         "frontend": []
     },
@@ -43,14 +37,9 @@
     "commands": {
         "install": null,
         "setup": "capell:navigation-setup",
-        "setupParams": [
-            "sites"
-        ],
+        "setupParams": ["sites"],
         "demo": "capell:navigation-demo",
-        "demoParams": [
-            "sites",
-            "languages"
-        ],
+        "demoParams": ["sites", "languages"],
         "health": null
     },
     "settings": [],
