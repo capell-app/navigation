@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Navigation\Filament\Resources\Navigations\Pages;
 
 use Capell\Admin\Filament\Actions\CreateAction;
-use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Admin\Filament\Concerns\HasSiteTableFilterTabs;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Filament\Resources\Pages\ListRecords;
@@ -14,7 +13,6 @@ use Override;
 
 class ListNavigations extends ListRecords
 {
-    use HasPageCacheNotification;
     use HasSiteTableFilterTabs;
 
     protected string $siteRelation = 'navigations';

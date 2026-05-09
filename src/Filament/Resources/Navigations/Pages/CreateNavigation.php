@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Filament\Resources\Navigations\Pages;
 
-use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Admin\Filament\Notifications\ClearCacheNotification;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Models\Navigation;
@@ -16,8 +15,6 @@ use Override;
  */
 class CreateNavigation extends CreateRecord
 {
-    use HasPageCacheNotification;
-
     /** @return class-string<NavigationResource> */
     #[Override]
     public static function getResource(): string

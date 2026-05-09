@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Capell\Navigation\Models;
 
 use Bkwld\Cloner\Cloneable;
-use Capell\Core\Contracts\PageCacheable;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasType;
@@ -82,7 +81,7 @@ use Spatie\LaravelData\DataCollection;
  * @mixin Model
  */
 #[ObservedBy(NavigationObserver::class)]
-class Navigation extends Model implements PageCacheable, Publishable, Typeable, Userstampable
+class Navigation extends Model implements Publishable, Typeable, Userstampable
 {
     use Cloneable;
 
