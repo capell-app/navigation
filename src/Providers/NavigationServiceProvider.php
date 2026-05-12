@@ -14,6 +14,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -29,6 +30,7 @@ use Capell\Navigation\Listeners\ReplicateSiteNavigationsListener;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
 use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
@@ -67,6 +69,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerConfigurators()
             ->registerPackageAssets()
             ->registerBladeComponents()
+            ->registerFrontendRenderHooks()
             ->registerPolicies()
             ->registerRelationships()
             ->registerEventListeners();
@@ -158,6 +161,17 @@ class NavigationServiceProvider extends ServiceProvider
     private function registerBladeComponents(): self
     {
         Blade::componentNamespace('Capell\\Navigation\\View\\Components', 'capell-navigation');
+
+        return $this;
+    }
+
+    private function registerFrontendRenderHooks(): self
+    {
+        if (! $this->app->bound(RenderHookRegistry::class)) {
+            return $this;
+        }
+
+        $this->app->make(RegisterFoundationHeaderNavigationHook::class)->register();
 
         return $this;
     }
