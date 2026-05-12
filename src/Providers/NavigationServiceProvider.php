@@ -43,7 +43,6 @@ class NavigationServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->registerPackageMetadata();
         $this->registerContentGraphExtractors();
         $this->commands([DemoCommand::class, SetupCommand::class]);
 
@@ -245,16 +244,5 @@ class NavigationServiceProvider extends ServiceProvider
     {
         $this->app->singleton($class, fn (): object => new $class);
         $this->app->tag($class, $tag);
-    }
-
-    private function registerPackageMetadata(): void
-    {
-        CapellCore::registerPackage(
-            static::$packageName,
-            serviceProviderClass: static::class,
-            path: realpath(__DIR__ . '/../..'),
-            version: CapellCore::getInstalledPrettyVersion(static::$packageName),
-            description: 'Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.',
-        );
     }
 }
