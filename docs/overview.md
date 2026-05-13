@@ -55,6 +55,16 @@ Navigation contributes content graph edges from each navigation record to the pa
 - Page form navigation tab.
 - Frontend menu output.
 
+## Screenshots
+
+![Navigation admin index](../../../public/docs/screenshots/packages/navigation/navigation-admin-index.png)
+
+![Create navigation form](../../../public/docs/screenshots/packages/navigation/create-edit-navigation-form.png)
+
+![Navigation fields on the site form](../../../public/docs/screenshots/packages/navigation/site-relation-manager-for-navigations.png)
+
+The frontend menu screenshot needs seeded navigation items before it is useful enough to publish.
+
 ## Pitfalls
 
 - Create language/site records before creating scoped navigation.

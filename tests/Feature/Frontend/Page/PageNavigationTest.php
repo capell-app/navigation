@@ -9,6 +9,7 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Tests\Support\Concerns\TestingFrontend;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Blade;
 
 use function Pest\Laravel\get;
@@ -35,7 +36,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
         ->assertSee('id="main-menu"', false)
         ->assertSee('Docs')
         ->assertSee('aria-controls="main-menu"', false)
-        ->assertSee('Alpine.data(\'capellHeaderNavigation\'', false)
+        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
         ->assertDontSee('id="header"', false);
 });
 
@@ -61,7 +62,7 @@ test('foundation theme displays the main navigation menu', function (): void {
         ->assertSee('id="main-menu"', false)
         ->assertSee('Docs')
         ->assertSee('aria-controls="main-menu"', false)
-        ->assertSee('Alpine.data(\'capellHeaderNavigation\'', false)
+        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
         ->assertSee('id="header"', false);
 });
 
@@ -151,7 +152,7 @@ function registerFoundationThemeComponentsForRendering(): void
     expect($foundationThemePath)->not->toBeFalse();
 
     Blade::anonymousComponentPath($foundationThemePath . '/resources/views/components', 'capell-foundation-test');
-    app('view')->addNamespace('capell-foundation-test', $foundationThemePath . '/resources/views');
+    resolve(Factory::class)->addNamespace('capell-foundation-test', $foundationThemePath . '/resources/views');
     Blade::component('capell-foundation-test::components.header.index', 'capell-foundation-test::header.index');
 }
 

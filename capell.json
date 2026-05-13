@@ -13,11 +13,7 @@
         "bundle": "foundation"
     },
     "namespace": "Capell\\Navigation",
-    "surfaces": [
-        "admin",
-        "frontend",
-        "console"
-    ],
+    "surfaces": ["admin", "frontend", "console"],
     "dependencies": {
         "requires": [
             "capell-app/admin",
@@ -30,9 +26,7 @@
     "providers": {
         "metadata": [],
         "install": [],
-        "runtime": [
-            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
-        ],
+        "runtime": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"],
         "admin": [],
         "frontend": []
     },
@@ -45,6 +39,7 @@
     "commands": {
         "install": null,
         "setup": "capell:navigation-setup",
+        "setupParams": ["sites"],
         "demo": "capell:navigation-demo",
         "doctor": null
     },
@@ -54,15 +49,10 @@
     "performance": {
         "frontendRenderBudgetMs": 20,
         "adminQueryBudget": 40,
-        "cacheTags": [
-            "navigation"
-        ],
+        "cacheTags": ["navigation"],
         "cacheSafety": {
             "cacheable": false,
-            "variesBy": [
-                "site",
-                "locale"
-            ],
+            "variesBy": ["site", "locale"],
             "sensitiveOutput": false,
             "invalidationSources": [],
             "queueInvalidation": true
@@ -78,12 +68,7 @@
     "marketplace": {
         "summary": "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.",
         "screenshots": [],
-        "categories": [
-            "admin",
-            "console",
-            "foundation",
-            "frontend"
-        ]
+        "categories": ["admin", "console", "foundation", "frontend"]
     },
     "contributionTraceability": {
         "deferredContributions": [
