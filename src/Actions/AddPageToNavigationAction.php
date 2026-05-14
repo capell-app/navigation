@@ -42,6 +42,10 @@ class AddPageToNavigationAction
 
     private function pageExistsInNavigation(Navigation $navigation, Pageable $page): bool
     {
+        if ($navigation->items === null) {
+            return false;
+        }
+
         return $navigation->items
             ->toCollection()
             ->contains(

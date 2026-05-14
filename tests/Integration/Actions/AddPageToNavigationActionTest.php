@@ -17,3 +17,16 @@ it('adds a page to navigation structure', function (): void {
 
     expect($navigation->items)->toBeInstanceOf(DataCollection::class)->toHaveCount(4);
 });
+
+it('adds a page to an empty navigation structure', function (): void {
+    $page = Page::factory()->create();
+    $navigation = Navigation::factory()->create([
+        'items' => null,
+    ]);
+
+    AddPageToNavigationAction::run($page, $navigation);
+
+    $navigation->refresh();
+
+    expect($navigation->items)->toBeInstanceOf(DataCollection::class)->toHaveCount(1);
+});
