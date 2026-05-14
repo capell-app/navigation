@@ -6,8 +6,64 @@
     $usesAlpine = $runtimeManifest?->usesAlpine ?? false;
 @endphp
 
+@if ($usesAlpine)
+    <script>
+        window.capellHeaderNavigation = () => ({
+            isMenuOpen: false,
+            isClosingMenu: false,
+            init() {
+                this.$watch('isMenuOpen', (value) => {
+                    this.isClosingMenu = true
+
+                    setTimeout(() => {
+                        this.isClosingMenu = false
+                        this.dispatchOverlayState()
+                    }, 450)
+
+                    document.body.classList.toggle('menu-open', value)
+                    this.dispatchOverlayState()
+                })
+
+                window.addEventListener('close-menu', () => {
+                    this.isMenuOpen = false
+                })
+            },
+            toggleMenu() {
+                if (this.isMenuOpen) {
+                    return this.closeMenu()
+                }
+
+                return this.openMenu()
+            },
+            openMenu() {
+                if (this.isMenuOpen) return
+
+                this.$refs.toggleMenu.focus()
+
+                this.isMenuOpen = true
+            },
+            closeMenu(focusAfter) {
+                if (!this.isMenuOpen) return
+
+                this.isMenuOpen = false
+
+                focusAfter && focusAfter.focus()
+            },
+            dispatchOverlayState() {
+                window.dispatchEvent(
+                    new CustomEvent('capell-navigation-menu-open-changed', {
+                        detail: {
+                            open: this.isMenuOpen || this.isClosingMenu,
+                        },
+                    }),
+                )
+            },
+        })
+    </script>
+@endif
+
 <div
-    @if ($usesAlpine) x-data="capellHeaderNavigation" x-on:keydown.escape.prevent.stop="closeMenu()" @endif
+    @if ($usesAlpine) x-data="window.capellHeaderNavigation()" x-on:keydown.escape.prevent.stop="closeMenu()" @endif
     class="contents"
 >
     @if ($usesAlpine)
@@ -134,61 +190,3 @@
         </nav>
     </div>
 </div>
-
-@if ($usesAlpine)
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('capellHeaderNavigation', () => ({
-                isMenuOpen: false,
-                isClosingMenu: false,
-                init() {
-                    this.$watch('isMenuOpen', (value) => {
-                        this.isClosingMenu = true
-
-                        setTimeout(() => {
-                            this.isClosingMenu = false
-                            this.dispatchOverlayState()
-                        }, 450)
-
-                        document.body.classList.toggle('menu-open', value)
-                        this.dispatchOverlayState()
-                    })
-
-                    window.addEventListener('close-menu', () => {
-                        this.isMenuOpen = false
-                    })
-                },
-                toggleMenu() {
-                    if (this.isMenuOpen) {
-                        return this.closeMenu()
-                    }
-
-                    return this.openMenu()
-                },
-                openMenu() {
-                    if (this.isMenuOpen) return
-
-                    this.$refs.toggleMenu.focus()
-
-                    this.isMenuOpen = true
-                },
-                closeMenu(focusAfter) {
-                    if (!this.isMenuOpen) return
-
-                    this.isMenuOpen = false
-
-                    focusAfter && focusAfter.focus()
-                },
-                dispatchOverlayState() {
-                    window.dispatchEvent(
-                        new CustomEvent('capell-navigation-menu-open-changed', {
-                            detail: {
-                                open: this.isMenuOpen || this.isClosingMenu,
-                            },
-                        }),
-                    )
-                },
-            }))
-        })
-    </script>
-@endif
