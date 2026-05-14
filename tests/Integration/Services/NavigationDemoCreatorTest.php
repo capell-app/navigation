@@ -111,7 +111,7 @@ it('merges generated footer items into an existing navigation with persisted ite
         ->language($language)
         ->create([
             'key' => NavigationHandle::Footer->value,
-            'type_id' => $navigationType->id,
+            'blueprint_id' => $navigationType->id,
             'items' => [
                 'existing-link' => [
                     'label' => 'Existing Link',

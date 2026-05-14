@@ -31,7 +31,7 @@ class NavigationFactory extends Factory
             'name' => $this->faker->name(),
             'key' => $this->faker->slug(),
             'items' => [],
-            'type_id' => Type::factory()->navigation(),
+            'blueprint_id' => Type::factory()->navigation(),
             'language_id' => $this->faker->boolean() ? Language::factory() : null,
             'site_id' => fn (array $attributes): SiteFactory => Site::factory()
                 ->language($attributes['language_id'] ?? null)

@@ -218,7 +218,7 @@ class NavigationCreator
 
         return $this->navigationQuery()->make([
             'name' => Str::title($key),
-            'type_id' => $type->id,
+            'blueprint_id' => $type->id,
             'key' => $key,
             'site_id' => $site->id,
             'language_id' => $language?->id,

@@ -32,7 +32,7 @@ use Spatie\LaravelData\DataCollection;
  * @property int $id
  * @property string|null $name
  * @property string $key
- * @property int $type_id
+ * @property int $blueprint_id
  * @property int|null $site_id
  * @property int|null $language_id
  * @property DataCollection<int, NavigationItemData>|null $items
@@ -108,7 +108,7 @@ class Navigation extends Model implements Publishable, Typeable, Userstampable
         'visible_from',
         'visible_until',
         'site_id',
-        'type_id',
+        'blueprint_id',
     ];
 
     protected static string $factory = NavigationFactory::class;

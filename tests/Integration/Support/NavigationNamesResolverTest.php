@@ -9,7 +9,7 @@ use Illuminate\Contracts\Cache\Factory;
 
 test('resolves navigation names for site and languages', function (): void {
     // Insert Type
-    $typeId = $this->connection()->table('types')->insertGetId([
+    $typeId = $this->connection()->table('blueprints')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
         'type' => 'navigation',
@@ -19,7 +19,7 @@ test('resolves navigation names for site and languages', function (): void {
     $nav1Id = $this->connection()->table('navigations')->insertGetId([
         'site_id' => 1,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'main-menu',
         'name' => 'Main Menu',
         'items' => json_encode([]),
@@ -30,7 +30,7 @@ test('resolves navigation names for site and languages', function (): void {
     $nav2Id = $this->connection()->table('navigations')->insertGetId([
         'site_id' => 1,
         'language_id' => 2,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'footer-menu',
         'name' => 'Footer Menu',
         'items' => json_encode([]),
@@ -51,7 +51,7 @@ test('resolves navigation names for site and languages', function (): void {
 
 test('caches result with correct key', function (): void {
     // Insert Type
-    $typeId = $this->connection()->table('types')->insertGetId([
+    $typeId = $this->connection()->table('blueprints')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
         'type' => 'navigation',
@@ -60,7 +60,7 @@ test('caches result with correct key', function (): void {
     $this->connection()->table('navigations')->insert([
         'site_id' => 1,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'cache-test',
         'name' => 'Cache Test',
         'items' => json_encode([]),
@@ -80,7 +80,7 @@ test('caches result with correct key', function (): void {
 
 test('includes navigations with null site id', function (): void {
     // Insert Type
-    $typeId = $this->connection()->table('types')->insertGetId([
+    $typeId = $this->connection()->table('blueprints')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
         'type' => 'navigation',
@@ -89,7 +89,7 @@ test('includes navigations with null site id', function (): void {
     $this->connection()->table('navigations')->insert([
         'site_id' => null,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'global',
         'name' => 'Global Menu',
         'items' => json_encode([]),
@@ -100,7 +100,7 @@ test('includes navigations with null site id', function (): void {
     $this->connection()->table('navigations')->insert([
         'site_id' => 1,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'site',
         'name' => 'Site Menu',
         'items' => json_encode([]),
@@ -118,7 +118,7 @@ test('includes navigations with null site id', function (): void {
 
 test('handles string site id', function (): void {
     // Insert Type
-    $typeId = $this->connection()->table('types')->insertGetId([
+    $typeId = $this->connection()->table('blueprints')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
         'type' => 'navigation',
@@ -127,7 +127,7 @@ test('handles string site id', function (): void {
     $this->connection()->table('navigations')->insert([
         'site_id' => 1,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'string-test',
         'name' => 'Menu',
         'items' => json_encode([]),
@@ -145,7 +145,7 @@ test('handles string site id', function (): void {
 
 test('returns id name mapping', function (): void {
     // Insert Type
-    $typeId = $this->connection()->table('types')->insertGetId([
+    $typeId = $this->connection()->table('blueprints')->insertGetId([
         'key' => 'navigation',
         'name' => 'Navigation',
         'type' => 'navigation',
@@ -154,7 +154,7 @@ test('returns id name mapping', function (): void {
     $navId = $this->connection()->table('navigations')->insertGetId([
         'site_id' => 1,
         'language_id' => 1,
-        'type_id' => $typeId,
+        'blueprint_id' => $typeId,
         'key' => 'test',
         'name' => 'Test Menu',
         'items' => json_encode([]),

@@ -148,7 +148,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             )
                 ->label(__('capell-admin::table.key')),
 
-            TypeSelect::make('type_id')
+            TypeSelect::make('blueprint_id')
                 ->live()
                 ->withRelation()
                 ->when(

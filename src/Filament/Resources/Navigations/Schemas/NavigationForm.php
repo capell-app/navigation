@@ -21,7 +21,7 @@ class NavigationForm implements FormConfigurator
         $record = $configurator->getRecord();
 
         if ($record instanceof Model && $record->exists) {
-            $typeId = $record->getAttribute('type_id');
+            $typeId = $record->getAttribute('blueprint_id');
 
             /** @var class-string<Type> $model */
             $model = Type::class;
@@ -34,7 +34,7 @@ class NavigationForm implements FormConfigurator
             return $adminType::configure($configurator, $context);
         }
 
-        $typeId = $configurator->getRawState()['type_id'] ?? null;
+        $typeId = $configurator->getRawState()['blueprint_id'] ?? null;
 
         /** @var class-string<Type> $model */
         $model = Type::class;

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('key')->index();
-            $table->foreignId('type_id')->constrained();
+            $table->foreignId('blueprint_id')->constrained();
             $table->foreignId('site_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('language_id')->nullable()->constrained()->cascadeOnDelete();
             $table->json('items')->nullable();
