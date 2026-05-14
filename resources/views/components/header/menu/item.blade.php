@@ -3,15 +3,18 @@
     'itemClass',
 ])
 @php
+    use Capell\Frontend\Facades\Frontend;
     use Capell\Navigation\Data\NavigationItemData;
 
     /** @var NavigationItemData $item */
+    $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
+    $usesWireNavigate = $runtimeManifest?->usesWireNavigate ?? false;
 @endphp
 
 <li class="flex">
     <a
         href="{{ $item->data['url'] ?? '' }}"
-        wire:navigate
+        @if ($usesWireNavigate) wire:navigate @endif
         @class([
             $itemClass,
             'color-header hover:text-primary focus:text-primary' => ! $item->active,

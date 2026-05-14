@@ -2,56 +2,73 @@
     use Capell\Frontend\Facades\Frontend;
 
     $theme = Frontend::theme();
+    $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
+    $usesAlpine = $runtimeManifest?->usesAlpine ?? false;
 @endphp
 
 <div
-    x-data="capellHeaderNavigation"
-    x-on:keydown.escape.prevent.stop="closeMenu()"
+    @if ($usesAlpine) x-data="capellHeaderNavigation" x-on:keydown.escape.prevent.stop="closeMenu()" @endif
     class="contents"
 >
-    <div
-        class="absolute right-4 top-[max(2vh,14px)] z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden"
-    >
-        <button
-            type="button"
-            x-ref="toggleMenu"
-            class="toggleMenu color-header hover:text-primary focus:text-primary relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-600/75"
-            :title="isMenuOpen ? '{{ __('capell-frontend::generic.close_menu') }}' : '{{ __('capell-frontend::generic.open_menu') }}'"
-            aria-controls="main-menu"
-            x-bind:aria-expanded="isMenuOpen.toString()"
-            :class="isMenuOpen ? 'bg-primary text-white hover:text-white hover:opacity-80 focus:text-white' : ''"
-            x-on:click="toggleMenu"
+    @if ($usesAlpine)
+        <div
+            class="absolute right-4 top-[max(2vh,14px)] z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden"
         >
-            <span
-                class="sr-only"
-                x-text="
-                    isMenuOpen
-                        ? '{{ __('capell-frontend::generic.close_menu') }}'
-                        : '{{ __('capell-frontend::generic.open_menu') }}'
-                "
-            ></span>
-            @svg('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
-            @svg('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
-        </button>
-    </div>
+            <button
+                type="button"
+                x-ref="toggleMenu"
+                class="capell-product-menu-toggle toggleMenu color-header hover:text-primary focus:text-primary relative cursor-pointer"
+                :title="isMenuOpen ? '{{ __('capell-frontend::generic.close_menu') }}' : '{{ __('capell-frontend::generic.open_menu') }}'"
+                aria-controls="main-menu"
+                x-bind:aria-expanded="isMenuOpen.toString()"
+                :class="isMenuOpen ? 'is-open' : ''"
+                x-on:click="toggleMenu"
+            >
+                <span
+                    class="sr-only"
+                    x-text="
+                        isMenuOpen
+                            ? '{{ __('capell-frontend::generic.close_menu') }}'
+                            : '{{ __('capell-frontend::generic.open_menu') }}'
+                    "
+                ></span>
+                @svg('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
+                @svg('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
+            </button>
+        </div>
+    @endif
 
     <div
         id="menu"
-        class="menu-wrapper max-lg:height-full relative flex h-full w-full grow justify-center bg-[var(--bg-color-header)] max-lg:bg-transparent lg:visible lg:w-auto lg:!bg-transparent"
-        x-bind:class="isMenuOpen || isClosingMenu ? 'visible' : 'invisible'"
+        @class([
+            'menu-wrapper relative flex h-full w-full grow justify-center bg-[var(--bg-color-header)] max-lg:fixed max-lg:inset-0 max-lg:z-40 max-lg:h-dvh max-lg:w-screen max-lg:justify-start max-lg:bg-transparent lg:visible lg:w-auto lg:justify-end lg:!bg-transparent',
+            'visible' => ! $usesAlpine,
+        ])
+        @if ($usesAlpine) x-bind:class="isMenuOpen || isClosingMenu ? 'visible' : 'max-lg:invisible'" @endif
     >
-        <div
-            class="menu-backdrop absolute left-0 top-0 z-30 h-full w-full bg-black/75 invert-[.25] lg:hidden"
-            x-on:click="closeMenu($refs.toggleMenu)"
-        ></div>
+        @if ($usesAlpine)
+            <div
+                class="menu-backdrop fixed inset-0 z-30 h-dvh w-screen bg-black/65 backdrop-blur-sm lg:hidden"
+                x-on:click="closeMenu($refs.toggleMenu)"
+            ></div>
+        @endif
+
         <nav
             id="main-menu"
-            class="navbar invisible absolute left-0 top-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-y-auto overflow-x-hidden border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent"
-            x-bind:class="isMenuOpen ? 'visible translate-x-0' : 'invisible translate-x-[-100%]'"
+            @class([
+                'navbar left-0 top-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-y-auto overflow-x-hidden border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
+                'max-lg:invisible max-lg:absolute' => $usesAlpine,
+                'visible static max-w-none' => ! $usesAlpine,
+            ])
+            @if ($usesAlpine) x-bind:class="
+                isMenuOpen
+                    ? 'max-lg:!visible max-lg:!translate-x-0'
+                    : 'max-lg:invisible max-lg:translate-x-[-100%]'
+            " @endif
         >
             <ul
                 @class([
-                    'nav-items relative flex w-full flex-col flex-wrap justify-center gap-y-0.5 pt-6 lg:static lg:flex-row lg:space-x-2 lg:py-3',
+                    'nav-items relative flex w-full flex-col flex-wrap justify-center gap-y-0.5 p-4 pt-6 lg:static lg:w-auto lg:flex-row lg:items-center lg:gap-1 lg:p-0',
                     'lg:justify-start' => $theme->getMeta('header_menu_alignment') === 'left',
                     'lg:justify-center' => $theme->getMeta('header_menu_alignment') === 'center',
                     'lg:justify-end' => $theme->getMeta('header_menu_alignment') === 'right',
@@ -84,22 +101,28 @@
                 >
                     <button
                         class="hover:text-primary flex h-auto w-full cursor-pointer justify-between rounded-lg border border-gray-100 px-3 py-3 lg:w-auto dark:border-gray-600"
-                        x-on:click="toggleDarkMode"
-                        x-tooltip="
-                            isDarkMode
-                                ? '{{ __('capell-frontend::generic.dark_mode') }}'
-                                : '{{ __('capell-frontend::generic.light_mode') }}'
-                        "
+                        @if ($usesAlpine)
+                            x-on:click="toggleDarkMode"
+                            x-tooltip="
+                                isDarkMode
+                                    ? '{{ __('capell-frontend::generic.dark_mode') }}'
+                                    : '{{ __('capell-frontend::generic.light_mode') }}'
+                            "
+                        @endif
                         tabindex="0"
                     >
                         <span
                             class="lg:hidden"
-                            x-text="
-                                isDarkMode
-                                    ? '{{ __('capell-frontend::generic.light_mode') }}'
-                                    : '{{ __('capell-frontend::generic.dark_mode') }}'
-                            "
-                        ></span>
+                            @if ($usesAlpine)
+                                x-text="
+                                    isDarkMode
+                                        ? '{{ __('capell-frontend::generic.light_mode') }}'
+                                        : '{{ __('capell-frontend::generic.dark_mode') }}'
+                                "
+                            @endif
+                        >
+                            {{ __('capell-frontend::generic.dark_mode') }}
+                        </span>
 
                         <span class="ml-auto">
                             @svg('heroicon-o-sun', 'hidden h-4 w-4 md:h-5 md:w-5 dark:block')
@@ -112,7 +135,7 @@
     </div>
 </div>
 
-@push('scripts')
+@if ($usesAlpine)
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('capellHeaderNavigation', () => ({
@@ -168,4 +191,4 @@
             }))
         })
     </script>
-@endpush
+@endif
