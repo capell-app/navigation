@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Support\Creator\TypeCreator;
+use Capell\Core\Support\Creator\BlueprintCreator;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
@@ -20,7 +20,7 @@ it('sets up main, footer, and sub-footer navigation', function (): void {
 
     $site = Site::factory()->language($language)->default()->withTranslations($language)->create();
 
-    $typeCreator = resolve(TypeCreator::class);
+    $typeCreator = resolve(BlueprintCreator::class);
     $navigationType = $typeCreator->createNavigationType();
     $homePageType = $typeCreator->homePageType();
 
@@ -67,7 +67,7 @@ it('merges generated footer items into an existing navigation with persisted ite
             'name' => 'Footer Demo Site',
         ]);
 
-    $typeCreator = resolve(TypeCreator::class);
+    $typeCreator = resolve(BlueprintCreator::class);
     $navigationType = $typeCreator->createNavigationType();
     $defaultPageType = $typeCreator->defaultPageType();
 
@@ -167,7 +167,7 @@ it('creates main navigation with the home page and eligible nested pages only', 
         ->withTranslations($language)
         ->create(['name' => 'Demo Site']);
 
-    $typeCreator = resolve(TypeCreator::class);
+    $typeCreator = resolve(BlueprintCreator::class);
     $navigationType = $typeCreator->createNavigationType();
     $defaultPageType = $typeCreator->defaultPageType();
     $homePageType = $typeCreator->homePageType();

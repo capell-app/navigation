@@ -442,7 +442,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
      *
      * @param  array<string, Pageable|null>  $pageCache
      */
-    private function getCachedPageItem(array $data, array &$pageCache, bool $withUrl = false, ?int $languageId = null, ?int $siteId = null): ?Page
+    private function getCachedPageItem(array $data, array &$pageCache, bool $withUrl = false, ?int $languageId = null, ?int $siteId = null): ?Pageable
     {
         $pageId = $data['pageable_id'] ?? null;
         $pageType = $data['pageable_type'] ?? null;
@@ -480,6 +480,12 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 ->find($pageId);
         } else {
             $page = $query->find($pageId);
+        }
+
+        if (! $page instanceof Pageable) {
+            $pageCache[$cacheKey] = null;
+
+            return null;
         }
 
         $pageCache[$cacheKey] = $page;

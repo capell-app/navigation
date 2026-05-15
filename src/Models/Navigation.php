@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Models;
 
 use Bkwld\Cloner\Cloneable;
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasType;
@@ -14,7 +15,6 @@ use Capell\Core\Models\Contracts\Typeable;
 use Capell\Core\Models\Contracts\Userstampable;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Database\Factories\NavigationFactory;
 use Capell\Navigation\Observers\NavigationObserver;
@@ -35,7 +35,7 @@ use Spatie\LaravelData\DataCollection;
  * @property int $blueprint_id
  * @property int|null $site_id
  * @property int|null $language_id
- * @property DataCollection<int, NavigationItemData>|null $items
+ * @property DataCollection<int, NavigationItemData>|array<int|string, mixed>|null $items
  * @property array<array-key, mixed>|null $meta
  * @property CarbonImmutable|null $visible_from
  * @property string|null $visible_until
@@ -50,7 +50,7 @@ use Spatie\LaravelData\DataCollection;
  * @property-read AuthenticatableUser|null $editor
  * @property-read Language|null $language
  * @property-read Site|null $site
- * @property-read Type $type
+ * @property-read Blueprint $type
  *
  * @method static Builder<static>|Navigation excludeRevision(Model|int $exclude)
  * @method static Builder<static>|Navigation expired()
@@ -97,7 +97,7 @@ class Navigation extends Model implements Publishable, Typeable, Userstampable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected $fillable = [
         'items',

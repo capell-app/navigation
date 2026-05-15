@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\Creator;
 
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Events\NavigationCreating;
@@ -24,14 +24,14 @@ class NavigationCreator
     private readonly string $navigationModel;
 
     /**
-     * @var class-string<Type>
+     * @var class-string<Blueprint>
      */
     private readonly string $typeModel;
 
     public function __construct()
     {
         $this->navigationModel = Navigation::class;
-        $this->typeModel = Type::class;
+        $this->typeModel = Blueprint::class;
     }
 
     public static function getPageNavigationLabel(Page $page, ?Language $language = null): ?string
@@ -47,7 +47,7 @@ class NavigationCreator
 
     public function footerNavigation(
         Site $site,
-        ?Type $type = null,
+        ?Blueprint $type = null,
         ?Language $language = null,
         ?Collection $pages = null,
         array $items = [],
@@ -87,7 +87,7 @@ class NavigationCreator
 
         event(new NavigationCreating($navigation, $items));
 
-        $navigation->items = $items;
+        $navigation->items = $items->all();
         $navigation->save();
 
         return $navigation;
@@ -95,7 +95,7 @@ class NavigationCreator
 
     public function subFooterNavigation(
         Site $site,
-        ?Type $type = null,
+        ?Blueprint $type = null,
         ?Language $language = null,
         ?Collection $pages = null,
         array $items = [],
@@ -106,7 +106,7 @@ class NavigationCreator
 
     public function mainNavigation(
         Site $site,
-        ?Type $type = null,
+        ?Blueprint $type = null,
         ?Language $language = null,
         ?Page $home = null,
         array $additionalItems = [],
@@ -181,14 +181,14 @@ class NavigationCreator
     }
 
     /**
-     * @return Builder<Type>
+     * @return Builder<Blueprint>
      */
     private function typeQuery(): Builder
     {
         return $this->typeModel::query();
     }
 
-    private function createNavigation(string $key, Site $site, ?Language $language = null, ?Type $type = null): Navigation
+    private function createNavigation(string $key, Site $site, ?Language $language = null, ?Blueprint $type = null): Navigation
     {
         $navigation = $this->navigationModel::query()
             ->where([
@@ -206,8 +206,8 @@ class NavigationCreator
             return $navigation;
         }
 
-        // Use typed Type builder so scopes are recognized
-        $type ??= $this->typeQuery()->navigationType()->first();
+        // Use typed Blueprint builder so scopes are recognized
+        $type ??= $this->typeQuery()->where('type', 'navigation')->first();
         if ($type === null) {
             $type = $this->typeQuery()->create([
                 'key' => 'navigation',

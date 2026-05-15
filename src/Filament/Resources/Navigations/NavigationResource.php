@@ -125,11 +125,13 @@ class NavigationResource extends Resource
             ]);
     }
 
-    /**
-     * @param  Navigation  $record
-     */
+    /** @return array<string, string> */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        if (! $record instanceof Navigation) {
+            return [];
+        }
+
         $details = [];
 
         if ($record->site !== null) {

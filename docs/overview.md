@@ -118,14 +118,14 @@ The frontend menu screenshot needs seeded navigation items before it is useful e
 erDiagram
     SITES ||--o{ NAVIGATIONS : owns
     LANGUAGES ||--o{ NAVIGATIONS : localizes
-    TYPES ||--o{ NAVIGATIONS : classifies
+    BLUEPRINTS ||--o{ NAVIGATIONS : classifies
     PAGES ||..o{ NAVIGATIONS : referenced_in_items_json
     PAGE_URLS ||..o{ NAVIGATIONS : referenced_in_items_json
 
     NAVIGATIONS {
         bigint id PK
         string key
-        bigint type_id FK
+        bigint blueprint_id FK
         bigint site_id FK
         bigint language_id FK
         json items

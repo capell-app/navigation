@@ -7,10 +7,10 @@ namespace Capell\Navigation\Database\Factories;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Database\Factories\Concerns\HasMeta;
 use Capell\Core\Database\Factories\SiteFactory;
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -31,7 +31,7 @@ class NavigationFactory extends Factory
             'name' => $this->faker->name(),
             'key' => $this->faker->slug(),
             'items' => [],
-            'blueprint_id' => Type::factory()->navigation(),
+            'blueprint_id' => Blueprint::factory()->navigation(),
             'language_id' => $this->faker->boolean() ? Language::factory() : null,
             'site_id' => fn (array $attributes): SiteFactory => Site::factory()
                 ->language($attributes['language_id'] ?? null)

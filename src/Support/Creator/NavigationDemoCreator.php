@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\Creator;
 
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Actions\AddPageToNavigationAction;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
@@ -21,8 +21,8 @@ class NavigationDemoCreator
 {
     public function setupInitialSiteNavigation(Site $site, Page $home, Page $sitemapPage): void
     {
-        /** @var class-string<Type> $typeModel */
-        $typeModel = Type::class;
+        /** @var class-string<Blueprint> $typeModel */
+        $typeModel = Blueprint::class;
         $navigationType = $typeModel::query()->navigationType()->default()->first();
 
         resolve(NavigationCreator::class)->mainNavigation(site: $site, type: $navigationType, home: $home);
@@ -63,8 +63,8 @@ class NavigationDemoCreator
             ->limit(6)
             ->get();
 
-        /** @var class-string<Type> $typeModel */
-        $typeModel = Type::class;
+        /** @var class-string<Blueprint> $typeModel */
+        $typeModel = Blueprint::class;
         $navigationType = $typeModel::query()->navigationType()->default()->first();
 
         resolve(NavigationCreator::class)->mainNavigation(
@@ -95,8 +95,8 @@ class NavigationDemoCreator
             ->get()
             ->toTree();
 
-        /** @var class-string<Type> $typeModel */
-        $typeModel = Type::class;
+        /** @var class-string<Blueprint> $typeModel */
+        $typeModel = Blueprint::class;
         $navigationType = $typeModel::query()->navigationType()->default()->first();
 
         resolve(NavigationCreator::class)->footerNavigation(
@@ -109,8 +109,8 @@ class NavigationDemoCreator
 
     public function setupSubFooterNavigation(Site $site, ?Language $language): void
     {
-        /** @var class-string<Type> $typeModel */
-        $typeModel = Type::class;
+        /** @var class-string<Blueprint> $typeModel */
+        $typeModel = Blueprint::class;
         $navigationType = $typeModel::query()->navigationType()->default()->first();
 
         resolve(NavigationCreator::class)->subFooterNavigation(

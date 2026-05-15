@@ -159,7 +159,7 @@
                         class="hover:text-primary flex h-auto w-full cursor-pointer justify-between rounded-lg border border-gray-100 px-3 py-3 lg:w-auto dark:border-gray-600"
                         @if ($usesAlpine)
                             x-on:click="toggleDarkMode"
-                            x-tooltip="
+                            x-bind:title="
                                 isDarkMode
                                     ? '{{ __('capell-frontend::generic.dark_mode') }}'
                                     : '{{ __('capell-frontend::generic.light_mode') }}'
