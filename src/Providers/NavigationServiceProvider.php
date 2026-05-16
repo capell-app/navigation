@@ -41,6 +41,8 @@ class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
 
+    private bool $frontendRenderHooksRegistered = false;
+
     public function register(): void
     {
         $this->registerContentGraphExtractors();
@@ -166,13 +168,29 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerFrontendRenderHooks(): self
     {
-        if (! $this->app->bound(RenderHookRegistry::class)) {
-            return $this;
+        $this->app->afterResolving(
+            RenderHookRegistry::class,
+            function (RenderHookRegistry $registry): void {
+                $this->registerFrontendRenderHooksForRegistry($registry);
+            },
+        );
+
+        if ($this->app->bound(RenderHookRegistry::class)) {
+            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
         }
 
-        $this->app->make(RegisterFoundationHeaderNavigationHook::class)->register();
-
         return $this;
+    }
+
+    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
+    {
+        if ($this->frontendRenderHooksRegistered) {
+            return;
+        }
+
+        (new RegisterFoundationHeaderNavigationHook($registry))->register();
+
+        $this->frontendRenderHooksRegistered = true;
     }
 
     private function registerPolicies(): self

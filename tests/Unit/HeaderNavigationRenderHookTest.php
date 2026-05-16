@@ -7,7 +7,9 @@ it('registers the foundation header navigation render hook from the navigation p
     $hook = file_get_contents(dirname(__DIR__, 2) . '/src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php');
 
     expect($provider)->toContain('registerFrontendRenderHooks()')
-        ->and($provider)->toContain('RegisterFoundationHeaderNavigationHook::class')
+        ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook')
+        ->and($provider)->toContain('afterResolving')
+        ->and($provider)->toContain('registerFrontendRenderHooksForRegistry')
         ->and($hook)->toContain('frontend-default-primary-navigation')
         ->and($hook)->toContain('foundation-theme-primary-navigation')
         ->and($hook)->toContain('capell::header.index')

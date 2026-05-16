@@ -59,6 +59,10 @@
                 )
             },
         })
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('capellHeaderNavigation', window.capellHeaderNavigation)
+        })
     </script>
 @endif
 
