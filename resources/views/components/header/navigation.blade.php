@@ -11,12 +11,34 @@
         window.capellHeaderNavigation = () => ({
             isMenuOpen: false,
             isClosingMenu: false,
+            mobileMenuMediaQuery: null,
+            closeMenuListener: null,
+            mobileMenuMediaListener: null,
+            menuTransitionTimeout: null,
             init() {
-                this.$watch('isMenuOpen', (value) => {
-                    this.isClosingMenu = true
+                this.mobileMenuMediaQuery = window.matchMedia(
+                    '(max-width: 1023px)',
+                )
+                this.closeMenuListener = () => this.closeMenu()
+                this.mobileMenuMediaListener = () =>
+                    this.handleMobileMenuMediaChange()
 
-                    setTimeout(() => {
+                this.$watch('isMenuOpen', (value) => {
+                    if (!value && !this.isMobileMenuViewport()) {
                         this.isClosingMenu = false
+                        this.setPageInert(false)
+                        document.body.classList.remove('menu-open')
+                        this.dispatchOverlayState()
+                        return
+                    }
+
+                    this.isClosingMenu = true
+                    this.setPageInert(value || this.isClosingMenu)
+
+                    window.clearTimeout(this.menuTransitionTimeout)
+                    this.menuTransitionTimeout = window.setTimeout(() => {
+                        this.isClosingMenu = false
+                        this.setPageInert(this.isMenuOpen)
                         this.dispatchOverlayState()
                     }, 450)
 
@@ -24,9 +46,23 @@
                     this.dispatchOverlayState()
                 })
 
-                window.addEventListener('close-menu', () => {
-                    this.isMenuOpen = false
-                })
+                window.addEventListener('close-menu', this.closeMenuListener)
+                this.mobileMenuMediaQuery.addEventListener(
+                    'change',
+                    this.mobileMenuMediaListener,
+                )
+
+                this.setPageInert(false)
+            },
+            destroy() {
+                window.removeEventListener('close-menu', this.closeMenuListener)
+                this.mobileMenuMediaQuery?.removeEventListener(
+                    'change',
+                    this.mobileMenuMediaListener,
+                )
+                window.clearTimeout(this.menuTransitionTimeout)
+                document.body.classList.remove('menu-open')
+                this.setPageInert(false)
             },
             toggleMenu() {
                 if (this.isMenuOpen) {
@@ -38,16 +74,39 @@
             openMenu() {
                 if (this.isMenuOpen) return
 
-                this.$refs.toggleMenu.focus()
-
                 this.isMenuOpen = true
+
+                this.$nextTick(() => this.focusFirstMenuItem())
             },
-            closeMenu(focusAfter) {
+            closeMenu(focusAfter = this.$refs.toggleMenu) {
                 if (!this.isMenuOpen) return
 
                 this.isMenuOpen = false
 
                 focusAfter && focusAfter.focus()
+            },
+            isMobileMenuViewport() {
+                return (
+                    this.mobileMenuMediaQuery?.matches ??
+                    window.matchMedia('(max-width: 1023px)').matches
+                )
+            },
+            handleMobileMenuMediaChange() {
+                if (this.isMobileMenuViewport()) {
+                    this.setPageInert(this.isMenuOpen || this.isClosingMenu)
+                    this.dispatchOverlayState()
+                    return
+                }
+
+                if (this.isMenuOpen) {
+                    this.isMenuOpen = false
+                    return
+                }
+
+                this.isClosingMenu = false
+                document.body.classList.remove('menu-open')
+                this.setPageInert(false)
+                this.dispatchOverlayState()
             },
             dispatchOverlayState() {
                 window.dispatchEvent(
@@ -58,6 +117,117 @@
                     }),
                 )
             },
+            focusableMenuElements() {
+                const elements = [
+                    this.$refs.toggleMenu,
+                    ...this.$refs.menuPanel.querySelectorAll(
+                        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+                    ),
+                ]
+
+                return elements.filter((element) => {
+                    if (!element || element.disabled || element.inert)
+                        return false
+                    if (element.closest('[inert], [aria-hidden="true"]'))
+                        return false
+                    if (element.getClientRects().length === 0) return false
+
+                    const style = window.getComputedStyle(element)
+
+                    return (
+                        style.visibility !== 'hidden' &&
+                        style.display !== 'none'
+                    )
+                })
+            },
+            focusFirstMenuItem() {
+                if (!this.isMobileMenuViewport()) return
+
+                const elements = this.focusableMenuElements()
+                const firstMenuElement = elements.find(
+                    (element) => element !== this.$refs.toggleMenu,
+                )
+
+                ;(firstMenuElement || this.$refs.menuPanel).focus()
+            },
+            trapFocus(event) {
+                if (!this.isMenuOpen || !this.isMobileMenuViewport()) return
+
+                const elements = this.focusableMenuElements()
+
+                if (elements.length === 0) {
+                    event.preventDefault()
+                    return
+                }
+
+                const firstElement = elements[0]
+                const lastElement = elements[elements.length - 1]
+
+                if (event.shiftKey && document.activeElement === firstElement) {
+                    event.preventDefault()
+                    lastElement.focus()
+                    return
+                }
+
+                if (!event.shiftKey && document.activeElement === lastElement) {
+                    event.preventDefault()
+                    firstElement.focus()
+                }
+            },
+            setPageInert(value) {
+                const shouldInert = value && this.isMobileMenuViewport()
+                const inertAttribute = 'data-capell-navigation-inert'
+                const ariaHiddenAttribute = 'data-capell-navigation-aria-hidden'
+                const applyNavigationInert = (element) => {
+                    if (!element.hasAttribute('inert')) {
+                        element.setAttribute('inert', '')
+                        element.setAttribute(inertAttribute, 'true')
+                    }
+
+                    if (element.getAttribute('aria-hidden') !== 'true') {
+                        element.setAttribute('aria-hidden', 'true')
+                        element.setAttribute(ariaHiddenAttribute, 'true')
+                    }
+                }
+                const releaseNavigationInert = (element) => {
+                    if (element.getAttribute(inertAttribute) === 'true') {
+                        element.removeAttribute('inert')
+                        element.removeAttribute(inertAttribute)
+                    }
+
+                    if (element.getAttribute(ariaHiddenAttribute) === 'true') {
+                        element.removeAttribute('aria-hidden')
+                        element.removeAttribute(ariaHiddenAttribute)
+                    }
+                }
+
+                document.querySelectorAll('main, footer').forEach((element) => {
+                    if (this.$el.contains(element)) return
+
+                    if (shouldInert) {
+                        applyNavigationInert(element)
+                        return
+                    }
+
+                    releaseNavigationInert(element)
+                })
+
+                this.$el
+                    .closest('header')
+                    ?.querySelectorAll(
+                        'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+                    )
+                    .forEach((element) => {
+                        if (this.$el.contains(element)) return
+
+                        if (shouldInert) {
+                            applyNavigationInert(element)
+                            return
+                        }
+
+                        releaseNavigationInert(element)
+                    })
+            },
         })
 
         document.addEventListener('alpine:init', () => {
@@ -67,7 +237,7 @@
 @endif
 
 <div
-    @if ($usesAlpine) x-data="window.capellHeaderNavigation()" x-on:keydown.escape.prevent.stop="closeMenu()" @endif
+    @if ($usesAlpine) x-data="window.capellHeaderNavigation()" x-on:keydown.escape.prevent.stop="closeMenu()" x-on:keydown.tab="trapFocus($event)" @endif
     class="contents"
 >
     @if ($usesAlpine)
@@ -115,6 +285,9 @@
 
         <nav
             id="main-menu"
+            tabindex="-1"
+            x-ref="menuPanel"
+            aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
             @class([
                 'navbar left-0 top-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-y-auto overflow-x-hidden border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
                 'max-lg:invisible max-lg:absolute' => $usesAlpine,
@@ -123,7 +296,9 @@
             @if ($usesAlpine) x-bind:class="
                 isMenuOpen
                     ? 'max-lg:!visible max-lg:!translate-x-0'
-                    : 'max-lg:invisible max-lg:translate-x-[-100%]'
+                    : isClosingMenu
+                      ? 'max-lg:!visible max-lg:translate-x-[-100%]'
+                      : 'max-lg:invisible max-lg:translate-x-[-100%]'
             " @endif
         >
             <ul

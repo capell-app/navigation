@@ -30,18 +30,23 @@ use Capell\Navigation\Listeners\ReplicateSiteNavigationsListener;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
 use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
+use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
 use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use WeakMap;
 
 class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
 
-    private bool $frontendRenderHooksRegistered = false;
+    /** @var WeakMap<RenderHookRegistry, true>|null */
+    private ?WeakMap $frontendRenderHookRegistries = null;
 
     public function register(): void
     {
@@ -57,6 +62,8 @@ class NavigationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerFrontendRenderHooks();
+
         if (! $this->isPackageInstalled()) {
             return;
         }
@@ -70,7 +77,6 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerConfigurators()
             ->registerPackageAssets()
             ->registerBladeComponents()
-            ->registerFrontendRenderHooks()
             ->registerPolicies()
             ->registerRelationships()
             ->registerEventListeners();
@@ -86,8 +92,10 @@ class NavigationServiceProvider extends ServiceProvider
         $this->app->singleton(NavigationPageSyncer::class, NavigationPageSyncerAdapter::class);
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
         $this->app->singleton(
-            \Capell\Navigation\Support\NavigationNamesResolver::class,
-            fn ($app): \Capell\Navigation\Support\NavigationNamesResolver => new \Capell\Navigation\Support\NavigationNamesResolver($app['cache']->store()),
+            ConcreteNavigationNamesResolver::class,
+            fn (Application $app): ConcreteNavigationNamesResolver => new ConcreteNavigationNamesResolver(
+                $app['cache']->store(),
+            ),
         );
 
         return $this;
@@ -154,6 +162,7 @@ class NavigationServiceProvider extends ServiceProvider
             $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         }
 
+        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
 
         return $this;
@@ -184,13 +193,19 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
     {
-        if ($this->frontendRenderHooksRegistered) {
+        if (! $this->isPackageInstalled()) {
+            return;
+        }
+
+        $this->frontendRenderHookRegistries ??= new WeakMap;
+
+        if (isset($this->frontendRenderHookRegistries[$registry])) {
             return;
         }
 
         (new RegisterFoundationHeaderNavigationHook($registry))->register();
 
-        $this->frontendRenderHooksRegistered = true;
+        $this->frontendRenderHookRegistries[$registry] = true;
     }
 
     private function registerPolicies(): self
@@ -233,12 +248,12 @@ class NavigationServiceProvider extends ServiceProvider
         CapellCore::removeCacheKey(FrontendCacheEnum::siteNavigations($event->site_id));
 
         $navigations = Navigation::query()
-            ->where(function ($query) use ($event): void {
+            ->where(function (Builder $query) use ($event): void {
                 $query
                     ->where('site_id', $event->site_id)
                     ->orWhereNull('site_id');
             })
-            ->where(function ($query) use ($event): void {
+            ->where(function (Builder $query) use ($event): void {
                 $query
                     ->where('language_id', $event->language_id)
                     ->orWhereNull('language_id');

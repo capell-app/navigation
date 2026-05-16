@@ -7,6 +7,7 @@ namespace Capell\Navigation\Support\RenderHooks;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Livewire\Blaze\Blaze;
 
 final class RegisterFoundationHeaderNavigationHook
 {
@@ -28,11 +29,23 @@ final class RegisterFoundationHeaderNavigationHook
     {
         $this->registry->register(
             RenderHookLocation::HeaderAfter,
-            static fn (RenderHookContext $context): string => view('capell-navigation::components.header.main-navigation', [
-                'itemClass' => is_array($context->item) && is_string($context->item['menuItemClass'] ?? null)
-                    ? $context->item['menuItemClass']
-                    : null,
-            ])->render(),
+            static function (RenderHookContext $context): string {
+                $view = view('capell-navigation::components.header.main-navigation', [
+                    'itemClass' => is_array($context->item) && is_string($context->item['menuItemClass'] ?? null)
+                        ? $context->item['menuItemClass']
+                        : null,
+                ]);
+                $wasBlazeEnabled = Blaze::isEnabled();
+                Blaze::disable();
+
+                try {
+                    return $view->render();
+                } finally {
+                    if ($wasBlazeEnabled) {
+                        Blaze::enable();
+                    }
+                }
+            },
             scenario: $scenario,
             target: self::Target,
         );

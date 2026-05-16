@@ -7,13 +7,13 @@ namespace Capell\Navigation\Filament\Components\Forms;
 use Capell\Admin\Filament\Actions\HintEditAction;
 use Capell\Admin\Filament\Concerns\HasCustomSelectOption;
 use Capell\Core\Contracts\Pageable;
+use Capell\Navigation\Actions\BuildPageNavigationReferencesAction;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Models\Navigation;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 class NavigationSelect extends Select
@@ -32,25 +32,18 @@ class NavigationSelect extends Select
                 /** @var class-string<Navigation> $model */
                 $model = Navigation::class;
 
-                $navigations = $model::query()->when($get('../site_id'), fn (Builder $query, int $siteId): Builder => $query->where(
-                    fn (Builder $query): Builder => $query->where('site_id', $siteId)
-                        ->orWhereNull('site_id'),
-                ))
-                    ->when(
-                        $record instanceof Pageable,
-                        function (Builder $query) use ($record): Builder {
-                            if (DB::getDriverName() === 'sqlite') {
-                                return $query->whereRaw('EXISTS (SELECT 1 FROM json_each(items) WHERE json_each.value = ?)', [$record->getKey()]);
-                            }
-
-                            return $query->whereRaw("JSON_SEARCH(JSON_EXTRACT(items, '$.*'), 'one', ?) IS NOT NULL", [$record->getKey()]);
-                        },
-                    )
-                    ->with(['language', 'site'])
-                    ->orderBy('site_id')
-                    ->orderBy('name')
-                    ->orderBy('language_id')
-                    ->get();
+                $navigations = $record instanceof Pageable
+                    ? BuildPageNavigationReferencesAction::run($record)
+                    : $model::query()
+                        ->when($get('../site_id'), fn (Builder $query, int $siteId): Builder => $query->where(
+                            fn (Builder $query): Builder => $query->where('site_id', $siteId)
+                                ->orWhereNull('site_id'),
+                        ))
+                        ->with(['language', 'site'])
+                        ->orderBy('site_id')
+                        ->orderBy('name')
+                        ->orderBy('language_id')
+                        ->get();
 
                 return $navigations->mapWithKeys(
                     function (Navigation $navigation): array {

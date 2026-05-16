@@ -35,7 +35,7 @@
         @if (! empty($item->data['icon']))
             <x-dynamic-component
                 :component="$item->active ? ($item->data['active_icon'] ?? str_replace('heroicon-o-', 'heroicon-s-', $item->data['icon'])) : $item->data['icon']"
-                @class(['h-4 w-4 lg:order-1', 'text-primary' => $item->active])
+                class="h-4 w-4 lg:order-1"
             />
         @endif
     </a>
