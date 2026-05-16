@@ -47,7 +47,7 @@ class Menu extends Component
     {
         $handle = $this->key instanceof NavigationHandle
             ? $this->key
-            : NavigationHandle::tryFrom((string) $this->key);
+            : NavigationHandle::tryFrom($this->key);
 
         return match ($handle) {
             NavigationHandle::Main => __('capell-navigation::generic.main_navigation'),

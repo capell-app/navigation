@@ -41,7 +41,7 @@ it('owns accessible header menu controls in the navigation package', function ()
         ->and($navigation)->toContain("if (element.getAttribute(ariaHiddenAttribute) === 'true')")
         ->and($navigation)->toContain('menuTransitionTimeout')
         ->and($navigation)->toContain('window.clearTimeout(this.menuTransitionTimeout)')
-        ->and($navigation)->toContain("isClosingMenu\n                            ? 'max-lg:!visible max-lg:translate-x-[-100%]'")
+        ->and($navigation)->toContain(": isClosingMenu\n                      ? 'max-lg:!visible max-lg:translate-x-[-100%]'")
         ->and($navigation)->toContain('x-on:keydown.tab="trapFocus($event)"')
         ->and($navigation)->toContain('capell-navigation-menu-open-changed')
         ->and($navigation)->not->toContain("\$refs.toggleMenu.setAttribute('aria-expanded', 'true')");
@@ -198,7 +198,6 @@ it('only releases mobile menu inert attributes owned by navigation', function ()
 it('registers frontend render hooks once per registry instance', function (): void {
     $provider = new NavigationServiceProvider(app());
     $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
-    $registerHooks->setAccessible(true);
 
     $firstRegistry = new RenderHookRegistry;
     $secondRegistry = new RenderHookRegistry;
@@ -214,7 +213,6 @@ it('registers frontend render hooks once per registry instance', function (): vo
 it('defers frontend render hook registration until navigation is installed', function (): void {
     $provider = new NavigationServiceProvider(app());
     $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
-    $registerHooks->setAccessible(true);
 
     CapellCore::forcePackageInstalled(NavigationServiceProvider::$packageName, false);
 

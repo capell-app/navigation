@@ -32,6 +32,7 @@ use Capell\Navigation\Policies\NavigationPolicy;
 use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
 use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
 use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
+use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -94,7 +95,7 @@ class NavigationServiceProvider extends ServiceProvider
         $this->app->singleton(
             ConcreteNavigationNamesResolver::class,
             fn (Application $app): ConcreteNavigationNamesResolver => new ConcreteNavigationNamesResolver(
-                $app['cache']->store(),
+                $app->make(Factory::class)->store(),
             ),
         );
 

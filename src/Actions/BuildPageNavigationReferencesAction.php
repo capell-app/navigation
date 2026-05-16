@@ -118,8 +118,11 @@ final class BuildPageNavigationReferencesAction
     private function itemContainsRecord(mixed $item, int $recordId, string $recordMorphClass): bool
     {
         if ($item instanceof NavigationItemData) {
-            return $this->itemDataMatches($item->data, $recordId, $recordMorphClass)
-                || $this->itemsContainRecord($item->children, $recordId, $recordMorphClass);
+            if ($this->itemDataMatches($item->data, $recordId, $recordMorphClass)) {
+                return true;
+            }
+
+            return $this->itemsContainRecord($item->children, $recordId, $recordMorphClass);
         }
 
         if (! is_array($item)) {
@@ -127,9 +130,11 @@ final class BuildPageNavigationReferencesAction
         }
 
         $data = is_array($item['data'] ?? null) ? $item['data'] : [];
+        if ($this->itemDataMatches($data, $recordId, $recordMorphClass)) {
+            return true;
+        }
 
-        return $this->itemDataMatches($data, $recordId, $recordMorphClass)
-            || $this->itemsContainRecord($item['children'] ?? [], $recordId, $recordMorphClass);
+        return $this->itemsContainRecord($item['children'] ?? [], $recordId, $recordMorphClass);
     }
 
     /**
