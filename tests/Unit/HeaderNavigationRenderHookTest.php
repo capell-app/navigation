@@ -26,6 +26,8 @@ it('owns accessible header menu controls in the navigation package', function ()
     $navigation = file_get_contents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php');
 
     expect($navigation)->toContain('aria-controls="main-menu"')
+        ->and($navigation)->toContain('use Capell\Frontend\Enums\RenderHookLocation;')
+        ->and($navigation)->toContain('use Capell\Frontend\Support\Render\RenderHookRegistry;')
         ->and($navigation)->toContain('x-bind:aria-expanded="isMenuOpen.toString()"')
         ->and($navigation)->toContain('capell-product-menu-toggle')
         ->and($navigation)->toContain('x-text=')

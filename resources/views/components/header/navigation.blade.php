@@ -1,5 +1,7 @@
 @php
+    use Capell\Frontend\Enums\RenderHookLocation;
     use Capell\Frontend\Facades\Frontend;
+    use Capell\Frontend\Support\Render\RenderHookRegistry;
 
     $theme = Frontend::theme();
     $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
