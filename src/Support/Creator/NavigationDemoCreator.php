@@ -55,7 +55,7 @@ class NavigationDemoCreator
                 'type',
                 fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
-            ->withWhereHas('children')
+            ->with('children')
             ->where('site_id', $site->id)
             ->whereNull('parent_id')
             ->notHomePage()
@@ -83,7 +83,7 @@ class NavigationDemoCreator
                 'type',
                 fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
-            ->withWhereHas('children')
+            ->with('children')
             ->withWhereHas(
                 'translations',
                 fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),

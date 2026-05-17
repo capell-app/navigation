@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\Creator;
 
+use Capell\Core\Actions\ResolvePageableMorphModelAction;
 use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
@@ -34,7 +35,7 @@ class NavigationCreator
         $this->typeModel = Blueprint::class;
     }
 
-    public static function getPageNavigationLabel(Page $page, ?Language $language = null): ?string
+    public static function getPageNavigationLabel(Page $page, ?Language $language = null): string
     {
         if (! $language instanceof Language) {
             $language = $page->site->language;
@@ -42,7 +43,19 @@ class NavigationCreator
 
         $translation = $page->translations->firstWhere('language_id', $language->id);
 
-        return $translation?->label ?? $page->name;
+        $label = $translation?->label;
+
+        if ($label) {
+            return $label;
+        }
+
+        $title = $translation?->title;
+
+        if ($title) {
+            return $title;
+        }
+
+        return $page->name;
     }
 
     public function footerNavigation(
@@ -119,6 +132,7 @@ class NavigationCreator
         $navigation = self::createNavigation($key, $site, $language, $type);
 
         $items = collect($navigation->items);
+        $items = $this->backfillMissingPageLabels($items, $language);
 
         $homePageExists = $items->first(
             fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
@@ -146,13 +160,20 @@ class NavigationCreator
 
         foreach ($additionalItems as $item) {
             if (isset($item['data']['pageable_id'], $item['data']['pageable_type'])) {
-                $pageExists = $items->first(
+                $pageExistsKey = $items->search(
                     fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
                         && (int) $candidate['data']['pageable_id'] === (int) $item['data']['pageable_id']
                         && $candidate['data']['pageable_type'] === $item['data']['pageable_type'],
                 );
 
-                if ($pageExists !== null) {
+                if ($pageExistsKey !== false) {
+                    $existingItem = $items->get($pageExistsKey);
+
+                    if (($existingItem['label'] ?? null) === null || $existingItem['label'] === '') {
+                        $existingItem['label'] = $item['label'];
+                        $items->put($pageExistsKey, $existingItem);
+                    }
+
                     continue;
                 }
             }
@@ -170,6 +191,33 @@ class NavigationCreator
         $navigation->save();
 
         return $navigation;
+    }
+
+    private function backfillMissingPageLabels(Collection $items, Language $language): Collection
+    {
+        return $items->map(function (array $item) use ($language): array {
+            if (($item['label'] ?? null) !== null && $item['label'] !== '') {
+                return $item;
+            }
+
+            if (! isset($item['data']['pageable_id'], $item['data']['pageable_type'])) {
+                return $item;
+            }
+
+            $page = ResolvePageableMorphModelAction::run(
+                $item['data']['pageable_type'],
+                $item['data']['pageable_id'],
+            );
+
+            if (! $page instanceof Page) {
+                return $item;
+            }
+
+            $page->loadMissing('translations', 'site.language');
+            $item['label'] = self::getPageNavigationLabel($page, $language);
+
+            return $item;
+        });
     }
 
     /**

@@ -156,7 +156,7 @@ it('merges generated footer items into an existing navigation with persisted ite
         ]);
 });
 
-it('creates main navigation with the home page and eligible nested pages only', function (): void {
+it('creates main navigation with the home page and eligible top-level pages', function (): void {
     $navigationDemoCreator = resolve(NavigationDemoCreator::class);
 
     $language = Language::factory()->english()->create();
@@ -263,7 +263,7 @@ it('creates main navigation with the home page and eligible nested pages only', 
     $navigationItems = collect($navigation->items?->toArray())->values();
     $navigationLabels = $navigationItems->pluck('label')->all();
 
-    expect($navigationItems)->toHaveCount(3)
+    expect($navigationItems)->toHaveCount(4)
         ->and($navigationItems->first())
         ->toMatchArray([
             'label' => 'Home',
@@ -277,8 +277,8 @@ it('creates main navigation with the home page and eligible nested pages only', 
             ],
         ])
         ->and($navigationLabels)
-        ->toContain('Home', 'About', 'Services')
-        ->not()->toContain('Standalone', 'Draft Section');
+        ->toContain('Home', 'About', 'Services', 'Standalone')
+        ->not()->toContain('Draft Section');
 
     $aboutNavigationItem = $navigationItems->firstWhere('label', 'About');
     $servicesNavigationItem = $navigationItems->firstWhere('label', 'Services');
