@@ -157,14 +157,6 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerPackageAssets(): self
     {
-        // Skip auto-loading migrations during unit tests: the ordered migration workspace
-        // (BuildsOrderedMigrationWorkspace) copies navigation's migrations into a temp
-        // directory and calls loadMigrationsFrom() on that directory. Loading the same
-        // migrations from two different paths would create the same tables twice.
-        if (! $this->app->runningUnitTests()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
-        }
-
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
 
