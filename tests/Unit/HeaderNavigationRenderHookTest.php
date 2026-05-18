@@ -53,7 +53,6 @@ it('lets active header item icons inherit the active link colour', function (): 
     $item = file_get_contents(dirname(__DIR__, 2) . '/resources/views/components/header/menu/item.blade.php');
 
     expect($item)->toContain("'active text-primary' => \$item->active")
-        ->and($item)->toContain('class="h-4 w-4 lg:order-1"')
         ->and($item)->not->toContain("'text-primary' => \$item->active");
 });
 

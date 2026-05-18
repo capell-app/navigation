@@ -2,4 +2,6 @@
     'itemClass' => null,
 ])
 
-<x-capell-navigation::header.main-navigation :item-class="$itemClass" />
+<x-capell-navigation::header.main-navigation
+    :item-class="trim('capell-header-main-navigation ' . $itemClass)"
+/>

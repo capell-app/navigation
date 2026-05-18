@@ -2,7 +2,7 @@
     use Capell\Navigation\Enums\NavigationItemType;
 @endphp
 
-<ul>
+<ul class="capell-menu-items">
     @foreach ($items as $item)
         <li @class(['is-active' => $item->active])>
             @if ($item->type === NavigationItemType::Heading)

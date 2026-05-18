@@ -18,7 +18,7 @@
 @endphp
 
 @if (! $usesAlpine)
-    <li class="flex flex-col lg:flex-row">
+    <li class="capell-navigation-menu-dropdown flex flex-col lg:flex-row">
         <a
             href="{{ $item->data['url'] ?? '#' }}"
             @class([

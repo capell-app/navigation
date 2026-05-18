@@ -240,7 +240,7 @@
 
 <div
     @if ($usesAlpine) x-data="window.capellHeaderNavigation()" x-on:keydown.escape.prevent.stop="closeMenu()" x-on:keydown.tab="trapFocus($event)" @endif
-    class="contents"
+    class="capell-navigation-header contents"
 >
     @if ($usesAlpine)
         <div

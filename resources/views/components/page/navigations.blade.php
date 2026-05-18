@@ -10,7 +10,7 @@
     $navigations = BuildPageNavigationReferencesAction::run($record);
 @endphp
 
-<div>
+<div class="capell-page-navigations">
     @if ($navigations->isNotEmpty())
         <h3 class="mb-2 text-lg font-semibold leading-tight">
             {{ __('capell-admin::generic.page_navigations') }}
