@@ -21,7 +21,7 @@ class NavigationPolicy
 {
     use ResolvesShieldPermission;
 
-    private const SUBJECT = 'Navigation';
+    private const string SUBJECT = 'Navigation';
 
     public function viewAny(User $user): bool
     {

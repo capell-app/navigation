@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as AuthenticatableUser;
+use Override;
 use Spatie\LaravelData\DataCollection;
 
 /**
@@ -128,6 +129,7 @@ class Navigation extends Model implements Publishable, Typeable, Userstampable
      *
      * @return array<string, string>
      */
+    #[Override]
     protected function casts(): array
     {
         return [

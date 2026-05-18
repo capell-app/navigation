@@ -21,7 +21,7 @@ class BuildNavigationRenderModelAction
 {
     use AsObject;
 
-    private const REQUEST_CACHE_KEY = 'capell.navigation.render_models';
+    private const string REQUEST_CACHE_KEY = 'capell.navigation.render_models';
 
     public static function flushPageCache(): void
     {

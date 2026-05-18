@@ -24,11 +24,13 @@ class ListNavigations extends ListRecords
         return NavigationResource::class;
     }
 
+    #[Override]
     public function getSubheading(): string|Htmlable|null
     {
         return __('capell-admin::generic.navigation_info');
     }
 
+    #[Override]
     protected function getActions(): array
     {
         return [

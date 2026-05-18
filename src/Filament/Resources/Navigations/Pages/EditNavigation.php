@@ -48,6 +48,7 @@ class EditNavigation extends EditRecord
         );
     }
 
+    #[Override]
     protected function getHeaderActions(): array
     {
         return [

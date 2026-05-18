@@ -55,31 +55,37 @@ class NavigationResource extends Resource
         return static::getTableConfigurator()::configure($table);
     }
 
+    #[Override]
     public static function getPluralModelLabel(): string
     {
         return __('capell-admin::generic.navigations');
     }
 
+    #[Override]
     public static function getModelLabel(): string
     {
         return __('capell-admin::generic.navigation');
     }
 
+    #[Override]
     public static function getNavigationLabel(): string
     {
         return (string) (__('capell-admin::navigation.navigations'));
     }
 
+    #[Override]
     public static function getNavigationGroup(): ?string
     {
         return (string) (__('capell-admin::navigation.group_websites'));
     }
 
+    #[Override]
     public static function getNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return config('capell-admin.resources.navigation.icon', static::$navigationIcon);
     }
 
+    #[Override]
     public static function getActiveNavigationIcon(): string|BackedEnum|Htmlable|null
     {
         return config('capell-admin.resources.navigation.active_icon', static::$activeNavigationIcon);
@@ -103,17 +109,20 @@ class NavigationResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'key'];
     }
 
+    #[Override]
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
         /** @var Navigation $record */
         return $record->name;
     }
 
+    #[Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return self::applySiteScope(parent::getGlobalSearchEloquentQuery())
@@ -126,6 +135,7 @@ class NavigationResource extends Resource
     }
 
     /** @return array<string, string> */
+    #[Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         if (! $record instanceof Navigation) {
@@ -141,6 +151,7 @@ class NavigationResource extends Resource
         return $details;
     }
 
+    #[Override]
     public static function getPages(): array
     {
         $pages = parent::getPages();
