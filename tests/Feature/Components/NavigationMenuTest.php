@@ -46,11 +46,42 @@ it('renders a package menu component with explicit frontend context', function (
     );
 
     $view
+        ->assertSee('aria-label="Navigation"', false)
         ->assertSee('Company')
         ->assertSee('Docs')
         ->assertSee('href="/docs"', false)
         ->assertDontSee('href=""', false)
         ->assertDontSee('Hidden');
+});
+
+it('lets callers override the package menu landmark label', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+    $siteDomain = $site->siteDomains->first();
+
+    Navigation::factory()->create([
+        'key' => 'footer',
+        'site_id' => $site->getKey(),
+        'language_id' => $language->getKey(),
+        'items' => [
+            [
+                'label' => 'Terms',
+                'type' => NavigationItemType::Link->value,
+                'data' => ['url' => '/terms'],
+            ],
+        ],
+    ]);
+
+    $this->blade(
+        '<x-capell-navigation::menu key="footer" aria-label="Legal links" :site="$site" :language="$language" :page="$currentPage" :domain="$siteDomain" />',
+        ['site' => $site, 'language' => $language, 'currentPage' => $currentPage, 'siteDomain' => $siteDomain],
+    )
+        ->assertSee('aria-label="Legal links"', false)
+        ->assertDontSee('aria-label="Footer navigation"', false);
 });
 
 it('renders nothing when the package menu component has no matching context', function (): void {

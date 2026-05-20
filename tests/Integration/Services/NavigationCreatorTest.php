@@ -68,6 +68,50 @@ it('does not prepend duplicate home when same page exists in navigation items', 
     expect($matches->count())->toBe(1);
 });
 
+it('backfills missing labels on existing main navigation page items', function (): void {
+    $site = Site::factory()->create();
+    $home = Page::factory()->for($site)->create();
+    $page = Page::factory()->for($site)->create();
+    $creator = new NavigationCreator;
+
+    Navigation::factory()
+        ->site($site)
+        ->create([
+            'key' => NavigationHandle::Main->value,
+            'items' => [
+                'existing-page' => [
+                    'label' => null,
+                    'type' => NavigationItemType::Page->value,
+                    'data' => [
+                        'site_id' => $site->id,
+                        'pageable_id' => $page->getKey(),
+                        'pageable_type' => $page->getMorphClass(),
+                    ],
+                    'children' => [],
+                ],
+            ],
+        ]);
+
+    $navigation = $creator->mainNavigation($site, null, null, $home, [
+        [
+            'label' => 'Resolved Label',
+            'type' => NavigationItemType::Page->value,
+            'data' => [
+                'site_id' => $site->id,
+                'pageable_id' => $page->getKey(),
+                'pageable_type' => $page->getMorphClass(),
+            ],
+            'children' => [],
+        ],
+    ]);
+
+    $pageItem = collect($navigation->items)->first(
+        fn (array $item): bool => (int) $item['data']['pageable_id'] === $page->getKey(),
+    );
+
+    expect($pageItem['label'])->toBe('Resolved Label');
+});
+
 it('returns translation label when language provided', function (): void {
     $language = Language::factory()->create();
     $site = Site::factory()->language($language)->withTranslations()->create();
@@ -78,6 +122,20 @@ it('returns translation label when language provided', function (): void {
     $translation = $page->translations->firstWhere('language_id', $language->id);
 
     expect($label)->toBe($translation->label);
+});
+
+it('falls back to translation title when label is empty', function (): void {
+    $language = Language::factory()->create();
+    $site = Site::factory()->language($language)->withTranslations()->create();
+    $page = Page::factory()
+        ->site($site)
+        ->withTranslations(collect([$language]), [
+            'title' => 'Latest Articles',
+            'label' => null,
+        ])
+        ->create(['name' => 'Blog']);
+
+    expect(NavigationCreator::getPageNavigationLabel($page, $language))->toBe('Latest Articles');
 });
 
 it('creates footer navigation and adds pages when missing', function (): void {

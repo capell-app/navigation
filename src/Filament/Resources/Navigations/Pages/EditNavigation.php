@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Filament\Resources\Navigations\Pages;
 
-use Capell\Admin\Contracts\PageCacheNotifiable;
 use Capell\Admin\Filament\Actions\CreateAction;
 use Capell\Admin\Filament\Actions\DeleteAction;
 use Capell\Admin\Filament\Actions\ReplicateAction;
 use Capell\Admin\Filament\Concerns\HasCreateActionOnEditPage;
-use Capell\Admin\Filament\Concerns\HasPageCacheNotification;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Models\Navigation;
 use Filament\Actions\ActionGroup;
@@ -25,10 +23,9 @@ use Override;
 /**
  * @property-read Navigation $record
  */
-class EditNavigation extends EditRecord implements PageCacheNotifiable
+class EditNavigation extends EditRecord
 {
     use HasCreateActionOnEditPage;
-    use HasPageCacheNotification;
     use HasRecordSwitcher{
         afterSave as recordSwitcherAfterSave;
     }
@@ -51,6 +48,7 @@ class EditNavigation extends EditRecord implements PageCacheNotifiable
         );
     }
 
+    #[Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -69,8 +67,6 @@ class EditNavigation extends EditRecord implements PageCacheNotifiable
 
     protected function afterSave(): void
     {
-        $this->notifyPageCached($this->record);
-
         $this->recordSwitcherAfterSave();
     }
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\CreateNavigation;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\EditNavigation;
@@ -22,7 +22,7 @@ uses(CreatesAdminUser::class)
 beforeEach(function (): void {
     Language::factory()->default()->create();
     Site::factory()->default()->create();
-    Type::factory()->navigation()->create();
+    Blueprint::factory()->navigation()->create();
 
     test()->actingAsAdmin();
 });

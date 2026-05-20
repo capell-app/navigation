@@ -11,11 +11,10 @@ use Capell\Core\Data\PageTypeData;
 use Capell\Core\Events\PageUrlChanged;
 use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
-use Capell\Core\Models\Language;
-use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
-use Capell\ExampleSites\Support\Creator\DemoCreator;
+use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -30,25 +29,44 @@ use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Listeners\ReplicateSiteNavigationsListener;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
-use Capell\Navigation\Support\Creator\NavigationDemoCreator;
+use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
+use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
+use Illuminate\Contracts\Cache\Factory;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Override;
+use WeakMap;
 
 class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
 
+    /** @var WeakMap<RenderHookRegistry, true>|null */
+    private ?WeakMap $frontendRenderHookRegistries = null;
+
+    #[Override]
     public function register(): void
     {
-        $this->registerPackageMetadata();
+        $this->registerContentGraphExtractors();
         $this->commands([DemoCommand::class, SetupCommand::class]);
+
+        $this->app->booting(function (): void {
+            if ($this->isPackageInstalled()) {
+                $this->registerResources();
+            }
+        });
     }
 
     public function boot(): void
     {
+        $this->registerFrontendRenderHooks();
+
         if (! $this->isPackageInstalled()) {
             return;
         }
@@ -64,8 +82,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerBladeComponents()
             ->registerPolicies()
             ->registerRelationships()
-            ->registerEventListeners()
-            ->registerDemoCreatorMacros();
+            ->registerEventListeners();
     }
 
     private function isPackageInstalled(): bool
@@ -78,8 +95,10 @@ class NavigationServiceProvider extends ServiceProvider
         $this->app->singleton(NavigationPageSyncer::class, NavigationPageSyncerAdapter::class);
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
         $this->app->singleton(
-            \Capell\Navigation\Support\NavigationNamesResolver::class,
-            fn ($app): \Capell\Navigation\Support\NavigationNamesResolver => new \Capell\Navigation\Support\NavigationNamesResolver($app['cache']->store()),
+            ConcreteNavigationNamesResolver::class,
+            fn (Application $app): ConcreteNavigationNamesResolver => new ConcreteNavigationNamesResolver(
+                $app->make(Factory::class)->store(),
+            ),
         );
 
         return $this;
@@ -138,14 +157,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerPackageAssets(): self
     {
-        // Skip auto-loading migrations during unit tests: the ordered migration workspace
-        // (BuildsOrderedMigrationWorkspace) copies navigation's migrations into a temp
-        // directory and calls loadMigrationsFrom() on that directory. Loading the same
-        // migrations from two different paths would create the same tables twice.
-        if (! $this->app->runningUnitTests()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
-        }
-
+        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
 
         return $this;
@@ -156,6 +168,39 @@ class NavigationServiceProvider extends ServiceProvider
         Blade::componentNamespace('Capell\\Navigation\\View\\Components', 'capell-navigation');
 
         return $this;
+    }
+
+    private function registerFrontendRenderHooks(): self
+    {
+        $this->app->afterResolving(
+            RenderHookRegistry::class,
+            function (RenderHookRegistry $registry): void {
+                $this->registerFrontendRenderHooksForRegistry($registry);
+            },
+        );
+
+        if ($this->app->bound(RenderHookRegistry::class)) {
+            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
+        }
+
+        return $this;
+    }
+
+    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
+    {
+        if (! $this->isPackageInstalled()) {
+            return;
+        }
+
+        $this->frontendRenderHookRegistries ??= new WeakMap;
+
+        if (isset($this->frontendRenderHookRegistries[$registry])) {
+            return;
+        }
+
+        (new RegisterFoundationHeaderNavigationHook($registry))->register();
+
+        $this->frontendRenderHookRegistries[$registry] = true;
     }
 
     private function registerPolicies(): self
@@ -180,6 +225,16 @@ class NavigationServiceProvider extends ServiceProvider
         return $this;
     }
 
+    private function registerContentGraphExtractors(): self
+    {
+        if (class_exists(ContentGraphRegistry::class)) {
+            $this->app->singleton(NavigationContentGraphExtractor::class);
+            $this->app->tag(NavigationContentGraphExtractor::class, ContentGraphRegistry::TAG);
+        }
+
+        return $this;
+    }
+
     private function handlePageUrlChanged(PageUrlChanged $event): void
     {
         BuildNavigationRenderModelAction::flushPageCache();
@@ -188,12 +243,12 @@ class NavigationServiceProvider extends ServiceProvider
         CapellCore::removeCacheKey(FrontendCacheEnum::siteNavigations($event->site_id));
 
         $navigations = Navigation::query()
-            ->where(function ($query) use ($event): void {
+            ->where(function (Builder $query) use ($event): void {
                 $query
                     ->where('site_id', $event->site_id)
                     ->orWhereNull('site_id');
             })
-            ->where(function ($query) use ($event): void {
+            ->where(function (Builder $query) use ($event): void {
                 $query
                     ->where('language_id', $event->language_id)
                     ->orWhereNull('language_id');
@@ -213,37 +268,9 @@ class NavigationServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerDemoCreatorMacros(): self
-    {
-        DemoCreator::macro('setupMainNavigation', function (Site $site, Language $language, Page $home): void {
-            resolve(NavigationDemoCreator::class)->setupMainNavigation($site, $language, $home);
-        });
-
-        DemoCreator::macro('setupFooterNavigation', function (Site $site, Language $language): void {
-            resolve(NavigationDemoCreator::class)->setupFooterNavigation($site, $language);
-        });
-
-        DemoCreator::macro('subFooterNavigation', function (Site $site, ?Language $language): void {
-            resolve(NavigationDemoCreator::class)->setupSubFooterNavigation($site, $language);
-        });
-
-        return $this;
-    }
-
     private function registerSchemaExtender(string $tag, string $class): void
     {
         $this->app->singleton($class, fn (): object => new $class);
         $this->app->tag($class, $tag);
-    }
-
-    private function registerPackageMetadata(): void
-    {
-        CapellCore::registerPackage(
-            static::$packageName,
-            serviceProviderClass: static::class,
-            path: realpath(__DIR__ . '/../..'),
-            version: CapellCore::getInstalledPrettyVersion(static::$packageName),
-            description: 'Navigation for Capell',
-        );
     }
 }

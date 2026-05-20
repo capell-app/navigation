@@ -39,7 +39,22 @@ class Menu extends Component
 
         return view('capell-navigation::components.menu', [
             'menu' => $menu,
+            'navigationLabel' => $this->navigationLabel(),
         ]);
+    }
+
+    private function navigationLabel(): string
+    {
+        $handle = $this->key instanceof NavigationHandle
+            ? $this->key
+            : NavigationHandle::tryFrom($this->key);
+
+        return match ($handle) {
+            NavigationHandle::Main => __('capell-navigation::generic.main_navigation'),
+            NavigationHandle::Footer => __('capell-navigation::generic.footer_navigation'),
+            NavigationHandle::SubFooter => __('capell-navigation::generic.sub_footer_navigation'),
+            default => __('capell-navigation::generic.navigation'),
+        };
     }
 
     private function resolveMenu(): ?NavigationRenderData

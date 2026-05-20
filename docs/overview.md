@@ -43,6 +43,10 @@ Lets editors manage menus for each site and language while keeping page selectio
 - Navigations connect to sites, languages, and types.
 - Cache key enum indicates navigation cache behaviour.
 
+## Content Graph
+
+Navigation contributes content graph edges from each navigation record to the pages referenced by its nested page items. These edges use `LinksToPage` with strong strength, so impact previews, safer deletes, diagnostics, and graph-aware invalidation can see which menus depend on a page.
+
 ## Screenshot Plan
 
 - Navigation admin index.
@@ -50,6 +54,16 @@ Lets editors manage menus for each site and language while keeping page selectio
 - Site relation manager for navigations.
 - Page form navigation tab.
 - Frontend menu output.
+
+## Screenshots
+
+![Navigation admin index](../../../public/docs/screenshots/packages/navigation/navigation-admin-index.png)
+
+![Create navigation form](../../../public/docs/screenshots/packages/navigation/create-edit-navigation-form.png)
+
+![Navigation fields on the site form](../../../public/docs/screenshots/packages/navigation/site-relation-manager-for-navigations.png)
+
+The frontend menu screenshot needs seeded navigation items before it is useful enough to publish.
 
 ## Pitfalls
 
@@ -104,14 +118,14 @@ Lets editors manage menus for each site and language while keeping page selectio
 erDiagram
     SITES ||--o{ NAVIGATIONS : owns
     LANGUAGES ||--o{ NAVIGATIONS : localizes
-    TYPES ||--o{ NAVIGATIONS : classifies
+    BLUEPRINTS ||--o{ NAVIGATIONS : classifies
     PAGES ||..o{ NAVIGATIONS : referenced_in_items_json
     PAGE_URLS ||..o{ NAVIGATIONS : referenced_in_items_json
 
     NAVIGATIONS {
         bigint id PK
         string key
-        bigint type_id FK
+        bigint blueprint_id FK
         bigint site_id FK
         bigint language_id FK
         json items

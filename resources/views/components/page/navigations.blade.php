@@ -1,38 +1,20 @@
 @php
+    use Capell\Admin\Contracts\Support\FlagIconRenderer;
     use Capell\Core\Contracts\Pageable;
+    use Capell\Navigation\Actions\BuildPageNavigationReferencesAction;
     use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
-    use Capell\Navigation\Models\Navigation;
-    use Illuminate\Support\Facades\DB;
 
     /* @var Pageable $record */
     $record = $getRecord();
-
-    /* @var class-string<\Capell\Navigation\Models\Navigation> $model */
-    $model = Navigation::class;
-
-    $navigations = $model::with('language')
-        ->when(
-            DB::getDriverName() === 'sqlite',
-            fn ($query) => $query->whereRaw(
-                'EXISTS (SELECT 1 FROM json_each(items) WHERE json_each.value = ?)',
-                [$record->id],
-            ),
-            fn ($query) => $query->whereRaw(
-                "JSON_SEARCH(JSON_EXTRACT(items, '$.*'), 'one', ?) IS NOT NULL",
-                [$record->id],
-            ),
-        )
-        ->orderBy('site_id')
-        ->orderBy('name')
-        ->orderBy('language_id')
-        ->get();
+    $flagIconRenderer = app(FlagIconRenderer::class);
+    $navigations = BuildPageNavigationReferencesAction::run($record);
 @endphp
 
-<div>
+<div class="capell-page-navigations">
     @if ($navigations->isNotEmpty())
-        <div class="mb-2 text-lg font-semibold leading-tight">
+        <h3 class="mb-2 text-lg font-semibold leading-tight">
             {{ __('capell-admin::generic.page_navigations') }}
-        </div>
+        </h3>
         <div
             class="grid grid-cols-1 gap-4 divide-y divide-white/50 md:grid-cols-2"
         >
@@ -61,10 +43,7 @@
                     >
                         {{ $navigation->name }}
                         @if ($navigation->language && $navigation->language->flag)
-                            <x-dynamic-component
-                                class="ml-2 h-4 w-5"
-                                :component="'flag-4x3-' . $navigation->language->flag"
-                            />
+                            {!! $flagIconRenderer->render('flag-4x3-' . $navigation->language->flag, attributes: ['class' => 'ml-2 h-4 w-5']) !!}
                         @endif
                     </x-filament::link>
                 </li>

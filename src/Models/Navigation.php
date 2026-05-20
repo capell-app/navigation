@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Models;
 
 use Bkwld\Cloner\Cloneable;
-use Capell\Core\Contracts\PageCacheable;
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPublishDates;
 use Capell\Core\Models\Concerns\HasType;
@@ -15,7 +15,6 @@ use Capell\Core\Models\Contracts\Typeable;
 use Capell\Core\Models\Contracts\Userstampable;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
-use Capell\Core\Models\Type;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Database\Factories\NavigationFactory;
 use Capell\Navigation\Observers\NavigationObserver;
@@ -27,16 +26,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as AuthenticatableUser;
+use Override;
 use Spatie\LaravelData\DataCollection;
 
 /**
  * @property int $id
  * @property string|null $name
  * @property string $key
- * @property int $type_id
+ * @property int $blueprint_id
  * @property int|null $site_id
  * @property int|null $language_id
- * @property DataCollection<int, NavigationItemData>|null $items
+ * @property DataCollection<int, NavigationItemData>|array<int|string, mixed>|null $items
  * @property array<array-key, mixed>|null $meta
  * @property CarbonImmutable|null $visible_from
  * @property string|null $visible_until
@@ -51,7 +51,7 @@ use Spatie\LaravelData\DataCollection;
  * @property-read AuthenticatableUser|null $editor
  * @property-read Language|null $language
  * @property-read Site|null $site
- * @property-read Type $type
+ * @property-read Blueprint $type
  *
  * @method static Builder<static>|Navigation excludeRevision(Model|int $exclude)
  * @method static Builder<static>|Navigation expired()
@@ -82,7 +82,7 @@ use Spatie\LaravelData\DataCollection;
  * @mixin Model
  */
 #[ObservedBy(NavigationObserver::class)]
-class Navigation extends Model implements PageCacheable, Publishable, Typeable, Userstampable
+class Navigation extends Model implements Publishable, Typeable, Userstampable
 {
     use Cloneable;
 
@@ -98,7 +98,7 @@ class Navigation extends Model implements PageCacheable, Publishable, Typeable, 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected $fillable = [
         'items',
@@ -109,7 +109,7 @@ class Navigation extends Model implements PageCacheable, Publishable, Typeable, 
         'visible_from',
         'visible_until',
         'site_id',
-        'type_id',
+        'blueprint_id',
     ];
 
     protected static string $factory = NavigationFactory::class;
@@ -129,6 +129,7 @@ class Navigation extends Model implements PageCacheable, Publishable, Typeable, 
      *
      * @return array<string, string>
      */
+    #[Override]
     protected function casts(): array
     {
         return [

@@ -7,8 +7,8 @@ namespace Capell\Navigation\Support\Loader;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
+use Capell\Frontend\Contracts\RenderedModelTracker;
 use Capell\Frontend\Enums\CacheEnum;
-use Capell\Frontend\Support\ModelServing\RetrievedModelStore;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
@@ -69,7 +69,7 @@ class NavigationLoader
         }
 
         if ($navigation) {
-            resolve(RetrievedModelStore::class)->track($navigation);
+            resolve(RenderedModelTracker::class)->track($navigation);
         }
 
         return $navigation;
@@ -93,7 +93,7 @@ class NavigationLoader
         });
 
         if ($fromCache && $navigation !== null) {
-            resolve(RetrievedModelStore::class)->track($navigation);
+            resolve(RenderedModelTracker::class)->track($navigation);
         }
 
         return $navigation;
