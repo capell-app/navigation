@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User;
 
 it('authorizes navigation resource abilities through shield permissions', function (): void {
@@ -11,6 +12,8 @@ it('authorizes navigation resource abilities through shield permissions', functi
     $navigation = new Navigation;
     $user = new class extends User
     {
+        use HasFactory;
+
         /** @var list<string> */
         public array $permissions = [];
 
