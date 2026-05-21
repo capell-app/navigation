@@ -345,16 +345,22 @@
                     class="ml-auto grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
                 >
                     <button
+                        type="button"
                         class="hover:text-primary flex h-auto w-full cursor-pointer justify-between rounded-lg border border-gray-100 px-3 py-3 lg:h-10 lg:w-10 lg:items-center lg:justify-center lg:rounded-full lg:p-0 dark:border-gray-600"
+                        aria-label="{{ __('capell-frontend::generic.dark_mode') }}"
                         @if ($usesAlpine)
                             x-on:click="toggleDarkMode"
+                            x-bind:aria-label="
+                                isDarkMode
+                                    ? '{{ __('capell-frontend::generic.light_mode') }}'
+                                    : '{{ __('capell-frontend::generic.dark_mode') }}'
+                            "
                             x-bind:title="
                                 isDarkMode
                                     ? '{{ __('capell-frontend::generic.dark_mode') }}'
                                     : '{{ __('capell-frontend::generic.light_mode') }}'
                             "
                         @endif
-                        tabindex="0"
                     >
                         <span
                             class="lg:hidden"
