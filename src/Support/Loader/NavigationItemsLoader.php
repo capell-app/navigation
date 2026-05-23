@@ -184,10 +184,12 @@ class NavigationItemsLoader
                     optionalLanguage: true,
                     withChildren: true,
                     cacheKeyPrepend: 'parent-' . $pageableReference['pageable_id'],
-                    modifyQuery: fn (BuilderContract $query): BuilderContract => $query->where(
-                        'parent_id',
-                        $pageableReference['pageable_id'],
-                    ),
+                    modifyQuery: function (BuilderContract $query) use ($pageableReference): void {
+                        $query->where(
+                            'parent_id',
+                            $pageableReference['pageable_id'],
+                        );
+                    },
                 );
 
                 if ($children->isNotEmpty()) {

@@ -44,7 +44,13 @@ class NavigationDemoCreator
     {
         Site::query()->with(['related', 'related.translation'])->get()
             ->each(function (Site $site): void {
-                $this->updateSubFooterNavigation($site, $site->related);
+                $relatedSites = $site->getRelationValue('related');
+
+                if (! $relatedSites instanceof SupportCollection) {
+                    return;
+                }
+
+                $this->updateSubFooterNavigation($site, $relatedSites);
             });
     }
 

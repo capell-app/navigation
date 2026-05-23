@@ -22,7 +22,9 @@ it('adds the saved page to provided navigations', function (): void {
     ]);
 
     (new Collection([$navigation]))->each(
-        static fn (Navigation $nav): mixed => AddPageToNavigationAction::run($page, $nav),
+        static function (Navigation $navigation) use ($page): void {
+            AddPageToNavigationAction::run($page, $navigation);
+        },
     );
 
     $navigation->refresh();

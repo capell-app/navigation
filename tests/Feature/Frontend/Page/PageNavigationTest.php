@@ -9,12 +9,17 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Tests\Support\Concerns\TestingFrontend;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
+use Illuminate\View\DynamicComponent;
 
 use function Pest\Laravel\get;
 
 uses(TestingFrontend::class);
+
+beforeEach(function (): void {
+    registerThemedHeaderComponentForRendering();
+});
 
 test('frontend default theme displays the main navigation menu', function (): void {
     $theme = Theme::factory()
@@ -41,9 +46,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
         ->assertDontSee('id="header"', false);
 });
 
-test('foundation theme displays the main navigation menu', function (): void {
-    registerFoundationThemeComponentsForRendering();
-
+test('themed header displays the main navigation menu', function (): void {
     $theme = Theme::factory()
         ->defaultMeta()
         ->state([
@@ -51,7 +54,7 @@ test('foundation theme displays the main navigation menu', function (): void {
             'meta' => [
                 ...Theme::factory()->defaultMeta()->make()->meta,
                 'footer' => false,
-                'header_file' => 'capell-foundation-test::header.index',
+                'header_file' => 'capell-navigation-test::header',
             ],
         ])
         ->create();
@@ -147,15 +150,23 @@ function createFrontendPageWithMainNavigation(Theme $theme): array
     return [$page, $site];
 }
 
-function registerFoundationThemeComponentsForRendering(): void
+function registerThemedHeaderComponentForRendering(): void
 {
-    $foundationThemePath = realpath(dirname(__DIR__, 5) . '/foundation-theme');
+    Blade::componentNamespace('Capell\\Navigation\\Tests\\Fixtures\\View\\Components', 'capell-navigation-test');
+    View::addNamespace('capell-navigation-test', __DIR__ . '/../../../Fixtures/views');
 
-    expect($foundationThemePath)->not->toBeFalse();
+    clearDynamicComponentResolverCache();
+}
 
-    Blade::anonymousComponentPath($foundationThemePath . '/resources/views/components', 'capell-foundation-test');
-    resolve(Factory::class)->addNamespace('capell-foundation-test', $foundationThemePath . '/resources/views');
-    Blade::component('capell-foundation-test::components.header.index', 'capell-foundation-test::header.index');
+function clearDynamicComponentResolverCache(): void
+{
+    $dynamicComponent = new ReflectionClass(DynamicComponent::class);
+
+    $compiler = $dynamicComponent->getProperty('compiler');
+    $compiler->setValue(null);
+
+    $componentClasses = $dynamicComponent->getProperty('componentClasses');
+    $componentClasses->setValue([]);
 }
 
 test('page renders without error when navigation exists with footer handle', function (): void {
