@@ -62,7 +62,7 @@ class Menu extends Component
         $site = $this->site ?? Frontend::site();
         $language = $this->language ?? Frontend::language();
         $page = $this->page ?? Frontend::page();
-        $siteDomain = $this->domain ?? $site->siteDomain ?? $page->pageUrl->siteDomain;
+        $siteDomain = $this->domain ?? $site?->siteDomain ?? $page?->pageUrl?->siteDomain;
 
         if (! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Pageable || ! $siteDomain instanceof SiteDomain) {
             return null;

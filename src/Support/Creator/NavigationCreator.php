@@ -49,7 +49,7 @@ class NavigationCreator
             return $label;
         }
 
-        $title = $translation->title;
+        $title = $translation?->title;
 
         if ($title) {
             return $title;
@@ -145,11 +145,13 @@ class NavigationCreator
         $items = collect($navigation->items);
         $items = $this->backfillMissingPageLabels($items, $language);
 
-        $homePageExists = $items->first(
-            fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
-                && (int) $candidate['data']['pageable_id'] === $home->getKey()
-                && $candidate['data']['pageable_type'] === $home->getMorphClass(),
-        );
+        $homePageExists = $home instanceof Page
+            ? $items->first(
+                fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
+                    && (int) $candidate['data']['pageable_id'] === $home->getKey()
+                    && $candidate['data']['pageable_type'] === $home->getMorphClass(),
+            )
+            : null;
 
         if ($home instanceof Page && $homePageExists === null) {
             $items->prepend(
