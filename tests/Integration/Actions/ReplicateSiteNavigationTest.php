@@ -64,7 +64,7 @@ it('replicates a site with navigations and pages', function (): void {
 
     expect($clonedItem->type)->toBe($originalItem->type)
         ->and($clonedItem->data['label'])->toBe('Page Link')
-        ->and($clonedItem->data['pageable_id'])->toBe($clonedPages->first()?->id ?? null);
+        ->and($clonedItem->data['pageable_id'])->toBe($clonedPages->first()->id ?? null);
 });
 
 it('replicates only navigations when setup pages is used', function (): void {

@@ -6,7 +6,7 @@ namespace Capell\Navigation\Support;
 
 use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Models\Navigation;
-use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Builder;
 
 class NavigationNamesResolver

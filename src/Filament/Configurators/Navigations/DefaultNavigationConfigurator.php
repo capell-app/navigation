@@ -56,13 +56,6 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
     protected static ConfiguratorTypeEnumInterface $configuratorType = NavigationConfiguratorTypeEnum::Navigation;
 
-    /**
-     * Array cache for loaded Page models by ID.
-     *
-     * @var array<string, Pageable|null>
-     */
-    private static array $pageCache = [];
-
     public static function getExtenders(): iterable
     {
         return app()->tagged(SchemaExtenderEnum::Navigation->value);
@@ -195,7 +188,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                     ->icon('heroicon-o-plus')
                     ->color('primary'),
             )
-            ->schema([
+            ->schema(fn (): array => [
                 Grid::make()
                     ->schema([
                         ToggleButtons::make('type')

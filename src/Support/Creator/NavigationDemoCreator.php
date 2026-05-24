@@ -101,6 +101,8 @@ class NavigationDemoCreator
             ->get()
             ->toTree();
 
+        $pages = $pages instanceof SupportCollection ? $pages : new SupportCollection($pages);
+
         /** @var class-string<Blueprint> $typeModel */
         $typeModel = Blueprint::class;
         $navigationType = $typeModel::query()->navigationType()->default()->first();

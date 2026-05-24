@@ -49,7 +49,7 @@ class NavigationCreator
             return $label;
         }
 
-        $title = $translation?->title;
+        $title = $translation->title;
 
         if ($title) {
             return $title;
@@ -143,7 +143,7 @@ class NavigationCreator
         if ($home instanceof Page && $homePageExists === null) {
             $items->prepend(
                 [
-                    'label' => self::getPageNavigationLabel($home, $language) ?? __('capell::generic.home'),
+                    'label' => self::getPageNavigationLabel($home, $language),
                     'type' => NavigationItemType::Page->value,
                     'data' => [
                         'site_id' => $home->site_id,

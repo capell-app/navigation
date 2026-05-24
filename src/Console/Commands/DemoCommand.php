@@ -11,6 +11,7 @@ use Capell\Navigation\Support\Creator\NavigationDemoCreator;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Throwable;
 
 class DemoCommand extends Command
@@ -27,7 +28,11 @@ class DemoCommand extends Command
             $sites = $this->resolveSites();
             $languageCodes = $this->resolveLanguageCodes();
 
-            $sites->each(function (Site $site) use ($navigationDemoCreator, $languageCodes): void {
+            $sites->each(function (Model $site) use ($navigationDemoCreator, $languageCodes): void {
+                if (! $site instanceof Site) {
+                    return;
+                }
+
                 $home = Page::getSiteHomePage($site);
 
                 if (! $home instanceof Page) {

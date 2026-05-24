@@ -10,6 +10,7 @@ use Capell\Navigation\Support\Creator\NavigationCreator;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Throwable;
 
 class SetupCommand extends Command
@@ -23,7 +24,11 @@ class SetupCommand extends Command
         try {
             $sites = $this->resolveSites();
 
-            $sites->each(function (Site $site): void {
+            $sites->each(function (Model $site): void {
+                if (! $site instanceof Site) {
+                    return;
+                }
+
                 $this->line(sprintf('Setting up navigation for "%s"', $site->name));
 
                 $home = Page::getSiteHomePage($site);

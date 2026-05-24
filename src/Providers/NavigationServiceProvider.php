@@ -85,7 +85,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerEventListeners();
     }
 
-    private function isPackageInstalled(): bool
+    protected function isPackageInstalled(): bool
     {
         return CapellCore::isPackageInstalled(static::$packageName);
     }

@@ -79,7 +79,7 @@ class NavigationsTable implements TableConfigurator
             NameColumn::make('name')
                 ->searchable()
                 ->sortable()
-                ->description(fn (Navigation $record): ?string => $record->key),
+                ->description(fn (Navigation $record): string => $record->key),
             NavigationItemsColumn::make('items'),
             TextColumn::make('items_count')
                 ->label(__('capell-admin::table.total_items'))
