@@ -146,6 +146,10 @@ class NavigationDemoCreator
             ));
     }
 
+    /**
+     * @param  SupportCollection<array-key, mixed>  $pages
+     * @return array<array-key, mixed>
+     */
     private function buildNavigationPageItems(SupportCollection $pages, Language $language): array
     {
         $this->loadPageTranslations($pages, $language);
@@ -170,6 +174,9 @@ class NavigationDemoCreator
         return $items;
     }
 
+    /**
+     * @param  SupportCollection<array-key, mixed>  $pages
+     */
     private function loadPageTranslations(SupportCollection $pages, Language $language): void
     {
         if ($pages instanceof Collection) {

@@ -62,6 +62,9 @@ class SetupCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @return Collection<int, Model>
+     */
     private function resolveSites(): Collection
     {
         $siteOptions = $this->option('sites');
@@ -72,7 +75,7 @@ class SetupCommand extends Command
             $siteOptions = null;
         }
 
-        /** @var Collection<int, Site> $sites */
+        /** @var \Illuminate\Support\Collection<int, Site> $sites */
         $sites = Site::query()
             ->with(['language', 'languages', 'translations'])
             ->when(

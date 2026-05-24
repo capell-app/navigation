@@ -15,6 +15,9 @@ class NavigationCreating
 {
     use Dispatchable;
 
+    /**
+     * @param  Collection<array-key, mixed>  $items
+     */
     public function __construct(
         public Navigation $navigation,
         public Collection $items,

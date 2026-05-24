@@ -50,6 +50,10 @@ final class BuildPageNavigationReferencesAction
             ->all());
     }
 
+    /**
+     * @param  Builder<Navigation>  $query
+     * @return Builder<Navigation>
+     */
     private function whereItemsMightContainRecord(Builder $query, int $recordId, string $recordMorphClass): Builder
     {
         $encodedMorphClass = trim(json_encode($recordMorphClass, JSON_THROW_ON_ERROR), '"');

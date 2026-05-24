@@ -72,6 +72,9 @@ class NavigationsTable implements TableConfigurator
             ]);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected static function getTableColumns(): array
     {
         return [
@@ -106,6 +109,9 @@ class NavigationsTable implements TableConfigurator
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected static function getTableFilters(): array
     {
         return [

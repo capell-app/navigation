@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Query log for test assertions.
  *
- * @var array<int, array<string, mixed>>
+ * @var array<int, array<array-key, mixed>>
  */
 static $testQueryLog = [];
 
@@ -31,6 +31,9 @@ function setupQueryLogging(): void
     });
 }
 
+/**
+ * @return array<array-key, mixed>
+ */
 function getTestQueryLog(): array
 {
     global $testQueryLog;

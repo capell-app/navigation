@@ -163,6 +163,10 @@ class NavigationResource extends Resource
         return $pages;
     }
 
+    /**
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
+     */
     private static function applySiteScope(Builder $query): Builder
     {
         $actor = auth()->user();

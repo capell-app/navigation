@@ -114,11 +114,17 @@ class Navigation extends Model implements Publishable, Typeable, Userstampable
 
     protected static string $factory = NavigationFactory::class;
 
+    /**
+     * @return BelongsTo<Language, $this>
+     */
     public function language(): BelongsTo
     {
         return $this->belongsTo(Language::class);
     }
 
+    /**
+     * @return BelongsTo<Site, $this>
+     */
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);

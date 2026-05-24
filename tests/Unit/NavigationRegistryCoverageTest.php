@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use Capell\Navigation\Health\NavigationHealthCheck;
 use Capell\Navigation\Support\Registry\NavigableRegistry;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 it('resolves registered navigable models and exposes health compatibility', function (): void {
     $model = new class extends Model
     {
+        /** @use HasFactory<Factory<static>> */
         use HasFactory;
 
         public function getKey(): int
@@ -43,6 +45,7 @@ it('resolves registered navigable models and exposes health compatibility', func
 it('falls back to model keys when navigable methods are absent', function (): void {
     $model = new class extends Model
     {
+        /** @use HasFactory<Factory<static>> */
         use HasFactory;
 
         public function getKey(): int

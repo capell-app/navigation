@@ -36,6 +36,7 @@ class ReplicateSiteNavigationsAction
 
     /**
      * @param  array<int|string, Pageable>  $replacementPages
+     * @return array<array-key, mixed>
      */
     private function mapItems(?string $rawItems, array $replacementPages): array
     {

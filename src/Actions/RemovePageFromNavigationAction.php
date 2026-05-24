@@ -28,6 +28,9 @@ class RemovePageFromNavigationAction
         }
     }
 
+    /**
+     * @param  array<array-key, mixed>  $item
+     */
     private function isPageItem(array $item, Pageable $page): bool
     {
         return ($item['type'] ?? null) === NavigationItemType::Page->value
@@ -37,7 +40,10 @@ class RemovePageFromNavigationAction
     }
 
     /**
+     * @param  Collection<array-key, mixed>  $items
      * @return array{0: Collection, 1: bool}
+     * @return Collection<array-key, mixed>
+     * @return array<array-key, mixed>
      */
     private function removePageFromItems(Collection $items, Pageable $page): array
     {

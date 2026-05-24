@@ -49,6 +49,11 @@ class NavigationFactory extends Factory
         return $this->set('language_id', $language->getKey());
     }
 
+    /**
+     * @param  array  $items
+     * @param  Collection<array-key, mixed>  $items
+     * @param  array<array-key, mixed>  $items
+     */
     public function items(array|Collection $items): self
     {
         return $this->set('items', is_array($items) ? $items : $this->mapPagesToItems($items));
@@ -71,6 +76,10 @@ class NavigationFactory extends Factory
         ]);
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return array<array-key, mixed>
+     */
     private function mapPagesToItems(Collection $pages): array
     {
         return $pages->map(fn (Pageable $page): array => [

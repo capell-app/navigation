@@ -29,11 +29,18 @@ class NavigationItemData extends Data
         $this->children ??= new DataCollection(self::class, []);
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     */
     public static function fromPages(Collection $pages): DataCollection
     {
         return self::collect(self::mapPages($pages), DataCollection::class);
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return Collection<array-key, mixed>
+     */
     private static function mapPages(Collection $pages): Collection
     {
         return $pages->map(fn (Pageable $page): self => new NavigationItemData(

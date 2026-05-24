@@ -56,11 +56,17 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
     protected static ConfiguratorTypeEnumInterface $configuratorType = NavigationConfiguratorTypeEnum::Navigation;
 
+    /**
+     * @return iterable<int, mixed>
+     */
     public static function getExtenders(): iterable
     {
         return app()->tagged(SchemaExtenderEnum::Navigation->value);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function make(Schema $configurator): array
     {
         return match ($configurator->getOperation()) {
@@ -70,6 +76,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         };
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getFormSchema(Schema $configurator): array
     {
         return [
@@ -82,6 +91,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getMainFormSchema(): array
     {
         return [
@@ -110,6 +122,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getSettingsFormSchema(Schema $configurator): array
     {
         return [
@@ -217,6 +232,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             ]);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getCreateOptionFormSchema(Schema $configurator): array
     {
         return [
@@ -228,6 +246,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getEditOptionFormSchema(Schema $configurator): array
     {
         return [
@@ -239,6 +260,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getNavigationItemFields(NavigationItemType $type): array
     {
         return match ($type) {
@@ -248,6 +272,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         };
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getPageNavigationItemFields(): array
     {
         return [
@@ -294,6 +321,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getLinkNavigationItemFields(): array
     {
         return [
@@ -326,6 +356,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getHeadingNavigationItemFields(): array
     {
         return [
@@ -344,6 +377,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getExtraItemFields(): array
     {
         return [
@@ -367,6 +403,10 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         ];
     }
 
+    /**
+     * @param  array<array-key, mixed>  $item
+     * @param  array<array-key, mixed>  $pageCache
+     */
     protected function getItemLabel(array $item, array &$pageCache = []): ?string
     {
         $navigationItem = NavigationItemData::from($item);
@@ -388,6 +428,10 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return null;
     }
 
+    /**
+     * @param  array<array-key, mixed>  $item
+     * @param  array<array-key, mixed>  $pageCache
+     */
     protected function getItemUrl(array $item, Get $get, array &$pageCache = []): ?string
     {
         $navigationItem = NavigationItemData::from($item);
@@ -434,6 +478,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
      * Get a Page model from cache, loading if necessary.
      *
      * @param  array<string, Pageable|null>  $pageCache
+     * @param  array<array-key, mixed>  $data
      */
     private function getCachedPageItem(array $data, array &$pageCache, bool $withUrl = false, ?int $languageId = null, ?int $siteId = null): ?Pageable
     {

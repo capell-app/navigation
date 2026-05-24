@@ -58,6 +58,10 @@ class NavigationCreator
         return $page->name;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @param  array<array-key, mixed>  $items
+     */
     public function footerNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -106,6 +110,10 @@ class NavigationCreator
         return $navigation;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @param  array<array-key, mixed>  $items
+     */
     public function subFooterNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -117,6 +125,9 @@ class NavigationCreator
         return $this->footerNavigation(site: $site, type: $type, language: $language, pages: $pages, items: $items, key: $key);
     }
 
+    /**
+     * @param  array<array-key, mixed>  $additionalItems
+     */
     public function mainNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -193,6 +204,10 @@ class NavigationCreator
         return $navigation;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $items
+     * @return Collection<array-key, mixed>
+     */
     private function backfillMissingPageLabels(Collection $items, Language $language): Collection
     {
         return $items->map(function (array $item) use ($language): array {
