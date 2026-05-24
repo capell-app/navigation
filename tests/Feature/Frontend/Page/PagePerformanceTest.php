@@ -44,7 +44,7 @@ it('loads a large, deeply nested frontend page efficiently', function (): void {
             'site_id' => $site->id,
         ])
         ->forEachSequence(
-            ...collect($languages)->map(fn (Language $language): array => [
+            ...capell_test_collect($languages)->map(fn (Language $language): array => [
                 'language_id' => $language->id,
                 'path' => '/' . Str::lower($language->code),
             ])->all(),
@@ -88,7 +88,7 @@ it('loads a large, deeply nested frontend page efficiently', function (): void {
         ->for($site)
         ->items($site->pages()->with('translation')->get()->toTree())
         ->forEachSequence(
-            ...collect($navigations)->map(fn (NavigationHandle $navigation): array => [
+            ...capell_test_collect($navigations)->map(fn (NavigationHandle $navigation): array => [
                 'key' => $navigation->value,
             ]),
         )
@@ -105,7 +105,7 @@ it('loads a large, deeply nested frontend page efficiently', function (): void {
 
     $durationMs = (microtime(true) - $start) * 1000;
 
-    $queryLog = collect(getTestQueryLog());
+    $queryLog = capell_test_collect(getTestQueryLog());
     $queryCount = $queryLog->count();
 
     $response->assertOk();

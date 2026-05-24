@@ -37,7 +37,7 @@ it('removes a page from all navigations when the page is deleted via the syncer'
 
     $navigation->refresh();
 
-    $containsPage = collect($navigation->items)->contains(
+    $containsPage = capell_test_collect($navigation->items)->contains(
         fn (mixed $item): bool => isset($item->data['pageable_id'])
             && (int) $item->data['pageable_id'] === $page->getKey(),
     );

@@ -37,7 +37,7 @@ it('extracts page dependencies from nested navigation items', function (): void 
         ],
     ]);
 
-    $edges = collect(BuildContentGraphForModelAction::run($navigation)->edges);
+    $edges = capell_test_collect(BuildContentGraphForModelAction::run($navigation)->edges);
 
     expect($edges)->toHaveCount(2)
         ->and($edges->pluck('kind')->unique()->all())->toBe([ContentGraphEdgeKind::LinksToPage])

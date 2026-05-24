@@ -11,7 +11,7 @@ use Capell\Navigation\Models\Navigation;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
- * @method static void run(Site $source, Site $replica, array $replacementPages = [])
+ * @method static void run(Site $source, Site $replica, array<int|string, Pageable> $replacementPages = [])
  */
 class ReplicateSiteNavigationsAction
 {

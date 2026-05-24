@@ -50,9 +50,7 @@ class NavigationFactory extends Factory
     }
 
     /**
-     * @param  array  $items
-     * @param  Collection<array-key, mixed>  $items
-     * @param  array<array-key, mixed>  $items
+     * @param  array<array-key, mixed>|Collection<array-key, mixed>  $items
      */
     public function items(array|Collection $items): self
     {
