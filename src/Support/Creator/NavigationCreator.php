@@ -14,6 +14,7 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Events\NavigationCreating;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -43,13 +44,13 @@ class NavigationCreator
 
         $translation = $page->translations->firstWhere('language_id', $language->id);
 
-        $label = $translation?->label;
+        $label = $translation instanceof Model ? $translation->label : null;
 
         if ($label) {
             return $label;
         }
 
-        $title = $translation?->title;
+        $title = $translation instanceof Model ? $translation->title : null;
 
         if ($title) {
             return $title;

@@ -73,15 +73,13 @@ class DemoCommand extends Command
             $siteOptions = null;
         }
 
-        $sites = Site::query()
+        return Site::query()
             ->with(['language', 'languages', 'translations'])
             ->when(
                 is_array($siteOptions),
                 fn (Builder $query): Builder => $query->whereIn('name', $siteOptions),
             )
             ->get();
-
-        return $sites;
     }
 
     /**
