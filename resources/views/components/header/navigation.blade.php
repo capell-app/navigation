@@ -332,17 +332,9 @@
                 @endforeach
             </ul>
 
-            {!!
-                app(RenderHookRegistry::class)->renderAll(
-                    RenderHookLocation::HeaderAfter,
-                    scenario: 'foundation-theme-header-actions',
-                    target: 'capell-navigation::components.header.navigation',
-                )
-            !!}
-
             @if ($theme->getMeta('dark_mode_toggle'))
                 <div
-                    class="ml-auto grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
+                    class="grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:ml-auto lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
                 >
                     <button
                         type="button"
@@ -382,6 +374,14 @@
                     </button>
                 </div>
             @endif
+
+            {!!
+                app(RenderHookRegistry::class)->renderAll(
+                    RenderHookLocation::HeaderAfter,
+                    scenario: 'foundation-theme-header-actions',
+                    target: 'capell-navigation::components.header.navigation',
+                )
+            !!}
         </nav>
     </div>
 </div>

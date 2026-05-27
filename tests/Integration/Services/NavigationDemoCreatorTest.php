@@ -277,7 +277,7 @@ it('creates main navigation with the home page and eligible top-level pages', fu
             ],
         ])
         ->and($navigationLabels)
-        ->toContain('Home', 'About', 'Services', 'Standalone')
+        ->toBe(['Home', 'Services', 'About', 'Standalone'])
         ->not()->toContain('Draft Section');
 
     $aboutNavigationItem = $navigationItems->firstWhere('label', 'About');

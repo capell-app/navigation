@@ -19,6 +19,16 @@ use Illuminate\Support\Str;
 
 class NavigationDemoCreator
 {
+    /** @var array<string, int> */
+    private const array MainNavigationPriority = [
+        'Services' => 10,
+        'Pricing' => 20,
+        'Projects' => 30,
+        'Blog' => 40,
+        'Resources' => 50,
+        'Contact' => 90,
+    ];
+
     public function setupInitialSiteNavigation(Site $site, Page $home, Page $sitemapPage): void
     {
         /** @var class-string<Blueprint> $typeModel */
@@ -66,8 +76,9 @@ class NavigationDemoCreator
             ->whereNull('parent_id')
             ->notHomePage()
             ->publishedDate()
-            ->limit(6)
-            ->get();
+            ->get()
+            ->sortBy(fn (Page $page): array => $this->mainNavigationSortKey($page, $language))
+            ->take(6);
 
         /** @var class-string<Blueprint> $typeModel */
         $typeModel = Blueprint::class;
@@ -172,6 +183,21 @@ class NavigationDemoCreator
         }
 
         return $items;
+    }
+
+    /** @return array{0: int, 1: string} */
+    private function mainNavigationSortKey(Page $page, Language $language): array
+    {
+        $page->loadMissing([
+            'translations' => fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
+        ]);
+
+        $label = NavigationCreator::getPageNavigationLabel($page, $language);
+
+        return [
+            self::MainNavigationPriority[$label] ?? 60,
+            mb_strtolower($label),
+        ];
     }
 
     /**
