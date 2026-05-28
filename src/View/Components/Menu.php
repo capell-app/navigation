@@ -6,6 +6,7 @@ namespace Capell\Navigation\View\Components;
 
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Language;
+use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Frontend\Facades\Frontend;
@@ -16,6 +17,7 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationLoader;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\Component;
 
 class Menu extends Component
@@ -62,7 +64,7 @@ class Menu extends Component
         $site = $this->site ?? Frontend::site();
         $language = $this->language ?? Frontend::language();
         $page = $this->page ?? Frontend::page();
-        $siteDomain = $this->domain ?? $site->siteDomain ?? $page?->pageUrl?->siteDomain;
+        $siteDomain = $this->domain ?? $this->loadedSiteDomain($site, $page);
 
         if (! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Pageable || ! $siteDomain instanceof SiteDomain) {
             return null;
@@ -81,5 +83,32 @@ class Menu extends Component
             language: $language,
             siteDomain: $siteDomain,
         ));
+    }
+
+    private function loadedSiteDomain(?Site $site, ?Pageable $page): ?SiteDomain
+    {
+        if ($site instanceof Site && $site->relationLoaded('siteDomain') && $site->siteDomain instanceof SiteDomain) {
+            return $site->siteDomain;
+        }
+
+        if ($site instanceof Site && $site->relationLoaded('siteDomains')) {
+            $siteDomain = $site->siteDomains->first();
+
+            if ($siteDomain instanceof SiteDomain) {
+                return $siteDomain;
+            }
+        }
+
+        if (! $page instanceof Model || ! $page->relationLoaded('pageUrl')) {
+            return null;
+        }
+
+        $pageUrl = $page->getRelation('pageUrl');
+
+        if (! $pageUrl instanceof PageUrl || ! $pageUrl->relationLoaded('siteDomain')) {
+            return null;
+        }
+
+        return $pageUrl->siteDomain instanceof SiteDomain ? $pageUrl->siteDomain : null;
     }
 }

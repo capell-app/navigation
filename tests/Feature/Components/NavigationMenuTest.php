@@ -84,6 +84,41 @@ it('lets callers override the package menu landmark label', function (): void {
         ->assertDontSee('aria-label="Footer navigation"', false);
 });
 
+it('resolves a menu domain from preloaded frontend relations without an explicit domain prop', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create()
+        ->load('siteDomains');
+    $currentPage = Page::factory()
+        ->site($site)
+        ->home()
+        ->withTranslations(slug: '/')
+        ->create()
+        ->load('pageUrl.siteDomain');
+
+    Navigation::factory()->create([
+        'key' => 'primary',
+        'site_id' => $site->getKey(),
+        'language_id' => $language->getKey(),
+        'items' => [
+            [
+                'label' => 'Docs',
+                'type' => NavigationItemType::Link->value,
+                'data' => ['url' => '/docs'],
+            ],
+        ],
+    ]);
+
+    $this->blade(
+        '<x-capell-navigation::menu key="primary" :site="$site" :language="$language" :page="$currentPage" />',
+        ['site' => $site, 'language' => $language, 'currentPage' => $currentPage],
+    )
+        ->assertSee('Docs')
+        ->assertSee('href="/docs"', false);
+});
+
 it('renders nothing when the package menu component has no matching context', function (): void {
     $this->blade('<x-capell-navigation::menu key="missing" />')
         ->assertDontSee('<nav', false);
