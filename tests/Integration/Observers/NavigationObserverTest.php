@@ -9,19 +9,19 @@ use Illuminate\Support\Facades\Cache;
 it('flushes navigation names cache on save', function (): void {
     $navigation = Navigation::factory()->create();
 
-    Cache::driver('array')->forever(NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([])), true);
+    Cache::driver('array')->forever(NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([], JSON_THROW_ON_ERROR)), true);
 
     $navigation->name = 'Updated';
     $navigation->save();
 
     $registry = Cache::driver('array')->get('capell-core-cache-keys', []);
-    expect($registry)->not()->toContain(NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([])));
+    expect($registry)->not()->toContain(NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([], JSON_THROW_ON_ERROR)));
 });
 
 it('flushes navigation names cache on delete', function (): void {
     $navigation = Navigation::factory()->create();
 
-    $cacheKey = NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([]));
+    $cacheKey = NavigationCacheEnum::NavigationNames->value . '-null-' . hash('sha256', json_encode([], JSON_THROW_ON_ERROR));
     Cache::driver('array')->forever($cacheKey, true);
 
     $navigation->delete();
