@@ -13,10 +13,12 @@ enum NavigationCacheEnum: string
 
     /**
      * Cache key for navigation name set filtered by site and languages.
+     *
+     * @param  array<array-key, mixed>  $languageIds
      */
     public static function navigationNamesKey(int|string|null $siteId, array $languageIds): string
     {
-        $languageIdsHash = hash('sha256', json_encode($languageIds));
+        $languageIdsHash = hash('sha256', json_encode($languageIds, JSON_THROW_ON_ERROR));
 
         return self::NavigationNames->value . '-' . ($siteId ?? 'null') . '-' . $languageIdsHash;
     }

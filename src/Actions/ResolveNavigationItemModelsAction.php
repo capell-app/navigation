@@ -12,14 +12,14 @@ use Lorisleiva\Actions\Concerns\AsAction;
 use Spatie\LaravelData\DataCollection;
 
 /**
- * @method static Collection<int, Model> run(array|Collection|DataCollection $items)
+ * @method static Collection<int, Model> run(array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed> $items)
  */
 class ResolveNavigationItemModelsAction
 {
     use AsAction;
 
     /**
-     * @param  array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection  $items
+     * @param  array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed>  $items
      * @return Collection<int, Model>
      */
     public function handle(array|Collection|DataCollection $items): Collection
@@ -38,13 +38,13 @@ class ResolveNavigationItemModelsAction
         return collect($pageableIdsByType)
             ->flatMap(function (array $pageableIds, string $pageableType): Collection {
                 if ($pageableIds === []) {
-                    return collect();
+                    return new Collection;
                 }
 
                 $modelClass = Relation::getMorphedModel($pageableType) ?? $pageableType;
 
                 if (! is_string($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
-                    return collect();
+                    return new Collection;
                 }
 
                 /** @var class-string<Model> $modelClass */

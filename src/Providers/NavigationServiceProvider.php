@@ -13,6 +13,7 @@ use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
+use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
@@ -47,7 +48,7 @@ class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
 
-    /** @var WeakMap<RenderHookRegistry, true>|null */
+    /** @var WeakMap<RenderHookRegistry<RenderHookContext>, true>|null */
     private ?WeakMap $frontendRenderHookRegistries = null;
 
     #[Override]
@@ -85,7 +86,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerEventListeners();
     }
 
-    private function isPackageInstalled(): bool
+    protected function isPackageInstalled(): bool
     {
         return CapellCore::isPackageInstalled(static::$packageName);
     }
@@ -186,6 +187,7 @@ class NavigationServiceProvider extends ServiceProvider
         return $this;
     }
 
+    /** @param RenderHookRegistry<RenderHookContext> $registry */
     private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
     {
         if (! $this->isPackageInstalled()) {

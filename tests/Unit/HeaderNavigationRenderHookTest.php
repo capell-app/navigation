@@ -46,6 +46,7 @@ it('owns accessible header menu controls in the navigation package', function ()
         ->and($navigation)->toContain(": isClosingMenu\n                      ? 'max-lg:!visible max-lg:translate-x-[-100%]'")
         ->and($navigation)->toContain('x-on:keydown.tab="trapFocus($event)"')
         ->and($navigation)->toContain('capell-navigation-menu-open-changed')
+        ->and($navigation)->toContain('x-bind:aria-label=')
         ->and($navigation)->not->toContain("\$refs.toggleMenu.setAttribute('aria-expanded', 'true')");
 });
 

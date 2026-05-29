@@ -244,7 +244,7 @@
 >
     @if ($usesAlpine)
         <div
-            class="absolute right-4 top-[max(2vh,14px)] z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden"
+            class="absolute top-[max(2vh,14px)] right-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden"
         >
             <button
                 type="button"
@@ -291,7 +291,7 @@
             x-ref="menuPanel"
             aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
             @class([
-                'navbar left-0 top-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-y-auto overflow-x-hidden border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
+                'navbar top-0 left-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
                 'max-lg:invisible max-lg:absolute' => $usesAlpine,
                 'visible static max-w-none' => ! $usesAlpine,
             ])
@@ -332,29 +332,27 @@
                 @endforeach
             </ul>
 
-            {!!
-                app(RenderHookRegistry::class)->renderAll(
-                    RenderHookLocation::HeaderAfter,
-                    scenario: 'foundation-theme-header-actions',
-                    target: 'capell-navigation::components.header.navigation',
-                )
-            !!}
-
             @if ($theme->getMeta('dark_mode_toggle'))
                 <div
-                    class="ml-auto grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
+                    class="grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:ml-auto lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
                 >
                     <button
+                        type="button"
                         class="hover:text-primary flex h-auto w-full cursor-pointer justify-between rounded-lg border border-gray-100 px-3 py-3 lg:h-10 lg:w-10 lg:items-center lg:justify-center lg:rounded-full lg:p-0 dark:border-gray-600"
+                        aria-label="{{ __('capell-frontend::generic.dark_mode') }}"
                         @if ($usesAlpine)
                             x-on:click="toggleDarkMode"
+                            x-bind:aria-label="
+                                isDarkMode
+                                    ? '{{ __('capell-frontend::generic.light_mode') }}'
+                                    : '{{ __('capell-frontend::generic.dark_mode') }}'
+                            "
                             x-bind:title="
                                 isDarkMode
                                     ? '{{ __('capell-frontend::generic.dark_mode') }}'
                                     : '{{ __('capell-frontend::generic.light_mode') }}'
                             "
                         @endif
-                        tabindex="0"
                     >
                         <span
                             class="lg:hidden"
@@ -376,6 +374,14 @@
                     </button>
                 </div>
             @endif
+
+            {!!
+                app(RenderHookRegistry::class)->renderAll(
+                    RenderHookLocation::HeaderAfter,
+                    scenario: 'foundation-theme-header-actions',
+                    target: 'capell-navigation::components.header.navigation',
+                )
+            !!}
         </nav>
     </div>
 </div>

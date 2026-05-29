@@ -17,6 +17,7 @@ final class RegisterFoundationHeaderNavigationHook
 
     private const string Target = 'capell::header.index';
 
+    /** @param RenderHookRegistry<RenderHookContext> $registry */
     public function __construct(private readonly RenderHookRegistry $registry) {}
 
     public function register(): void

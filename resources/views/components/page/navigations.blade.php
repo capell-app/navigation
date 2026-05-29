@@ -12,7 +12,7 @@
 
 <div class="capell-page-navigations">
     @if ($navigations->isNotEmpty())
-        <h3 class="mb-2 text-lg font-semibold leading-tight">
+        <h3 class="mb-2 text-lg leading-tight font-semibold">
             {{ __('capell-admin::generic.page_navigations') }}
         </h3>
         <div

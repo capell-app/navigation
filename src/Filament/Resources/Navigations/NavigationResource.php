@@ -163,11 +163,15 @@ class NavigationResource extends Resource
         return $pages;
     }
 
+    /**
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
+     */
     private static function applySiteScope(Builder $query): Builder
     {
         $actor = auth()->user();
 
-        if (! $actor instanceof Authenticatable || SiteScope::isGlobalActor($actor) || ! method_exists($actor, 'getAssignedSiteIds')) {
+        if (! $actor instanceof Authenticatable || SiteScope::isGlobalActor($actor)) {
             return $query;
         }
 

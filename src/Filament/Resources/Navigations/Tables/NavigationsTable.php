@@ -72,6 +72,9 @@ class NavigationsTable implements TableConfigurator
             ]);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected static function getTableColumns(): array
     {
         return [
@@ -79,7 +82,7 @@ class NavigationsTable implements TableConfigurator
             NameColumn::make('name')
                 ->searchable()
                 ->sortable()
-                ->description(fn (Navigation $record): ?string => $record->key),
+                ->description(fn (Navigation $record): string => $record->key),
             NavigationItemsColumn::make('items'),
             TextColumn::make('items_count')
                 ->label(__('capell-admin::table.total_items'))
@@ -106,6 +109,9 @@ class NavigationsTable implements TableConfigurator
         ];
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected static function getTableFilters(): array
     {
         return [

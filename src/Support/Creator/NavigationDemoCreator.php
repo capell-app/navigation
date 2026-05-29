@@ -19,6 +19,16 @@ use Illuminate\Support\Str;
 
 class NavigationDemoCreator
 {
+    /** @var array<string, int> */
+    private const array MainNavigationPriority = [
+        'Services' => 10,
+        'Pricing' => 20,
+        'Projects' => 30,
+        'Blog' => 40,
+        'Resources' => 50,
+        'Contact' => 90,
+    ];
+
     public function setupInitialSiteNavigation(Site $site, Page $home, Page $sitemapPage): void
     {
         /** @var class-string<Blueprint> $typeModel */
@@ -44,7 +54,13 @@ class NavigationDemoCreator
     {
         Site::query()->with(['related', 'related.translation'])->get()
             ->each(function (Site $site): void {
-                $this->updateSubFooterNavigation($site, $site->related);
+                $relatedSites = $site->getRelationValue('related');
+
+                if (! $relatedSites instanceof SupportCollection) {
+                    return;
+                }
+
+                $this->updateSubFooterNavigation($site, $relatedSites);
             });
     }
 
@@ -60,8 +76,9 @@ class NavigationDemoCreator
             ->whereNull('parent_id')
             ->notHomePage()
             ->publishedDate()
-            ->limit(6)
-            ->get();
+            ->get()
+            ->sortBy(fn (Page $page): array => $this->mainNavigationSortKey($page, $language))
+            ->take(6);
 
         /** @var class-string<Blueprint> $typeModel */
         $typeModel = Blueprint::class;
@@ -94,6 +111,8 @@ class NavigationDemoCreator
             ->limit(8)
             ->get()
             ->toTree();
+
+        $pages = $pages instanceof SupportCollection ? $pages : new SupportCollection($pages);
 
         /** @var class-string<Blueprint> $typeModel */
         $typeModel = Blueprint::class;
@@ -138,6 +157,10 @@ class NavigationDemoCreator
             ));
     }
 
+    /**
+     * @param  SupportCollection<array-key, mixed>  $pages
+     * @return array<array-key, mixed>
+     */
     private function buildNavigationPageItems(SupportCollection $pages, Language $language): array
     {
         $this->loadPageTranslations($pages, $language);
@@ -162,6 +185,24 @@ class NavigationDemoCreator
         return $items;
     }
 
+    /** @return array{0: int, 1: string} */
+    private function mainNavigationSortKey(Page $page, Language $language): array
+    {
+        $page->loadMissing([
+            'translations' => fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
+        ]);
+
+        $label = NavigationCreator::getPageNavigationLabel($page, $language);
+
+        return [
+            self::MainNavigationPriority[$label] ?? 60,
+            mb_strtolower($label),
+        ];
+    }
+
+    /**
+     * @param  SupportCollection<array-key, mixed>  $pages
+     */
     private function loadPageTranslations(SupportCollection $pages, Language $language): void
     {
         if ($pages instanceof Collection) {

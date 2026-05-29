@@ -14,6 +14,7 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Events\NavigationCreating;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -43,13 +44,13 @@ class NavigationCreator
 
         $translation = $page->translations->firstWhere('language_id', $language->id);
 
-        $label = $translation?->label;
+        $label = $translation instanceof Model ? $translation->label : null;
 
         if ($label) {
             return $label;
         }
 
-        $title = $translation?->title;
+        $title = $translation instanceof Model ? $translation->title : null;
 
         if ($title) {
             return $title;
@@ -58,6 +59,10 @@ class NavigationCreator
         return $page->name;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @param  array<array-key, mixed>  $items
+     */
     public function footerNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -106,6 +111,10 @@ class NavigationCreator
         return $navigation;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @param  array<array-key, mixed>  $items
+     */
     public function subFooterNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -117,6 +126,9 @@ class NavigationCreator
         return $this->footerNavigation(site: $site, type: $type, language: $language, pages: $pages, items: $items, key: $key);
     }
 
+    /**
+     * @param  array<array-key, mixed>  $additionalItems
+     */
     public function mainNavigation(
         Site $site,
         ?Blueprint $type = null,
@@ -134,16 +146,18 @@ class NavigationCreator
         $items = collect($navigation->items);
         $items = $this->backfillMissingPageLabels($items, $language);
 
-        $homePageExists = $items->first(
-            fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
-                && (int) $candidate['data']['pageable_id'] === $home->getKey()
-                && $candidate['data']['pageable_type'] === $home->getMorphClass(),
-        );
+        $homePageExists = $home instanceof Page
+            ? $items->first(
+                fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
+                    && (int) $candidate['data']['pageable_id'] === $home->getKey()
+                    && $candidate['data']['pageable_type'] === $home->getMorphClass(),
+            )
+            : null;
 
         if ($home instanceof Page && $homePageExists === null) {
             $items->prepend(
                 [
-                    'label' => self::getPageNavigationLabel($home, $language) ?? __('capell::generic.home'),
+                    'label' => self::getPageNavigationLabel($home, $language),
                     'type' => NavigationItemType::Page->value,
                     'data' => [
                         'site_id' => $home->site_id,
@@ -193,6 +207,10 @@ class NavigationCreator
         return $navigation;
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $items
+     * @return Collection<array-key, mixed>
+     */
     private function backfillMissingPageLabels(Collection $items, Language $language): Collection
     {
         return $items->map(function (array $item) use ($language): array {

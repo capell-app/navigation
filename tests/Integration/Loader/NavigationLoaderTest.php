@@ -14,7 +14,7 @@ it('loads navigation by key for a site', function (): void {
 
     $nav = NavigationLoader::getNavigation(NavigationHandle::Main, $site, $site->language, true);
 
-    expect(! $nav instanceof Navigation || $nav instanceof Navigation)->toBeTrue();
+    expect($nav)->toBeNull();
 });
 
 it('falls back to current site navigation before global navigation', function (): void {

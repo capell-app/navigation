@@ -10,6 +10,18 @@ Navigation owns editor-managed menus and renders structured navigation data for 
 - Service providers: `packages/navigation/src/Providers/NavigationServiceProvider.php`
 - Capell dependencies: `capell-app/admin`, `capell-app/frontend`
 
+## Why It Helps Your Capell Workflow
+
+- Adds site and language scoped navigation trees so editors can manage menus without editing theme code.
+- Keeps page navigation fields, sync actions, and frontend loaders together for predictable theme rendering.
+- Helps developers connect themes to editor-managed menus through package-owned loaders instead of direct page queries in Blade.
+
+## Best Used With
+
+- [Foundation Theme](../foundation-theme/README.md)
+- [Layout Builder](../layout-builder/README.md)
+- [Frontend Authoring](../frontend-authoring/README.md)
+
 ## What It Adds
 
 Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.
@@ -132,6 +144,7 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 
 ## Docs
 
+- [docs index](docs/README.md)
 - [credits-and-acknowledgements.md](docs/credits-and-acknowledgements.md)
 - [overview.md](docs/overview.md)
 - [rendering-and-sync.md](docs/rendering-and-sync.md)

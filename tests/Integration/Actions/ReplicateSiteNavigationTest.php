@@ -41,30 +41,30 @@ it('replicates a site with navigations and pages', function (): void {
         'copy_navigations' => true,
     ]);
 
-    expect($clone)->toBeInstanceOf(Site::class)
+    capell_expect($clone)->toBeInstanceOf(Site::class)
         ->and($clone->id)->not()->toBe($site->id)
         ->and($clone->name)->toContain('Original');
 
     $clonedNavigations = $clone->navigations;
     $clonedPages = $clone->pages;
 
-    expect($clonedNavigations)->toHaveCount(1)
-        ->and($clonedNavigations->first())->not()->toBeNull()
-        ->and($clonedNavigations->first()->site_id)->toBe($clone->id);
+    capell_expect($clonedNavigations)->toHaveCount(1);
+    capell_expect($clonedNavigations->first())->not()->toBeNull();
+    capell_expect($clonedNavigations->first()?->site_id)->toBe($clone->id);
 
-    expect($clonedPages)->toHaveCount(1)
+    capell_expect($clonedPages)->toHaveCount(1)
         ->and($clonedPages->first())->not()->toBeNull();
 
     if ($clonedPages->first() !== null) {
-        expect($clonedPages->first()->site_id)->toBe($clone->id);
+        capell_expect($clonedPages->first()->site_id)->toBe($clone->id);
     }
 
     $originalItem = $navigation->items[0];
     $clonedItem = $clonedNavigations->first()->items[0];
 
-    expect($clonedItem->type)->toBe($originalItem->type)
+    capell_expect($clonedItem->type)->toBe($originalItem->type)
         ->and($clonedItem->data['label'])->toBe('Page Link')
-        ->and($clonedItem->data['pageable_id'])->toBe($clonedPages->first()?->id ?? null);
+        ->and($clonedItem->data['pageable_id'])->toBe($clonedPages->first()->id ?? null);
 });
 
 it('replicates only navigations when setup pages is used', function (): void {
@@ -85,13 +85,13 @@ it('replicates only navigations when setup pages is used', function (): void {
         ],
     );
 
-    expect($clone)->toBeInstanceOf(Site::class)
-        ->and($clone->id)->not()->toBe($site->id);
+    capell_expect($clone)->toBeInstanceOf(Site::class);
+    capell_expect($clone->id)->not()->toBe($site->id);
 
-    expect($clone->navigations)->toHaveCount(1)
-        ->and($clone->navigations->first()->site_id)->toBe($clone->id);
+    capell_expect($clone->navigations)->toHaveCount(1);
+    capell_expect($clone->navigations->first()?->site_id)->toBe($clone->id);
 
-    expect($clone->pages)->not()->toBeEmpty();
+    capell_expect($clone->pages)->not()->toBeEmpty();
 });
 
 it('does not copy navigations when disabled', function (): void {
@@ -103,5 +103,5 @@ it('does not copy navigations when disabled', function (): void {
         'copy_navigations' => false,
     ]);
 
-    expect($clone->navigations)->toBeEmpty();
+    capell_expect($clone->navigations)->toBeEmpty();
 });

@@ -13,6 +13,7 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class NavigationLoader
 {
@@ -21,7 +22,11 @@ class NavigationLoader
         $navigationKey = $key instanceof NavigationHandle ? $key->value : $key;
         $navigations = $site->relationLoaded('navigations')
             ? $site->navigations->filter(
-                fn (Navigation $navigation): bool => ! $navigation->isPending() && ! $navigation->isExpired(),
+                function (Model $navigation): bool {
+                    throw_unless($navigation instanceof Navigation);
+
+                    return ! $navigation->isPending() && ! $navigation->isExpired();
+                },
             )
             : new Collection;
 

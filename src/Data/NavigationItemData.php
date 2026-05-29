@@ -15,7 +15,7 @@ class NavigationItemData extends Data
 {
     /**
      * @param  array<string, mixed>  $data
-     * @param  DataCollection<int, NavigationItemData>|null  $children
+     * @param  DataCollection<int|string, NavigationItemData>|null  $children
      */
     public function __construct(
         public ?string $label = null,
@@ -29,11 +29,19 @@ class NavigationItemData extends Data
         $this->children ??= new DataCollection(self::class, []);
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return DataCollection<int|string, NavigationItemData>
+     */
     public static function fromPages(Collection $pages): DataCollection
     {
-        return self::collect(self::mapPages($pages), DataCollection::class);
+        return new DataCollection(self::class, self::mapPages($pages)->values()->all());
     }
 
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return Collection<array-key, mixed>
+     */
     private static function mapPages(Collection $pages): Collection
     {
         return $pages->map(fn (Pageable $page): self => new NavigationItemData(

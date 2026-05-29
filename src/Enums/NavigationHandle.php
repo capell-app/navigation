@@ -14,9 +14,12 @@ enum NavigationHandle: string implements HasLabel
 
     case SubFooter = 'sub-footer';
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public static function getValues(): array
     {
-        return array_values(self::cases());
+        return self::cases();
     }
 
     public function getLabel(): string

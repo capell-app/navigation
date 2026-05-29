@@ -38,7 +38,7 @@ class NavigationObserver
 
     private function clearCache(Navigation $navigation): void
     {
-        CapellCoreHelper::flushCache([NavigationCacheEnum::NavigationNames]);
+        CapellCoreHelper::flushCache([NavigationCacheEnum::NavigationNames->value]);
 
         CapellCore::removeCacheKey(FrontendCacheEnum::Navigations->value);
         CapellCore::removeCacheKey(FrontendCacheEnum::navigationById((int) $navigation->getKey()));

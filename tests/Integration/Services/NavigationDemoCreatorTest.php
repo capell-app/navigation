@@ -36,7 +36,7 @@ it('sets up main, footer, and sub-footer navigation', function (): void {
     $homePage = Page::factory()
         ->site($site)
         ->type($homePageType)
-        ->withTranslations(collect([$language]), [
+        ->withTranslations(capell_test_collect([$language]), [
             'title' => 'Home',
             'label' => 'Home',
         ])
@@ -84,7 +84,7 @@ it('merges generated footer items into an existing navigation with persisted ite
     $parentPage = Page::factory()
         ->site($site)
         ->type($defaultPageType)
-        ->withTranslations(collect([$language]), [
+        ->withTranslations(capell_test_collect([$language]), [
             'title' => 'About',
             'label' => 'About',
         ])
@@ -97,7 +97,7 @@ it('merges generated footer items into an existing navigation with persisted ite
         ->site($site)
         ->type($defaultPageType)
         ->parent($parentPage)
-        ->withTranslations(collect([$language]), [
+        ->withTranslations(capell_test_collect([$language]), [
             'title' => 'Team',
             'label' => 'Team',
         ])
@@ -135,7 +135,7 @@ it('merges generated footer items into an existing navigation with persisted ite
     expect($navigation)->toBeInstanceOf(Navigation::class)
         ->and($navigation->items)->not()->toBeNull();
 
-    $navigationItems = collect($navigation->items?->toArray())->values();
+    $navigationItems = capell_test_collect($navigation->items?->toArray())->values();
     $navigationLabels = $navigationItems->pluck('label')->all();
 
     expect($navigationItems)->toHaveCount(2)
@@ -196,7 +196,7 @@ it('creates main navigation with the home page and eligible top-level pages', fu
         }
 
         return $pageFactory->withTranslations(
-            collect([$language]),
+            capell_test_collect([$language]),
             [
                 'title' => $name,
                 'label' => $name,
@@ -212,7 +212,7 @@ it('creates main navigation with the home page and eligible top-level pages', fu
     $home = Page::factory()
         ->site($site)
         ->type($homePageType)
-        ->withTranslations(collect([$language]), [
+        ->withTranslations(capell_test_collect([$language]), [
             'title' => 'Home',
             'label' => 'Home',
         ])
@@ -232,7 +232,7 @@ it('creates main navigation with the home page and eligible top-level pages', fu
     $draftPage = Page::factory()
         ->site($site)
         ->type($defaultPageType)
-        ->withTranslations(collect([$language]), [
+        ->withTranslations(capell_test_collect([$language]), [
             'title' => 'Draft Section',
             'label' => 'Draft Section',
         ])
@@ -260,7 +260,7 @@ it('creates main navigation with the home page and eligible top-level pages', fu
     expect($navigation)->toBeInstanceOf(Navigation::class)
         ->and($navigation->items)->not()->toBeNull();
 
-    $navigationItems = collect($navigation->items?->toArray())->values();
+    $navigationItems = capell_test_collect($navigation->items?->toArray())->values();
     $navigationLabels = $navigationItems->pluck('label')->all();
 
     expect($navigationItems)->toHaveCount(4)
@@ -277,16 +277,16 @@ it('creates main navigation with the home page and eligible top-level pages', fu
             ],
         ])
         ->and($navigationLabels)
-        ->toContain('Home', 'About', 'Services', 'Standalone')
+        ->toBe(['Home', 'Services', 'About', 'Standalone'])
         ->not()->toContain('Draft Section');
 
     $aboutNavigationItem = $navigationItems->firstWhere('label', 'About');
     $servicesNavigationItem = $navigationItems->firstWhere('label', 'Services');
 
     expect($aboutNavigationItem)->not()->toBeNull()
-        ->and(collect($aboutNavigationItem['children'])->values()->pluck('label')->all())
+        ->and(capell_test_collect($aboutNavigationItem['children'])->values()->pluck('label')->all())
         ->toContain('Team')
         ->and($servicesNavigationItem)->not()->toBeNull()
-        ->and(collect($servicesNavigationItem['children'])->values()->pluck('label')->all())
+        ->and(capell_test_collect($servicesNavigationItem['children'])->values()->pluck('label')->all())
         ->toContain('Consulting');
 });
