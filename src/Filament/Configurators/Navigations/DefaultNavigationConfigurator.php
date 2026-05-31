@@ -214,11 +214,18 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                             ->options(NavigationItemType::class)
                             ->default(NavigationItemType::Page->value)
                             ->afterStateUpdated(
-                                fn (ToggleButtons $component): Schema => $component
-                                    ->getRootContainer()
-                                    ->getComponent($navigationFieldsKey)
-                                    ->getChildSchema()
-                                    ->fill(),
+                                function (ToggleButtons $component) use ($navigationFieldsKey): ?Schema {
+                                    $typeFields = $component->getRootContainer()->getComponent($navigationFieldsKey);
+
+                                    if (! $typeFields instanceof Grid) {
+                                        return null;
+                                    }
+
+                                    $schema = $typeFields->getChildSchema();
+                                    $schema?->fill();
+
+                                    return $schema;
+                                },
                             ),
                         $this->getLabelField(),
                         Checkbox::make('is_visible')
@@ -563,9 +570,15 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             ->requiredIf('type', NavigationItemType::Link->value)
             ->requiredIf('type', NavigationItemType::Heading->value)
             ->helperText(
-                fn (Get $get): ?string => $get('type') === NavigationItemType::Link->value
-                    ? __('capell-admin::generic.navigation_page_label_info')
-                    : null,
+                function (Get $get): ?string {
+                    if ($get('type') !== NavigationItemType::Link->value) {
+                        return null;
+                    }
+
+                    $text = __('capell-admin::generic.navigation_page_label_info');
+
+                    return is_string($text) ? $text : null;
+                },
             );
     }
 }

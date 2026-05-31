@@ -11,6 +11,7 @@ use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsObject;
+use Spatie\LaravelData\DataCollection;
 
 /**
  * @method static void run(Pageable $page, Navigation $navigation, ?string $label = null)
@@ -40,7 +41,7 @@ class AddPageToNavigationAction
                 return;
             }
 
-            $items = $lockedNavigation->items?->toArray() ?? [];
+            $items = $this->navigationItemsArray($lockedNavigation);
 
             $items[(string) Str::uuid()] = [
                 'label' => $label,
@@ -59,7 +60,31 @@ class AddPageToNavigationAction
 
     private function pageExistsInNavigation(Navigation $navigation, Pageable $page): bool
     {
-        return $this->itemsContainPage($navigation->items?->toCollection() ?? [], $page);
+        return $this->itemsContainPage($this->navigationItemsIterable($navigation), $page);
+    }
+
+    /**
+     * @return array<int|string, mixed>
+     */
+    private function navigationItemsArray(Navigation $navigation): array
+    {
+        if ($navigation->items instanceof DataCollection) {
+            return $navigation->items->toArray();
+        }
+
+        return is_array($navigation->items) ? $navigation->items : [];
+    }
+
+    /**
+     * @return iterable<array-key, array<string, mixed>|NavigationItemData>
+     */
+    private function navigationItemsIterable(Navigation $navigation): iterable
+    {
+        if ($navigation->items instanceof DataCollection) {
+            return $navigation->items->toCollection();
+        }
+
+        return is_array($navigation->items) ? $navigation->items : [];
     }
 
     /**

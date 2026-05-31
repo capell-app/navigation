@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Query log for test assertions.
  *
- * @var array<int, array<array-key, mixed>>
+ * @var list<array{query: string, bindings: array<int, mixed>, time: float, trace: Collection<int, string>}>
  */
 static $testQueryLog = [];
 
@@ -32,7 +32,7 @@ function setupQueryLogging(): void
 }
 
 /**
- * @return array<array-key, mixed>
+ * @return list<array{query: string, bindings: array<int, mixed>, time: float, trace: Collection<int, string>}>
  */
 function getTestQueryLog(): array
 {
@@ -47,10 +47,13 @@ function clearTestQueryLog(): void
     $testQueryLog = [];
 }
 
-/**
- * @param  array{query:string, bindings:array<int, mixed>, time:float, trace:Collection<int, string>}  $queryEntry
- */
+/** @param array<array-key, mixed> $queryEntry */
 function buildQuerySignature(array $queryEntry): string
 {
-    return $queryEntry['query'] . '|' . serialize($queryEntry['bindings']);
+    $query = $queryEntry['query'] ?? null;
+    $bindings = $queryEntry['bindings'] ?? null;
+
+    throw_if(! is_string($query) || ! is_array($bindings), RuntimeException::class, 'Expected query log entry to contain query text and bindings.');
+
+    return $query . '|' . serialize($bindings);
 }

@@ -178,7 +178,7 @@ class NavigationsTable implements TableConfigurator
 
                         $indicators['site_id'] = __(
                             'capell-admin::filter.site',
-                            ['search' => $model::query()->find($data['site_id'], 'name')?->name],
+                            ['search' => $model::query()->find((int) $data['site_id'], ['name'])?->name],
                         );
                     }
 
@@ -188,7 +188,7 @@ class NavigationsTable implements TableConfigurator
 
                         $indicators['language_id'] = __(
                             'capell-admin::filter.language',
-                            ['search' => $model::query()->find($data['language_id'], 'name')?->name],
+                            ['search' => $model::query()->find((int) $data['language_id'], ['name'])?->name],
                         );
                     }
 

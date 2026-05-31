@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\Creator;
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
@@ -148,10 +149,15 @@ class NavigationDemoCreator
             ->each(fn (Navigation $navigation) => $relatedSites->each(
                 function (Site $relatedSite) use ($navigation): void {
                     $homepage = Page::getSiteHomePage($relatedSite);
+
+                    if (! $homepage instanceof Pageable) {
+                        return;
+                    }
+
                     AddPageToNavigationAction::run(
                         page: $homepage,
                         navigation: $navigation,
-                        label: $relatedSite->translation->label,
+                        label: (string) ($relatedSite->translation->label ?? $relatedSite->name),
                     );
                 },
             ));

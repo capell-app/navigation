@@ -44,15 +44,20 @@ class NavigationItemData extends Data
      */
     private static function mapPages(Collection $pages): Collection
     {
-        return $pages->map(fn (Pageable $page): self => new NavigationItemData(
-            label: $page->translation->label,
-            type: NavigationItemType::Page,
-            data: [
-                'url' => $page->pageUrl->full_url,
-                'pageable_id' => $page->getKey(),
-                'pageable_type' => $page->getMorphClass(),
-            ],
-            children: self::fromPages($page->children),
-        ));
+        return $pages->map(function (Pageable $page): self {
+            $translation = $page->translation;
+            $pageUrl = $page->pageUrl;
+
+            return new NavigationItemData(
+                label: $translation->label ?? $page->name,
+                type: NavigationItemType::Page,
+                data: [
+                    'url' => $pageUrl->full_url ?? '#',
+                    'pageable_id' => $page->getKey(),
+                    'pageable_type' => $page->getMorphClass(),
+                ],
+                children: self::fromPages($page->children),
+            );
+        });
     }
 }

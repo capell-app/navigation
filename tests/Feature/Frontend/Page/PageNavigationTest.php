@@ -17,6 +17,15 @@ use function Pest\Laravel\get;
 
 uses(TestingFrontend::class);
 
+function navigationFeaturePageUrl(Page $page): string
+{
+    $pageUrl = $page->pageUrl;
+
+    throw_if($pageUrl === null, RuntimeException::class, 'Expected page URL for navigation feature assertion.');
+
+    return $pageUrl->full_url;
+}
+
 beforeEach(function (): void {
     registerThemedHeaderComponentForRendering();
 });
@@ -36,7 +45,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
 
     [$page] = createFrontendPageWithMainNavigation($theme);
 
-    get($page->pageUrl->full_url)
+    get(navigationFeaturePageUrl($page))
         ->assertOk()
         ->assertSee('id="main-menu"', false)
         ->assertSee('aria-label="Main navigation"', false)
@@ -61,7 +70,7 @@ test('themed header displays the main navigation menu', function (): void {
 
     [$page] = createFrontendPageWithMainNavigation($theme);
 
-    get($page->pageUrl->full_url)
+    get(navigationFeaturePageUrl($page))
         ->assertOk()
         ->assertSee('id="main-menu"', false)
         ->assertSee('aria-label="Main navigation"', false)

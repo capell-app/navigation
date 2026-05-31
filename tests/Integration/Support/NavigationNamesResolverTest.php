@@ -2,23 +2,21 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Models\Blueprint;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Site;
 use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Support\NavigationNamesResolver;
 use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Factory;
 
 test('resolves navigation names for site and languages', function (): void {
-    // Insert Type
-    $typeId = $this->connection()->table('blueprints')->insertGetId([
-        'key' => 'navigation',
-        'name' => 'Navigation',
-        'type' => 'navigation',
-    ]);
+    [$siteId, $typeId, $languageId] = navigationResolverFixture();
+    $secondLanguage = Language::factory()->french()->create();
 
-    // Insert Navigations
     $nav1Id = $this->connection()->table('navigations')->insertGetId([
-        'site_id' => 1,
-        'language_id' => 1,
+        'site_id' => $siteId,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'main-menu',
         'name' => 'Main Menu',
@@ -28,8 +26,8 @@ test('resolves navigation names for site and languages', function (): void {
     ]);
 
     $nav2Id = $this->connection()->table('navigations')->insertGetId([
-        'site_id' => 1,
-        'language_id' => 2,
+        'site_id' => $siteId,
+        'language_id' => $secondLanguage->getKey(),
         'blueprint_id' => $typeId,
         'key' => 'footer-menu',
         'name' => 'Footer Menu',
@@ -41,7 +39,7 @@ test('resolves navigation names for site and languages', function (): void {
     /** @var Repository $cache */
     $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
-    $result = $resolver->resolve(1, [1, 2]);
+    $result = $resolver->resolve($siteId, [$languageId, (int) $secondLanguage->getKey()]);
 
     $this->assertArrayHasKey($nav1Id, $result);
     $this->assertArrayHasKey($nav2Id, $result);
@@ -50,16 +48,11 @@ test('resolves navigation names for site and languages', function (): void {
 });
 
 test('caches result with correct key', function (): void {
-    // Insert Type
-    $typeId = $this->connection()->table('blueprints')->insertGetId([
-        'key' => 'navigation',
-        'name' => 'Navigation',
-        'type' => 'navigation',
-    ]);
+    [$siteId, $typeId, $languageId] = navigationResolverFixture();
 
     $this->connection()->table('navigations')->insert([
-        'site_id' => 1,
-        'language_id' => 1,
+        'site_id' => $siteId,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'cache-test',
         'name' => 'Cache Test',
@@ -71,24 +64,19 @@ test('caches result with correct key', function (): void {
     /** @var Repository $cache */
     $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
-    $cacheKey = NavigationCacheEnum::navigationNamesKey(1, [1]);
+    $cacheKey = NavigationCacheEnum::navigationNamesKey($siteId, [$languageId]);
 
-    $resolver->resolve(1, [1]);
+    $resolver->resolve($siteId, [$languageId]);
 
     $this->assertNotNull($cache->get($cacheKey));
 });
 
 test('includes navigations with null site id', function (): void {
-    // Insert Type
-    $typeId = $this->connection()->table('blueprints')->insertGetId([
-        'key' => 'navigation',
-        'name' => 'Navigation',
-        'type' => 'navigation',
-    ]);
+    [$siteId, $typeId, $languageId] = navigationResolverFixture();
 
     $this->connection()->table('navigations')->insert([
         'site_id' => null,
-        'language_id' => 1,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'global',
         'name' => 'Global Menu',
@@ -98,8 +86,8 @@ test('includes navigations with null site id', function (): void {
     ]);
 
     $this->connection()->table('navigations')->insert([
-        'site_id' => 1,
-        'language_id' => 1,
+        'site_id' => $siteId,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'site',
         'name' => 'Site Menu',
@@ -111,22 +99,17 @@ test('includes navigations with null site id', function (): void {
     /** @var Repository $cache */
     $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
-    $result = $resolver->resolve(1, [1]);
+    $result = $resolver->resolve($siteId, [$languageId]);
 
     $this->assertCount(2, $result);
 });
 
 test('handles string site id', function (): void {
-    // Insert Type
-    $typeId = $this->connection()->table('blueprints')->insertGetId([
-        'key' => 'navigation',
-        'name' => 'Navigation',
-        'type' => 'navigation',
-    ]);
+    [$siteId, $typeId, $languageId] = navigationResolverFixture();
 
     $this->connection()->table('navigations')->insert([
-        'site_id' => 1,
-        'language_id' => 1,
+        'site_id' => $siteId,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'string-test',
         'name' => 'Menu',
@@ -138,22 +121,17 @@ test('handles string site id', function (): void {
     /** @var Repository $cache */
     $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
-    $result = $resolver->resolve('1', [1]);
+    $result = $resolver->resolve((string) $siteId, [$languageId]);
 
     $this->assertCount(1, $result);
 });
 
 test('returns id name mapping', function (): void {
-    // Insert Type
-    $typeId = $this->connection()->table('blueprints')->insertGetId([
-        'key' => 'navigation',
-        'name' => 'Navigation',
-        'type' => 'navigation',
-    ]);
+    [$siteId, $typeId, $languageId] = navigationResolverFixture();
 
     $navId = $this->connection()->table('navigations')->insertGetId([
-        'site_id' => 1,
-        'language_id' => 1,
+        'site_id' => $siteId,
+        'language_id' => $languageId,
         'blueprint_id' => $typeId,
         'key' => 'test',
         'name' => 'Test Menu',
@@ -165,9 +143,25 @@ test('returns id name mapping', function (): void {
     /** @var Repository $cache */
     $cache = resolve(Factory::class)->store();
     $resolver = new NavigationNamesResolver($cache);
-    $result = $resolver->resolve(1, [1]);
+    $result = $resolver->resolve($siteId, [$languageId]);
 
     $this->assertIsArray($result);
     $this->assertArrayHasKey($navId, $result);
     $this->assertEquals('Test Menu', $result[$navId]);
 });
+
+/**
+ * @return array{int, int, int}
+ */
+function navigationResolverFixture(): array
+{
+    $language = Language::factory()->english()->create();
+    $site = Site::factory()->language($language)->create();
+    $type = Blueprint::query()->create([
+        'key' => 'navigation',
+        'name' => 'Navigation',
+        'type' => 'navigation',
+    ]);
+
+    return [(int) $site->getKey(), (int) $type->getKey(), (int) $language->getKey()];
+}

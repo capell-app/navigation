@@ -6,6 +6,7 @@ use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\CreateNavigation;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\EditNavigation;
@@ -15,6 +16,8 @@ use Filament\Actions\Testing\TestAction;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
+
+use Spatie\LaravelData\DataCollection;
 
 uses(CreatesAdminUser::class)
     ->group('navigation');
@@ -40,15 +43,19 @@ test('required fields are required', function (): void {
 it('can create', function (): void {
     $newData = Navigation::factory()->make();
 
-    livewire(CreateNavigation::class)
+    $component = livewire(CreateNavigation::class)
         ->assertSuccessful()
         ->fillForm([
             'name' => $newData->name,
             'key' => $newData->key,
         ])
         ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertRedirectToRoute(EditNavigation::getRouteName(), ['record' => Navigation::query()->latest()->first()->getRouteKey()]);
+        ->assertHasNoFormErrors();
+
+    $navigation = Navigation::query()->latest()->first();
+    throw_unless($navigation instanceof Navigation);
+
+    $component->assertRedirectToRoute(EditNavigation::getRouteName(), ['record' => $navigation->getRouteKey()]);
 
     assertDatabaseHas(Navigation::class, [
         'name' => $newData->name,
@@ -81,13 +88,14 @@ it('can add items with link', function (): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $navigation = Navigation::query()->latest()->first();
+    $navigation = Navigation::query()->latest()->firstOrFail();
+    $firstItem = firstNavigationItem($navigation);
 
     expect($navigation)
         ->name->toBe($newData->name)
         ->key->toBe($newData->key)
         ->items->toHaveCount(1)
-        ->and($navigation->items->first())
+        ->and($firstItem)
         ->label->toBe('Test')
         ->type->toBe($type);
 });
@@ -124,13 +132,27 @@ it('can add items with page', function (): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $navigation = Navigation::query()->latest()->first();
+    $navigation = Navigation::query()->latest()->firstOrFail();
+    $firstItem = firstNavigationItem($navigation);
 
     expect($navigation)
         ->name->toBe($newData->name)
         ->key->toBe($newData->key)
         ->items->toHaveCount(1)
-        ->and($navigation->items->first())
+        ->and($firstItem)
         ->label->toBe('Test')
         ->type->toBe($type);
 });
+
+function firstNavigationItem(Navigation $navigation): NavigationItemData
+{
+    $items = $navigation->items;
+
+    throw_unless($items instanceof DataCollection, RuntimeException::class, 'Expected navigation items to be cast to a data collection.');
+
+    $item = $items->first();
+
+    throw_unless($item instanceof NavigationItemData, RuntimeException::class, 'Expected navigation to contain a navigation item.');
+
+    return $item;
+}

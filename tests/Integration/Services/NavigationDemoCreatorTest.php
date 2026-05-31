@@ -10,8 +10,24 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Creator\NavigationDemoCreator;
+use Illuminate\Support\Collection;
 
 use function Pest\Laravel\assertDatabaseHas;
+
+use Spatie\LaravelData\DataCollection;
+
+/**
+ * @param  array<string, mixed>|null  $item
+ * @return array<int, array<string, mixed>>
+ */
+function navigationDemoCreatorChildren(?array $item): array
+{
+    $children = $item['children'] ?? null;
+
+    throw_unless(is_array($children), RuntimeException::class, 'Expected navigation demo item children.');
+
+    return $children;
+}
 
 it('sets up main, footer, and sub-footer navigation', function (): void {
     $navigationDemoCreator = resolve(NavigationDemoCreator::class);
@@ -130,12 +146,12 @@ it('merges generated footer items into an existing navigation with persisted ite
         ->where('key', NavigationHandle::Footer->value)
         ->where('site_id', $site->id)
         ->where('language_id', $language->id)
-        ->first();
+        ->firstOrFail();
 
     expect($navigation)->toBeInstanceOf(Navigation::class)
         ->and($navigation->items)->not()->toBeNull();
 
-    $navigationItems = capell_test_collect($navigation->items?->toArray())->values();
+    $navigationItems = navigationDemoCreatorItems($navigation);
     $navigationLabels = $navigationItems->pluck('label')->all();
 
     expect($navigationItems)->toHaveCount(2)
@@ -255,12 +271,12 @@ it('creates main navigation with the home page and eligible top-level pages', fu
         ->where('key', NavigationHandle::Main->value)
         ->where('site_id', $site->id)
         ->where('language_id', $language->id)
-        ->first();
+        ->firstOrFail();
 
     expect($navigation)->toBeInstanceOf(Navigation::class)
         ->and($navigation->items)->not()->toBeNull();
 
-    $navigationItems = capell_test_collect($navigation->items?->toArray())->values();
+    $navigationItems = navigationDemoCreatorItems($navigation);
     $navigationLabels = $navigationItems->pluck('label')->all();
 
     expect($navigationItems)->toHaveCount(4)
@@ -284,9 +300,27 @@ it('creates main navigation with the home page and eligible top-level pages', fu
     $servicesNavigationItem = $navigationItems->firstWhere('label', 'Services');
 
     expect($aboutNavigationItem)->not()->toBeNull()
-        ->and(capell_test_collect($aboutNavigationItem['children'])->values()->pluck('label')->all())
+        ->and(capell_test_collect(navigationDemoCreatorChildren($aboutNavigationItem))->values()->pluck('label')->all())
         ->toContain('Team')
         ->and($servicesNavigationItem)->not()->toBeNull()
-        ->and(capell_test_collect($servicesNavigationItem['children'])->values()->pluck('label')->all())
+        ->and(capell_test_collect(navigationDemoCreatorChildren($servicesNavigationItem))->values()->pluck('label')->all())
         ->toContain('Consulting');
 });
+
+/**
+ * @return Collection<int, array<string, mixed>>
+ */
+function navigationDemoCreatorItems(Navigation $navigation): Collection
+{
+    $items = $navigation->items;
+
+    if ($items instanceof DataCollection) {
+        return capell_test_collect($items->toArray())->values();
+    }
+
+    if (is_array($items)) {
+        return capell_test_collect($items)->values();
+    }
+
+    throw new RuntimeException('Expected navigation items to be available.');
+}

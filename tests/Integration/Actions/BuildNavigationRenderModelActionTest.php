@@ -7,10 +7,39 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
+use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
+use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Facades\DB;
+
+function navigationRenderItem(NavigationRenderData $renderData, int ...$indexes): NavigationItemRenderData
+{
+    $items = $renderData->items;
+    $item = null;
+
+    foreach ($indexes as $index) {
+        $item = $items->get($index);
+
+        throw_unless($item instanceof NavigationItemRenderData, RuntimeException::class, 'Expected navigation render item at index ' . $index . '.');
+
+        $items = $item->children;
+    }
+
+    throw_unless($item instanceof NavigationItemRenderData, RuntimeException::class, 'Expected navigation render item.');
+
+    return $item;
+}
+
+function navigationRenderPageUrl(Page $page): string
+{
+    $pageUrl = $page->pageUrl;
+
+    throw_if($pageUrl === null, RuntimeException::class, 'Expected page URL for navigation render assertion.');
+
+    return $pageUrl->full_url;
+}
 
 it('builds a view-ready render model for current page and child active state', function (): void {
     $language = Language::factory()->default()->create();
@@ -71,14 +100,14 @@ it('builds a view-ready render model for current page and child active state', f
     expect($renderModel->items)->toHaveCount(2)
         ->and($renderModel->navigationKey)->toBe('main')
         ->and($renderModel->listComponent)->toBe('capell::stacked-list')
-        ->and($renderModel->items[0]->label)->toBe('Home')
-        ->and($renderModel->items[0]->url)->toBe($homePage->pageUrl->full_url)
-        ->and($renderModel->items[0]->active)->toBeFalse()
-        ->and($renderModel->items[1]->active)->toBeTrue()
-        ->and($renderModel->items[1]->children[0]->url)->toBe($nestedPage->pageUrl->full_url)
-        ->and($renderModel->items[1]->children[0]->active)->toBeFalse()
-        ->and($renderModel->items[1]->children[1]->url)->toBe($secondaryPage->pageUrl->full_url)
-        ->and($renderModel->items[1]->children[1]->active)->toBeTrue();
+        ->and(navigationRenderItem($renderModel, 0)->label)->toBe('Home')
+        ->and(navigationRenderItem($renderModel, 0)->url)->toBe(navigationRenderPageUrl($homePage))
+        ->and(navigationRenderItem($renderModel, 0)->active)->toBeFalse()
+        ->and(navigationRenderItem($renderModel, 1)->active)->toBeTrue()
+        ->and(navigationRenderItem($renderModel, 1, 0)->url)->toBe(navigationRenderPageUrl($nestedPage))
+        ->and(navigationRenderItem($renderModel, 1, 0)->active)->toBeFalse()
+        ->and(navigationRenderItem($renderModel, 1, 1)->url)->toBe(navigationRenderPageUrl($secondaryPage))
+        ->and(navigationRenderItem($renderModel, 1, 1)->active)->toBeTrue();
 });
 
 it('expands auto children using the provided site language and domain context', function (): void {
@@ -127,15 +156,15 @@ it('expands auto children using the provided site language and domain context', 
     ));
 
     expect($renderModel->items)->toHaveCount(1)
-        ->and($renderModel->items[0]->url)->toBe($parentPage->pageUrl->full_url)
-        ->and($renderModel->items[0]->active)->toBeTrue()
-        ->and($renderModel->items[0]->children)->toHaveCount(1)
-        ->and($renderModel->items[0]->children[0]->label)->toBe($currentChildPage->translation->label)
-        ->and($renderModel->items[0]->children[0]->url)->toBe($currentChildPage->pageUrl->full_url)
-        ->and($renderModel->items[0]->children[0]->active)->toBeTrue()
-        ->and($renderModel->items[0]->children[0]->data)->toHaveKey('url')
-        ->and($renderModel->items[0]->children[0]->data)->not->toHaveKey('pageable_id')
-        ->and($renderModel->items[0]->children[0]->data)->not->toHaveKey('pageable_type');
+        ->and(navigationRenderItem($renderModel, 0)->url)->toBe(navigationRenderPageUrl($parentPage))
+        ->and(navigationRenderItem($renderModel, 0)->active)->toBeTrue()
+        ->and(navigationRenderItem($renderModel, 0)->children)->toHaveCount(1)
+        ->and(navigationRenderItem($renderModel, 0, 0)->label)->toBe($currentChildPage->translation->label)
+        ->and(navigationRenderItem($renderModel, 0, 0)->url)->toBe(navigationRenderPageUrl($currentChildPage))
+        ->and(navigationRenderItem($renderModel, 0, 0)->active)->toBeTrue()
+        ->and(navigationRenderItem($renderModel, 0, 0)->data)->toHaveKey('url')
+        ->and(navigationRenderItem($renderModel, 0, 0)->data)->not->toHaveKey('pageable_id')
+        ->and(navigationRenderItem($renderModel, 0, 0)->data)->not->toHaveKey('pageable_type');
 });
 
 it('clears the page lookup cache through the render-model action', function (): void {
@@ -177,8 +206,8 @@ it('clears the page lookup cache through the render-model action', function (): 
     BuildNavigationRenderModelAction::flushPageCache();
     $freshRenderModel = BuildNavigationRenderModelAction::run($context);
 
-    expect($staleRenderModel->items[0]->url)->toBe($linkedPage->pageUrl->full_url)
-        ->and($freshRenderModel->items[0]->url)->toContain('/changed');
+    expect(navigationRenderItem($staleRenderModel, 0)->url)->toBe(navigationRenderPageUrl($linkedPage))
+        ->and(navigationRenderItem($freshRenderModel, 0)->url)->toContain('/changed');
 });
 
 it('memoizes navigation render models for the current request', function (): void {
@@ -218,7 +247,7 @@ it('memoizes navigation render models for the current request', function (): voi
     $secondRenderModel = BuildNavigationRenderModelAction::run($context);
 
     expect($secondRenderModel)->toBe($firstRenderModel)
-        ->and($secondRenderModel->items[0]->url)->toBe($linkedPage->pageUrl->full_url);
+        ->and(navigationRenderItem($secondRenderModel, 0)->url)->toBe(navigationRenderPageUrl($linkedPage));
 });
 
 it('renders heading items without a url', function (): void {
@@ -256,11 +285,11 @@ it('renders heading items without a url', function (): void {
     ));
 
     expect($renderModel->items)->toHaveCount(2)
-        ->and($renderModel->items[0]->type)->toBe(NavigationItemType::Heading)
-        ->and($renderModel->items[0]->label)->toBe('Company')
-        ->and($renderModel->items[0]->url)->toBeNull()
-        ->and($renderModel->items[0]->active)->toBeFalse()
-        ->and($renderModel->items[1]->url)->toBe('/about');
+        ->and(navigationRenderItem($renderModel, 0)->type)->toBe(NavigationItemType::Heading)
+        ->and(navigationRenderItem($renderModel, 0)->label)->toBe('Company')
+        ->and(navigationRenderItem($renderModel, 0)->url)->toBeNull()
+        ->and(navigationRenderItem($renderModel, 0)->active)->toBeFalse()
+        ->and(navigationRenderItem($renderModel, 1)->url)->toBe('/about');
 });
 
 it('flushes stale page lookup cache when a page url changed event is received', function (): void {
@@ -314,5 +343,5 @@ it('flushes stale page lookup cache when a page url changed event is received', 
 
     $renderModel = BuildNavigationRenderModelAction::run($context);
 
-    expect($renderModel->items[0]->url)->toContain('/event-changed');
+    expect(navigationRenderItem($renderModel, 0)->url)->toContain('/event-changed');
 });
