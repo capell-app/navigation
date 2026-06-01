@@ -42,8 +42,8 @@ class EditNavigation extends EditRecord
     {
         return new HtmlString(
             __('capell-admin::heading.edit_navigation_record', [
-                'name' => Str::limit($this->record->name, 40),
-                'site' => Str::limit($this->record->site->name, 40),
+                'name' => Str::limit((string) $this->record->name, 40),
+                'site' => Str::limit((string) ($this->record->site->name ?? ''), 40),
             ]),
         );
     }

@@ -68,10 +68,12 @@ it('resolves morph aliases and nested child items', function (): void {
     ];
 
     $models = ResolveNavigationItemModelsAction::run($items);
+    $model = $models->first();
+    throw_unless($model instanceof Model);
 
     expect($models)->toHaveCount(1)
-        ->and($models->first())->toBeInstanceOf(Page::class)
-        ->and((int) $models->first()->getKey())->toBe((int) $page->getKey());
+        ->and($model)->toBeInstanceOf(Page::class)
+        ->and((int) $model->getKey())->toBe((int) $page->getKey());
 });
 
 it('ignores invalid and unknown morph references', function (): void {

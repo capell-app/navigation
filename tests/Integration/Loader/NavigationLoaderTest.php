@@ -75,7 +75,29 @@ it('does not load pending or expired navigations by key or id', function (): voi
 
     expect(NavigationLoader::getNavigation('seasonal', $site, $site->language, true))->toBeNull()
         ->and(NavigationLoader::getNavigation('archive', $site, $site->language, true))->toBeNull()
-        ->and(NavigationLoader::getNavigationById((int) $pendingNavigation->getKey()))->toBeNull()
-        ->and(NavigationLoader::getNavigationById((int) $expiredNavigation->getKey()))->toBeNull()
-        ->and(NavigationLoader::getNavigationById((int) $publishedNavigation->getKey())?->getKey())->toBe($publishedNavigation->getKey());
+        ->and(NavigationLoader::getNavigationById((int) $pendingNavigation->getKey(), $site, $site->language))->toBeNull()
+        ->and(NavigationLoader::getNavigationById((int) $expiredNavigation->getKey(), $site, $site->language))->toBeNull()
+        ->and(NavigationLoader::getNavigationById((int) $publishedNavigation->getKey(), $site, $site->language)?->getKey())->toBe($publishedNavigation->getKey());
+});
+
+it('does not load another site navigation by raw id', function (): void {
+    $site = Site::factory()->withTranslations()->create();
+    $otherSite = Site::factory()->withTranslations()->create();
+
+    $otherNavigation = Navigation::factory()->create([
+        'key' => 'footer',
+        'site_id' => $otherSite->getKey(),
+        'language_id' => $otherSite->language->getKey(),
+        'name' => 'Other Site Footer',
+    ]);
+
+    $globalNavigation = Navigation::factory()->create([
+        'key' => 'global',
+        'site_id' => null,
+        'language_id' => null,
+        'name' => 'Global Navigation',
+    ]);
+
+    expect(NavigationLoader::getNavigationById((int) $otherNavigation->getKey(), $site, $site->language))->toBeNull()
+        ->and(NavigationLoader::getNavigationById((int) $globalNavigation->getKey(), $site, $site->language)?->getKey())->toBe($globalNavigation->getKey());
 });

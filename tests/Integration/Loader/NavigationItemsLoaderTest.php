@@ -5,9 +5,46 @@ declare(strict_types=1);
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\DataCollection;
+
+/**
+ * @param  Collection<int, NavigationItemData>  $items
+ */
+function navigationLoaderItem(Collection $items, int $index): NavigationItemData
+{
+    $item = $items->get($index);
+
+    throw_unless($item instanceof NavigationItemData, RuntimeException::class, 'Expected navigation item at index ' . $index . '.');
+
+    return $item;
+}
+
+function navigationLoaderChild(NavigationItemData $item, int $index): NavigationItemData
+{
+    $children = $item->children;
+
+    throw_unless($children instanceof DataCollection, RuntimeException::class, 'Expected navigation item children.');
+
+    $child = $children[$index] ?? null;
+
+    throw_unless($child instanceof NavigationItemData, RuntimeException::class, 'Expected child navigation item at index ' . $index . '.');
+
+    return $child;
+}
+
+function navigationLoaderPageUrl(Page $page): string
+{
+    $pageUrl = $page->pageUrl;
+
+    throw_if($pageUrl === null, RuntimeException::class, 'Expected page URL for navigation loader assertion.');
+
+    return $pageUrl->full_url;
+}
 
 it('loads morph navigation items and preserves order', function (): void {
     $language = Language::factory()->default()->create();
@@ -73,15 +110,15 @@ it('loads morph navigation items and preserves order', function (): void {
     $loader->activeMenuItems($items);
 
     expect($items)->toHaveCount(3)
-        ->and($items[0]->type->value)->toBe(NavigationItemType::Link->value)
-        ->and($items[1]->type->value)->toBe(NavigationItemType::Page->value)
-        ->and($items[1]->data['pageable_id'])->toBe($secondaryPage->id)
-        ->and($items[1]->data['url'])->toBe($secondaryPage->pageUrl->full_url)
-        ->and($items[2]->children[0]->data['pageable_id'])->toBe($nestedPage->id)
-        ->and($items[2]->children[0]->data['url'])->toBe($nestedPage->pageUrl->full_url)
-        ->and($items[2]->children[1]->data['pageable_id'])->toBe($currentPage->id)
-        ->and($items[2]->children[1]->active)->toBeTrue()
-        ->and($items[2]->active)->toBeTrue();
+        ->and(navigationLoaderItem($items, 0)->type->value)->toBe(NavigationItemType::Link->value)
+        ->and(navigationLoaderItem($items, 1)->type->value)->toBe(NavigationItemType::Page->value)
+        ->and(navigationLoaderItem($items, 1)->data['pageable_id'])->toBe($secondaryPage->id)
+        ->and(navigationLoaderItem($items, 1)->data['url'])->toBe(navigationLoaderPageUrl($secondaryPage))
+        ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 0)->data['pageable_id'])->toBe($nestedPage->id)
+        ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 0)->data['url'])->toBe(navigationLoaderPageUrl($nestedPage))
+        ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 1)->data['pageable_id'])->toBe($currentPage->id)
+        ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 1)->active)->toBeTrue()
+        ->and(navigationLoaderItem($items, 2)->active)->toBeTrue();
 });
 
 it('loads pure link navigation items', function (): void {
@@ -113,8 +150,8 @@ it('loads pure link navigation items', function (): void {
     $items = $loader->fetchMenuItems();
 
     expect($items)->toHaveCount(1)
-        ->and($items[0]->type->value)->toBe(NavigationItemType::Link->value)
-        ->and($items[0]->data['url'])->toBe('/docs');
+        ->and(navigationLoaderItem($items, 0)->type->value)->toBe(NavigationItemType::Link->value)
+        ->and(navigationLoaderItem($items, 0)->data['url'])->toBe('/docs');
 });
 
 it('skips page items that belong to a different site', function (): void {
@@ -155,7 +192,7 @@ it('skips page items that belong to a different site', function (): void {
     $items = $loader->fetchMenuItems();
 
     expect($items)->toHaveCount(1)
-        ->and($items[0]->label)->toBe('Safe Link');
+        ->and(navigationLoaderItem($items, 0)->label)->toBe('Safe Link');
 });
 
 it('excludes hidden navigation items and hidden nested children', function (): void {
@@ -219,6 +256,6 @@ it('excludes hidden navigation items and hidden nested children', function (): v
 
     expect($items)->toHaveCount(2)
         ->and($items->pluck('label')->all())->toBe(['Visible', 'Visible Parent'])
-        ->and($items[1]->children)->toHaveCount(1)
-        ->and($items[1]->children[0]->label)->toBe('Nested Visible');
+        ->and(navigationLoaderItem($items, 1)->children)->toHaveCount(1)
+        ->and(navigationLoaderChild(navigationLoaderItem($items, 1), 0)->label)->toBe('Nested Visible');
 });

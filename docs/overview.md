@@ -57,11 +57,11 @@ Navigation contributes content graph edges from each navigation record to the pa
 
 ## Screenshots
 
-![Navigation admin index](../../../public/docs/screenshots/packages/navigation/navigation-admin-index.png)
+![Navigation admin index](screenshots/navigation-admin-index.png)
 
-![Create navigation form](../../../public/docs/screenshots/packages/navigation/create-edit-navigation-form.png)
+![Create navigation form](screenshots/create-edit-navigation-form.png)
 
-![Navigation fields on the site form](../../../public/docs/screenshots/packages/navigation/site-relation-manager-for-navigations.png)
+![Navigation fields on the site form](screenshots/site-relation-manager-for-navigations.png)
 
 The frontend menu screenshot needs seeded navigation items before it is useful enough to publish.
 
@@ -137,7 +137,7 @@ erDiagram
 
 ## Screenshot Automation
 
-Deployment should read [screenshots.json](screenshots.json), install the package with demo data, resolve each admin surface or frontend URL, and write images to `public/docs/screenshots/packages/navigation`.
+Deployment should read [screenshots.json](screenshots.json), install the package with demo data, resolve each admin surface or frontend URL, and write images to `packages/navigation/docs/screenshots`.
 
 - Navigation admin index.
 - Create/edit navigation form.

@@ -11,6 +11,7 @@ use Capell\Core\Models\Blueprint;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Filament\Configurators\Navigations\DefaultNavigationConfigurator;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 
 class NavigationForm implements FormConfigurator
@@ -26,7 +27,7 @@ class NavigationForm implements FormConfigurator
             /** @var class-string<Blueprint> $model */
             $model = Blueprint::class;
 
-            $type = $typeId !== null ? $model::query()->find($typeId) : null;
+            $type = $typeId !== null ? $model::query()->find((int) $typeId) : null;
             $adminType = $type instanceof Blueprint
                 ? $resolver->resolveForType($type, NavigationConfiguratorTypeEnum::Navigation, DefaultNavigationConfigurator::getKey())
                 : DefaultNavigationConfigurator::class;
@@ -34,12 +35,14 @@ class NavigationForm implements FormConfigurator
             return $adminType::configure($configurator, $context);
         }
 
-        $typeId = $configurator->getRawState()['blueprint_id'] ?? null;
+        $rawState = $configurator->getRawState();
+        $state = $rawState instanceof Arrayable ? $rawState->toArray() : $rawState;
+        $typeId = $state['blueprint_id'] ?? null;
 
         /** @var class-string<Blueprint> $model */
         $model = Blueprint::class;
 
-        $type = $typeId !== null ? $model::query()->find($typeId) : null;
+        $type = $typeId !== null ? $model::query()->find((int) $typeId) : null;
         $adminType = $type instanceof Blueprint
             ? $resolver->resolveForType($type, NavigationConfiguratorTypeEnum::Navigation, DefaultNavigationConfigurator::getKey())
             : DefaultNavigationConfigurator::class;

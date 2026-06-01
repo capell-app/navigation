@@ -72,7 +72,7 @@ class Menu extends Component
 
         $navigation = NavigationLoader::getNavigation($this->key, $site, $language, $this->siteOnlyFallback);
 
-        if (! $navigation instanceof Navigation) {
+        if (! $navigation instanceof Navigation || ! $page instanceof Model) {
             return null;
         }
 

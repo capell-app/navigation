@@ -80,19 +80,35 @@ class NavigationLoader
         return $navigation;
     }
 
-    public static function getNavigationById(int $id): ?Navigation
+    public static function getNavigationById(int $id, Site $site, ?Language $language = null): ?Navigation
     {
-        $key = CacheEnum::navigationById($id);
+        $key = sprintf(
+            '%s-site-%d-language-%s',
+            CacheEnum::navigationById($id),
+            $site->getKey(),
+            $language instanceof Language ? $language->getKey() : 'any',
+        );
 
         $fromCache = true;
 
-        $navigation = CapellCore::rememberCache($key, function () use ($id, &$fromCache): ?Navigation {
+        $navigation = CapellCore::rememberCache($key, function () use ($id, $site, $language, &$fromCache): ?Navigation {
             $fromCache = false;
 
             /** @var class-string<Navigation> $model */
             $model = Navigation::class;
 
             return $model::query()
+                ->where(function (Builder $query) use ($site): void {
+                    $query->where('site_id', $site->getKey())
+                        ->orWhereNull('site_id');
+                })
+                ->where(function (Builder $query) use ($language): void {
+                    $query->whereNull('language_id');
+
+                    if ($language instanceof Language) {
+                        $query->orWhere('language_id', $language->getKey());
+                    }
+                })
                 ->publishedDate()
                 ->find($id);
         });

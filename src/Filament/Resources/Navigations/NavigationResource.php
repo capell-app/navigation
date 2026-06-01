@@ -119,7 +119,7 @@ class NavigationResource extends Resource
     public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
     {
         /** @var Navigation $record */
-        return $record->name;
+        return (string) $record->name;
     }
 
     #[Override]

@@ -9,8 +9,8 @@ use Capell\Navigation\Providers\NavigationServiceProvider;
 use Symfony\Component\Process\Process;
 
 it('registers the foundation header navigation render hook from the navigation package', function (): void {
-    $provider = file_get_contents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
-    $hook = file_get_contents(dirname(__DIR__, 2) . '/src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php');
+    $provider = navigationFileContents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
+    $hook = navigationFileContents(dirname(__DIR__, 2) . '/src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php');
 
     expect($provider)->toContain('registerFrontendRenderHooks()')
         ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook')
@@ -65,9 +65,13 @@ it('only releases mobile menu inert attributes owned by navigation', function ()
         $this->markTestSkipped('Node.js is required to run the navigation behavior test.');
     }
 
-    $navigation = file_get_contents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php');
+    $navigation = navigationFileContents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php');
 
-    expect(preg_match('#<script>\s*(.*?)\s*document\.addEventListener#s', $navigation, $matches))->toBe(1);
+    $matchCount = preg_match('#<script>\s*(.*?)\s*document\.addEventListener#s', $navigation, $matches);
+
+    expect($matchCount)->toBe(1);
+
+    throw_if($matchCount !== 1 || ! isset($matches[1]), RuntimeException::class, 'Expected navigation Blade file to contain the mobile menu script.');
 
     $navigationScript = base64_encode($matches[1]);
     $nodeScript = <<<JS
@@ -196,6 +200,17 @@ it('only releases mobile menu inert attributes owned by navigation', function ()
 
     expect($process->isSuccessful())->toBeTrue();
 });
+
+function navigationFileContents(string $path): string
+{
+    $contents = file_get_contents($path);
+
+    if (! is_string($contents)) {
+        throw new RuntimeException(sprintf('Expected %s to be readable.', $path));
+    }
+
+    return $contents;
+}
 
 it('registers frontend render hooks once per registry instance', function (): void {
     $provider = new NavigationServiceProvider(app());

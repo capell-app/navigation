@@ -86,7 +86,7 @@ class BuildNavigationRenderModelAction
             type: $item->type,
             url: isset($data['url']) && is_string($data['url']) ? $data['url'] : null,
             active: $item->active === true,
-            children: $this->mapItems(collect($item->children->all())),
+            children: $this->mapItems(collect($item->children?->all() ?? [])),
             data: $this->viewData($data),
             target: isset($data['target']) && is_string($data['target']) ? $data['target'] : null,
             icon: isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null,

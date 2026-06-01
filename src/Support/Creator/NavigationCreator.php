@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class NavigationCreator
 {
@@ -39,7 +40,11 @@ class NavigationCreator
     public static function getPageNavigationLabel(Page $page, ?Language $language = null): string
     {
         if (! $language instanceof Language) {
-            $language = $page->site->language;
+            $language = $page->site?->language;
+        }
+
+        if (! $language instanceof Language) {
+            return $page->name;
         }
 
         $translation = $page->translations->firstWhere('language_id', $language->id);
@@ -74,6 +79,8 @@ class NavigationCreator
         if (! $language instanceof Language) {
             $language = $site->language;
         }
+
+        throw_unless($language instanceof Language, RuntimeException::class, 'Unable to resolve a language for main navigation creation.');
 
         $navigation = self::createNavigation($key, $site, $language, $type);
 
@@ -140,6 +147,8 @@ class NavigationCreator
         if (! $language instanceof Language) {
             $language = $site->language;
         }
+
+        throw_unless($language instanceof Language, RuntimeException::class, 'Unable to resolve a language for main navigation creation.');
 
         $navigation = self::createNavigation($key, $site, $language, $type);
 
@@ -256,14 +265,16 @@ class NavigationCreator
 
     private function createNavigation(string $key, Site $site, ?Language $language = null, ?Blueprint $type = null): Navigation
     {
+        $languageId = $language instanceof Language ? (int) $language->id : null;
+
         $navigation = $this->navigationModel::query()
             ->where([
                 'key' => $key,
                 'site_id' => $site->id,
             ])
             ->when(
-                $language instanceof Language,
-                fn (Builder $query): Builder => $query->where('language_id', $language->id),
+                $languageId !== null,
+                fn (Builder $query): Builder => $query->where('language_id', $languageId),
                 fn (Builder $query): Builder => $query->whereNull('language_id'),
             )
             ->first();

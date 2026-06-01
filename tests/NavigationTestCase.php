@@ -54,6 +54,8 @@ class NavigationTestCase extends AbstractTestCase
      */
     protected function connection(): Connection
     {
+        throw_unless($this->app !== null);
+
         return $this->app->make(ConnectionResolverInterface::class)->connection();
     }
 

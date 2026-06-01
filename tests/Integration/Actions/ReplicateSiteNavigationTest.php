@@ -7,8 +7,41 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\DataCollection;
+
+function navigationReplicateItem(mixed $item): NavigationItemData
+{
+    if ($item instanceof NavigationItemData) {
+        return $item;
+    }
+
+    if (is_array($item)) {
+        return NavigationItemData::from($item);
+    }
+
+    throw new RuntimeException('Expected replicated navigation item.');
+}
+
+function navigationReplicateFirstItem(mixed $items): NavigationItemData
+{
+    if ($items instanceof DataCollection) {
+        return navigationReplicateItem($items[0] ?? null);
+    }
+
+    if ($items instanceof Collection) {
+        return navigationReplicateItem($items->first());
+    }
+
+    if (is_array($items)) {
+        return navigationReplicateItem(reset($items));
+    }
+
+    throw new RuntimeException('Expected replicated navigation items.');
+}
 
 it('replicates a site with navigations and pages', function (): void {
     $languages = Language::factory()->count(2)->create();
@@ -59,8 +92,11 @@ it('replicates a site with navigations and pages', function (): void {
         capell_expect($clonedPages->first()->site_id)->toBe($clone->id);
     }
 
-    $originalItem = $navigation->items[0];
-    $clonedItem = $clonedNavigations->first()->items[0];
+    $clonedNavigation = $clonedNavigations->first();
+    throw_unless($clonedNavigation instanceof Navigation);
+
+    $originalItem = navigationReplicateFirstItem($navigation->items);
+    $clonedItem = navigationReplicateFirstItem($clonedNavigation->items);
 
     capell_expect($clonedItem->type)->toBe($originalItem->type)
         ->and($clonedItem->data['label'])->toBe('Page Link')

@@ -77,7 +77,7 @@ final class MainNavigation extends Component
         $page = Frontend::page();
         $siteDomain = $this->loadedSiteDomain($site, $page);
 
-        if (! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Pageable || ! $siteDomain instanceof SiteDomain) {
+        if (! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Pageable || ! $page instanceof Model || ! $siteDomain instanceof SiteDomain) {
             return null;
         }
 

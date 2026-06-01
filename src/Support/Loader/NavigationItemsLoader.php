@@ -21,9 +21,12 @@ use Spatie\LaravelData\DataCollection;
 
 class NavigationItemsLoader
 {
-    /** @var array<string, array<string, Pageable>> */
+    /** @var array<string, array<string, Model&Pageable<Model>>> */
     protected static array $pagesByMorphKeyCache = [];
 
+    /**
+     * @param  Model&Pageable<Model>  $page
+     */
     public function __construct(
         public Navigation $navigation,
         public Pageable $page,
@@ -58,7 +61,7 @@ class NavigationItemsLoader
     {
         $hasActive = false;
 
-        $currentUrl = $this->page->pageUrl->full_url;
+        $currentUrl = $this->page->pageUrl->full_url ?? '';
 
         foreach ($items as $item) {
             $active = false;
@@ -77,11 +80,15 @@ class NavigationItemsLoader
                         continue 2;
                     }
 
-                    $url = $this->siteDomain->url . $item->data['url'];
+                    $domainUrl = $this->siteDomain->url;
 
-                    if ($url !== '/') {
-                        $url = mb_ltrim($url, '/');
+                    if (! is_string($domainUrl)) {
+                        continue 2;
                     }
+
+                    $url = $domainUrl . $item->data['url'];
+
+                    $url = $url !== '/' ? ltrim($url, '/') : $url;
 
                     $active = $this->urlMatches($currentUrl, $url);
                     break;
@@ -103,7 +110,7 @@ class NavigationItemsLoader
                 $item->active = true;
             }
 
-            $children = collect($item->children->all());
+            $children = collect($item->children?->all() ?? []);
 
             if ($children->isNotEmpty()) {
                 $activeChild = $this->activeMenuItems($children);
@@ -123,7 +130,7 @@ class NavigationItemsLoader
      */
     public function fetchMenuItems(): Collection
     {
-        $items = $this->visibleMenuItems(collect($this->navigation->items->all()));
+        $items = $this->visibleMenuItems(collect($this->navigationItems()));
 
         if ($items->isEmpty()) {
             return collect();
@@ -137,15 +144,18 @@ class NavigationItemsLoader
         // Cast to Illuminate\Support\Collection explicitly
         $result = $this->menuItemPageSetup($this->navigation, new Collection($items->all()), $pagesByMorphKey);
 
-        $this->navigation->items = $result;
+        /** @var DataCollection<int, NavigationItemData> $navigationItems */
+        $navigationItems = NavigationItemData::collect(array_values($result->all()), DataCollection::class);
 
-        return collect($result->all());
+        $this->navigation->items = $navigationItems;
+
+        return collect($navigationItems->all());
     }
 
     /**
      * @param  Collection<int, NavigationItemData>  $items
-     * @param  array<string, Pageable>  $pagesByMorphKey
-     * @return DataCollection<int, NavigationItemData>
+     * @param  array<string, Model&Pageable<Model>>  $pagesByMorphKey
+     * @return DataCollection<int|string, NavigationItemData>
      */
     protected function menuItemPageSetup(Navigation $navigation, Collection $items, array $pagesByMorphKey): DataCollection
     {
@@ -160,7 +170,7 @@ class NavigationItemsLoader
                 'is_visible' => $item->is_visible,
             ];
 
-            $children = collect($item->children->all());
+            $children = collect($item->children?->all() ?? []);
 
             // Cast to Illuminate\Support\Collection explicitly
             if ($children->isNotEmpty()) {
@@ -220,10 +230,10 @@ class NavigationItemsLoader
                 }
 
                 if (blank($item->label)) {
-                    $menuItem['label'] = $page->translation->label;
+                    $menuItem['label'] = $page->translation->label ?? $page->name;
                 }
 
-                $menuItem['data']['url'] = $page->pageUrl->full_url;
+                $menuItem['data']['url'] = $page->pageUrl->full_url ?? '#';
             }
 
             $result[] = new NavigationItemData(...$menuItem);
@@ -250,7 +260,7 @@ class NavigationItemsLoader
         return $items
             ->filter(fn (NavigationItemData $item): bool => $item->is_visible)
             ->map(function (NavigationItemData $item): NavigationItemData {
-                $children = $this->visibleMenuItems(collect($item->children->all()));
+                $children = $this->visibleMenuItems(collect($item->children?->all() ?? []));
 
                 $item->children = NavigationItemData::collect($children->all(), DataCollection::class);
 
@@ -286,7 +296,7 @@ class NavigationItemsLoader
                 }
             }
 
-            $children = collect($item->children->all());
+            $children = collect($item->children?->all() ?? []);
 
             if ($children->isNotEmpty()) {
                 $nestedPageableIdsByType = $this->extractMenuItemsPagesByType($children);
@@ -310,16 +320,21 @@ class NavigationItemsLoader
 
     /**
      * @param  array<string, array<int, int>>  $pageableIdsByType
-     * @return array<string, Pageable>
+     * @return array<string, Model&Pageable<Model>>
      */
     protected function getPagesByMorphKey(array $pageableIdsByType): array
     {
         $currentPageType = $this->page->getMorphClass();
         $currentPageId = (int) $this->page->getKey();
         $currentPageLookupKey = $this->buildMorphLookupKey($currentPageType, $currentPageId);
+        $currentPage = $this->page;
+
+        if (! $currentPage instanceof Model) {
+            return [];
+        }
 
         $pagesByMorphKey = [
-            $currentPageLookupKey => $this->page,
+            $currentPageLookupKey => $currentPage,
         ];
 
         foreach ($pageableIdsByType as $pageableType => $pageableIds) {
@@ -363,7 +378,11 @@ class NavigationItemsLoader
                 continue;
             }
 
-            /** @var class-string<Model&Pageable> $modelClass */
+            if (! is_subclass_of($modelClass, Pageable::class)) {
+                continue;
+            }
+
+            /** @var class-string<Model&Pageable<Model>> $modelClass */
             $model = new $modelClass;
 
             $query = $modelClass::query()
@@ -371,16 +390,18 @@ class NavigationItemsLoader
                 ->whereIn($model->getKeyName(), $pageableIds)
                 ->orderBy($model->getKeyName());
 
-            if (method_exists($model, 'site')) {
-                $query->where('site_id', $this->site->getKey());
-            }
+            $query->where('site_id', $this->site->getKey());
 
             $pages = $query->get();
 
-            /** @var Model&Pageable $page */
+            /** @var array<string, Model&Pageable<Model>> $cachedPages */
             $cachedPages = [];
 
             foreach ($pages as $page) {
+                if (! $page instanceof Pageable) {
+                    continue;
+                }
+
                 if (
                     $page->pageUrl !== null
                     && $page->pageUrl->site_id === $this->siteDomain->site_id
@@ -431,5 +452,31 @@ class NavigationItemsLoader
     protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
     {
         return $pageableType . ':' . $pageableId;
+    }
+
+    /**
+     * @return list<NavigationItemData>
+     */
+    private function navigationItems(): array
+    {
+        $items = $this->navigation->items;
+
+        if ($items instanceof DataCollection) {
+            /** @var list<NavigationItemData> $navigationItems */
+            $navigationItems = array_values($items->all());
+
+            return $navigationItems;
+        }
+
+        if (is_array($items)) {
+            $dataCollection = NavigationItemData::collect($items, DataCollection::class);
+
+            /** @var list<NavigationItemData> $navigationItems */
+            $navigationItems = array_values($dataCollection->all());
+
+            return $navigationItems;
+        }
+
+        return [];
     }
 }
