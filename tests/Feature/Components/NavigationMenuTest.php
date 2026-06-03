@@ -7,6 +7,8 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Sinnbeck\DomAssertions\Asserts\AssertElement;
+use Sinnbeck\DomAssertions\Asserts\BaseAssert;
 
 it('renders a package menu component with explicit frontend context', function (): void {
     $language = Language::factory()->default()->create();
@@ -46,11 +48,11 @@ it('renders a package menu component with explicit frontend context', function (
     );
 
     $view
-        ->assertSee('aria-label="Navigation"', false)
+        ->assertElementExists('nav[aria-label="Navigation"]')
         ->assertSee('Company')
         ->assertSee('Docs')
-        ->assertSee('href="/docs"', false)
-        ->assertDontSee('href=""', false)
+        ->assertElementExists('a[href="/docs"]')
+        ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('a[href=""]'))
         ->assertDontSee('Hidden');
 });
 
@@ -80,8 +82,8 @@ it('lets callers override the package menu landmark label', function (): void {
         '<x-capell-navigation::menu key="footer" aria-label="Legal links" :site="$site" :language="$language" :page="$currentPage" :domain="$siteDomain" />',
         ['site' => $site, 'language' => $language, 'currentPage' => $currentPage, 'siteDomain' => $siteDomain],
     )
-        ->assertSee('aria-label="Legal links"', false)
-        ->assertDontSee('aria-label="Footer navigation"', false);
+        ->assertElementExists('nav[aria-label="Legal links"]')
+        ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('nav[aria-label="Footer navigation"]'));
 });
 
 it('resolves a menu domain from preloaded frontend relations without an explicit domain prop', function (): void {
@@ -116,7 +118,7 @@ it('resolves a menu domain from preloaded frontend relations without an explicit
         ['site' => $site, 'language' => $language, 'currentPage' => $currentPage],
     )
         ->assertSee('Docs')
-        ->assertSee('href="/docs"', false);
+        ->assertElementExists('a[href="/docs"]');
 });
 
 it('renders nothing when the package menu component has no matching context', function (): void {
