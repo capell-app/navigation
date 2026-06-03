@@ -15,6 +15,9 @@ use Illuminate\View\DynamicComponent;
 
 use function Pest\Laravel\get;
 
+use Sinnbeck\DomAssertions\Asserts\AssertElement;
+use Sinnbeck\DomAssertions\Asserts\BaseAssert;
+
 uses(TestingFrontend::class);
 
 function navigationFeaturePageUrl(Page $page): string
@@ -47,12 +50,11 @@ test('frontend default theme displays the main navigation menu', function (): vo
 
     get(navigationFeaturePageUrl($page))
         ->assertOk()
-        ->assertSee('id="main-menu"', false)
-        ->assertSee('aria-label="Main navigation"', false)
+        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
-        ->assertSee('aria-controls="main-menu"', false)
+        ->assertElementExists('[aria-controls="main-menu"]')
         ->assertSee("Alpine.data('capellHeaderNavigation'", false)
-        ->assertDontSee('id="header"', false);
+        ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('#header'));
 });
 
 test('themed header displays the main navigation menu', function (): void {
@@ -72,12 +74,11 @@ test('themed header displays the main navigation menu', function (): void {
 
     get(navigationFeaturePageUrl($page))
         ->assertOk()
-        ->assertSee('id="main-menu"', false)
-        ->assertSee('aria-label="Main navigation"', false)
+        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
-        ->assertSee('aria-controls="main-menu"', false)
+        ->assertElementExists('[aria-controls="main-menu"]')
         ->assertSee("Alpine.data('capellHeaderNavigation'", false)
-        ->assertSee('id="header"', false);
+        ->assertElementExists('#header');
 });
 
 test('page renders without error when navigation exists with main handle', function (): void {
