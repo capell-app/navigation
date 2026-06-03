@@ -116,6 +116,36 @@ test('page renders without error when navigation exists with main handle', funct
     get($page->pageUrl->full_url)->assertOk();
 });
 
+test('anonymous frontend menu output leaks no admin internals', function (): void {
+    $theme = Theme::factory()
+        ->defaultMeta()
+        ->state([
+            'key' => 'foundation-public-safety-test',
+            'meta' => [
+                ...Theme::factory()->defaultMeta()->make()->meta,
+                'footer' => false,
+                'header_file' => 'capell-navigation-test::header',
+            ],
+        ])
+        ->create();
+
+    [$page, $site] = createFrontendPageWithMainNavigation($theme);
+
+    expect(auth()->check())->toBeFalse();
+
+    $response = get(navigationFeaturePageUrl($page))->assertOk();
+
+    $response
+        ->assertSee('Docs')
+        ->assertDontSee('pageable_id', false)
+        ->assertDontSee('pageable_type', false)
+        ->assertDontSee('is_visible', false)
+        ->assertDontSee('Capell\\Core\\Models\\Page', false)
+        ->assertDontSee('"id":' . $page->id, false)
+        ->assertDontSee('/admin/', false)
+        ->assertDontSee('NavigationResource', false);
+});
+
 /**
  * @return array{0: Page, 1: Site}
  */

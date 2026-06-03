@@ -6,7 +6,7 @@
     "kind": "package",
     "capellApiVersion": "^4.0",
     "version": "4.x-dev",
-    "description": "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.",
+    "description": "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.",
     "product": {
         "group": "Capell Foundation",
         "tier": "free",
@@ -45,7 +45,12 @@
     },
     "settings": [],
     "permissions": [],
-    "capabilities": [],
+    "capabilities": [
+        "navigation-menu-builder",
+        "navigation-page-field",
+        "navigation-render-model",
+        "navigation-site-replication"
+    ],
     "performance": {
         "frontendRenderBudgetMs": 20,
         "adminQueryBudget": 40,
@@ -54,7 +59,20 @@
             "cacheable": false,
             "variesBy": ["site", "locale"],
             "sensitiveOutput": false,
-            "invalidationSources": [],
+            "invalidationSources": [
+                {
+                    "model": "Capell\\Navigation\\Models\\Navigation",
+                    "events": ["saved", "deleted", "restored"]
+                },
+                {
+                    "model": "Capell\\Core\\Models\\Page",
+                    "events": ["updated"]
+                },
+                {
+                    "model": "Capell\\Core\\Models\\Site",
+                    "events": ["replicated"]
+                }
+            ],
             "queueInvalidation": true
         }
     },
@@ -74,12 +92,72 @@
         "privateDocsRequested": false
     },
     "marketplace": {
-        "summary": "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.",
+        "summary": "Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",
                 "alt": "Navigation extension preview image",
                 "caption": "Navigation extension preview"
+            },
+            {
+                "path": "docs/assets/marketplace/hero-desktop.jpg",
+                "alt": "Navigation hero banner on desktop",
+                "caption": "Navigation hero (desktop)"
+            },
+            {
+                "path": "docs/assets/marketplace/hero-mobile.jpg",
+                "alt": "Navigation hero banner on mobile",
+                "caption": "Navigation hero (mobile)"
+            },
+            {
+                "path": "docs/screenshots/navigation-admin-index.png",
+                "alt": "Navigation admin index listing site navigations and their scope",
+                "caption": "Navigation admin index"
+            },
+            {
+                "path": "docs/screenshots/navigation-admin-index-dark.png",
+                "alt": "Navigation admin index in dark mode",
+                "caption": "Navigation admin index (dark)"
+            },
+            {
+                "path": "docs/screenshots/create-edit-navigation-form.png",
+                "alt": "Create and edit navigation form with links, page references, and nested items",
+                "caption": "Create/edit navigation form"
+            },
+            {
+                "path": "docs/screenshots/create-edit-navigation-form-dark.png",
+                "alt": "Create and edit navigation form in dark mode",
+                "caption": "Create/edit navigation form (dark)"
+            },
+            {
+                "path": "docs/screenshots/site-relation-manager-for-navigations.png",
+                "alt": "Site relation manager listing navigations for a site",
+                "caption": "Site relation manager for navigations"
+            },
+            {
+                "path": "docs/screenshots/site-relation-manager-for-navigations-dark.png",
+                "alt": "Site relation manager for navigations in dark mode",
+                "caption": "Site relation manager for navigations (dark)"
+            },
+            {
+                "path": "docs/screenshots/page-form-navigation-tab.png",
+                "alt": "Page form navigation tab showing which menus reference the page",
+                "caption": "Page form navigation tab"
+            },
+            {
+                "path": "docs/screenshots/page-form-navigation-tab-dark.png",
+                "alt": "Page form navigation tab in dark mode",
+                "caption": "Page form navigation tab (dark)"
+            },
+            {
+                "path": "docs/screenshots/frontend-menu-output.png",
+                "alt": "Frontend menu output rendered for an anonymous visitor",
+                "caption": "Frontend menu output"
+            },
+            {
+                "path": "docs/screenshots/frontend-menu-output-dark.png",
+                "alt": "Frontend menu output in dark mode",
+                "caption": "Frontend menu output (dark)"
             }
         ],
         "categories": ["admin", "console", "foundation", "frontend"]
