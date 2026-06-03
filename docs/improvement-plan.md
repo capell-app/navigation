@@ -1,4 +1,5 @@
 # Navigation — Improvement & Growth Plan
+
 > Package: capell-app/navigation · Kind: package · Tier: free · Product group: Capell Foundation · Bundle: foundation · Status: Draft
 
 ## 1. Snapshot
@@ -24,7 +25,7 @@ Manifest `capabilities[]` is empty, so there is no advertised contract to measur
 - **Breadcrumbs** (table-stakes for a navigation package) — grep for `breadcrumb` across `src/` and `resources/` returns nothing. The package computes `active` state for the current page already (`activeMenuItems()`), so the ancestry data exists, but there is no breadcrumb builder action or component. — whole package
 - **Richer item types and link targets** — `NavigationItemType` has only `Link`, `Page`, `Heading`. There is no first-class "external URL" type (external links are just `Link` with a manual `/`-or-URL string, and the active-state logic in `activeMenuItems()` actually `continue`s past any link whose URL doesn't start with `/`), no divider/separator, no "link to any content model" beyond `Pageable`. `NavigationItemTarget` has a single case (`_blank`) — no `rel="noopener"`, no `_self`/`_parent`. — `src/Enums/NavigationItemType.php`, `src/Enums/NavigationItemTarget.php`
 - **Mega-menu / column layout support** — items support `children` (dropdowns, rendered in `header/menu/dropdown.blade.php`) but there is no concept of multi-column mega-menu blocks, featured panels, or embedding a component/promo inside a dropdown. The `data.component`/`component_item` meta hints at per-item component override but there is no mega-menu primitive. — `resources/views/components/header/menu/dropdown.blade.php`
-- **Per-menu / per-handle programmatic registration** — handles are a fixed enum (`Main`, `Footer`, `SubFooter`). A theme or package cannot register a new named menu location (e.g. `account-menu`, `mega-header`) without editing this package's enum. A `NavigableRegistry`-style registry exists for *models*, but not for *menu handles*. — `src/Enums/NavigationHandle.php`
+- **Per-menu / per-handle programmatic registration** — handles are a fixed enum (`Main`, `Footer`, `SubFooter`). A theme or package cannot register a new named menu location (e.g. `account-menu`, `mega-header`) without editing this package's enum. A `NavigableRegistry`-style registry exists for _models_, but not for _menu handles_. — `src/Enums/NavigationHandle.php`
 - **Active-state for child/descendant URL matching** — `urlMatches()` does an exact normalized-string equality (`trim($a,'/') === trim($b,'/')`). A parent section page is not marked active when a child URL is the current page unless the child item itself is in the tree. There is no "starts-with / is-ancestor" active mode, which most themes need for section highlighting. — `src/Support/Loader/NavigationItemsLoader::urlMatches()`
 - **Public render-model cache (cross-request)** — `capell.json` sets `cacheSafety.cacheable: false` and the build action only memoizes per-request. Every cold request rebuilds the render model (resolve pages, build active state). A site/locale-scoped cached render model (the manifest already lists `variesBy: ["site","locale"]`) would meaningfully help the 20ms frontend budget. — `src/Actions/BuildNavigationRenderModelAction.php`
 
@@ -33,7 +34,7 @@ Manifest `capabilities[]` is empty, so there is no advertised contract to measur
 - **Unindexable JSON `LIKE` scan on the admin page form** — `BuildPageNavigationReferencesAction::whereItemsMightContainRecord()` does `orWhere('items','like','%...%')` over the whole `navigations` table. This blows the manifest `adminQueryBudget: 40` reasoning (it is one query but a full scan) and degrades linearly with navigation count. — `src/Actions/BuildPageNavigationReferencesAction.php`
 - **Stub health check declared `critical`** — `NavigationHealthCheck` has no `check()`/probe logic at all; Diagnostics will report navigation as healthy unconditionally. False-green on a critical check is a production risk. — `src/Health/NavigationHealthCheck.php`
 - **Public render path lazy-loads in component `render()`** — Capell forbids the public render path from querying/lazy-loading; the Blade templates are clean, but `Menu::render()` and `MainNavigation::render()` execute `NavigationLoader::getNavigation()` (DB + cache) and `BuildNavigationRenderModelAction::run()` (which runs `NavigationItemsLoader` queries) at render time. The boundary is being honored in spirit (Blade is pure) but violated in the component class. — `src/View/Components/Menu.php`, `src/View/Components/Header/MainNavigation.php`
-- **`NavigationLoader::getNavigation()` falls back to `whereNull('language_id')` site-wide query then in-PHP sort** — when `siteOnlyFallback` is true and no language match is found, it loads *all* published navigations for the site into memory and sorts in PHP. Fine for a handful of menus, but unbounded by design. — `src/Support/Loader/NavigationLoader.php`
+- **`NavigationLoader::getNavigation()` falls back to `whereNull('language_id')` site-wide query then in-PHP sort** — when `siteOnlyFallback` is true and no language match is found, it loads _all_ published navigations for the site into memory and sorts in PHP. Fine for a handful of menus, but unbounded by design. — `src/Support/Loader/NavigationLoader.php`
 - **Observer cache invalidation can fan out to every site** — `NavigationObserver::clearCache()` merges `Site::query()->pluck('id')` (all sites) into the keys-to-clear set whenever `site_id` is null on either the current or original record. A single global-navigation save invalidates per-site keys for the entire install. Correct, but a thundering-herd risk on large multi-site installs; the manifest sets `queueInvalidation: true` but `invalidationSources: []` is undocumented. — `src/Observers/NavigationObserver.php`
 - **No cross-request cache safety test for anonymous output** — Capell requires tests proving anonymous/non-admin render safety for cache/render changes. There are frontend render tests (`tests/Feature/Frontend/Page/PageNavigationTest.php`, `PagePerformanceNavigationTest.php`) and the boundary arch test (`tests/Arch/NavigationBoundaryTest.php`) only asserts it doesn't import downstream packages and uses strict equality. There is no test asserting the rendered menu HTML leaks no admin internals (model IDs, field paths, `pageable_type`, signed editor URLs) for an anonymous visitor. The admin page panel does emit `NavigationResource::getUrl('edit')` links — confirm that Blade (`page/navigations.blade.php`) is never reachable on a public surface. — `tests/Arch/NavigationBoundaryTest.php`, `resources/views/components/page/navigations.blade.php`
 - **`NavigationItemData` is mutated in place during loading** — `NavigationItemsLoader::load()` reassigns `$this->navigation->items` and flips `$item->active = true` on shared data objects; `BuildNavigationRenderModelAction` memoizes by a cache key that includes `spl_object_id` for unsaved navigations. Mutating model state during a read path is a subtle cache-coherence footgun if the same `Navigation` instance is rendered in two contexts. — `src/Support/Loader/NavigationItemsLoader.php`
@@ -45,31 +46,31 @@ Manifest `capabilities[]` is empty, so there is no advertised contract to measur
 This is a free, foundation-bundle, first-party package — correctly positioned: navigation is non-negotiable infrastructure every Capell site needs, so it belongs in the free foundation tier as a platform credibility piece, not a revenue line.
 
 - **Current `summary` critique**: "Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support." It is accurate but inward-facing and feature-listy ("sync actions", "frontend loading support" mean nothing to a buyer). It leads with mechanics, not outcome.
-  - **Improved summary**: "Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included."
+    - **Improved summary**: "Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included."
 - **Current composer `description` critique**: "Navigation for Capell" — placeholder-grade, zero keywords, zero value.
-  - **Improved description**: "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication."
-- **free/bundle vs premium**: keep free/foundation. The premium upsell is *not* this package — it is a future `navigation-pro` (mega-menus, role-conditional visibility, breadcrumbs-as-a-service, A/B menu variants) that *depends on* this one's contract. That dependency only works if `capabilities[]` is populated (Section 2/4).
+    - **Improved description**: "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication."
+- **free/bundle vs premium**: keep free/foundation. The premium upsell is _not_ this package — it is a future `navigation-pro` (mega-menus, role-conditional visibility, breadcrumbs-as-a-service, A/B menu variants) that _depends on_ this one's contract. That dependency only works if `capabilities[]` is populated (Section 2/4).
 - **Screenshot/media gaps**: manifest advertises 1 image; repo has 10 (light+dark for index, create/edit form, site relation manager, page nav tab, frontend output) plus `hero-desktop.jpg`/`hero-mobile.jpg` that are not referenced in the manifest at all. Wire the existing assets into `marketplace.screenshots[]` — the work is already done, it just isn't declared.
 - **Platform-pitch contribution**: navigation is the proof that Capell's "editors manage structure without touching theme code" promise is real. The README's "Why It Helps Your Capell Workflow" framing is the right pitch; surface it in the marketplace summary, not just the README.
 - **Keywords/tags (8–12)**: `navigation`, `menus`, `menu-builder`, `multilingual`, `multi-site`, `dropdown`, `mega-menu`, `breadcrumbs`, `active-state`, `cms`, `filament`, `foundation`.
 
 ## 6. Prioritized Roadmap
 
-| Item | Bucket | Effort | Impact | Section ref |
-| --- | --- | --- | --- | --- |
-| Implement real `NavigationHealthCheck` probes (currently stub, declared critical) | Now | M | High | 2, 4 |
-| Replace JSON `LIKE '%...%'` reverse-lookup with pivot or `whereJsonContains`/indexed column | Now | M | High | 2, 4 |
-| Add `capell-app/core` to composer `require` | Now | S | Med | 2 |
-| Populate manifest `capabilities[]` + `cacheSafety.invalidationSources[]` | Now | S | High | 2, 4 |
-| Declare existing 10 screenshots + hero assets in `marketplace.screenshots[]` | Now | S | Med | 1, 5 |
-| Rewrite marketplace `summary` + composer `description` | Now | S | Med | 5 |
-| Add anonymous/non-admin public-output safety test for rendered menu HTML | Now | S | High | 4 |
-| Move DB resolution out of frontend component `render()` into a resolver/composer | Next | M | High | 2, 4 |
-| Add role/permission/auth-conditional item visibility | Next | L | High | 3 |
-| Add breadcrumb builder action + component (ancestry data already computed) | Next | M | High | 3 |
-| Add ancestor/starts-with active-state mode for section highlighting | Next | M | Med | 3 |
-| First-class external-link item type + `rel`/`_self`/`_parent` targets | Next | S | Med | 3 |
-| Programmatic menu-handle registry (replace fixed `NavigationHandle` enum) | Later | M | Med | 3 |
-| Cross-request site/locale-scoped cached render model (hit 20ms budget) | Later | M | Med | 3, 4 |
-| Mega-menu / multi-column dropdown primitive | Later | L | Med | 3 |
-| Preload site domains once in item loader (drop per-page fallback query) | Later | S | Low | 2 |
+| Item                                                                                        | Bucket | Effort | Impact | Section ref |
+| ------------------------------------------------------------------------------------------- | ------ | ------ | ------ | ----------- |
+| Implement real `NavigationHealthCheck` probes (currently stub, declared critical)           | Now    | M      | High   | 2, 4        |
+| Replace JSON `LIKE '%...%'` reverse-lookup with pivot or `whereJsonContains`/indexed column | Now    | M      | High   | 2, 4        |
+| Add `capell-app/core` to composer `require`                                                 | Now    | S      | Med    | 2           |
+| Populate manifest `capabilities[]` + `cacheSafety.invalidationSources[]`                    | Now    | S      | High   | 2, 4        |
+| Declare existing 10 screenshots + hero assets in `marketplace.screenshots[]`                | Now    | S      | Med    | 1, 5        |
+| Rewrite marketplace `summary` + composer `description`                                      | Now    | S      | Med    | 5           |
+| Add anonymous/non-admin public-output safety test for rendered menu HTML                    | Now    | S      | High   | 4           |
+| Move DB resolution out of frontend component `render()` into a resolver/composer            | Next   | M      | High   | 2, 4        |
+| Add role/permission/auth-conditional item visibility                                        | Next   | L      | High   | 3           |
+| Add breadcrumb builder action + component (ancestry data already computed)                  | Next   | M      | High   | 3           |
+| Add ancestor/starts-with active-state mode for section highlighting                         | Next   | M      | Med    | 3           |
+| First-class external-link item type + `rel`/`_self`/`_parent` targets                       | Next   | S      | Med    | 3           |
+| Programmatic menu-handle registry (replace fixed `NavigationHandle` enum)                   | Later  | M      | Med    | 3           |
+| Cross-request site/locale-scoped cached render model (hit 20ms budget)                      | Later  | M      | Med    | 3, 4        |
+| Mega-menu / multi-column dropdown primitive                                                 | Later  | L      | Med    | 3           |
+| Preload site domains once in item loader (drop per-page fallback query)                     | Later  | S      | Low    | 2           |
