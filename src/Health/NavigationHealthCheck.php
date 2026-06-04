@@ -222,7 +222,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             ->orderBy('id')
             ->pluck('id')
             ->map(static fn (mixed $siteId): int => (int) $siteId)
-            ->filter(fn (int $siteId): bool => ! $this->siteMainNavigationExists($siteId))
+            ->reject(fn (int $siteId): bool => $this->siteMainNavigationExists($siteId))
             ->values()
             ->all();
 
