@@ -140,7 +140,7 @@ test('anonymous frontend menu output leaks no admin internals', function (): voi
         ->assertDontSee('pageable_id', false)
         ->assertDontSee('pageable_type', false)
         ->assertDontSee('is_visible', false)
-        ->assertDontSee('Capell\\Core\\Models\\Page', false)
+        ->assertDontSee(Page::class, false)
         ->assertDontSee('"id":' . $page->id, false)
         ->assertDontSee('/admin/', false)
         ->assertDontSee('NavigationResource', false);
