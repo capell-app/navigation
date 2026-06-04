@@ -4,15 +4,15 @@ Navigation owns editable navigation trees, render models, header render hooks, a
 
 ## Main Surfaces
 
-| Surface                                  | Use                                                      |
-| ---------------------------------------- | -------------------------------------------------------- |
-| `BuildNavigationRenderModelAction`       | Builds the frontend render model.                        |
-| `NavigationNamesResolver`                | Resolves navigation names for a site and languages.      |
-| `NavigationPageSyncer`                   | Removes deleted or detached pages from navigation items. |
+| Surface                                  | Use                                                          |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| `BuildNavigationRenderModelAction`       | Builds the frontend render model.                            |
+| `NavigationNamesResolver`                | Resolves navigation names for a site and languages.          |
+| `NavigationPageSyncer`                   | Removes deleted or detached pages from navigation items.     |
 | `SyncNavigationPageReferencesAction`     | Rebuilds the indexed page-reference rows for one navigation. |
-| `RegisterFoundationHeaderNavigationHook` | Adds the foundation header navigation render hook.       |
-| `NavigationObserver`                     | Clears frontend navigation cache keys after changes.     |
-| `ReplicateSiteNavigationsListener`       | Copies navigation rows when a site is replicated.        |
+| `RegisterFoundationHeaderNavigationHook` | Adds the foundation header navigation render hook.           |
+| `NavigationObserver`                     | Clears frontend navigation cache keys after changes.         |
+| `ReplicateSiteNavigationsListener`       | Copies navigation rows when a site is replicated.            |
 
 ## Render a Navigation
 

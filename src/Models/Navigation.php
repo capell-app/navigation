@@ -6,12 +6,12 @@ namespace Capell\Navigation\Models;
 
 use Bkwld\Cloner\Cloneable;
 use Capell\Core\Models\Blueprint;
+use Capell\Core\Models\Concerns\HasBlueprint;
 use Capell\Core\Models\Concerns\HasMetaData;
 use Capell\Core\Models\Concerns\HasPublishDates;
-use Capell\Core\Models\Concerns\HasType;
 use Capell\Core\Models\Concerns\HasUserstamps;
+use Capell\Core\Models\Contracts\Blueprintable;
 use Capell\Core\Models\Contracts\Publishable;
-use Capell\Core\Models\Contracts\Typeable;
 use Capell\Core\Models\Contracts\Userstampable;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
@@ -82,16 +82,16 @@ use Spatie\LaravelData\DataCollection;
  * @mixin Model
  */
 #[ObservedBy(NavigationObserver::class)]
-class Navigation extends Model implements Publishable, Typeable, Userstampable
+class Navigation extends Model implements Blueprintable, Publishable, Userstampable
 {
     use Cloneable;
+    use HasBlueprint;
 
     /** @use HasFactory<NavigationFactory> */
     use HasFactory;
 
     use HasMetaData;
     use HasPublishDates;
-    use HasType;
     use HasUserstamps;
     use SoftDeletes;
 

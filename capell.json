@@ -34,10 +34,7 @@
     "database": {
         "migrations": true,
         "settings": false,
-        "requiredTables": [
-            "navigations",
-            "navigation_page_references"
-        ]
+        "requiredTables": ["navigations", "navigation_page_references"]
     },
     "commands": {
         "install": null,
