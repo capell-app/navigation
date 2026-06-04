@@ -64,7 +64,7 @@ This is a free, foundation-bundle, first-party package — correctly positioned:
 | Populate manifest `capabilities[]` + `cacheSafety.invalidationSources[]`                    | Now    | S      | High   | 2, 4        |
 | Declare existing 10 screenshots + hero assets in `marketplace.screenshots[]`                | Now    | S      | Med    | 1, 5        |
 | Rewrite marketplace `summary` + composer `description`                                      | Now    | S      | Med    | 5           |
-| Add anonymous/non-admin public-output safety test for rendered menu HTML                    | Now    | S      | High   | 4           |
+| Add anonymous/non-admin public-output safety test for rendered menu HTML                    | Done   | S      | High   | 4           |
 | Move DB resolution out of frontend component `render()` into a resolver/composer            | Next   | M      | High   | 2, 4        |
 | Add role/permission/auth-conditional item visibility                                        | Next   | L      | High   | 3           |
 | Add breadcrumb builder action + component (ancestry data already computed)                  | Next   | M      | High   | 3           |
