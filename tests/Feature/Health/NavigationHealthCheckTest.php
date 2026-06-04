@@ -26,11 +26,24 @@ it('passes when the storage table and morph alias are present', function (): voi
 });
 
 it('fails the storage table check when the navigations table is missing', function (): void {
+    Schema::drop('navigation_page_references');
     Schema::drop('navigations');
 
     $check = new NavigationHealthCheck;
 
     expect($check->hasStorageTable())->toBeFalse()
+        ->and($check->missingStorageTables())->toContain('navigations')
+        ->and($check->storageTableCheck()->passed)->toBeFalse()
+        ->and(NavigationHealthCheck::passed())->toBeFalse();
+});
+
+it('fails the storage table check when the navigation page references table is missing', function (): void {
+    Schema::drop('navigation_page_references');
+
+    $check = new NavigationHealthCheck;
+
+    expect($check->hasStorageTable())->toBeFalse()
+        ->and($check->missingStorageTables())->toContain('navigation_page_references')
         ->and($check->storageTableCheck()->passed)->toBeFalse()
         ->and(NavigationHealthCheck::passed())->toBeFalse();
 });

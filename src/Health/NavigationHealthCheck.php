@@ -18,7 +18,13 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
 {
     private const string NavigationMorphAlias = 'navigation';
 
-    private const string StorageTableName = 'navigations';
+    /**
+     * @var list<string>
+     */
+    private const array StorageTableNames = [
+        'navigations',
+        'navigation_page_references',
+    ];
 
     public static function compatibleCapellApiVersion(): string
     {
@@ -50,17 +56,17 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     public function storageTableCheck(): DoctorCheckResultData
     {
-        $tableExists = $this->hasStorageTable();
+        $missingTables = $this->missingStorageTables();
 
         return new DoctorCheckResultData(
-            label: 'Navigation storage table',
-            passed: $tableExists,
-            message: $tableExists
-                ? 'The navigations table is present.'
-                : 'The navigations table is missing.',
-            remediation: $tableExists
+            label: 'Navigation storage tables',
+            passed: $missingTables === [],
+            message: $missingTables === []
+                ? 'The navigations and navigation_page_references tables are present.'
+                : 'Missing tables: ' . implode(', ', $missingTables) . '.',
+            remediation: $missingTables === []
                 ? null
-                : 'Run the Capell migrations to create the navigations table.',
+                : 'Run the Capell migrations to create the navigation storage tables.',
         );
     }
 
@@ -104,7 +110,18 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
 
     public function hasStorageTable(): bool
     {
-        return Schema::hasTable(self::StorageTableName);
+        return $this->missingStorageTables() === [];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function missingStorageTables(): array
+    {
+        return array_values(collect(self::StorageTableNames)
+            ->reject(static fn (string $tableName): bool => Schema::hasTable($tableName))
+            ->values()
+            ->all());
     }
 
     public function hasNavigationMorphAlias(): bool

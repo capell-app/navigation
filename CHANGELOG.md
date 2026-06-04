@@ -5,6 +5,8 @@ All notable changes to `capell-app/navigation` will be documented in this file.
 ## Unreleased
 
 - Prepared package metadata and documentation for ongoing Capell 4.x package work.
+- Added the `navigation_page_references` index table and sync action so page navigation panels can resolve references without scanning the `items` JSON column.
+- Navigation health diagnostics now require both navigation storage tables.
 
 ## 2026-06-03
 

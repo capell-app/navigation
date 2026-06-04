@@ -8,7 +8,7 @@ Navigation owns editor-managed menus and renders structured navigation data for 
 - Namespace: `Capell\Navigation\`
 - Surfaces: Filament admin, console, database
 - Service providers: `packages/navigation/src/Providers/NavigationServiceProvider.php`
-- Capell dependencies: `capell-app/admin`, `capell-app/frontend`
+- Capell dependencies: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`
 
 ## Why It Helps Your Capell Workflow
 
@@ -30,6 +30,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Navigation relation manager on sites.
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
+- Indexed page-reference tracking for fast page edit panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Navigation loader support for frontend rendering.
 
@@ -65,7 +66,7 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 ## Technical Shape
 
 - NavigationServiceProvider registers the package.
-- Migration creates navigations.
+- Migrations create navigations and the indexed page-reference table.
 - Model: Navigation.
 - Filament resource: NavigationResource.
 - Policy: NavigationPolicy.
@@ -98,12 +99,13 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 ## Data And Persistence
 
 - navigations stores key, type, site, language, items JSON, meta, and visibility windows.
+- navigation_page_references stores the page references extracted from nested navigation items so admin page panels do not scan JSON.
 - Navigation items may reference pages and page URLs through JSON.
 - Navigations connect to sites, languages, and types.
 - Cache key enum indicates navigation cache behaviour.
 
 - Models: `Navigation`.
-- Migrations: `2026_05_10_190860_01_create_navigations_table.php`.
+- Migrations: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`.
 - Data objects live in `src/Data/`; use them for payloads, form state, and view models.
 
 ## Extension Points
@@ -115,7 +117,7 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 
 ## Install Impact
 
-- Adds navigations table.
+- Adds navigations and navigation_page_references tables.
 - Adds navigation admin resource and site relation manager.
 - Extends page and site admin schemas.
 - No explicit public route is registered by this package.
@@ -139,6 +141,7 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 ## Common Pitfalls
 
 - Create language/site records before creating scoped navigation.
+- Keep navigation writes going through package actions/models so the page-reference index stays synchronized.
 - Resolve stale page references after deleting pages.
 - Clear navigation cache after manual data changes.
 

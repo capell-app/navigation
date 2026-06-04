@@ -13,6 +13,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
 - Actions to add, remove, replicate, and resolve navigation entries.
+- Indexed page-reference tracking for fast page edit panels.
 - Navigation loader support for frontend rendering.
 
 ## Developer Notes
@@ -20,7 +21,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 Stores navigation items in structured data and uses adapters/registries to connect navigable models without hard-coding page logic everywhere.
 
 - NavigationServiceProvider registers the package.
-- Migration creates navigations.
+- Migrations create navigations and the page-reference index table.
 - Model: Navigation.
 - Filament resource: NavigationResource.
 - Policy: NavigationPolicy.
@@ -39,6 +40,7 @@ Lets editors manage menus for each site and language while keeping page selectio
 ## Data And Retention
 
 - navigations stores key, type, site, language, items JSON, meta, and visibility windows.
+- navigation_page_references stores extracted nested page references for indexed admin lookups.
 - Navigation items may reference pages and page URLs through JSON.
 - Navigations connect to sites, languages, and types.
 - Cache key enum indicates navigation cache behaviour.
@@ -111,6 +113,7 @@ The frontend menu screenshot needs seeded navigation items before it is useful e
 ## Migrations
 
 - Migration: create_navigations_table.php
+- Migration: create_navigation_page_references_table.php
 
 ## ERD Excerpt
 
@@ -119,7 +122,8 @@ erDiagram
     SITES ||--o{ NAVIGATIONS : owns
     LANGUAGES ||--o{ NAVIGATIONS : localizes
     BLUEPRINTS ||--o{ NAVIGATIONS : classifies
-    PAGES ||..o{ NAVIGATIONS : referenced_in_items_json
+    PAGES ||..o{ NAVIGATION_PAGE_REFERENCES : referenced
+    NAVIGATIONS ||--o{ NAVIGATION_PAGE_REFERENCES : indexes
     PAGE_URLS ||..o{ NAVIGATIONS : referenced_in_items_json
 
     NAVIGATIONS {
@@ -132,6 +136,15 @@ erDiagram
         json meta
         timestamp visible_from
         timestamp visible_until
+    }
+
+    NAVIGATION_PAGE_REFERENCES {
+        bigint id PK
+        bigint navigation_id FK
+        bigint site_id
+        bigint language_id
+        string pageable_type
+        bigint pageable_id
     }
 ```
 

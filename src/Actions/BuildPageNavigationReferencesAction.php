@@ -10,12 +10,24 @@ use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
 final class BuildPageNavigationReferencesAction
 {
     use AsObject;
+
+    private const string REQUEST_CACHE_KEY = 'capell.navigation.page_references';
+
+    public static function flushRequestCache(): void
+    {
+        if (app()->bound('request')) {
+            request()->attributes->remove(self::REQUEST_CACHE_KEY);
+        }
+    }
 
     /**
      * @return Collection<int, Navigation>
@@ -26,13 +38,50 @@ final class BuildPageNavigationReferencesAction
             return new Collection;
         }
 
+        $cacheKey = $this->cacheKey($record);
+        $request = app()->bound('request') ? request() : null;
+        $cache = $this->requestCache($request);
+
+        if (isset($cache[$cacheKey])) {
+            return $cache[$cacheKey];
+        }
+
+        if (! Schema::hasTable('navigation_page_references')) {
+            return new Collection;
+        }
+
         /** @var class-string<Navigation> $model */
         $model = Navigation::class;
         $siteId = $record->getAttribute('site_id');
         $recordId = (int) $record->getKey();
         $recordMorphClass = $record->getMorphClass();
+        $navigationIds = DB::table('navigation_page_references')
+            ->where('pageable_type', $recordMorphClass)
+            ->where('pageable_id', $recordId)
+            ->when(
+                is_numeric($siteId),
+                fn (\Illuminate\Database\Query\Builder $query): \Illuminate\Database\Query\Builder => $query->where(
+                    fn (\Illuminate\Database\Query\Builder $query): \Illuminate\Database\Query\Builder => $query->whereNull('site_id')
+                        ->orWhere('site_id', (int) $siteId),
+                ),
+            )
+            ->orderBy('navigation_id')
+            ->pluck('navigation_id')
+            ->map(static fn (mixed $navigationId): int => (int) $navigationId)
+            ->unique()
+            ->values()
+            ->all();
 
-        return new Collection($model::with(['language', 'site'])
+        if ($navigationIds === []) {
+            $references = new Collection;
+            $cache[$cacheKey] = $references;
+            $request?->attributes->set(self::REQUEST_CACHE_KEY, $cache);
+
+            return $references;
+        }
+
+        $references = new Collection($model::with(['language', 'site'])
+            ->whereKey($navigationIds)
             ->when(
                 is_numeric($siteId),
                 fn (Builder $query): Builder => $query->where(
@@ -40,7 +89,6 @@ final class BuildPageNavigationReferencesAction
                         ->orWhere('site_id', (int) $siteId),
                 ),
             )
-            ->where(fn (Builder $query): Builder => $this->whereItemsMightContainRecord($query, $recordId, $recordMorphClass))
             ->orderBy('site_id')
             ->orderBy('name')
             ->orderBy('language_id')
@@ -48,51 +96,11 @@ final class BuildPageNavigationReferencesAction
             ->filter(fn (Navigation $navigation): bool => $this->navigationContainsRecord($navigation, $record))
             ->values()
             ->all());
-    }
 
-    /**
-     * @param  Builder<Navigation>  $query
-     * @return Builder<Navigation>
-     */
-    private function whereItemsMightContainRecord(Builder $query, int $recordId, string $recordMorphClass): Builder
-    {
-        $encodedMorphClass = trim(json_encode($recordMorphClass, JSON_THROW_ON_ERROR), '"');
+        $cache[$cacheKey] = $references;
+        $request?->attributes->set(self::REQUEST_CACHE_KEY, $cache);
 
-        return $query
-            ->where(function (Builder $query) use ($recordId): void {
-                foreach ($this->jsonNumberFragments('pageable_id', $recordId) as $fragment) {
-                    $query->orWhere('items', 'like', '%' . $fragment . '%');
-                }
-            })
-            ->where(function (Builder $query) use ($encodedMorphClass): void {
-                foreach ($this->jsonStringFragments('pageable_type', $encodedMorphClass) as $fragment) {
-                    $query->orWhere('items', 'like', '%' . $fragment . '%');
-                }
-            });
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function jsonNumberFragments(string $key, int $value): array
-    {
-        return [
-            sprintf('"%s":%d', $key, $value),
-            sprintf('"%s": %d', $key, $value),
-            sprintf('"%s":"%d"', $key, $value),
-            sprintf('"%s": "%d"', $key, $value),
-        ];
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function jsonStringFragments(string $key, string $value): array
-    {
-        return [
-            sprintf('"%s":"%s"', $key, $value),
-            sprintf('"%s": "%s"', $key, $value),
-        ];
+        return $references;
     }
 
     private function navigationContainsRecord(Navigation $navigation, Model $record): bool
@@ -148,5 +156,28 @@ final class BuildPageNavigationReferencesAction
     {
         return (int) ($data['pageable_id'] ?? 0) === $recordId
             && ($data['pageable_type'] ?? null) === $recordMorphClass;
+    }
+
+    /**
+     * @return array<string, Collection<int, Navigation>>
+     */
+    private function requestCache(?Request $request): array
+    {
+        if (! $request instanceof Request) {
+            return [];
+        }
+
+        $cache = $request->attributes->get(self::REQUEST_CACHE_KEY, []);
+
+        return is_array($cache) ? $cache : [];
+    }
+
+    private function cacheKey(Model $record): string
+    {
+        return implode('|', [
+            $record->getMorphClass(),
+            (string) $record->getKey(),
+            (string) $record->getAttribute('site_id'),
+        ]);
     }
 }

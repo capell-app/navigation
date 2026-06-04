@@ -9,6 +9,7 @@ use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\CapellCoreHelper;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
+use Capell\Navigation\Actions\SyncNavigationPageReferencesAction;
 use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Models\Navigation;
 
@@ -23,6 +24,8 @@ class NavigationObserver
 
     public function saved(Navigation $navigation): void
     {
+        SyncNavigationPageReferencesAction::run($navigation);
+
         $this->clearCache($navigation);
     }
 

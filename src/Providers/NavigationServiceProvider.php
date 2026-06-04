@@ -66,6 +66,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         $this->registerFrontendRenderHooks();
 
         if (! $this->isPackageInstalled()) {

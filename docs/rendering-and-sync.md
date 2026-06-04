@@ -9,6 +9,7 @@ Navigation owns editable navigation trees, render models, header render hooks, a
 | `BuildNavigationRenderModelAction`       | Builds the frontend render model.                        |
 | `NavigationNamesResolver`                | Resolves navigation names for a site and languages.      |
 | `NavigationPageSyncer`                   | Removes deleted or detached pages from navigation items. |
+| `SyncNavigationPageReferencesAction`     | Rebuilds the indexed page-reference rows for one navigation. |
 | `RegisterFoundationHeaderNavigationHook` | Adds the foundation header navigation render hook.       |
 | `NavigationObserver`                     | Clears frontend navigation cache keys after changes.     |
 | `ReplicateSiteNavigationsListener`       | Copies navigation rows when a site is replicated.        |
@@ -73,6 +74,18 @@ final class DemoNavigationPageSyncer implements NavigationPageSyncer
 ```
 
 Bind a replacement only when another package owns the navigation payload shape. Otherwise use the default adapter.
+
+## Page Reference Index
+
+Nested page items are still stored in `navigations.items`, but the page edit panel reads from `navigation_page_references` instead of scanning that JSON column. `SyncNavigationPageReferencesAction` extracts every nested `pageable_type` / `pageable_id` pair and rewrites the indexed rows whenever a navigation is saved. The migration backfills existing navigation records during upgrade.
+
+If a script updates `navigations.items` directly, run the sync action for that navigation afterward:
+
+```php
+use Capell\Navigation\Actions\SyncNavigationPageReferencesAction;
+
+SyncNavigationPageReferencesAction::run($navigation);
+```
 
 ## Cache Notes
 
