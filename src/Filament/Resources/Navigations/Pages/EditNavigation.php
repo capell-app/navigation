@@ -8,9 +8,9 @@ use Capell\Admin\Filament\Actions\CreateAction;
 use Capell\Admin\Filament\Actions\DeleteAction;
 use Capell\Admin\Filament\Actions\ReplicateAction;
 use Capell\Admin\Filament\Concerns\HasCreateActionOnEditPage;
+use Capell\Admin\Filament\Concerns\HasExtensibleRecordHeading;
 use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
 use Capell\Navigation\Models\Navigation;
-use Capell\RecordSwitcher\Concerns\HasRecordSwitcher;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -26,9 +26,7 @@ use Override;
 class EditNavigation extends EditRecord
 {
     use HasCreateActionOnEditPage;
-    use HasRecordSwitcher {
-        afterSave as recordSwitcherAfterSave;
-    }
+    use HasExtensibleRecordHeading;
 
     /** @return class-string<NavigationResource> */
     #[Override]
@@ -67,6 +65,6 @@ class EditNavigation extends EditRecord
 
     protected function afterSave(): void
     {
-        $this->recordSwitcherAfterSave();
+        $this->notifyEditRecordHeadingSaved();
     }
 }
