@@ -6,9 +6,12 @@ use Capell\Core\Data\Diagnostics\DoctorCheckResultData;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Frontend\Enums\RenderHookLocation;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Health\NavigationHealthCheck;
 use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -29,6 +32,51 @@ it('passes when the storage table and morph alias are present', function (): voi
 
     expect($check->storageTableCheck()->passed)->toBeTrue()
         ->and($check->modelMorphAliasCheck()->passed)->toBeTrue();
+});
+
+it('passes the header render hook check when the navigation hook scenarios are registered', function (): void {
+    $check = new NavigationHealthCheck;
+
+    expect($check->hasHeaderRenderHook())->toBeTrue()
+        ->and($check->headerRenderHookCheck()->passed)->toBeTrue();
+});
+
+it('fails the header render hook check when only unrelated header hooks are registered', function (): void {
+    $registry = new RenderHookRegistry;
+
+    $registry->register(
+        RenderHookLocation::HeaderAfter,
+        static fn (): string => '',
+        scenario: 'unrelated-header-hook',
+        target: RegisterFoundationHeaderNavigationHook::Target,
+    );
+
+    app()->instance(RenderHookRegistry::class, $registry);
+
+    $check = new NavigationHealthCheck;
+
+    expect($check->hasHeaderRenderHook())->toBeFalse()
+        ->and($check->headerRenderHookCheck()->passed)->toBeFalse()
+        ->and(NavigationHealthCheck::passed())->toBeFalse();
+});
+
+it('fails the header render hook check when a navigation header hook scenario is missing', function (): void {
+    $registry = new RenderHookRegistry;
+
+    $registry->register(
+        RenderHookLocation::HeaderAfter,
+        static fn (): string => '',
+        scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
+        target: RegisterFoundationHeaderNavigationHook::Target,
+    );
+
+    app()->instance(RenderHookRegistry::class, $registry);
+
+    $check = new NavigationHealthCheck;
+
+    expect($check->hasHeaderRenderHook())->toBeFalse()
+        ->and($check->headerRenderHookCheck()->passed)->toBeFalse()
+        ->and(NavigationHealthCheck::passed())->toBeFalse();
 });
 
 it('fails the storage table check when the navigations table is missing', function (): void {

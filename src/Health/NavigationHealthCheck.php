@@ -10,11 +10,13 @@ use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ReflectionProperty;
 use Throwable;
 
 final class NavigationHealthCheck implements ChecksExtensionHealth
@@ -198,8 +200,9 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
 
         try {
             $registry = app()->make(RenderHookRegistry::class);
+            $registeredScenarios = $this->registeredNavigationHeaderHookScenarios($registry);
 
-            return $registry->get(RenderHookLocation::HeaderAfter) !== [];
+            return array_diff($this->requiredHeaderHookScenarios(), $registeredScenarios) === [];
         } catch (Throwable) {
             return false;
         }
@@ -341,5 +344,61 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             ->where('pageable_type', $pageableType)
             ->whereIn('pageable_id', $orphanedIds)
             ->count();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function registeredNavigationHeaderHookScenarios(RenderHookRegistry $registry): array
+    {
+        $extensions = $this->registeredRenderHookExtensions($registry);
+        $headerExtensions = $extensions[RenderHookLocation::HeaderAfter->value] ?? [];
+
+        if (! is_array($headerExtensions)) {
+            return [];
+        }
+
+        $scenarios = [];
+
+        foreach ($headerExtensions as $extensionEntry) {
+            if (! is_array($extensionEntry)) {
+                continue;
+            }
+
+            if (($extensionEntry['target'] ?? null) !== RegisterFoundationHeaderNavigationHook::Target) {
+                continue;
+            }
+
+            $scenario = $extensionEntry['scenario'] ?? null;
+
+            if (is_string($scenario) && in_array($scenario, $this->requiredHeaderHookScenarios(), true)) {
+                $scenarios[] = $scenario;
+            }
+        }
+
+        return array_values(array_unique($scenarios));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function registeredRenderHookExtensions(RenderHookRegistry $registry): array
+    {
+        $property = new ReflectionProperty($registry, 'extensions');
+        $property->setAccessible(true);
+        $extensions = $property->getValue($registry);
+
+        return is_array($extensions) ? $extensions : [];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function requiredHeaderHookScenarios(): array
+    {
+        return [
+            RegisterFoundationHeaderNavigationHook::DefaultScenario,
+            RegisterFoundationHeaderNavigationHook::FoundationScenario,
+        ];
     }
 }
