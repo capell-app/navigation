@@ -42,7 +42,7 @@ final readonly class NavigationRenderModelComposer
             fallbackWithoutLanguage: ($data['fallbackWithoutLanguage'] ?? false) === true,
         );
 
-        if (! $navigation instanceof Navigation || ! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Model || ! $page instanceof Pageable || ! $siteDomain instanceof SiteDomain) {
+        if (! $navigation instanceof Navigation || ! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Model || ! $siteDomain instanceof SiteDomain) {
             $view->with('menu');
             $view->with('navigation', $navigation);
 

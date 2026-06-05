@@ -50,14 +50,12 @@ final class BuildPageNavigationReferencesAction
             return new Collection;
         }
 
-        /** @var class-string<Navigation> $model */
-        $model = Navigation::class;
         $siteId = $record->getAttribute('site_id');
         $recordSiteId = is_numeric($siteId) ? (int) $siteId : null;
         $recordId = (int) $record->getKey();
         $recordMorphClass = $record->getMorphClass();
 
-        $references = new Collection($model::query()
+        $query = Navigation::query()
             ->with(['language', 'site'])
             ->whereExists(
                 fn (QueryBuilder $query): QueryBuilder => $this->referenceExistsQuery(
@@ -66,18 +64,19 @@ final class BuildPageNavigationReferencesAction
                     recordId: $recordId,
                     recordSiteId: $recordSiteId,
                 ),
-            )
-            ->when(
-                $recordSiteId !== null,
-                fn (Builder $query): Builder => $this->whereNavigationMatchesSite($query, $recordSiteId),
-            )
+            );
+
+        if ($recordSiteId !== null) {
+            $this->whereNavigationMatchesSite($query, $recordSiteId);
+        }
+
+        $references = $query
             ->orderBy('site_id')
             ->orderBy('name')
             ->orderBy('language_id')
             ->get()
             ->filter(fn (Navigation $navigation): bool => $this->navigationContainsRecord($navigation, $record))
-            ->values()
-            ->all());
+            ->values();
 
         $cache[$cacheKey] = $references;
         $request?->attributes->set(self::REQUEST_CACHE_KEY, $cache);
@@ -91,18 +90,24 @@ final class BuildPageNavigationReferencesAction
         int $recordId,
         ?int $recordSiteId,
     ): QueryBuilder {
-        return $query
+        $query
             ->from('navigation_page_references')
             ->select('navigation_page_references.navigation_id')
             ->whereColumn('navigation_page_references.navigation_id', 'navigations.id')
             ->where('navigation_page_references.pageable_type', $recordMorphClass)
-            ->where('navigation_page_references.pageable_id', $recordId)
-            ->when(
-                $recordSiteId !== null,
-                fn (QueryBuilder $query): QueryBuilder => $this->whereReferenceMatchesSite($query, $recordSiteId),
-            );
+            ->where('navigation_page_references.pageable_id', $recordId);
+
+        if ($recordSiteId !== null) {
+            $this->whereReferenceMatchesSite($query, $recordSiteId);
+        }
+
+        return $query;
     }
 
+    /**
+     * @param  Builder<Navigation>  $query
+     * @return Builder<Navigation>
+     */
     private function whereNavigationMatchesSite(Builder $query, int $recordSiteId): Builder
     {
         return $query->where(

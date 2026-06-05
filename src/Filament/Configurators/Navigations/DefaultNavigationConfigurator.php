@@ -190,7 +190,6 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     {
         return AdjacencyList::make('items')
             ->label(__('capell-admin::form.navigation_items'))
-            ->view('capell-admin::components.adjacency-list.builder')
             ->hiddenLabel()
             ->labelKey('label')
             ->columnSpanFull()

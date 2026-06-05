@@ -6,6 +6,7 @@ namespace Capell\Navigation\Health;
 
 use Capell\Core\Contracts\Extensions\ChecksExtensionHealth;
 use Capell\Core\Data\Diagnostics\DoctorCheckResultData;
+use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Enums\NavigationHandle;
@@ -347,6 +348,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
     }
 
     /**
+     * @param  RenderHookRegistry<RenderHookContext>  $registry
      * @return list<string>
      */
     private function registeredNavigationHeaderHookScenarios(RenderHookRegistry $registry): array
@@ -380,6 +382,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
     }
 
     /**
+     * @param  RenderHookRegistry<RenderHookContext>  $registry
      * @return array<string, mixed>
      */
     private function registeredRenderHookExtensions(RenderHookRegistry $registry): array
