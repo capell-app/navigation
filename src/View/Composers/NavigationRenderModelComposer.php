@@ -43,7 +43,7 @@ final readonly class NavigationRenderModelComposer
         );
 
         if (! $navigation instanceof Navigation || ! $site instanceof Site || ! $language instanceof Language || ! $page instanceof Model || ! $page instanceof Pageable || ! $siteDomain instanceof SiteDomain) {
-            $view->with('menu', null);
+            $view->with('menu');
             $view->with('navigation', $navigation);
 
             return;

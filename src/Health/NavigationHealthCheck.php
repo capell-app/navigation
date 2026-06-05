@@ -385,7 +385,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
     private function registeredRenderHookExtensions(RenderHookRegistry $registry): array
     {
         $property = new ReflectionProperty($registry, 'extensions');
-        $property->setAccessible(true);
+
         $extensions = $property->getValue($registry);
 
         return is_array($extensions) ? $extensions : [];

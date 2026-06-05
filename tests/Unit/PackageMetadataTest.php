@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
+use Capell\Navigation\Models\Navigation;
+
 function navigationPackagePath(string $filename): string
 {
     return dirname(__DIR__, 2) . '/' . $filename;
@@ -53,15 +57,15 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
 
     expect($manifest['performance']['cacheSafety']['invalidationSources'] ?? [])->toEqual([
         [
-            'model' => 'Capell\\Navigation\\Models\\Navigation',
+            'model' => Navigation::class,
             'events' => ['saved', 'deleted', 'restored'],
         ],
         [
-            'model' => 'Capell\\Core\\Models\\Page',
+            'model' => Page::class,
             'events' => ['updated'],
         ],
         [
-            'model' => 'Capell\\Core\\Models\\Site',
+            'model' => Site::class,
             'events' => ['replicated'],
         ],
     ]);
