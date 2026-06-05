@@ -56,7 +56,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
         ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
+        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('#header'));
 });
 
@@ -80,7 +80,7 @@ test('themed header displays the main navigation menu', function (): void {
         ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
+        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists('#header');
 });
 
