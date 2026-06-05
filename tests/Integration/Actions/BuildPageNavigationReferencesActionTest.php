@@ -149,7 +149,9 @@ it('uses the indexed page references table instead of scanning navigation item j
 
     expect($references)->toHaveCount(1)
         ->and($references->first()?->is($navigation))->toBeTrue()
-        ->and(navigationReferenceQueriesUsingItemsLike())->toBe([]);
+        ->and(navigationReferenceQueriesUsingItemsLike())->toBe([])
+        ->and(navigationReferenceStandalonePivotQueries())->toBe([])
+        ->and(navigationReferenceExistsQueries())->not->toBeEmpty();
 });
 
 it('memoizes page navigation references for repeated form renders in one request', function (): void {
@@ -222,6 +224,34 @@ it('refreshes indexed references when navigation items change', function (): voi
         ->and(DB::table('navigation_page_references')->where('navigation_id', $navigation->getKey())->count())->toBe(1);
 });
 
+it('ignores stale indexed references that are not present in navigation item data', function (): void {
+    $site = Site::factory()->create();
+    $page = Page::factory()->site($site)->create();
+
+    $navigation = Navigation::factory()
+        ->site($site)
+        ->items([])
+        ->create();
+
+    DB::table('navigation_page_references')->insert([
+        'navigation_id' => $navigation->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => null,
+        'pageable_type' => $page->getMorphClass(),
+        'pageable_id' => $page->getKey(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    DB::enableQueryLog();
+
+    $references = BuildPageNavigationReferencesAction::run($page);
+
+    expect($references)->toHaveCount(0)
+        ->and(navigationReferenceQueriesUsingItemsLike())->toBe([])
+        ->and(navigationReferenceStandalonePivotQueries())->toBe([]);
+});
+
 /**
  * @return list<string>
  */
@@ -230,6 +260,33 @@ function navigationReferenceQueriesUsingItemsLike(): array
     return array_values(collect(DB::getQueryLog())
         ->map(static fn (array $query): string => (string) ($query['query'] ?? ''))
         ->filter(static fn (string $query): bool => str_contains($query, '"items" like') || str_contains($query, '`items` like'))
+        ->values()
+        ->all());
+}
+
+/**
+ * @return list<string>
+ */
+function navigationReferenceStandalonePivotQueries(): array
+{
+    return array_values(collect(DB::getQueryLog())
+        ->map(static fn (array $query): string => (string) ($query['query'] ?? ''))
+        ->filter(static fn (string $query): bool => (str_contains($query, 'from "navigation_page_references"') || str_contains($query, 'from `navigation_page_references`'))
+            && ! str_contains($query, 'from "navigations"')
+            && ! str_contains($query, 'from `navigations`'))
+        ->values()
+        ->all());
+}
+
+/**
+ * @return list<string>
+ */
+function navigationReferenceExistsQueries(): array
+{
+    return array_values(collect(DB::getQueryLog())
+        ->map(static fn (array $query): string => strtolower((string) ($query['query'] ?? '')))
+        ->filter(static fn (string $query): bool => str_contains($query, 'exists')
+            && str_contains($query, 'navigation_page_references'))
         ->values()
         ->all());
 }
