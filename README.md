@@ -55,13 +55,13 @@ This package makes its Composer dependencies visible because they are part of th
 
 ## Screens And Workflow
 
-Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) during package deployment.
+Runtime screenshots are generated from [docs/screenshots.json](docs/screenshots.json) during package deployment. Marketplace card and hero artwork ship from [docs/assets/marketplace](docs/assets/marketplace).
 
-- Navigation admin index.
-- Create/edit navigation form.
-- Site relation manager for navigations.
-- Page form navigation tab.
-- Frontend menu output.
+- Navigation admin index, light and dark.
+- Create/edit navigation form, light and dark.
+- Site relation manager for navigations, light and dark.
+- Page form navigation tab, light and dark.
+- Frontend menu output, light and dark.
 
 ## Technical Shape
 

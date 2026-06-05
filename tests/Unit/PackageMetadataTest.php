@@ -2,9 +2,19 @@
 
 declare(strict_types=1);
 
+function navigationPackagePath(string $filename): string
+{
+    return dirname(__DIR__, 2) . '/' . $filename;
+}
+
+function navigationRepositoryPath(string $filename): string
+{
+    return dirname(__DIR__, 4) . '/' . $filename;
+}
+
 function navigationPackageJson(string $filename): array
 {
-    $path = dirname(__DIR__, 2) . '/' . $filename;
+    $path = navigationPackagePath($filename);
 
     expect($path)->toBeFile();
 
@@ -66,4 +76,80 @@ it('uses marketplace and composer copy that describes the package outcome', func
 
     expect($manifest['marketplace']['summary'] ?? null)
         ->toBe('Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.');
+});
+
+it('declares shipped marketplace images and screenshot captures', function (): void {
+    $manifest = navigationPackageJson('capell.json');
+    $marketplaceScreenshots = $manifest['marketplace']['screenshots'] ?? [];
+    $marketplacePaths = array_column($marketplaceScreenshots, 'path');
+    $expectedMarketplacePaths = [
+        'docs/assets/marketplace/extension-card.jpg',
+        'docs/assets/marketplace/hero-desktop.jpg',
+        'docs/assets/marketplace/hero-mobile.jpg',
+        'docs/screenshots/navigation-admin-index.png',
+        'docs/screenshots/navigation-admin-index-dark.png',
+        'docs/screenshots/create-edit-navigation-form.png',
+        'docs/screenshots/create-edit-navigation-form-dark.png',
+        'docs/screenshots/site-relation-manager-for-navigations.png',
+        'docs/screenshots/site-relation-manager-for-navigations-dark.png',
+        'docs/screenshots/page-form-navigation-tab.png',
+        'docs/screenshots/page-form-navigation-tab-dark.png',
+        'docs/screenshots/frontend-menu-output.png',
+        'docs/screenshots/frontend-menu-output-dark.png',
+    ];
+
+    expect($marketplacePaths)->toEqual($expectedMarketplacePaths);
+
+    foreach ($marketplaceScreenshots as $marketplaceScreenshot) {
+        expect($marketplaceScreenshot)
+            ->toHaveKeys(['path', 'alt', 'caption']);
+        expect($marketplaceScreenshot['alt'])->toBeString()->not->toBeEmpty();
+        expect($marketplaceScreenshot['caption'])->toBeString()->not->toBeEmpty();
+        expect(navigationPackagePath($marketplaceScreenshot['path']))->toBeFile();
+    }
+
+    $declaredScreenshotPaths = array_values(array_filter(
+        $marketplacePaths,
+        static fn (string $marketplacePath): bool => str_starts_with($marketplacePath, 'docs/screenshots/'),
+    ));
+    sort($declaredScreenshotPaths);
+
+    $shippedScreenshotPaths = array_map(
+        static fn (string $shippedScreenshotPath): string => 'docs/screenshots/' . basename($shippedScreenshotPath),
+        glob(navigationPackagePath('docs/screenshots/*.png')) ?: [],
+    );
+    sort($shippedScreenshotPaths);
+
+    expect($declaredScreenshotPaths)->toEqual($shippedScreenshotPaths);
+});
+
+it('keeps the screenshot capture manifest aligned with shipped captures', function (): void {
+    $screenshotManifest = navigationPackageJson('docs/screenshots.json');
+    $entries = $screenshotManifest['entries'] ?? [];
+
+    expect($entries)->toHaveCount(5);
+
+    $expectedScreenshotPaths = [
+        'packages/navigation/docs/screenshots/navigation-admin-index.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form.png',
+        'packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png',
+        'packages/navigation/docs/screenshots/page-form-navigation-tab.png',
+        'packages/navigation/docs/screenshots/frontend-menu-output.png',
+    ];
+    $expectedDarkScreenshotPaths = [
+        'packages/navigation/docs/screenshots/navigation-admin-index-dark.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png',
+        'packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png',
+        'packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png',
+        'packages/navigation/docs/screenshots/frontend-menu-output-dark.png',
+    ];
+
+    expect(array_column($entries, 'screenshotPath'))->toEqual($expectedScreenshotPaths);
+    expect(array_column($entries, 'darkScreenshotPath'))->toEqual($expectedDarkScreenshotPaths);
+
+    foreach ($entries as $entry) {
+        expect($entry)->toHaveKeys(['id', 'screenshotPath', 'darkScreenshotPath']);
+        expect(navigationRepositoryPath($entry['screenshotPath']))->toBeFile();
+        expect(navigationRepositoryPath($entry['darkScreenshotPath']))->toBeFile();
+    }
 });

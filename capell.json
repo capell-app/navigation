@@ -96,68 +96,68 @@
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",
-                "alt": "Navigation extension preview image",
-                "caption": "Navigation extension preview"
+                "alt": "Navigation marketplace card showing editor-managed site menus",
+                "caption": "Navigation gives Capell editors a visual menu builder for site and language scoped menus"
             },
             {
                 "path": "docs/assets/marketplace/hero-desktop.jpg",
-                "alt": "Navigation hero banner on desktop",
-                "caption": "Navigation hero (desktop)"
+                "alt": "Navigation marketplace hero banner for desktop displays",
+                "caption": "Desktop marketplace hero for the Navigation foundation package"
             },
             {
                 "path": "docs/assets/marketplace/hero-mobile.jpg",
-                "alt": "Navigation hero banner on mobile",
-                "caption": "Navigation hero (mobile)"
+                "alt": "Navigation marketplace hero banner for mobile displays",
+                "caption": "Mobile marketplace hero for the Navigation foundation package"
             },
             {
                 "path": "docs/screenshots/navigation-admin-index.png",
                 "alt": "Navigation admin index listing site navigations and their scope",
-                "caption": "Navigation admin index"
+                "caption": "Review navigation records, their site scope, language, and publication state"
             },
             {
                 "path": "docs/screenshots/navigation-admin-index-dark.png",
                 "alt": "Navigation admin index in dark mode",
-                "caption": "Navigation admin index (dark)"
+                "caption": "Review navigation records from the dark-mode admin index"
             },
             {
                 "path": "docs/screenshots/create-edit-navigation-form.png",
                 "alt": "Create and edit navigation form with links, page references, and nested items",
-                "caption": "Create/edit navigation form"
+                "caption": "Build nested menus from page references, links, and headings"
             },
             {
                 "path": "docs/screenshots/create-edit-navigation-form-dark.png",
                 "alt": "Create and edit navigation form in dark mode",
-                "caption": "Create/edit navigation form (dark)"
+                "caption": "Build nested menus from the dark-mode create and edit form"
             },
             {
                 "path": "docs/screenshots/site-relation-manager-for-navigations.png",
                 "alt": "Site relation manager listing navigations for a site",
-                "caption": "Site relation manager for navigations"
+                "caption": "Manage a site's scoped navigations directly from the site edit surface"
             },
             {
                 "path": "docs/screenshots/site-relation-manager-for-navigations-dark.png",
                 "alt": "Site relation manager for navigations in dark mode",
-                "caption": "Site relation manager for navigations (dark)"
+                "caption": "Manage site-scoped navigations from the dark-mode site relation manager"
             },
             {
                 "path": "docs/screenshots/page-form-navigation-tab.png",
                 "alt": "Page form navigation tab showing which menus reference the page",
-                "caption": "Page form navigation tab"
+                "caption": "See and manage which menus reference the page from the page form"
             },
             {
                 "path": "docs/screenshots/page-form-navigation-tab-dark.png",
                 "alt": "Page form navigation tab in dark mode",
-                "caption": "Page form navigation tab (dark)"
+                "caption": "Review page navigation references from the dark-mode page form"
             },
             {
                 "path": "docs/screenshots/frontend-menu-output.png",
                 "alt": "Frontend menu output rendered for an anonymous visitor",
-                "caption": "Frontend menu output"
+                "caption": "Render the seeded menu as clean public frontend HTML"
             },
             {
                 "path": "docs/screenshots/frontend-menu-output-dark.png",
                 "alt": "Frontend menu output in dark mode",
-                "caption": "Frontend menu output (dark)"
+                "caption": "Render the seeded menu in dark mode without exposing editor metadata"
             }
         ],
         "categories": ["admin", "console", "foundation", "frontend"]
