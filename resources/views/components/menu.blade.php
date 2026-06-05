@@ -1,5 +1,7 @@
-<nav {{ $attributes->merge(['aria-label' => $navigationLabel]) }}>
-    @include('capell-navigation::components.menu-items', [
-        'items' => $menu->items,
-    ])
-</nav>
+@if (($menu ?? null) instanceof NavigationRenderData && $menu->isNotEmpty())
+    <nav {{ $attributes->merge(['aria-label' => $navigationLabel]) }}>
+        @include('capell-navigation::components.menu-items', [
+            'items' => $menu->items,
+        ])
+    </nav>
+@endif
