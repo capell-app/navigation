@@ -13,11 +13,14 @@ use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelData\DataCollection;
 
 class NavigationItemsLoader
@@ -279,7 +282,7 @@ class NavigationItemsLoader
     protected function visibleMenuItems(Collection $items): Collection
     {
         return $items
-            ->filter(fn (NavigationItemData $item): bool => $item->is_visible)
+            ->filter(fn (NavigationItemData $item): bool => $item->is_visible && $this->passesVisibilityCondition($item))
             ->map(function (NavigationItemData $item): NavigationItemData {
                 $children = $this->visibleMenuItems(collect($item->children?->all() ?? []));
 
@@ -288,6 +291,49 @@ class NavigationItemsLoader
                 return $item;
             })
             ->values();
+    }
+
+    private function passesVisibilityCondition(NavigationItemData $item): bool
+    {
+        $visibility = $this->visibility($item);
+
+        return match ($visibility) {
+            NavigationItemVisibility::Everyone => true,
+            NavigationItemVisibility::Guests => Auth::guest(),
+            NavigationItemVisibility::Authenticated => Auth::check(),
+            NavigationItemVisibility::Ability => $this->passesAbilityCondition($item),
+            NavigationItemVisibility::Role => $this->passesRoleCondition($item),
+        };
+    }
+
+    private function visibility(NavigationItemData $item): NavigationItemVisibility
+    {
+        $visibility = $item->data['visibility'] ?? NavigationItemVisibility::Everyone->value;
+
+        return is_string($visibility)
+            ? NavigationItemVisibility::tryFrom($visibility) ?? NavigationItemVisibility::Everyone
+            : NavigationItemVisibility::Everyone;
+    }
+
+    private function passesAbilityCondition(NavigationItemData $item): bool
+    {
+        $ability = $item->data['ability'] ?? null;
+
+        return is_string($ability)
+            && $ability !== ''
+            && Gate::allows($ability);
+    }
+
+    private function passesRoleCondition(NavigationItemData $item): bool
+    {
+        $role = $item->data['role'] ?? null;
+        $user = Auth::user();
+
+        return is_string($role)
+            && $role !== ''
+            && is_object($user)
+            && method_exists($user, 'hasRole')
+            && $user->hasRole($role) === true;
     }
 
     /**

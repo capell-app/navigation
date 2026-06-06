@@ -33,6 +33,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - First-class external-link items with `_self`, `_blank`, `_parent`, and `rel` output controls.
 - Exact and starts-with active-state modes for section highlighting.
 - Breadcrumb component and builder action derived from the active navigation branch.
+- Conditional item visibility for everyone, guests, authenticated users, Gate abilities, and host-provided roles.
 - Indexed page-reference tracking for fast page edit panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Navigation loader support for frontend rendering.

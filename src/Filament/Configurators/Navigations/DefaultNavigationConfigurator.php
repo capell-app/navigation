@@ -28,6 +28,7 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
 use Closure;
 use Filament\Actions\Action;
@@ -398,6 +399,17 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 ->label(__('capell-navigation::generic.active_mode'))
                 ->options(NavigationItemActiveMode::class)
                 ->default(NavigationItemActiveMode::Exact->value),
+            Select::make('visibility')
+                ->label(__('capell-navigation::generic.visibility'))
+                ->options(NavigationItemVisibility::class)
+                ->default(NavigationItemVisibility::Everyone->value)
+                ->live(),
+            TextInput::make('ability')
+                ->label(__('capell-navigation::generic.visibility_ability_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Ability->value),
+            TextInput::make('role')
+                ->label(__('capell-navigation::generic.visibility_role_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Role->value),
             TextInput::make('rel')
                 ->label(__('capell-navigation::generic.rel_attribute'))
                 ->helperText(__('capell-navigation::generic.rel_attribute_info'))

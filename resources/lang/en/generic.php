@@ -40,4 +40,12 @@ return [
     'sub_footer_navigation' => 'Footer utility navigation',
     'target_parent' => 'Parent frame',
     'target_self' => 'Same tab',
+    'visibility' => 'Visibility',
+    'visibility_ability' => 'Requires ability',
+    'visibility_ability_name' => 'Ability',
+    'visibility_authenticated' => 'Authenticated users',
+    'visibility_everyone' => 'Everyone',
+    'visibility_guests' => 'Guests',
+    'visibility_role' => 'Requires role',
+    'visibility_role_name' => 'Role',
 ];
