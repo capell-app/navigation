@@ -133,16 +133,6 @@
                 "caption": "Navigation gives Capell editors a visual menu builder for site and language scoped menus"
             },
             {
-                "path": "docs/screenshots/navigation-admin-index.png",
-                "alt": "Navigation admin index listing site navigations and their scope",
-                "caption": "Review navigation records, their site scope, language, and publication state"
-            },
-            {
-                "path": "docs/screenshots/navigation-admin-index-dark.png",
-                "alt": "Navigation admin index in dark mode",
-                "caption": "Review navigation records from the dark-mode admin index"
-            },
-            {
                 "path": "docs/screenshots/create-edit-navigation-form.png",
                 "alt": "Create and edit navigation form with links, page references, and nested items",
                 "caption": "Build nested menus from page references, links, and headings"
@@ -161,16 +151,6 @@
                 "path": "docs/screenshots/site-relation-manager-for-navigations-dark.png",
                 "alt": "Site relation manager for navigations in dark mode",
                 "caption": "Manage site-scoped navigations from the dark-mode site relation manager"
-            },
-            {
-                "path": "docs/screenshots/page-form-navigation-tab.png",
-                "alt": "Page form navigation tab showing which menus reference the page",
-                "caption": "See and manage which menus reference the page from the page form"
-            },
-            {
-                "path": "docs/screenshots/page-form-navigation-tab-dark.png",
-                "alt": "Page form navigation tab in dark mode",
-                "caption": "Review page navigation references from the dark-mode page form"
             }
         ],
         "categories": [

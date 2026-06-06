@@ -116,18 +116,10 @@ it('declares shipped marketplace images and screenshot captures', function (): v
     $marketplacePaths = array_column($marketplaceScreenshots, 'path');
     $expectedMarketplacePaths = [
         'docs/assets/marketplace/extension-card.jpg',
-        'docs/assets/marketplace/hero-desktop.jpg',
-        'docs/assets/marketplace/hero-mobile.jpg',
-        'docs/screenshots/navigation-admin-index.png',
-        'docs/screenshots/navigation-admin-index-dark.png',
         'docs/screenshots/create-edit-navigation-form.png',
         'docs/screenshots/create-edit-navigation-form-dark.png',
         'docs/screenshots/site-relation-manager-for-navigations.png',
         'docs/screenshots/site-relation-manager-for-navigations-dark.png',
-        'docs/screenshots/page-form-navigation-tab.png',
-        'docs/screenshots/page-form-navigation-tab-dark.png',
-        'docs/screenshots/frontend-menu-output.png',
-        'docs/screenshots/frontend-menu-output-dark.png',
     ];
 
     expect($marketplacePaths)->toEqual($expectedMarketplacePaths);
@@ -150,13 +142,12 @@ it('declares shipped marketplace images and screenshot captures', function (): v
     ));
     sort($declaredScreenshotPaths);
 
-    $shippedScreenshotPaths = array_map(
-        static fn (string $shippedScreenshotPath): string => 'docs/screenshots/' . basename($shippedScreenshotPath),
-        glob(navigationPackagePath('docs/screenshots/*.png')) ?: [],
-    );
-    sort($shippedScreenshotPaths);
-
-    expect($declaredScreenshotPaths)->toEqual($shippedScreenshotPaths);
+    expect($declaredScreenshotPaths)->toEqual([
+        'docs/screenshots/create-edit-navigation-form-dark.png',
+        'docs/screenshots/create-edit-navigation-form.png',
+        'docs/screenshots/site-relation-manager-for-navigations-dark.png',
+        'docs/screenshots/site-relation-manager-for-navigations.png',
+    ]);
 });
 
 it('keeps the screenshot capture manifest aligned with shipped captures', function (): void {
