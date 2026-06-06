@@ -68,6 +68,7 @@ class NavigationItemsLoader
 
             switch ($item->type) {
                 case NavigationItemType::Link:
+                case NavigationItemType::ExternalLink:
                     if (! isset($item->data['url'])) {
                         continue 2;
                     }

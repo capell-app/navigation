@@ -30,6 +30,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Navigation relation manager on sites.
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
+- First-class external-link items with `_self`, `_blank`, `_parent`, and `rel` output controls.
 - Indexed page-reference tracking for fast page edit panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Navigation loader support for frontend rendering.

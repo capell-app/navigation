@@ -49,7 +49,8 @@
         "navigation-menu-builder",
         "navigation-page-field",
         "navigation-render-model",
-        "navigation-site-replication"
+        "navigation-site-replication",
+        "navigation-external-links"
     ],
     "performance": {
         "frontendRenderBudgetMs": 20,

@@ -8,6 +8,7 @@ use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
+use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
 use Illuminate\Http\Request;
@@ -89,6 +90,7 @@ class BuildNavigationRenderModelAction
             children: $this->mapItems(collect($item->children?->all() ?? [])),
             data: $this->viewData($data),
             target: isset($data['target']) && is_string($data['target']) ? $data['target'] : null,
+            rel: $this->rel($item, $data),
             icon: isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null,
             activeIcon: isset($data['active_icon']) && is_string($data['active_icon']) ? $data['active_icon'] : null,
             class: isset($data['class']) && is_string($data['class']) ? $data['class'] : null,
@@ -106,13 +108,35 @@ class BuildNavigationRenderModelAction
     {
         $viewData = [];
 
-        foreach (['url', 'target', 'icon', 'active_icon', 'class', 'component', 'component_item', 'hide_label'] as $key) {
+        foreach (['url', 'target', 'rel', 'icon', 'active_icon', 'class', 'component', 'component_item', 'hide_label'] as $key) {
             if (array_key_exists($key, $data)) {
                 $viewData[$key] = $data[$key];
             }
         }
 
         return $viewData;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function rel(NavigationItemData $item, array $data): ?string
+    {
+        if (isset($data['rel']) && is_string($data['rel']) && trim($data['rel']) !== '') {
+            return trim($data['rel']);
+        }
+
+        if (($data['target'] ?? null) !== '_blank') {
+            return null;
+        }
+
+        $url = $data['url'] ?? null;
+
+        if ($item->type === NavigationItemType::ExternalLink || (is_string($url) && preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1)) {
+            return 'noopener noreferrer';
+        }
+
+        return null;
     }
 
     private function listComponent(Navigation $navigation): string

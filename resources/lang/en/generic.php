@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'footer_navigation' => 'Footer navigation',
+    'external_link' => 'External link',
     'health_header_render_hook_failed' => 'The foundation header navigation render hook is not registered.',
     'health_header_render_hook_label' => 'Navigation header render hook',
     'health_header_render_hook_passed' => 'The foundation header navigation render hook is registered.',
@@ -30,5 +31,9 @@ return [
     'health_storage_tables_remediation' => 'Run the Capell migrations to create the navigation storage tables.',
     'main_navigation' => 'Main navigation',
     'navigation' => 'Navigation',
+    'rel_attribute' => 'Link relationship',
+    'rel_attribute_info' => 'Optional rel attribute for links. External links opened in a new tab default to noopener noreferrer when this is empty.',
     'sub_footer_navigation' => 'Footer utility navigation',
+    'target_parent' => 'Parent frame',
+    'target_self' => 'Same tab',
 ];

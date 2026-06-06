@@ -7,13 +7,19 @@
     use Capell\Navigation\Data\NavigationItemData;
 
     /** @var NavigationItemData $item */
+    $url = isset($item->data['url']) && is_string($item->data['url']) ? $item->data['url'] : '';
+    $isExternalUrl = preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1;
     $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
-    $usesWireNavigate = $runtimeManifest?->usesWireNavigate ?? false;
+    $usesWireNavigate = ($runtimeManifest?->usesWireNavigate ?? false) && ! $isExternalUrl;
+    $target = isset($item->data['target']) && is_string($item->data['target']) ? $item->data['target'] : null;
+    $rel = isset($item->data['rel']) && is_string($item->data['rel']) && trim($item->data['rel']) !== ''
+        ? trim($item->data['rel'])
+        : ($target === '_blank' && $isExternalUrl ? 'noopener noreferrer' : null);
 @endphp
 
 <li class="capell-navigation-menu-item flex">
     <a
-        href="{{ $item->data['url'] ?? '' }}"
+        href="{{ $url }}"
         @if ($usesWireNavigate) wire:navigate @endif
         @class([
             $itemClass,
@@ -21,7 +27,8 @@
             'active text-primary' => $item->active,
             $item->data['class'] ?? '',
         ])
-        @if (!empty($item->data['target'])) target="{{ $item->data['target'] }}" @endif
+        @if ($target !== null) target="{{ $target }}" @endif
+        @if ($rel !== null) rel="{{ $rel }}" @endif
     >
         <span
             @class([

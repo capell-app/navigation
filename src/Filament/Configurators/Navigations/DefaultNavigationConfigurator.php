@@ -274,6 +274,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return match ($type) {
             NavigationItemType::Page => $this->getPageNavigationItemFields(),
             NavigationItemType::Link => $this->getLinkNavigationItemFields(),
+            NavigationItemType::ExternalLink => $this->getLinkNavigationItemFields(),
             NavigationItemType::Heading => $this->getHeadingNavigationItemFields(),
         };
     }
@@ -392,6 +393,10 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             Select::make('target')
                 ->label(__('capell-admin::form.url_target'))
                 ->options(NavigationItemTarget::class),
+            TextInput::make('rel')
+                ->label(__('capell-navigation::generic.rel_attribute'))
+                ->helperText(__('capell-navigation::generic.rel_attribute_info'))
+                ->placeholder('noopener noreferrer'),
             Group::make()
                 ->dense()
                 ->schema([
@@ -465,6 +470,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 $url = $page->pageUrl?->full_url;
                 break;
             case NavigationItemType::Link:
+            case NavigationItemType::ExternalLink:
                 $url = $navigationItem->data['url'];
                 break;
             case NavigationItemType::Heading:
@@ -567,10 +573,11 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return TextInput::make('label')
             ->label(__('capell-admin::form.label'))
             ->requiredIf('type', NavigationItemType::Link->value)
+            ->requiredIf('type', NavigationItemType::ExternalLink->value)
             ->requiredIf('type', NavigationItemType::Heading->value)
             ->helperText(
                 function (Get $get): ?string {
-                    if ($get('type') !== NavigationItemType::Link->value) {
+                    if (! in_array($get('type'), [NavigationItemType::Link->value, NavigationItemType::ExternalLink->value], true)) {
                         return null;
                     }
 
