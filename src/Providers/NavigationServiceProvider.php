@@ -248,6 +248,7 @@ class NavigationServiceProvider extends ServiceProvider
     private function handlePageUrlChanged(PageUrlChanged $event): void
     {
         BuildNavigationRenderModelAction::flushPageCache();
+        BuildNavigationRenderModelAction::flushSharedRenderModelCache();
 
         CapellCore::removeCacheKey(FrontendCacheEnum::Navigations->value);
         CapellCore::removeCacheKey(FrontendCacheEnum::siteNavigations($event->site_id));

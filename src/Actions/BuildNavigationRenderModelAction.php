@@ -8,10 +8,12 @@ use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
+use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -27,9 +29,17 @@ class BuildNavigationRenderModelAction
     public static function flushPageCache(): void
     {
         NavigationItemsLoader::flushPageCache();
+        self::flushSharedRenderModelCache();
 
         if (app()->bound('request')) {
             request()->attributes->remove(self::REQUEST_CACHE_KEY);
+        }
+    }
+
+    public static function flushSharedRenderModelCache(): void
+    {
+        if (Cache::supportsTags()) {
+            Cache::tags(['navigation'])->flush();
         }
     }
 
@@ -43,6 +53,40 @@ class BuildNavigationRenderModelAction
             return $cache[$cacheKey];
         }
 
+        $renderModel = $this->sharedCacheKey($context) !== null
+            ? $this->rememberSharedRenderModel($context)
+            : $this->buildRenderModel($context);
+
+        $cache[$cacheKey] = $renderModel;
+        $request?->attributes->set(self::REQUEST_CACHE_KEY, $cache);
+
+        return $renderModel;
+    }
+
+    private function rememberSharedRenderModel(NavigationRenderContextData $context): NavigationRenderData
+    {
+        $sharedCacheKey = $this->sharedCacheKey($context);
+
+        if ($sharedCacheKey === null) {
+            return $this->buildRenderModel($context);
+        }
+
+        $repository = Cache::supportsTags()
+            ? Cache::tags(['navigation'])
+            : Cache::store();
+
+        /** @var NavigationRenderData $renderModel */
+        $renderModel = $repository->remember(
+            $sharedCacheKey,
+            now()->addMinutes(5),
+            fn (): NavigationRenderData => $this->buildRenderModel($context),
+        );
+
+        return $renderModel;
+    }
+
+    private function buildRenderModel(NavigationRenderContextData $context): NavigationRenderData
+    {
         $loader = new NavigationItemsLoader(
             navigation: $context->navigation,
             page: $context->page,
@@ -53,18 +97,13 @@ class BuildNavigationRenderModelAction
 
         $items = $loader->load();
 
-        $renderModel = new NavigationRenderData(
+        return new NavigationRenderData(
             navigationId: $context->navigation->exists ? (int) $context->navigation->getKey() : null,
             navigationKey: $context->navigation->key,
             navigationName: $context->navigation->name,
             listComponent: $this->listComponent($context->navigation),
             items: $this->mapItems($items),
         );
-
-        $cache[$cacheKey] = $renderModel;
-        $request?->attributes->set(self::REQUEST_CACHE_KEY, $cache);
-
-        return $renderModel;
     }
 
     /**
@@ -172,5 +211,20 @@ class BuildNavigationRenderModelAction
             (string) $context->language->getKey(),
             (string) $context->siteDomain->getKey(),
         ]);
+    }
+
+    private function sharedCacheKey(NavigationRenderContextData $context): ?string
+    {
+        if (! $context->navigation->exists || auth()->check()) {
+            return null;
+        }
+
+        return NavigationCacheEnum::renderModelKey(implode('|', [
+            $this->cacheKey($context),
+            (string) $context->page->updated_at?->getTimestamp(),
+            (string) $context->site->updated_at?->getTimestamp(),
+            (string) $context->language->updated_at?->getTimestamp(),
+            (string) $context->siteDomain->updated_at?->getTimestamp(),
+        ]));
     }
 }

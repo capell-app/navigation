@@ -38,6 +38,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Indexed page-reference tracking for fast page edit panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Navigation loader support for frontend rendering.
+- Anonymous render models use a short cross-request cache scoped by navigation, site, locale, page, and domain; authenticated requests stay request-local for visibility safety.
 
 ## Why It Matters
 

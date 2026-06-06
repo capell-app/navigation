@@ -61,8 +61,8 @@
         "adminQueryBudget": 40,
         "cacheTags": ["navigation"],
         "cacheSafety": {
-            "cacheable": false,
-            "variesBy": ["site", "locale"],
+            "cacheable": true,
+            "variesBy": ["site", "locale", "page", "domain", "guest"],
             "sensitiveOutput": false,
             "invalidationSources": [
                 {

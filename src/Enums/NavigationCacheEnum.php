@@ -10,6 +10,7 @@ namespace Capell\Navigation\Enums;
 enum NavigationCacheEnum: string
 {
     case NavigationNames = 'navigation-names';
+    case RenderModels = 'navigation-render-models';
 
     /**
      * Cache key for navigation name set filtered by site and languages.
@@ -21,5 +22,10 @@ enum NavigationCacheEnum: string
         $languageIdsHash = hash('sha256', json_encode($languageIds, JSON_THROW_ON_ERROR));
 
         return self::NavigationNames->value . '-' . ($siteId ?? 'null') . '-' . $languageIdsHash;
+    }
+
+    public static function renderModelKey(string $context): string
+    {
+        return self::RenderModels->value . '-' . hash('sha256', $context);
     }
 }
