@@ -460,6 +460,7 @@ class NavigationItemsLoader
             $query->where('site_id', $this->site->getKey());
 
             $pages = $query->get();
+            $siteDomainsByScope = $this->siteDomainsByScope($pages);
 
             /** @var array<string, Model&Pageable<Model>> $cachedPages */
             $cachedPages = [];
@@ -478,10 +479,7 @@ class NavigationItemsLoader
                 } elseif ($page->pageUrl !== null) {
                     $page->pageUrl->setRelation(
                         'siteDomain',
-                        SiteDomain::query()
-                            ->where('site_id', $page->pageUrl->site_id)
-                            ->where('language_id', $page->pageUrl->language_id)
-                            ->first(),
+                        $siteDomainsByScope[$this->siteDomainScopeKey((int) $page->pageUrl->site_id, (int) $page->pageUrl->language_id)] ?? null,
                     );
                 }
 
@@ -495,6 +493,52 @@ class NavigationItemsLoader
         }
 
         return $pagesByMorphKey;
+    }
+
+    /**
+     * @param  Collection<int, Model>  $pages
+     * @return array<string, SiteDomain>
+     */
+    private function siteDomainsByScope(Collection $pages): array
+    {
+        $scopes = [];
+
+        foreach ($pages as $page) {
+            if (! $page instanceof Pageable || $page->pageUrl === null) {
+                continue;
+            }
+
+            $siteId = $page->pageUrl->site_id;
+            $languageId = $page->pageUrl->language_id;
+
+            if (! is_numeric($siteId) || ! is_numeric($languageId)) {
+                continue;
+            }
+
+            $scopeKey = $this->siteDomainScopeKey((int) $siteId, (int) $languageId);
+            $scopes[$scopeKey] = [(int) $siteId, (int) $languageId];
+        }
+
+        if ($scopes === []) {
+            return [];
+        }
+
+        $siteIds = array_values(array_unique(array_column($scopes, 0)));
+        $languageIds = array_values(array_unique(array_column($scopes, 1)));
+
+        return SiteDomain::query()
+            ->whereIn('site_id', $siteIds)
+            ->whereIn('language_id', $languageIds)
+            ->get()
+            ->mapWithKeys(fn (SiteDomain $siteDomain): array => [
+                $this->siteDomainScopeKey((int) $siteDomain->site_id, (int) $siteDomain->language_id) => $siteDomain,
+            ])
+            ->all();
+    }
+
+    private function siteDomainScopeKey(int $siteId, int $languageId): string
+    {
+        return $siteId . ':' . $languageId;
     }
 
     /**
