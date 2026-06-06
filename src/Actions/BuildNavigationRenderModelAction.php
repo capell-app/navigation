@@ -108,7 +108,7 @@ class BuildNavigationRenderModelAction
     {
         $viewData = [];
 
-        foreach (['url', 'target', 'rel', 'icon', 'active_icon', 'class', 'component', 'component_item', 'hide_label'] as $key) {
+        foreach (['url', 'target', 'rel', 'active_mode', 'icon', 'active_icon', 'class', 'component', 'component_item', 'hide_label'] as $key) {
             if (array_key_exists($key, $data)) {
                 $viewData[$key] = $data[$key];
             }

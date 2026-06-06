@@ -11,6 +11,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Navigation\Data\NavigationItemData;
+use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
@@ -91,7 +92,7 @@ class NavigationItemsLoader
 
                     $url = $url !== '/' ? ltrim($url, '/') : $url;
 
-                    $active = $this->urlMatches($currentUrl, $url);
+                    $active = $this->urlMatches($currentUrl, $url, $this->activeMode($item));
                     break;
 
                 case NavigationItemType::Page:
@@ -103,6 +104,10 @@ class NavigationItemsLoader
                     $active = $pageableReference !== null
                         && $pageableReference['pageable_id'] === (int) $this->page->getKey()
                         && $pageableReference['pageable_type'] === $this->page->getMorphClass();
+
+                    if (! $active && isset($item->data['url']) && is_string($item->data['url'])) {
+                        $active = $this->urlMatches($currentUrl, $item->data['url'], $this->activeMode($item));
+                    }
                     break;
             }
 
@@ -243,13 +248,28 @@ class NavigationItemsLoader
         return NavigationItemData::collect($result, DataCollection::class);
     }
 
-    protected function urlMatches(string $currentUrl, string $menuUrl): bool
+    protected function urlMatches(string $currentUrl, string $menuUrl, NavigationItemActiveMode $activeMode = NavigationItemActiveMode::Exact): bool
     {
         // Normalize both URLs for comparison
         $normalizedCurrent = trim($currentUrl, '/');
         $normalizedMenu = trim($menuUrl, '/');
 
-        return $normalizedCurrent === $normalizedMenu;
+        if ($normalizedCurrent === $normalizedMenu) {
+            return true;
+        }
+
+        return $activeMode === NavigationItemActiveMode::StartsWith
+            && $normalizedMenu !== ''
+            && str_starts_with($normalizedCurrent . '/', $normalizedMenu . '/');
+    }
+
+    private function activeMode(NavigationItemData $item): NavigationItemActiveMode
+    {
+        $mode = $item->data['active_mode'] ?? NavigationItemActiveMode::Exact->value;
+
+        return is_string($mode)
+            ? NavigationItemActiveMode::tryFrom($mode) ?? NavigationItemActiveMode::Exact
+            : NavigationItemActiveMode::Exact;
     }
 
     /**

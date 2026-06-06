@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'active_mode' => 'Active state',
+    'active_mode_exact' => 'Exact URL',
+    'active_mode_starts_with' => 'Section starts with URL',
     'footer_navigation' => 'Footer navigation',
     'external_link' => 'External link',
     'health_header_render_hook_failed' => 'The foundation header navigation render hook is not registered.',

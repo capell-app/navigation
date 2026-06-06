@@ -25,6 +25,7 @@ use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Enums\NavigationHandle;
+use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
@@ -393,6 +394,10 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             Select::make('target')
                 ->label(__('capell-admin::form.url_target'))
                 ->options(NavigationItemTarget::class),
+            Select::make('active_mode')
+                ->label(__('capell-navigation::generic.active_mode'))
+                ->options(NavigationItemActiveMode::class)
+                ->default(NavigationItemActiveMode::Exact->value),
             TextInput::make('rel')
                 ->label(__('capell-navigation::generic.rel_attribute'))
                 ->helperText(__('capell-navigation::generic.rel_attribute_info'))
