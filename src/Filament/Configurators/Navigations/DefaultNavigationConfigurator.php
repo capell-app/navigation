@@ -7,7 +7,6 @@ namespace Capell\Navigation\Filament\Configurators\Navigations;
 use Capell\Admin\Contracts\ConfiguratorInterface;
 use Capell\Admin\Contracts\ConfiguratorTypeEnumInterface;
 use Capell\Admin\Enums\SchemaExtenderEnum;
-use Capell\Admin\Filament\Components\Forms\CustomSelectGroup;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\LanguageSelect;
@@ -30,6 +29,7 @@ use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
+use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -140,22 +140,22 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                     return SlugGenerator::slugifyState("\$state ?? ''", 'key');
                 }),
 
-            CustomSelectGroup::make(
-                'key',
-                NavigationHandle::class,
-                modifySelectUsing: fn (Select $select): Select => $select->required()
-                    ->unique(
-                        column: 'key',
-                        ignoreRecord: $configurator->getOperation() !== 'replicate',
-                        modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
-                            ->withoutTrashed()
-                            ->where('site_id', $get('site_id'))
-                            ->when(
-                                $get('language_id', true),
-                                fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
-                            ),
-                    ),
-            )
+            Select::make('key')
+                ->required()
+                ->options(fn (): array => NavigationHandleRegistry::options())
+                ->searchable()
+                ->allowHtml(false)
+                ->unique(
+                    column: 'key',
+                    ignoreRecord: $configurator->getOperation() !== 'replicate',
+                    modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
+                        ->withoutTrashed()
+                        ->where('site_id', $get('site_id'))
+                        ->when(
+                            $get('language_id', true),
+                            fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
+                        ),
+                )
                 ->label(__('capell-admin::table.key')),
 
             TypeSelect::make('blueprint_id')

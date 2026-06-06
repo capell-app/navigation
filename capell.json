@@ -47,6 +47,7 @@
     "permissions": [],
     "capabilities": [
         "navigation-menu-builder",
+        "navigation-handle-registry",
         "navigation-page-field",
         "navigation-render-model",
         "navigation-site-replication",

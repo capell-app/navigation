@@ -30,6 +30,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Navigation relation manager on sites.
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
+- Programmatic menu-handle registry for theme and package menu locations.
 - First-class external-link items with `_self`, `_blank`, `_parent`, and `rel` output controls.
 - Exact and starts-with active-state modes for section highlighting.
 - Breadcrumb component and builder action derived from the active navigation branch.
@@ -118,6 +119,7 @@ Runtime screenshots are generated from [docs/screenshots.json](docs/screenshots.
 - Events: `NavigationCreating`.
 - Listeners: `ReplicateSiteNavigationsListener`.
 - Register Capell extension points, routes, migrations, settings, render hooks, and resources from service providers.
+- Register extra menu locations with `NavigationHandleRegistry::register($handle, $label)` so themes/packages can expose handles without editing the built-in enum.
 
 ## Install Impact
 
