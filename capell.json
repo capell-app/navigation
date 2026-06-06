@@ -171,16 +171,6 @@
                 "path": "docs/screenshots/page-form-navigation-tab-dark.png",
                 "alt": "Page form navigation tab in dark mode",
                 "caption": "Review page navigation references from the dark-mode page form"
-            },
-            {
-                "path": "docs/screenshots/frontend-menu-output.png",
-                "alt": "Frontend menu output rendered for an anonymous visitor",
-                "caption": "Render the seeded menu as clean public frontend HTML"
-            },
-            {
-                "path": "docs/screenshots/frontend-menu-output-dark.png",
-                "alt": "Frontend menu output in dark mode",
-                "caption": "Render the seeded menu in dark mode without exposing editor metadata"
             }
         ],
         "categories": [
