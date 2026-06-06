@@ -164,6 +164,7 @@ class NavigationServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
         View::composer([
+            'capell-navigation::components.breadcrumbs',
             'capell-navigation::components.header.navigation',
             'capell-navigation::components.menu',
         ], NavigationRenderModelComposer::class);
