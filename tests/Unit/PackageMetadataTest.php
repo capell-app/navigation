@@ -60,6 +60,7 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
     expect($manifest['capabilities'] ?? [])->toEqual([
         'navigation-menu-builder',
         'navigation-handle-registry',
+        'navigation-mega-menus',
         'navigation-page-field',
         'navigation-render-model',
         'navigation-site-replication',

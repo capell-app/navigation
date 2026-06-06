@@ -12,6 +12,7 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Navigation relation manager on sites.
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
+- Mega-menu dropdown settings for multi-column child links and optional intro panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Indexed page-reference tracking for fast page edit panels.
 - Navigation loader support for frontend rendering.

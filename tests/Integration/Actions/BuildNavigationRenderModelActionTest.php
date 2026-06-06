@@ -292,6 +292,61 @@ it('renders heading items without a url', function (): void {
         ->and(navigationRenderItem($renderModel, 1)->url)->toBe('/about');
 });
 
+it('passes mega-menu render settings through public view data', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+
+    $navigation = Navigation::factory()->make([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $language->id,
+        'items' => [
+            [
+                'label' => 'Solutions',
+                'type' => NavigationItemType::Link->value,
+                'data' => [
+                    'url' => '/solutions',
+                    'dropdown_layout' => 'mega',
+                    'mega_columns' => 4,
+                    'mega_panel_heading' => 'Explore solutions',
+                    'mega_panel_description' => 'Grouped links for larger site menus.',
+                    'mega_panel_url' => '/solutions',
+                    'pageable_id' => 123,
+                ],
+                'children' => [
+                    [
+                        'label' => 'Healthcare',
+                        'type' => NavigationItemType::Link->value,
+                        'data' => ['url' => '/solutions/healthcare'],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $renderModel = BuildNavigationRenderModelAction::run(new NavigationRenderContextData(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $language,
+        siteDomain: $site->siteDomains->first(),
+    ));
+
+    expect(navigationRenderItem($renderModel, 0)->data)->toMatchArray([
+        'url' => '/solutions',
+        'dropdown_layout' => 'mega',
+        'mega_columns' => 4,
+        'mega_panel_heading' => 'Explore solutions',
+        'mega_panel_description' => 'Grouped links for larger site menus.',
+        'mega_panel_url' => '/solutions',
+    ])
+        ->and(navigationRenderItem($renderModel, 0)->data)->not->toHaveKey('pageable_id');
+});
+
 it('flushes stale page lookup cache when a page url changed event is received', function (): void {
     if (! class_exists(PageUrlChanged::class)) {
         test()->markTestSkipped('Capell Core does not provide the PageUrlChanged event in this checkout.');

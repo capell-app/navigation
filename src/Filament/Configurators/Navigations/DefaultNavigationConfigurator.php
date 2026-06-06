@@ -23,6 +23,7 @@ use Capell\Core\Support\CapellCoreHelper;
 use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
+use Capell\Navigation\Enums\NavigationDropdownLayout;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
@@ -414,6 +415,36 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 ->label(__('capell-navigation::generic.rel_attribute'))
                 ->helperText(__('capell-navigation::generic.rel_attribute_info'))
                 ->placeholder('noopener noreferrer'),
+            Select::make('dropdown_layout')
+                ->label(__('capell-navigation::generic.dropdown_layout'))
+                ->helperText(__('capell-navigation::generic.dropdown_layout_info'))
+                ->options(NavigationDropdownLayout::class)
+                ->default(NavigationDropdownLayout::Dropdown->value)
+                ->live(),
+            TextInput::make('mega_columns')
+                ->label(__('capell-navigation::generic.mega_columns'))
+                ->helperText(__('capell-navigation::generic.mega_columns_info'))
+                ->numeric()
+                ->minValue(1)
+                ->maxValue(4)
+                ->default(3)
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_heading')
+                ->label(__('capell-navigation::generic.mega_panel_heading'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_description')
+                ->label(__('capell-navigation::generic.mega_panel_description'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_url')
+                ->label(__('capell-navigation::generic.mega_panel_url'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value)
+                ->rules([
+                    fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        if ($value !== null && $value !== '' && (! is_string($value) || ! $this->isSafeNavigationUrl($value))) {
+                            $fail(__('validation.url'));
+                        }
+                    },
+                ]),
             Group::make()
                 ->dense()
                 ->schema([

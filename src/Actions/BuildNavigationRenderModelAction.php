@@ -147,7 +147,24 @@ class BuildNavigationRenderModelAction
     {
         $viewData = [];
 
-        foreach (['url', 'target', 'rel', 'active_mode', 'visibility', 'icon', 'active_icon', 'class', 'component', 'component_item', 'hide_label'] as $key) {
+        foreach ([
+            'url',
+            'target',
+            'rel',
+            'active_mode',
+            'visibility',
+            'icon',
+            'active_icon',
+            'class',
+            'component',
+            'component_item',
+            'hide_label',
+            'dropdown_layout',
+            'mega_columns',
+            'mega_panel_heading',
+            'mega_panel_description',
+            'mega_panel_url',
+        ] as $key) {
             if (array_key_exists($key, $data)) {
                 $viewData[$key] = $data[$key];
             }
