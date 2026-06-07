@@ -8,7 +8,7 @@ Navigation owns editor-managed menus and renders structured navigation data for 
 - Namespace: `Capell\Navigation\`
 - Surfaces: Filament admin, console, database
 - Service providers: `packages/navigation/src/Providers/NavigationServiceProvider.php`
-- Capell dependencies: `capell-app/admin`, `capell-app/frontend`
+- Capell dependencies: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`
 
 ## Why It Helps Your Capell Workflow
 
@@ -30,8 +30,16 @@ Navigation adds site and language scoped navigation trees, page navigation field
 - Navigation relation manager on sites.
 - Page schema extender for navigation placement.
 - Navigation item model resolution.
+- Programmatic menu-handle registry for theme and package menu locations.
+- First-class external-link items with `_self`, `_blank`, `_parent`, and `rel` output controls.
+- Exact and starts-with active-state modes for section highlighting.
+- Breadcrumb component and builder action derived from the active navigation branch.
+- Mega-menu dropdown settings for multi-column child links and optional intro panels.
+- Conditional item visibility for everyone, guests, authenticated users, Gate abilities, and host-provided roles.
+- Indexed page-reference tracking for fast page edit panels.
 - Actions to add, remove, replicate, and resolve navigation entries.
 - Navigation loader support for frontend rendering.
+- Anonymous render models use a short cross-request cache scoped by navigation, site, locale, page, and domain; authenticated requests stay request-local for visibility safety.
 
 ## Why It Matters
 
@@ -54,18 +62,18 @@ This package makes its Composer dependencies visible because they are part of th
 
 ## Screens And Workflow
 
-Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) during package deployment.
+Runtime screenshots are generated from [docs/screenshots.json](docs/screenshots.json) during package deployment. Marketplace card and hero artwork ship from [docs/assets/marketplace](docs/assets/marketplace).
 
-- Navigation admin index.
-- Create/edit navigation form.
-- Site relation manager for navigations.
-- Page form navigation tab.
-- Frontend menu output.
+- Navigation admin index, light and dark.
+- Create/edit navigation form, light and dark.
+- Site relation manager for navigations, light and dark.
+- Page form navigation tab, light and dark.
+- Frontend menu output, light and dark.
 
 ## Technical Shape
 
 - NavigationServiceProvider registers the package.
-- Migration creates navigations.
+- Migrations create navigations and the indexed page-reference table.
 - Model: Navigation.
 - Filament resource: NavigationResource.
 - Policy: NavigationPolicy.
@@ -98,12 +106,13 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 ## Data And Persistence
 
 - navigations stores key, type, site, language, items JSON, meta, and visibility windows.
+- navigation_page_references stores the page references extracted from nested navigation items so admin page panels do not scan JSON.
 - Navigation items may reference pages and page URLs through JSON.
 - Navigations connect to sites, languages, and types.
 - Cache key enum indicates navigation cache behaviour.
 
 - Models: `Navigation`.
-- Migrations: `2026_05_10_190860_01_create_navigations_table.php`.
+- Migrations: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`.
 - Data objects live in `src/Data/`; use them for payloads, form state, and view models.
 
 ## Extension Points
@@ -112,10 +121,12 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 - Events: `NavigationCreating`.
 - Listeners: `ReplicateSiteNavigationsListener`.
 - Register Capell extension points, routes, migrations, settings, render hooks, and resources from service providers.
+- Register extra menu locations with `NavigationHandleRegistry::register($handle, $label)` so themes/packages can expose handles without editing the built-in enum.
+- Configure multi-column dropdowns per parent item with `dropdown_layout=mega`, `mega_columns`, and optional panel heading/description/link data.
 
 ## Install Impact
 
-- Adds navigations table.
+- Adds navigations and navigation_page_references tables.
 - Adds navigation admin resource and site relation manager.
 - Extends page and site admin schemas.
 - No explicit public route is registered by this package.
@@ -139,6 +150,7 @@ Screenshots are generated from [docs/screenshots.json](docs/screenshots.json) du
 ## Common Pitfalls
 
 - Create language/site records before creating scoped navigation.
+- Keep navigation writes going through package actions/models so the page-reference index stays synchronized.
 - Resolve stale page references after deleting pages.
 - Clear navigation cache after manual data changes.
 

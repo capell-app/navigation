@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Navigation\Health\NavigationHealthCheck;
+use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Capell\Navigation\Support\Registry\NavigableRegistry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -60,4 +61,20 @@ it('falls back to model keys when navigable methods are absent', function (): vo
 
     expect($result?->label)->toBe('77')
         ->and($result?->url)->toBe('');
+});
+
+it('allows packages and themes to register additional menu handles', function (): void {
+    NavigationHandleRegistry::flush();
+
+    NavigationHandleRegistry::register('account-menu', 'Account menu');
+
+    expect(NavigationHandleRegistry::options())
+        ->toHaveKey('main')
+        ->toHaveKey('footer')
+        ->toHaveKey('sub-footer')
+        ->toHaveKey('account-menu')
+        ->and(NavigationHandleRegistry::label('account-menu'))->toBe('Account menu')
+        ->and(NavigationHandleRegistry::label('unknown-menu'))->toBe('unknown-menu');
+
+    NavigationHandleRegistry::flush();
 });

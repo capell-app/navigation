@@ -22,6 +22,7 @@ class NavigationItemRenderData extends Data
         public Collection $children,
         public array $data = [],
         public ?string $target = null,
+        public ?string $rel = null,
         public ?string $icon = null,
         public ?string $activeIcon = null,
         public ?string $class = null,

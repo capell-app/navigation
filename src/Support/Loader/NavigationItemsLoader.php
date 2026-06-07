@@ -11,12 +11,16 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Navigation\Data\NavigationItemData;
+use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelData\DataCollection;
 
 class NavigationItemsLoader
@@ -68,6 +72,7 @@ class NavigationItemsLoader
 
             switch ($item->type) {
                 case NavigationItemType::Link:
+                case NavigationItemType::ExternalLink:
                     if (! isset($item->data['url'])) {
                         continue 2;
                     }
@@ -90,7 +95,7 @@ class NavigationItemsLoader
 
                     $url = $url !== '/' ? ltrim($url, '/') : $url;
 
-                    $active = $this->urlMatches($currentUrl, $url);
+                    $active = $this->urlMatches($currentUrl, $url, $this->activeMode($item));
                     break;
 
                 case NavigationItemType::Page:
@@ -102,6 +107,10 @@ class NavigationItemsLoader
                     $active = $pageableReference !== null
                         && $pageableReference['pageable_id'] === (int) $this->page->getKey()
                         && $pageableReference['pageable_type'] === $this->page->getMorphClass();
+
+                    if (! $active && isset($item->data['url']) && is_string($item->data['url'])) {
+                        $active = $this->urlMatches($currentUrl, $item->data['url'], $this->activeMode($item));
+                    }
                     break;
             }
 
@@ -242,13 +251,28 @@ class NavigationItemsLoader
         return NavigationItemData::collect($result, DataCollection::class);
     }
 
-    protected function urlMatches(string $currentUrl, string $menuUrl): bool
+    protected function urlMatches(string $currentUrl, string $menuUrl, NavigationItemActiveMode $activeMode = NavigationItemActiveMode::Exact): bool
     {
         // Normalize both URLs for comparison
         $normalizedCurrent = trim($currentUrl, '/');
         $normalizedMenu = trim($menuUrl, '/');
 
-        return $normalizedCurrent === $normalizedMenu;
+        if ($normalizedCurrent === $normalizedMenu) {
+            return true;
+        }
+
+        return $activeMode === NavigationItemActiveMode::StartsWith
+            && $normalizedMenu !== ''
+            && str_starts_with($normalizedCurrent . '/', $normalizedMenu . '/');
+    }
+
+    private function activeMode(NavigationItemData $item): NavigationItemActiveMode
+    {
+        $mode = $item->data['active_mode'] ?? NavigationItemActiveMode::Exact->value;
+
+        return is_string($mode)
+            ? NavigationItemActiveMode::tryFrom($mode) ?? NavigationItemActiveMode::Exact
+            : NavigationItemActiveMode::Exact;
     }
 
     /**
@@ -258,7 +282,7 @@ class NavigationItemsLoader
     protected function visibleMenuItems(Collection $items): Collection
     {
         return $items
-            ->filter(fn (NavigationItemData $item): bool => $item->is_visible)
+            ->filter(fn (NavigationItemData $item): bool => $item->is_visible && $this->passesVisibilityCondition($item))
             ->map(function (NavigationItemData $item): NavigationItemData {
                 $children = $this->visibleMenuItems(collect($item->children?->all() ?? []));
 
@@ -267,6 +291,49 @@ class NavigationItemsLoader
                 return $item;
             })
             ->values();
+    }
+
+    private function passesVisibilityCondition(NavigationItemData $item): bool
+    {
+        $visibility = $this->visibility($item);
+
+        return match ($visibility) {
+            NavigationItemVisibility::Everyone => true,
+            NavigationItemVisibility::Guests => Auth::guest(),
+            NavigationItemVisibility::Authenticated => Auth::check(),
+            NavigationItemVisibility::Ability => $this->passesAbilityCondition($item),
+            NavigationItemVisibility::Role => $this->passesRoleCondition($item),
+        };
+    }
+
+    private function visibility(NavigationItemData $item): NavigationItemVisibility
+    {
+        $visibility = $item->data['visibility'] ?? NavigationItemVisibility::Everyone->value;
+
+        return is_string($visibility)
+            ? NavigationItemVisibility::tryFrom($visibility) ?? NavigationItemVisibility::Everyone
+            : NavigationItemVisibility::Everyone;
+    }
+
+    private function passesAbilityCondition(NavigationItemData $item): bool
+    {
+        $ability = $item->data['ability'] ?? null;
+
+        return is_string($ability)
+            && $ability !== ''
+            && Gate::allows($ability);
+    }
+
+    private function passesRoleCondition(NavigationItemData $item): bool
+    {
+        $role = $item->data['role'] ?? null;
+        $user = Auth::user();
+
+        return is_string($role)
+            && $role !== ''
+            && is_object($user)
+            && method_exists($user, 'hasRole')
+            && $user->hasRole($role) === true;
     }
 
     /**
@@ -393,6 +460,7 @@ class NavigationItemsLoader
             $query->where('site_id', $this->site->getKey());
 
             $pages = $query->get();
+            $siteDomainsByScope = $this->siteDomainsByScope($pages);
 
             /** @var array<string, Model&Pageable<Model>> $cachedPages */
             $cachedPages = [];
@@ -411,10 +479,7 @@ class NavigationItemsLoader
                 } elseif ($page->pageUrl !== null) {
                     $page->pageUrl->setRelation(
                         'siteDomain',
-                        SiteDomain::query()
-                            ->where('site_id', $page->pageUrl->site_id)
-                            ->where('language_id', $page->pageUrl->language_id)
-                            ->first(),
+                        $siteDomainsByScope[$this->siteDomainScopeKey((int) $page->pageUrl->site_id, (int) $page->pageUrl->language_id)] ?? null,
                     );
                 }
 
@@ -428,6 +493,52 @@ class NavigationItemsLoader
         }
 
         return $pagesByMorphKey;
+    }
+
+    /**
+     * @param  Collection<int, Model>  $pages
+     * @return array<string, SiteDomain>
+     */
+    private function siteDomainsByScope(Collection $pages): array
+    {
+        $scopes = [];
+
+        foreach ($pages as $page) {
+            if (! $page instanceof Pageable || $page->pageUrl === null) {
+                continue;
+            }
+
+            $siteId = $page->pageUrl->site_id;
+            $languageId = $page->pageUrl->language_id;
+
+            if (! is_numeric($siteId) || ! is_numeric($languageId)) {
+                continue;
+            }
+
+            $scopeKey = $this->siteDomainScopeKey((int) $siteId, (int) $languageId);
+            $scopes[$scopeKey] = [(int) $siteId, (int) $languageId];
+        }
+
+        if ($scopes === []) {
+            return [];
+        }
+
+        $siteIds = array_values(array_unique(array_column($scopes, 0)));
+        $languageIds = array_values(array_unique(array_column($scopes, 1)));
+
+        return SiteDomain::query()
+            ->whereIn('site_id', $siteIds)
+            ->whereIn('language_id', $languageIds)
+            ->get()
+            ->mapWithKeys(fn (SiteDomain $siteDomain): array => [
+                $this->siteDomainScopeKey((int) $siteDomain->site_id, (int) $siteDomain->language_id) => $siteDomain,
+            ])
+            ->all();
+    }
+
+    private function siteDomainScopeKey(int $siteId, int $languageId): string
+    {
+        return $siteId . ':' . $languageId;
     }
 
     /**

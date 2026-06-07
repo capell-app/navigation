@@ -150,7 +150,7 @@ function firstNavigationItem(Navigation $navigation): NavigationItemData
 
     throw_unless($items instanceof DataCollection, RuntimeException::class, 'Expected navigation items to be cast to a data collection.');
 
-    $item = $items->first();
+    $item = collect($items->items())->first();
 
     throw_unless($item instanceof NavigationItemData, RuntimeException::class, 'Expected navigation to contain a navigation item.');
 

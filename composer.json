@@ -1,6 +1,6 @@
 {
     "name": "capell-app/navigation",
-    "description": "Navigation for Capell",
+    "description": "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.",
     "keywords": [
         "capell",
         "navigation",
@@ -20,6 +20,7 @@
     "require": {
         "php": "^8.3",
         "capell-app/admin": "^4.0 || 4.x-dev",
+        "capell-app/core": "^4.0 || 4.x-dev",
         "capell-app/frontend": "^4.0 || 4.x-dev"
     },
     "autoload": {

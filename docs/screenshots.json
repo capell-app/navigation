@@ -15,7 +15,8 @@
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor reviews site navigation records and their scope/status.",
-            "screenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index.png"
+            "screenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index-dark.png"
         },
         {
             "id": "create-edit-navigation-form",
@@ -27,7 +28,8 @@
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor builds a navigation tree with links, page references, headings, and nested items.",
-            "screenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form.png"
+            "screenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png"
         },
         {
             "id": "site-relation-manager-for-navigations",
@@ -39,7 +41,8 @@
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor manages navigations directly from the site edit surface.",
-            "screenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png"
+            "screenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png"
         },
         {
             "id": "page-form-navigation-tab",
@@ -51,7 +54,8 @@
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor controls page-level navigation metadata from the page form.",
-            "screenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab.png"
+            "screenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png"
         },
         {
             "id": "frontend-menu-output",
@@ -63,7 +67,8 @@
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.",
-            "screenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output.png"
+            "screenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output-dark.png"
         }
     ]
 }

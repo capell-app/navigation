@@ -11,6 +11,7 @@
                 <a
                     href="{{ $item->url }}"
                     @if ($item->target !== null) target="{{ $item->target }}" @endif
+                    @if ($item->rel !== null) rel="{{ $item->rel }}" @endif
                 >
                     {{ $item->label }}
                 </a>

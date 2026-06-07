@@ -11,11 +11,11 @@ use Livewire\Blaze\Blaze;
 
 final class RegisterFoundationHeaderNavigationHook
 {
-    private const string DefaultScenario = 'frontend-default-primary-navigation';
+    public const string DefaultScenario = 'frontend-default-primary-navigation';
 
-    private const string FoundationScenario = 'foundation-theme-primary-navigation';
+    public const string FoundationScenario = 'foundation-theme-primary-navigation';
 
-    private const string Target = 'capell::header.index';
+    public const string Target = 'capell::header.index';
 
     /** @param RenderHookRegistry<RenderHookContext> $registry */
     public function __construct(private readonly RenderHookRegistry $registry) {}

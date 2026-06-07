@@ -7,7 +7,6 @@ namespace Capell\Navigation\Filament\Configurators\Navigations;
 use Capell\Admin\Contracts\ConfiguratorInterface;
 use Capell\Admin\Contracts\ConfiguratorTypeEnumInterface;
 use Capell\Admin\Enums\SchemaExtenderEnum;
-use Capell\Admin\Filament\Components\Forms\CustomSelectGroup;
 use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
 use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\LanguageSelect;
@@ -24,10 +23,14 @@ use Capell\Core\Support\CapellCoreHelper;
 use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
+use Capell\Navigation\Enums\NavigationDropdownLayout;
 use Capell\Navigation\Enums\NavigationHandle;
+use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
+use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -138,22 +141,22 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                     return SlugGenerator::slugifyState("\$state ?? ''", 'key');
                 }),
 
-            CustomSelectGroup::make(
-                'key',
-                NavigationHandle::class,
-                modifySelectUsing: fn (Select $select): Select => $select->required()
-                    ->unique(
-                        column: 'key',
-                        ignoreRecord: $configurator->getOperation() !== 'replicate',
-                        modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
-                            ->withoutTrashed()
-                            ->where('site_id', $get('site_id'))
-                            ->when(
-                                $get('language_id', true),
-                                fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
-                            ),
-                    ),
-            )
+            Select::make('key')
+                ->required()
+                ->options(fn (): array => NavigationHandleRegistry::options())
+                ->searchable()
+                ->allowHtml(false)
+                ->unique(
+                    column: 'key',
+                    ignoreRecord: $configurator->getOperation() !== 'replicate',
+                    modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
+                        ->withoutTrashed()
+                        ->where('site_id', $get('site_id'))
+                        ->when(
+                            $get('language_id', true),
+                            fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
+                        ),
+                )
                 ->label(__('capell-admin::table.key')),
 
             TypeSelect::make('blueprint_id')
@@ -190,7 +193,6 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     {
         return AdjacencyList::make('items')
             ->label(__('capell-admin::form.navigation_items'))
-            ->view('capell-admin::components.adjacency-list.builder')
             ->hiddenLabel()
             ->labelKey('label')
             ->columnSpanFull()
@@ -275,6 +277,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return match ($type) {
             NavigationItemType::Page => $this->getPageNavigationItemFields(),
             NavigationItemType::Link => $this->getLinkNavigationItemFields(),
+            NavigationItemType::ExternalLink => $this->getLinkNavigationItemFields(),
             NavigationItemType::Heading => $this->getHeadingNavigationItemFields(),
         };
     }
@@ -393,6 +396,55 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             Select::make('target')
                 ->label(__('capell-admin::form.url_target'))
                 ->options(NavigationItemTarget::class),
+            Select::make('active_mode')
+                ->label(__('capell-navigation::generic.active_mode'))
+                ->options(NavigationItemActiveMode::class)
+                ->default(NavigationItemActiveMode::Exact->value),
+            Select::make('visibility')
+                ->label(__('capell-navigation::generic.visibility'))
+                ->options(NavigationItemVisibility::class)
+                ->default(NavigationItemVisibility::Everyone->value)
+                ->live(),
+            TextInput::make('ability')
+                ->label(__('capell-navigation::generic.visibility_ability_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Ability->value),
+            TextInput::make('role')
+                ->label(__('capell-navigation::generic.visibility_role_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Role->value),
+            TextInput::make('rel')
+                ->label(__('capell-navigation::generic.rel_attribute'))
+                ->helperText(__('capell-navigation::generic.rel_attribute_info'))
+                ->placeholder('noopener noreferrer'),
+            Select::make('dropdown_layout')
+                ->label(__('capell-navigation::generic.dropdown_layout'))
+                ->helperText(__('capell-navigation::generic.dropdown_layout_info'))
+                ->options(NavigationDropdownLayout::class)
+                ->default(NavigationDropdownLayout::Dropdown->value)
+                ->live(),
+            TextInput::make('mega_columns')
+                ->label(__('capell-navigation::generic.mega_columns'))
+                ->helperText(__('capell-navigation::generic.mega_columns_info'))
+                ->numeric()
+                ->minValue(1)
+                ->maxValue(4)
+                ->default(3)
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_heading')
+                ->label(__('capell-navigation::generic.mega_panel_heading'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_description')
+                ->label(__('capell-navigation::generic.mega_panel_description'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_url')
+                ->label(__('capell-navigation::generic.mega_panel_url'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value)
+                ->rules([
+                    fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        if ($value !== null && $value !== '' && (! is_string($value) || ! $this->isSafeNavigationUrl($value))) {
+                            $fail(__('validation.url'));
+                        }
+                    },
+                ]),
             Group::make()
                 ->dense()
                 ->schema([
@@ -466,6 +518,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 $url = $page->pageUrl?->full_url;
                 break;
             case NavigationItemType::Link:
+            case NavigationItemType::ExternalLink:
                 $url = $navigationItem->data['url'];
                 break;
             case NavigationItemType::Heading:
@@ -568,10 +621,11 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return TextInput::make('label')
             ->label(__('capell-admin::form.label'))
             ->requiredIf('type', NavigationItemType::Link->value)
+            ->requiredIf('type', NavigationItemType::ExternalLink->value)
             ->requiredIf('type', NavigationItemType::Heading->value)
             ->helperText(
                 function (Get $get): ?string {
-                    if ($get('type') !== NavigationItemType::Link->value) {
+                    if (! in_array($get('type'), [NavigationItemType::Link->value, NavigationItemType::ExternalLink->value], true)) {
                         return null;
                     }
 

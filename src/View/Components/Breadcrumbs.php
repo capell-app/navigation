@@ -12,10 +12,10 @@ use Capell\Navigation\Enums\NavigationHandle;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\View\Component;
 
-class Menu extends Component
+final class Breadcrumbs extends Component
 {
     public function __construct(
-        public NavigationHandle|string $key,
+        public NavigationHandle|string $key = NavigationHandle::Main,
         public ?Site $site = null,
         public ?Language $language = null,
         public ?Pageable $page = null,
@@ -25,28 +25,13 @@ class Menu extends Component
 
     public function render(): ViewContract
     {
-        return view('capell-navigation::components.menu', [
+        return view('capell-navigation::components.breadcrumbs', [
             'navigationKey' => $this->key,
-            'navigationLabel' => $this->navigationLabel(),
             'site' => $this->site,
             'language' => $this->language,
             'page' => $this->page,
             'domain' => $this->domain,
             'siteOnlyFallback' => $this->siteOnlyFallback,
         ]);
-    }
-
-    private function navigationLabel(): string
-    {
-        $handle = $this->key instanceof NavigationHandle
-            ? $this->key
-            : NavigationHandle::tryFrom($this->key);
-
-        return match ($handle) {
-            NavigationHandle::Main => __('capell-navigation::generic.main_navigation'),
-            NavigationHandle::Footer => __('capell-navigation::generic.footer_navigation'),
-            NavigationHandle::SubFooter => __('capell-navigation::generic.sub_footer_navigation'),
-            default => __('capell-navigation::generic.navigation'),
-        };
     }
 }

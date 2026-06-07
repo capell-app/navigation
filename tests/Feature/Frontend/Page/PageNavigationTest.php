@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Database\Factories\UserFactory;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Theme;
@@ -11,8 +12,10 @@ use Capell\Navigation\Models\Navigation;
 use Capell\Tests\Support\Concerns\TestingFrontend;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
+use Illuminate\Testing\TestResponse;
 use Illuminate\View\DynamicComponent;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 use Sinnbeck\DomAssertions\Asserts\AssertElement;
@@ -53,7 +56,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
         ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
+        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('#header'));
 });
 
@@ -77,7 +80,7 @@ test('themed header displays the main navigation menu', function (): void {
         ->assertElementExists('#main-menu[aria-label="Main navigation"]')
         ->assertSee('Docs')
         ->assertElementExists('[aria-controls="main-menu"]')
-        ->assertSee("Alpine.data('capellHeaderNavigation'", false)
+        ->assertSee('window.capellHeaderNavigation', false)
         ->assertElementExists('#header');
 });
 
@@ -114,6 +117,52 @@ test('page renders without error when navigation exists with main handle', funct
         ->create();
 
     get($page->pageUrl->full_url)->assertOk();
+});
+
+test('anonymous frontend menu output leaks no admin internals', function (): void {
+    $theme = Theme::factory()
+        ->defaultMeta()
+        ->state([
+            'key' => 'foundation-public-safety-test',
+            'meta' => [
+                ...Theme::factory()->defaultMeta()->make()->meta,
+                'footer' => false,
+                'header_file' => 'capell-navigation-test::header',
+            ],
+        ])
+        ->create();
+
+    [$page, $site] = createFrontendPageWithMainNavigation($theme);
+
+    expect(auth()->check())->toBeFalse();
+
+    $response = get(navigationFeaturePageUrl($page))->assertOk();
+
+    assertNavigationPublicOutputContainsNoAdminInternals($response, $page);
+});
+
+test('non-admin frontend menu output leaks no admin internals', function (): void {
+    $theme = Theme::factory()
+        ->defaultMeta()
+        ->state([
+            'key' => 'foundation-public-safety-non-admin-test',
+            'meta' => [
+                ...Theme::factory()->defaultMeta()->make()->meta,
+                'footer' => false,
+                'header_file' => 'capell-navigation-test::header',
+            ],
+        ])
+        ->create();
+
+    [$page] = createFrontendPageWithMainNavigation($theme);
+
+    actingAs(UserFactory::new()->createOne());
+
+    expect(auth()->check())->toBeTrue();
+
+    $response = get(navigationFeaturePageUrl($page))->assertOk();
+
+    assertNavigationPublicOutputContainsNoAdminInternals($response, $page);
 });
 
 /**
@@ -177,6 +226,19 @@ function clearDynamicComponentResolverCache(): void
 
     $componentClasses = $dynamicComponent->getProperty('componentClasses');
     $componentClasses->setValue([]);
+}
+
+function assertNavigationPublicOutputContainsNoAdminInternals(TestResponse $response, Page $page): void
+{
+    $response
+        ->assertSee('Docs')
+        ->assertDontSee('pageable_id', false)
+        ->assertDontSee('pageable_type', false)
+        ->assertDontSee('is_visible', false)
+        ->assertDontSee(Page::class, false)
+        ->assertDontSee('"id":' . $page->id, false)
+        ->assertDontSee('/admin/', false)
+        ->assertDontSee('NavigationResource', false);
 }
 
 test('page renders without error when navigation exists with footer handle', function (): void {
