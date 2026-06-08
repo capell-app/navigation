@@ -79,7 +79,7 @@ class NavigationSelect extends Select
                             /** @var Navigation $record */
                             $record = $action->getRecord();
 
-                            if (! Route::has('filament.admin.resources.navigations.edit')) {
+                            if (! Route::has(NavigationResource::getRouteBaseName() . '.edit')) {
                                 return '#';
                             }
 

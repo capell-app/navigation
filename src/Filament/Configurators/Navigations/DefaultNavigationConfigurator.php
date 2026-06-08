@@ -24,7 +24,6 @@ use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Enums\NavigationDropdownLayout;
-use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;

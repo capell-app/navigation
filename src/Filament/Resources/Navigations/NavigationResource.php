@@ -33,6 +33,8 @@ class NavigationResource extends Resource
     use HasConfiguredTable;
     use HasNavigationBadge;
 
+    protected static ?string $slug = 'navigation/navigations';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static bool $isGloballySearchable = true;
