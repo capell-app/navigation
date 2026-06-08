@@ -152,8 +152,9 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                         ->withoutTrashed()
                         ->where('site_id', $get('site_id'))
                         ->when(
-                            $get('language_id', true),
-                            fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
+                            filled($get('language_id', true)),
+                            fn (Unique $query): Unique => $query->where('language_id', $get('language_id')),
+                            fn (Unique $query): Unique => $query->whereNull('language_id'),
                         ),
                 )
                 ->label(__('capell-admin::table.key')),
