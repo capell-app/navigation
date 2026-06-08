@@ -41,15 +41,15 @@ class BuildNavigationChildFragmentAction
         }
 
         $cacheKey = NavigationCacheEnum::lazyFragmentKey(implode('|', [
-            $context->navigation->getKey(),
+            $this->stringValue($context->navigation->getKey()),
             $context->navigation->key,
-            (string) $context->site->getKey(),
-            (string) $context->language->getKey(),
+            $this->stringValue($context->site->getKey()),
+            $this->stringValue($context->language->getKey()),
             $data['item'],
             $data['path'],
             (string) $context->navigation->updated_at?->getTimestamp(),
             $context->page->getMorphClass(),
-            (string) $context->page->getKey(),
+            $this->stringValue($context->page->getKey()),
         ]));
 
         $repository = Cache::supportsTags()
@@ -148,5 +148,12 @@ class BuildNavigationChildFragmentAction
             'items' => $items,
             'includeNavigationLazyLoader' => false,
         ])->render();
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        return is_string($value) || is_int($value) || is_float($value)
+            ? (string) $value
+            : '';
     }
 }

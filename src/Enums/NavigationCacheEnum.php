@@ -11,6 +11,7 @@ enum NavigationCacheEnum: string
 {
     case NavigationNames = 'navigation-names';
     case RenderModels = 'navigation-render-models';
+    case LazyFragments = 'navigation-lazy-fragments';
 
     /**
      * Cache key for navigation name set filtered by site and languages.
@@ -27,5 +28,10 @@ enum NavigationCacheEnum: string
     public static function renderModelKey(string $context): string
     {
         return self::RenderModels->value . '-' . hash('sha256', $context);
+    }
+
+    public static function lazyFragmentKey(string $context): string
+    {
+        return self::LazyFragments->value . '-' . hash('sha256', $context);
     }
 }

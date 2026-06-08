@@ -25,6 +25,7 @@ class NavigationItemData extends Data
         public ?DataCollection $children = null,
         public ?bool $active = null,
         public bool $is_visible = true,
+        public ?string $key = null,
     ) {
         $this->children ??= new DataCollection(self::class, []);
     }

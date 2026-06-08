@@ -13,8 +13,8 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 use Livewire\Livewire;
 
@@ -23,9 +23,7 @@ use function Pest\Laravel\get;
 uses(CreatesAdminUser::class)
     ->group('navigation');
 
-/**
- * @param  Collection<array-key, mixed>  $assignedSiteIds
- */
+/** @param SupportCollection<int, int> $assignedSiteIds */
 function createScopedUserForNavigationResourceTest(SupportCollection $assignedSiteIds): Authenticatable
 {
     $user = new class extends Authenticatable implements FilamentUser
@@ -131,10 +129,21 @@ test('navigation queries include globals and assigned sites only for scoped user
     $assignedNavigation = Navigation::factory()->site($assignedSite)->create();
     Navigation::factory()->site($otherSite)->create();
 
-    test()->actingAs(createScopedUserForNavigationResourceTest(collect([$assignedSite->getKey()])));
+    test()->actingAs(createScopedUserForNavigationResourceTest(collect([navigationResourceModelIntKey($assignedSite)])));
 
     expect(NavigationResource::getEloquentQuery()->pluck('id')->all())
         ->toEqualCanonicalizing([$globalNavigation->getKey(), $assignedNavigation->getKey()])
         ->and(NavigationResource::getGlobalSearchEloquentQuery()->pluck('id')->all())
         ->toEqualCanonicalizing([$globalNavigation->getKey(), $assignedNavigation->getKey()]);
 });
+
+function navigationResourceModelIntKey(Model $model): int
+{
+    $key = $model->getKey();
+
+    if (is_int($key)) {
+        return $key;
+    }
+
+    return is_string($key) && ctype_digit($key) ? (int) $key : 0;
+}

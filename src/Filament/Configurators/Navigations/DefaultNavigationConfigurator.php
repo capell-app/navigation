@@ -148,14 +148,18 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 ->unique(
                     column: 'key',
                     ignoreRecord: $configurator->getOperation() !== 'replicate',
-                    modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
-                        ->withoutTrashed()
-                        ->where('site_id', $get('site_id'))
-                        ->when(
-                            filled($get('language_id', true)),
-                            fn (Unique $query): Unique => $query->where('language_id', $get('language_id')),
-                            fn (Unique $query): Unique => $query->whereNull('language_id'),
-                        ),
+                    modifyRuleUsing: function (Unique $rule, Get $get): Unique {
+                        $languageId = self::uniqueRuleValue($get('language_id'));
+
+                        return $rule
+                            ->withoutTrashed()
+                            ->where('site_id', self::uniqueRuleValue($get('site_id')))
+                            ->when(
+                                $languageId !== null,
+                                fn (Unique $query): Unique => $query->where('language_id', $languageId),
+                                fn (Unique $query): Unique => $query->whereNull('language_id'),
+                            );
+                    },
                 )
                 ->label(__('capell-admin::table.key')),
 
@@ -532,6 +536,15 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     protected function getLanguageById(?int $languageId, int $siteId): ?Language
     {
         return CapellCoreHelper::getLanguageByIdOrSite($languageId, $siteId);
+    }
+
+    private static function uniqueRuleValue(mixed $value): int|string|null
+    {
+        if (is_string($value)) {
+            return $value !== '' ? $value : null;
+        }
+
+        return is_int($value) ? $value : null;
     }
 
     /**

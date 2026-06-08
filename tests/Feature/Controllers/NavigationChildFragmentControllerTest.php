@@ -6,10 +6,12 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
+use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Enums\NavigationChildrenLoadingEnum;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Illuminate\Support\Collection;
 
 it('returns a lazy navigation child fragment for a valid public payload', function (): void {
     $language = Language::factory()->default()->create();
@@ -56,7 +58,7 @@ it('returns a lazy navigation child fragment for a valid public payload', functi
         siteDomain: $siteDomain,
     ));
 
-    $url = $renderModel->items->first()->lazyFragmentUrl;
+    $url = navigationChildFragmentUrl(navigationChildFragmentFirstItem($renderModel->items)->lazyFragmentUrl);
 
     expect($url)->toBeString();
 
@@ -141,3 +143,22 @@ it('returns not found for an invalid lazy navigation fragment payload', function
     $this->get(route('capell-navigation.children', ['payload' => 'invalid']))
         ->assertNotFound();
 });
+
+/**
+ * @param  Collection<int, NavigationItemRenderData>  $items
+ */
+function navigationChildFragmentFirstItem(Collection $items): NavigationItemRenderData
+{
+    $item = $items->first();
+
+    throw_unless($item instanceof NavigationItemRenderData, RuntimeException::class, 'Expected a navigation render item.');
+
+    return $item;
+}
+
+function navigationChildFragmentUrl(?string $url): string
+{
+    throw_unless(is_string($url) && $url !== '', RuntimeException::class, 'Expected a navigation child fragment URL.');
+
+    return $url;
+}
