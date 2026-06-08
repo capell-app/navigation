@@ -8,7 +8,9 @@
 @endphp
 
 @if ($breadcrumbs->isNotEmpty())
-    <nav {{ $attributes->merge(['aria-label' => __('capell-navigation::generic.breadcrumb_navigation')]) }}>
+    <nav
+        {{ $attributes->merge(['aria-label' => __('capell-navigation::generic.breadcrumb_navigation')]) }}
+    >
         <ol class="capell-navigation-breadcrumbs">
             @foreach ($breadcrumbs as $breadcrumb)
                 <li @class(['is-active' => $loop->last])>

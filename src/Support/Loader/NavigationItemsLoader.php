@@ -532,14 +532,17 @@ class NavigationItemsLoader
             if (! $page instanceof Pageable) {
                 continue;
             }
+
             if ($page->pageUrl === null) {
                 continue;
             }
+
             $siteId = $page->pageUrl->site_id;
             $languageId = $page->pageUrl->language_id;
             if (! is_numeric($siteId)) {
                 continue;
             }
+
             if (! is_numeric($languageId)) {
                 continue;
             }
