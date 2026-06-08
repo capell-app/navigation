@@ -20,9 +20,17 @@
             @endif
 
             @if ($item->children->isNotEmpty())
-                @include('capell-navigation::components.menu-items', [
-                    'items' => $item->children,
-                ])
+                @if (($includeNavigationLazyLoader ?? true) !== false && $item->lazyFragmentUrl !== null)
+                    <div
+                        data-navigation-lazy-fragment
+                        data-navigation-fragment-url="{{ $item->lazyFragmentUrl }}"
+                    ></div>
+                @else
+                    @include('capell-navigation::components.menu-items', [
+                        'items' => $item->children,
+                        'includeNavigationLazyLoader' => $includeNavigationLazyLoader ?? true,
+                    ])
+                @endif
             @endif
         </li>
     @endforeach

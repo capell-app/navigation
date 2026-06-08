@@ -178,6 +178,7 @@ class NavigationItemsLoader
                 'data' => $item->data,
                 'children' => $item->children,
                 'is_visible' => $item->is_visible,
+                'key' => $item->key,
             ];
 
             $children = collect($item->children?->all() ?? []);

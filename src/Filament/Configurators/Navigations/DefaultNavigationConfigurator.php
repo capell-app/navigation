@@ -29,6 +29,7 @@ use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
+use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Closure;
 use Filament\Actions\Action;
@@ -142,7 +143,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
             Select::make('key')
                 ->required()
-                ->options(fn (): array => NavigationHandleRegistry::options())
+                ->options(fn (Get $get, ?Model $record): array => $this->navigationKeyOptions($record, $get('key')))
                 ->searchable()
                 ->allowHtml(false)
                 ->unique(
@@ -545,6 +546,36 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         }
 
         return is_int($value) ? $value : null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function navigationKeyOptions(?Model $record, mixed $currentKey): array
+    {
+        $options = NavigationHandleRegistry::options();
+
+        if ($record instanceof Navigation) {
+            $this->addNavigationKeyOption($options, $record->key);
+        }
+
+        $this->addNavigationKeyOption($options, is_string($currentKey) ? $currentKey : null);
+
+        return $options;
+    }
+
+    /**
+     * @param  array<string, string>  $options
+     */
+    private function addNavigationKeyOption(array &$options, ?string $key): void
+    {
+        $normalizedKey = $key === null ? '' : trim($key);
+
+        if ($normalizedKey === '' || array_key_exists($normalizedKey, $options)) {
+            return;
+        }
+
+        $options[$normalizedKey] = NavigationHandleRegistry::label($normalizedKey);
     }
 
     /**
