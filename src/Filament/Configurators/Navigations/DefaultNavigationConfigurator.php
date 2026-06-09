@@ -24,12 +24,12 @@ use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Enums\NavigationDropdownLayout;
-use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
+use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Closure;
 use Filament\Actions\Action;
@@ -143,19 +143,24 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
             Select::make('key')
                 ->required()
-                ->options(fn (): array => NavigationHandleRegistry::options())
+                ->options(fn (Get $get, ?Model $record): array => $this->navigationKeyOptions($record, $get('key')))
                 ->searchable()
                 ->allowHtml(false)
                 ->unique(
                     column: 'key',
                     ignoreRecord: $configurator->getOperation() !== 'replicate',
-                    modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule
-                        ->withoutTrashed()
-                        ->where('site_id', $get('site_id'))
-                        ->when(
-                            $get('language_id', true),
-                            fn (Unique $query, int $languageId): Unique => $query->where('language_id', $languageId),
-                        ),
+                    modifyRuleUsing: function (Unique $rule, Get $get): Unique {
+                        $languageId = self::uniqueRuleValue($get('language_id'));
+
+                        return $rule
+                            ->withoutTrashed()
+                            ->where('site_id', self::uniqueRuleValue($get('site_id')))
+                            ->when(
+                                $languageId !== null,
+                                fn (Unique $query): Unique => $query->where('language_id', $languageId),
+                                fn (Unique $query): Unique => $query->whereNull('language_id'),
+                            );
+                    },
                 )
                 ->label(__('capell-admin::table.key')),
 
@@ -532,6 +537,45 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     protected function getLanguageById(?int $languageId, int $siteId): ?Language
     {
         return CapellCoreHelper::getLanguageByIdOrSite($languageId, $siteId);
+    }
+
+    private static function uniqueRuleValue(mixed $value): int|string|null
+    {
+        if (is_string($value)) {
+            return $value !== '' ? $value : null;
+        }
+
+        return is_int($value) ? $value : null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function navigationKeyOptions(?Model $record, mixed $currentKey): array
+    {
+        $options = NavigationHandleRegistry::options();
+
+        if ($record instanceof Navigation) {
+            $this->addNavigationKeyOption($options, $record->key);
+        }
+
+        $this->addNavigationKeyOption($options, is_string($currentKey) ? $currentKey : null);
+
+        return $options;
+    }
+
+    /**
+     * @param  array<string, string>  $options
+     */
+    private function addNavigationKeyOption(array &$options, ?string $key): void
+    {
+        $normalizedKey = $key === null ? '' : trim($key);
+
+        if ($normalizedKey === '' || array_key_exists($normalizedKey, $options)) {
+            return;
+        }
+
+        $options[$normalizedKey] = NavigationHandleRegistry::label($normalizedKey);
     }
 
     /**

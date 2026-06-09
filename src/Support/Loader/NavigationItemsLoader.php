@@ -111,6 +111,7 @@ class NavigationItemsLoader
                     if (! $active && isset($item->data['url']) && is_string($item->data['url'])) {
                         $active = $this->urlMatches($currentUrl, $item->data['url'], $this->activeMode($item));
                     }
+
                     break;
             }
 
@@ -177,6 +178,7 @@ class NavigationItemsLoader
                 'data' => $item->data,
                 'children' => $item->children,
                 'is_visible' => $item->is_visible,
+                'key' => $item->key,
             ];
 
             $children = collect($item->children?->all() ?? []);
@@ -266,15 +268,6 @@ class NavigationItemsLoader
             && str_starts_with($normalizedCurrent . '/', $normalizedMenu . '/');
     }
 
-    private function activeMode(NavigationItemData $item): NavigationItemActiveMode
-    {
-        $mode = $item->data['active_mode'] ?? NavigationItemActiveMode::Exact->value;
-
-        return is_string($mode)
-            ? NavigationItemActiveMode::tryFrom($mode) ?? NavigationItemActiveMode::Exact
-            : NavigationItemActiveMode::Exact;
-    }
-
     /**
      * @param  Collection<int, NavigationItemData>  $items
      * @return Collection<int, NavigationItemData>
@@ -291,49 +284,6 @@ class NavigationItemsLoader
                 return $item;
             })
             ->values();
-    }
-
-    private function passesVisibilityCondition(NavigationItemData $item): bool
-    {
-        $visibility = $this->visibility($item);
-
-        return match ($visibility) {
-            NavigationItemVisibility::Everyone => true,
-            NavigationItemVisibility::Guests => Auth::guest(),
-            NavigationItemVisibility::Authenticated => Auth::check(),
-            NavigationItemVisibility::Ability => $this->passesAbilityCondition($item),
-            NavigationItemVisibility::Role => $this->passesRoleCondition($item),
-        };
-    }
-
-    private function visibility(NavigationItemData $item): NavigationItemVisibility
-    {
-        $visibility = $item->data['visibility'] ?? NavigationItemVisibility::Everyone->value;
-
-        return is_string($visibility)
-            ? NavigationItemVisibility::tryFrom($visibility) ?? NavigationItemVisibility::Everyone
-            : NavigationItemVisibility::Everyone;
-    }
-
-    private function passesAbilityCondition(NavigationItemData $item): bool
-    {
-        $ability = $item->data['ability'] ?? null;
-
-        return is_string($ability)
-            && $ability !== ''
-            && Gate::allows($ability);
-    }
-
-    private function passesRoleCondition(NavigationItemData $item): bool
-    {
-        $role = $item->data['role'] ?? null;
-        $user = Auth::user();
-
-        return is_string($role)
-            && $role !== ''
-            && is_object($user)
-            && method_exists($user, 'hasRole')
-            && $user->hasRole($role) === true;
     }
 
     /**
@@ -496,6 +446,82 @@ class NavigationItemsLoader
     }
 
     /**
+     * @param  array<string, mixed>  $item
+     * @return array{pageable_id:int, pageable_type:string}|null
+     */
+    protected function extractPageableReference(array $item): ?array
+    {
+        $pageableId = $item['data']['pageable_id'] ?? null;
+        $pageableType = $item['data']['pageable_type'] ?? null;
+
+        if (! is_numeric($pageableId) || ! is_string($pageableType) || $pageableType === '') {
+            return null;
+        }
+
+        return [
+            'pageable_id' => (int) $pageableId,
+            'pageable_type' => $pageableType,
+        ];
+    }
+
+    protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
+    {
+        return $pageableType . ':' . $pageableId;
+    }
+
+    private function activeMode(NavigationItemData $item): NavigationItemActiveMode
+    {
+        $mode = $item->data['active_mode'] ?? NavigationItemActiveMode::Exact->value;
+
+        return is_string($mode)
+            ? NavigationItemActiveMode::tryFrom($mode) ?? NavigationItemActiveMode::Exact
+            : NavigationItemActiveMode::Exact;
+    }
+
+    private function passesVisibilityCondition(NavigationItemData $item): bool
+    {
+        $visibility = $this->visibility($item);
+
+        return match ($visibility) {
+            NavigationItemVisibility::Everyone => true,
+            NavigationItemVisibility::Guests => Auth::guest(),
+            NavigationItemVisibility::Authenticated => Auth::check(),
+            NavigationItemVisibility::Ability => $this->passesAbilityCondition($item),
+            NavigationItemVisibility::Role => $this->passesRoleCondition($item),
+        };
+    }
+
+    private function visibility(NavigationItemData $item): NavigationItemVisibility
+    {
+        $visibility = $item->data['visibility'] ?? NavigationItemVisibility::Everyone->value;
+
+        return is_string($visibility)
+            ? NavigationItemVisibility::tryFrom($visibility) ?? NavigationItemVisibility::Everyone
+            : NavigationItemVisibility::Everyone;
+    }
+
+    private function passesAbilityCondition(NavigationItemData $item): bool
+    {
+        $ability = $item->data['ability'] ?? null;
+
+        return is_string($ability)
+            && $ability !== ''
+            && Gate::allows($ability);
+    }
+
+    private function passesRoleCondition(NavigationItemData $item): bool
+    {
+        $role = $item->data['role'] ?? null;
+        $user = Auth::user();
+
+        return is_string($role)
+            && $role !== ''
+            && is_object($user)
+            && method_exists($user, 'hasRole')
+            && $user->hasRole($role) === true;
+    }
+
+    /**
      * @param  Collection<int, Model>  $pages
      * @return array<string, SiteDomain>
      */
@@ -504,14 +530,21 @@ class NavigationItemsLoader
         $scopes = [];
 
         foreach ($pages as $page) {
-            if (! $page instanceof Pageable || $page->pageUrl === null) {
+            if (! $page instanceof Pageable) {
+                continue;
+            }
+
+            if ($page->pageUrl === null) {
                 continue;
             }
 
             $siteId = $page->pageUrl->site_id;
             $languageId = $page->pageUrl->language_id;
+            if (! is_numeric($siteId)) {
+                continue;
+            }
 
-            if (! is_numeric($siteId) || ! is_numeric($languageId)) {
+            if (! is_numeric($languageId)) {
                 continue;
             }
 
@@ -539,30 +572,6 @@ class NavigationItemsLoader
     private function siteDomainScopeKey(int $siteId, int $languageId): string
     {
         return $siteId . ':' . $languageId;
-    }
-
-    /**
-     * @param  array<string, mixed>  $item
-     * @return array{pageable_id:int, pageable_type:string}|null
-     */
-    protected function extractPageableReference(array $item): ?array
-    {
-        $pageableId = $item['data']['pageable_id'] ?? null;
-        $pageableType = $item['data']['pageable_type'] ?? null;
-
-        if (! is_numeric($pageableId) || ! is_string($pageableType) || $pageableType === '') {
-            return null;
-        }
-
-        return [
-            'pageable_id' => (int) $pageableId,
-            'pageable_type' => $pageableType,
-        ];
-    }
-
-    protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
-    {
-        return $pageableType . ':' . $pageableId;
     }
 
     /**

@@ -10,7 +10,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
 /**
- * @method static DataCollection<int|string, NavigationItemData> run(DataCollection|array|null $items)
+ * @method static DataCollection<int|string, NavigationItemData> run(DataCollection<int|string, NavigationItemData>|array<array-key, mixed>|null $items)
  */
 class EnsureNavigationItemKeysAction
 {

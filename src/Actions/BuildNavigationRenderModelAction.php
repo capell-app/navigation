@@ -9,12 +9,14 @@ use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationCacheEnum;
+use Capell\Navigation\Enums\NavigationChildrenLoadingEnum;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -63,6 +65,17 @@ class BuildNavigationRenderModelAction
         return $renderModel;
     }
 
+    /**
+     * @return Collection<int, NavigationItemRenderData>|null
+     */
+    public function childRenderItems(NavigationRenderContextData $context, string $itemKey, string $itemPath): ?Collection
+    {
+        $renderModel = $this->handle($context);
+        $item = $this->findRenderItem($renderModel->items, $itemKey);
+
+        return $item instanceof NavigationItemRenderData ? $item->children : null;
+    }
+
     private function rememberSharedRenderModel(NavigationRenderContextData $context): NavigationRenderData
     {
         $sharedCacheKey = $this->sharedCacheKey($context);
@@ -102,7 +115,7 @@ class BuildNavigationRenderModelAction
             navigationKey: $context->navigation->key,
             navigationName: $context->navigation->name,
             listComponent: $this->listComponent($context->navigation),
-            items: $this->mapItems($items),
+            items: $this->mapItems($items, $context),
         );
     }
 
@@ -110,23 +123,29 @@ class BuildNavigationRenderModelAction
      * @param  Collection<int, NavigationItemData>  $items
      * @return Collection<int, NavigationItemRenderData>
      */
-    private function mapItems(Collection $items): Collection
+    private function mapItems(Collection $items, NavigationRenderContextData $context, string $parentPath = ''): Collection
     {
         return $items
-            ->map(fn (NavigationItemData $item): NavigationItemRenderData => $this->mapItem($item))
+            ->values()
+            ->map(fn (NavigationItemData $item, int $itemIndex): NavigationItemRenderData => $this->mapItem(
+                item: $item,
+                context: $context,
+                itemPath: $parentPath === '' ? (string) $itemIndex : $parentPath . '.' . $itemIndex,
+            ))
             ->values();
     }
 
-    private function mapItem(NavigationItemData $item): NavigationItemRenderData
+    private function mapItem(NavigationItemData $item, NavigationRenderContextData $context, string $itemPath): NavigationItemRenderData
     {
         $data = $item->data;
+        $children = $this->mapItems(collect($item->children?->all() ?? []), $context, $itemPath);
 
         return new NavigationItemRenderData(
             label: $item->label,
             type: $item->type,
             url: isset($data['url']) && is_string($data['url']) ? $data['url'] : null,
             active: $item->active === true,
-            children: $this->mapItems(collect($item->children?->all() ?? [])),
+            children: $children,
             data: $this->viewData($data),
             target: isset($data['target']) && is_string($data['target']) ? $data['target'] : null,
             rel: $this->rel($item, $data),
@@ -136,7 +155,56 @@ class BuildNavigationRenderModelAction
             component: isset($data['component']) && is_string($data['component']) ? $data['component'] : null,
             componentItem: isset($data['component_item']) && is_string($data['component_item']) ? $data['component_item'] : null,
             hideLabel: ($data['hide_label'] ?? false) === true,
+            key: $item->key,
+            lazyFragmentUrl: $this->lazyFragmentUrl($item, $context, $itemPath, $children),
         );
+    }
+
+    /**
+     * @param  Collection<int, NavigationItemRenderData>  $children
+     */
+    private function lazyFragmentUrl(NavigationItemData $item, NavigationRenderContextData $context, string $itemPath, Collection $children): ?string
+    {
+        if ($item->key === null || $children->isEmpty()) {
+            return null;
+        }
+
+        if (NavigationChildrenLoadingEnum::fromItemData($item->data) !== NavigationChildrenLoadingEnum::Lazy) {
+            return null;
+        }
+
+        $payload = Crypt::encryptString(json_encode([
+            'navigation' => $this->integerKey($context->navigation->getKey()),
+            'item' => $item->key,
+            'path' => $itemPath,
+            'page' => $this->integerKey($context->page->getKey()),
+            'page_type' => $context->page->getMorphClass(),
+            'site' => $this->integerKey($context->site->getKey()),
+            'language' => $this->integerKey($context->language->getKey()),
+            'domain' => $this->integerKey($context->siteDomain->getKey()),
+        ], JSON_THROW_ON_ERROR));
+
+        return route('capell-navigation.children', ['payload' => $payload]);
+    }
+
+    /**
+     * @param  Collection<int, NavigationItemRenderData>  $items
+     */
+    private function findRenderItem(Collection $items, string $itemKey): ?NavigationItemRenderData
+    {
+        foreach ($items as $item) {
+            if ($item->key === $itemKey) {
+                return $item;
+            }
+
+            $child = $this->findRenderItem($item->children, $itemKey);
+
+            if ($child instanceof NavigationItemRenderData) {
+                return $child;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -243,5 +311,14 @@ class BuildNavigationRenderModelAction
             (string) $context->language->updated_at?->getTimestamp(),
             (string) $context->siteDomain->updated_at?->getTimestamp(),
         ]));
+    }
+
+    private function integerKey(mixed $value): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        return is_string($value) && ctype_digit($value) ? (int) $value : 0;
     }
 }

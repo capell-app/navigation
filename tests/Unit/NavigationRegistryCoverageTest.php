@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Capell\Navigation\Health\NavigationHealthCheck;
-use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Capell\Navigation\Support\Registry\NavigableRegistry;
+use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

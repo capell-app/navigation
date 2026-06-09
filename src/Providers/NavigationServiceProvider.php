@@ -68,7 +68,6 @@ class NavigationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         $this->registerFrontendRenderHooks();
 
         if (! $this->isPackageInstalled()) {
@@ -77,6 +76,7 @@ class NavigationServiceProvider extends ServiceProvider
 
         $this
             ->registerServices()
+            ->registerRoutes()
             ->registerSchemaExtenders()
             ->registerResources()
             ->registerPageTypes()
@@ -104,6 +104,13 @@ class NavigationServiceProvider extends ServiceProvider
                 $app->make(Factory::class)->store(),
             ),
         );
+
+        return $this;
+    }
+
+    private function registerRoutes(): self
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
 
         return $this;
     }

@@ -29,5 +29,7 @@ class NavigationItemRenderData extends Data
         public ?string $component = null,
         public ?string $componentItem = null,
         public bool $hideLabel = false,
+        public ?string $key = null,
+        public ?string $lazyFragmentUrl = null,
     ) {}
 }

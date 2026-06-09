@@ -148,13 +148,17 @@
             @if ($hasMegaPanel)
                 <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
                     @if (! empty($item->data['mega_panel_heading']))
-                        <p class="text-sm font-semibold text-slate-950 dark:text-white">
+                        <p
+                            class="text-sm font-semibold text-slate-950 dark:text-white"
+                        >
                             {{ $item->data['mega_panel_heading'] }}
                         </p>
                     @endif
 
                     @if (! empty($item->data['mega_panel_description']))
-                        <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        <p
+                            class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300"
+                        >
                             {{ $item->data['mega_panel_description'] }}
                         </p>
                     @endif
