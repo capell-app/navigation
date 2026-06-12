@@ -57,6 +57,39 @@
         "navigation-breadcrumbs",
         "navigation-conditional-visibility"
     ],
+    "security": {
+        "riskTier": "standard",
+        "publicSurface": {
+            "routeNames": ["capell-navigation.children"],
+            "auth": "public",
+            "csrfExemptRoutes": [],
+            "signedRoutes": [],
+            "tokenizedRoutes": [],
+            "webhookRoutes": [],
+            "throttledRoutes": []
+        },
+        "sensitiveData": {
+            "encryptedFields": [],
+            "hashedTokenFields": [],
+            "redactedOutputClasses": [],
+            "plaintextJustifications": []
+        },
+        "publicOutput": {
+            "cacheSafe": true,
+            "forbidAuthoringSurface": true,
+            "forbidSecrets": true,
+            "forbidPublicBladeQueries": true
+        },
+        "externalHttpClients": {
+            "requiresTimeouts": false,
+            "requiresSecretRedaction": false,
+            "clients": []
+        },
+        "adminSurface": {
+            "authorization": "policies",
+            "permissions": []
+        }
+    },
     "performance": {
         "frontendRenderBudgetMs": 20,
         "adminQueryBudget": 40,
