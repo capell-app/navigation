@@ -13,7 +13,11 @@
         "bundle": "foundation"
     },
     "namespace": "Capell\\Navigation",
-    "surfaces": ["admin", "frontend", "console"],
+    "surfaces": [
+        "admin",
+        "frontend",
+        "console"
+    ],
     "dependencies": {
         "requires": [
             "capell-app/admin",
@@ -26,7 +30,9 @@
     "providers": {
         "metadata": [],
         "install": [],
-        "runtime": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"],
+        "runtime": [
+            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
+        ],
         "admin": [],
         "frontend": []
     },
@@ -34,12 +40,17 @@
     "database": {
         "migrations": true,
         "settings": false,
-        "requiredTables": ["navigations", "navigation_page_references"]
+        "requiredTables": [
+            "navigations",
+            "navigation_page_references"
+        ]
     },
     "commands": {
         "install": null,
         "setup": "capell:navigation-setup",
-        "setupParams": ["sites"],
+        "setupParams": [
+            "sites"
+        ],
         "demo": "capell:navigation-demo",
         "doctor": null
     },
@@ -60,7 +71,10 @@
     "security": {
         "riskTier": "standard",
         "publicSurface": {
-            "routeNames": ["capell-navigation.children"],
+            "routeNames": [
+                "capell-navigation.children",
+                "children"
+            ],
             "auth": "public",
             "csrfExemptRoutes": [],
             "signedRoutes": [],
@@ -93,23 +107,39 @@
     "performance": {
         "frontendRenderBudgetMs": 20,
         "adminQueryBudget": 40,
-        "cacheTags": ["navigation"],
+        "cacheTags": [
+            "navigation"
+        ],
         "cacheSafety": {
             "cacheable": true,
-            "variesBy": ["site", "locale", "page", "domain", "guest"],
+            "variesBy": [
+                "site",
+                "locale",
+                "page",
+                "domain",
+                "guest"
+            ],
             "sensitiveOutput": false,
             "invalidationSources": [
                 {
                     "model": "Capell\\Navigation\\Models\\Navigation",
-                    "events": ["saved", "deleted", "restored"]
+                    "events": [
+                        "saved",
+                        "deleted",
+                        "restored"
+                    ]
                 },
                 {
                     "model": "Capell\\Core\\Models\\Page",
-                    "events": ["updated"]
+                    "events": [
+                        "updated"
+                    ]
                 },
                 {
                     "model": "Capell\\Core\\Models\\Site",
-                    "events": ["replicated"]
+                    "events": [
+                        "replicated"
+                    ]
                 }
             ],
             "queueInvalidation": true
@@ -159,7 +189,12 @@
                 "caption": "Manage site-scoped navigations from the dark-mode site relation manager"
             }
         ],
-        "categories": ["admin", "console", "foundation", "frontend"]
+        "categories": [
+            "admin",
+            "console",
+            "foundation",
+            "frontend"
+        ]
     },
     "contributionTraceability": {
         "deferredContributions": [
