@@ -13,10 +13,11 @@ use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
+use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
-use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
-use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\Frontend\Enums\RenderHookLocation;
+use Capell\Frontend\Support\Render\FrontendHookRegistrar;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -46,14 +47,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
-use WeakMap;
 
 class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
-
-    /** @var WeakMap<RenderHookRegistry<RenderHookContext>, true>|null */
-    private ?WeakMap $frontendRenderHookRegistries = null;
 
     #[Override]
     public function register(): void
@@ -138,7 +135,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerPageTypes(): self
     {
-        CapellCore::registerPageType(new PageTypeData(
+        app(PackageSurfaceRegistrar::class)->pageType(new PageTypeData(
             name: 'navigation',
             model: Navigation::class,
             label: 'Navigation',
@@ -149,7 +146,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerModels(): self
     {
-        CapellCore::registerModels([Navigation::class]);
+        app(PackageSurfaceRegistrar::class)->models([Navigation::class]);
 
         return $this;
     }
@@ -198,36 +195,34 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerFrontendRenderHooks(): self
     {
-        $this->app->afterResolving(
-            RenderHookRegistry::class,
-            function (RenderHookRegistry $registry): void {
-                $this->registerFrontendRenderHooksForRegistry($registry);
-            },
+        if (! $this->isPackageInstalled() || ! $this->app->bound(FrontendHookRegistrar::class)) {
+            return $this;
+        }
+
+        $registrar = resolve(FrontendHookRegistrar::class);
+        $hook = new RegisterFoundationHeaderNavigationHook;
+
+        $registrar->contribute(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-default',
+            scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
         );
 
-        if ($this->app->bound(RenderHookRegistry::class)) {
-            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
-        }
+        $registrar->contribute(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-foundation',
+            scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        );
 
         return $this;
-    }
-
-    /** @param RenderHookRegistry<RenderHookContext> $registry */
-    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
-    {
-        if (! $this->isPackageInstalled()) {
-            return;
-        }
-
-        $this->frontendRenderHookRegistries ??= new WeakMap;
-
-        if (isset($this->frontendRenderHookRegistries[$registry])) {
-            return;
-        }
-
-        (new RegisterFoundationHeaderNavigationHook($registry))->register();
-
-        $this->frontendRenderHookRegistries[$registry] = true;
     }
 
     private function registerPolicies(): self
