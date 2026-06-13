@@ -88,12 +88,21 @@ class BuildNavigationRenderModelAction
             ? Cache::tags(['navigation'])
             : Cache::store();
 
-        /** @var NavigationRenderData $renderModel */
-        $renderModel = $repository->remember(
-            $sharedCacheKey,
-            now()->addMinutes(5),
-            fn (): NavigationRenderData => $this->buildRenderModel($context),
-        );
+        $cachedPayload = $repository->get($sharedCacheKey);
+
+        if ($cachedPayload !== null) {
+            $renderModel = $this->renderModelFromCachePayload($cachedPayload);
+
+            if ($renderModel instanceof NavigationRenderData) {
+                return $renderModel;
+            }
+
+            $repository->forget($sharedCacheKey);
+        }
+
+        $renderModel = $this->buildRenderModel($context);
+
+        $repository->put($sharedCacheKey, $this->renderModelCachePayload($renderModel), now()->addMinutes(5));
 
         return $renderModel;
     }
@@ -320,5 +329,178 @@ class BuildNavigationRenderModelAction
         }
 
         return is_string($value) && ctype_digit($value) ? (int) $value : 0;
+    }
+
+    /**
+     * @return array{navigationId:int|null,navigationKey:string,navigationName:string|null,listComponent:string,items:array<int, array<string, mixed>>}
+     */
+    private function renderModelCachePayload(NavigationRenderData $renderModel): array
+    {
+        return [
+            'navigationId' => $renderModel->navigationId,
+            'navigationKey' => $renderModel->navigationKey,
+            'navigationName' => $renderModel->navigationName,
+            'listComponent' => $renderModel->listComponent,
+            'items' => $renderModel->items
+                ->map(fn (NavigationItemRenderData $item): array => $this->renderItemCachePayload($item))
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function renderItemCachePayload(NavigationItemRenderData $item): array
+    {
+        return [
+            'label' => $item->label,
+            'type' => $item->type->value,
+            'url' => $item->url,
+            'active' => $item->active,
+            'children' => $item->children
+                ->map(fn (NavigationItemRenderData $child): array => $this->renderItemCachePayload($child))
+                ->values()
+                ->all(),
+            'data' => $item->data,
+            'target' => $item->target,
+            'rel' => $item->rel,
+            'icon' => $item->icon,
+            'activeIcon' => $item->activeIcon,
+            'class' => $item->class,
+            'component' => $item->component,
+            'componentItem' => $item->componentItem,
+            'hideLabel' => $item->hideLabel,
+            'key' => $item->key,
+            'lazyFragmentUrl' => $item->lazyFragmentUrl,
+        ];
+    }
+
+    private function renderModelFromCachePayload(mixed $payload): ?NavigationRenderData
+    {
+        if (! is_array($payload)) {
+            return null;
+        }
+
+        $navigationId = $payload['navigationId'] ?? null;
+        $navigationKey = $payload['navigationKey'] ?? null;
+        $navigationName = $payload['navigationName'] ?? null;
+        $listComponent = $payload['listComponent'] ?? null;
+        $items = $this->renderItemsFromCachePayload($payload['items'] ?? null);
+
+        if (
+            (! is_int($navigationId) && $navigationId !== null)
+            || ! is_string($navigationKey)
+            || (! is_string($navigationName) && $navigationName !== null)
+            || ! is_string($listComponent)
+            || ! $items instanceof Collection
+        ) {
+            return null;
+        }
+
+        return new NavigationRenderData(
+            navigationId: $navigationId,
+            navigationKey: $navigationKey,
+            navigationName: $navigationName,
+            listComponent: $listComponent,
+            items: $items,
+        );
+    }
+
+    /**
+     * @return Collection<int, NavigationItemRenderData>|null
+     */
+    private function renderItemsFromCachePayload(mixed $payload): ?Collection
+    {
+        if (! is_array($payload)) {
+            return null;
+        }
+
+        $items = [];
+
+        foreach ($payload as $itemPayload) {
+            $item = $this->renderItemFromCachePayload($itemPayload);
+
+            if (! $item instanceof NavigationItemRenderData) {
+                return null;
+            }
+
+            $items[] = $item;
+        }
+
+        return collect($items);
+    }
+
+    private function renderItemFromCachePayload(mixed $payload): ?NavigationItemRenderData
+    {
+        if (! is_array($payload)) {
+            return null;
+        }
+
+        $typeValue = $payload['type'] ?? null;
+        $active = $payload['active'] ?? null;
+        $data = $this->stringKeyedArray($payload['data'] ?? null);
+        $children = $this->renderItemsFromCachePayload($payload['children'] ?? null);
+
+        if (! is_string($typeValue) || ! is_bool($active) || ! is_array($data) || ! $children instanceof Collection) {
+            return null;
+        }
+
+        $type = NavigationItemType::tryFrom($typeValue);
+
+        if (! $type instanceof NavigationItemType) {
+            return null;
+        }
+
+        return new NavigationItemRenderData(
+            label: $this->nullableString($payload, 'label'),
+            type: $type,
+            url: $this->nullableString($payload, 'url'),
+            active: $active,
+            children: $children,
+            data: $data,
+            target: $this->nullableString($payload, 'target'),
+            rel: $this->nullableString($payload, 'rel'),
+            icon: $this->nullableString($payload, 'icon'),
+            activeIcon: $this->nullableString($payload, 'activeIcon'),
+            class: $this->nullableString($payload, 'class'),
+            component: $this->nullableString($payload, 'component'),
+            componentItem: $this->nullableString($payload, 'componentItem'),
+            hideLabel: ($payload['hideLabel'] ?? false) === true,
+            key: $this->nullableString($payload, 'key'),
+            lazyFragmentUrl: $this->nullableString($payload, 'lazyFragmentUrl'),
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function nullableString(array $payload, string $key): ?string
+    {
+        $value = $payload[$key] ?? null;
+
+        return is_string($value) ? $value : null;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function stringKeyedArray(mixed $value): ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        $array = [];
+
+        foreach ($value as $key => $item) {
+            if (! is_string($key)) {
+                return null;
+            }
+
+            $array[$key] = $item;
+        }
+
+        return $array;
     }
 }
