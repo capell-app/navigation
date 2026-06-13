@@ -16,6 +16,7 @@ use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationLoader;
+use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 
@@ -50,6 +51,16 @@ final readonly class NavigationRenderModelComposer
         }
 
         $view->with('navigation', $navigation);
+        $preparedRenderModel = Frontend::getFrontendData(
+            NavigationFrontendRuntimeManifestContributor::renderModelKey($navigation->key),
+        );
+
+        if ($preparedRenderModel instanceof NavigationRenderData) {
+            $view->with('menu', $preparedRenderModel);
+
+            return;
+        }
+
         $view->with('menu', BuildNavigationRenderModelAction::run(new NavigationRenderContextData(
             navigation: $navigation,
             page: $page,

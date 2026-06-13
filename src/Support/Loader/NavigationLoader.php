@@ -39,21 +39,23 @@ class NavigationLoader
         }
 
         if ($siteOnlyFallback && $navigation === null) {
-            $navigations = CapellCore::rememberCache(
-                CacheEnum::siteNavigations((int) $site->getKey()),
-                function () use ($site): Collection {
-                    /** @var class-string<Navigation> $model */
-                    $model = Navigation::class;
+            if (! $site->relationLoaded('navigations')) {
+                $navigations = CapellCore::rememberCache(
+                    CacheEnum::siteNavigations((int) $site->getKey()),
+                    function () use ($site): Collection {
+                        /** @var class-string<Navigation> $model */
+                        $model = Navigation::class;
 
-                    return $model::query()
-                        ->where(function (Builder $query) use ($site): void {
-                            $query->where('site_id', $site->getKey())
-                                ->orWhereNull('site_id');
-                        })
-                        ->publishedDate()
-                        ->get();
-                },
-            );
+                        return $model::query()
+                            ->where(function (Builder $query) use ($site): void {
+                                $query->where('site_id', $site->getKey())
+                                    ->orWhereNull('site_id');
+                            })
+                            ->publishedDate()
+                            ->get();
+                    },
+                );
+            }
 
             $navigation = $navigations
                 ->where('key', $navigationKey)
