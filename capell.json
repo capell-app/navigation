@@ -60,7 +60,7 @@
     "security": {
         "riskTier": "standard",
         "publicSurface": {
-            "routeNames": ["capell-navigation.children", "children"],
+            "routeNames": ["capell-navigation.children"],
             "auth": "public",
             "csrfExemptRoutes": [],
             "signedRoutes": [],
