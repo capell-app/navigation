@@ -9,6 +9,7 @@ use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\DataCollection;
 
@@ -119,6 +120,56 @@ it('loads morph navigation items and preserves order', function (): void {
         ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 1)->data['pageable_id'])->toBe($currentPage->id)
         ->and(navigationLoaderChild(navigationLoaderItem($items, 2), 1)->active)->toBeTrue()
         ->and(navigationLoaderItem($items, 2)->active)->toBeTrue();
+});
+
+it('keeps page lookup cache scoped to the current request', function (): void {
+    NavigationItemsLoader::flushPageCache();
+
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()->language($language)->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+    $secondaryPage = Page::factory()->site($site)->withTranslations(slug: '/before-cache-refresh')->create();
+
+    $navigation = Navigation::factory()->make([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $site->language->id,
+        'items' => [
+            [
+                'type' => NavigationItemType::Page->value,
+                'data' => [
+                    'pageable_id' => $secondaryPage->id,
+                    'pageable_type' => $secondaryPage->getMorphClass(),
+                ],
+            ],
+        ],
+    ]);
+
+    app()->instance('request', Request::create('/navigation/first'));
+
+    $firstItems = (new NavigationItemsLoader(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $site->language,
+        siteDomain: $site->siteDomains->first(),
+    ))->fetchMenuItems();
+
+    throw_if($secondaryPage->pageUrl === null, RuntimeException::class, 'Expected secondary page URL.');
+
+    $secondaryPage->pageUrl->forceFill(['url' => '/after-cache-refresh'])->save();
+    app()->instance('request', Request::create('/navigation/second'));
+
+    $secondItems = (new NavigationItemsLoader(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $site->language,
+        siteDomain: $site->siteDomains->first(),
+    ))->fetchMenuItems();
+
+    expect(navigationLoaderItem($firstItems, 0)->data['url'])->toContain('/before-cache-refresh')
+        ->and(navigationLoaderItem($secondItems, 0)->data['url'])->toContain('/after-cache-refresh');
 });
 
 it('loads pure link navigation items', function (): void {
