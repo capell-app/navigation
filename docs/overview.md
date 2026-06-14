@@ -1,172 +1,109 @@
 # Navigation
 
-Status: **Available, schema-owning** · Kind: **package** · Tier: **free** · Bundle: **foundation** · Contexts: **admin, frontend, console** · Product group: **Capell Foundation**
+<!-- prettier-ignore-start -->
 
-This page is the consolidated implementation overview for the Navigation package. It is extracted from the package README, service providers, migrations, config files, routes, resources, models, actions, and the shared Capell ERD notes where available.
+## What This Plugin Adds
 
-## What This Package Adds
+Navigation is an **Available**, **Schema-owning** Capell package in the **Capell Foundation** product group. It ships as `capell-app/navigation` and extends these surfaces: admin, frontend, console.
 
-Navigation adds site and language scoped navigation trees, page navigation fields, sync actions, and frontend loading support.
+Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.
 
-- Navigation Filament resource.
-- Navigation relation manager on sites.
-- Page schema extender for navigation placement.
-- Navigation item model resolution.
-- Mega-menu dropdown settings for multi-column child links and optional intro panels.
-- Actions to add, remove, replicate, and resolve navigation entries.
-- Indexed page-reference tracking for fast page edit panels.
-- Navigation loader support for frontend rendering.
+After install, admins get package-owned management surfaces and public users may see package-owned frontend output or routes.
 
-## Developer Notes
+Status details:
 
-Stores navigation items in structured data and uses adapters/registries to connect navigable models without hard-coding page logic everywhere.
-
-- NavigationServiceProvider registers the package.
-- Migrations create navigations and the page-reference index table.
-- Model: Navigation.
-- Filament resource: NavigationResource.
-- Policy: NavigationPolicy.
-- Events/listeners handle creation and site replication.
-
-## Operational Notes
-
-Lets editors manage menus for each site and language while keeping page selection tied to Capell records.
-
-- Adds navigations table.
-- Adds navigation admin resource and site relation manager.
-- Extends page and site admin schemas.
-- No explicit public route is registered by this package.
-- Adds setup and demo commands.
-
-## Data And Retention
-
-- navigations stores key, type, site, language, items JSON, meta, and visibility windows.
-- navigation_page_references stores extracted nested page references for indexed admin lookups.
-- Navigation items may reference pages and page URLs through JSON.
-- Navigations connect to sites, languages, and types.
-- Cache key enum indicates navigation cache behaviour.
-
-## Content Graph
-
-Navigation contributes content graph edges from each navigation record to the pages referenced by its nested page items. These edges use `LinksToPage` with strong strength, so impact previews, safer deletes, diagnostics, and graph-aware invalidation can see which menus depend on a page.
-
-## Screenshot Plan
-
-- Navigation admin index, light and dark.
-- Create/edit navigation form, light and dark.
-- Site relation manager for navigations, light and dark.
-- Page form navigation tab, light and dark.
-- Frontend menu output, light and dark.
-
-## Screenshots
-
-![Navigation admin index](screenshots/navigation-admin-index.png)
-
-![Navigation admin index in dark mode](screenshots/navigation-admin-index-dark.png)
-
-![Create navigation form](screenshots/create-edit-navigation-form.png)
-
-![Create navigation form in dark mode](screenshots/create-edit-navigation-form-dark.png)
-
-![Navigation fields on the site form](screenshots/site-relation-manager-for-navigations.png)
-
-![Navigation fields on the site form in dark mode](screenshots/site-relation-manager-for-navigations-dark.png)
-
-![Page form navigation tab](screenshots/page-form-navigation-tab.png)
-
-![Page form navigation tab in dark mode](screenshots/page-form-navigation-tab-dark.png)
-
-![Frontend menu output](screenshots/frontend-menu-output.png)
-
-![Frontend menu output in dark mode](screenshots/frontend-menu-output-dark.png)
-
-## Pitfalls
-
-- Create language/site records before creating scoped navigation.
-- Resolve stale page references after deleting pages.
-- Clear navigation cache after manual data changes.
-
-## Verification
-
-- Run `vendor/bin/pest packages/navigation/tests` when package tests exist.
-- Run the relevant host-app migration or package install flow in a disposable database.
-- Open the listed admin or frontend surface and compare it with the screenshot plan.
-
-## Package Manifest
-
-- Composer name: `capell-app/navigation`
-- Product group: Capell Foundation
-- Kind: package
+- Status: Available
 - Tier: free
 - Bundle: foundation
-- Contexts: `admin`, `frontend`, `console`
-- Requires: `capell-app/core`, `capell-app/admin`, `capell-app/frontend`
-- Optional dependencies: None listed.
+- Composer package: `capell-app/navigation`
+- Namespace: `Capell\Navigation`
+- Theme key: not applicable
 
-## Admin Surfaces
+## Why It Matters
 
-- NavigationResource (packages/navigation/src/Filament/Resources/Navigations/NavigationResource.php)
-- CreateNavigation (packages/navigation/src/Filament/Resources/Navigations/Pages/CreateNavigation.php)
-- EditNavigation (packages/navigation/src/Filament/Resources/Navigations/Pages/EditNavigation.php)
-- ListNavigations (packages/navigation/src/Filament/Resources/Navigations/Pages/ListNavigations.php)
+**For developers:** The package gives developers package-owned service providers, Actions, Data objects, models, Laravel routes, Filament classes, and Blade views instead of pushing this behaviour into core or application code.
 
-## Commands
+**For teams:** Build and manage multilingual, per-site menus visually - link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.
 
-- `capell:navigation-demo {--sites=} {--languages=}` (packages/navigation/src/Console/Commands/DemoCommand.php)
-- `capell:navigation-setup {--sites=}` (packages/navigation/src/Console/Commands/SetupCommand.php)
+## Screens And Workflow
 
-## Routes And Config
+Screenshot contract: `screenshots.json`.
 
-- None proven in this package directory.
+- Navigation admin index (admin, required).
+- Create/edit navigation form (admin, required).
+- Site relation manager for navigations (admin, required).
+- Page form navigation tab (admin, required).
+- Frontend menu output (frontend, required).
 
-## Permissions And Gates
+## Technical Shape
 
-- Policy: NavigationPolicy (packages/navigation/src/Policies/NavigationPolicy.php)
+- Service providers: `Capell\Navigation\Providers\NavigationServiceProvider`.
+- Migrations: `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`, `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`.
+- Models: `Navigation`.
+- Filament classes: `TypeSelect`, `NavigationSelect`, `NavigationTab`, `NavigationItemsColumn`, `DefaultNavigationConfigurator`, `NavigationPageSchemaExtender`, `NavigationSiteExtender`, `NavigationResource`, `CreateNavigation`, `EditNavigation`, `ListNavigations`, `NavigationForm`, `and 2 more`.
+- Route files: `packages/navigation/routes/web.php`.
+- Policies: `NavigationPolicy`.
+- Events: `NavigationCreating`.
+- Listeners: `ReplicateSiteNavigationsListener`.
+- Actions: `AddPageToNavigationAction`, `BuildNavigationBreadcrumbsAction`, `BuildNavigationChildFragmentAction`, `BuildNavigationRenderModelAction`, `BuildPageNavigationReferencesAction`, `EnsureNavigationItemKeysAction`, `RemovePageFromNavigationAction`, `ReplicateSiteNavigationsAction`, `ResolveNavigationItemModelsAction`, `SyncNavigationPageReferencesAction`.
+- Data objects: `NavigationItemData`, `NavigationItemRenderData`, `NavigationRenderContextData`, `NavigationRenderData`.
+- Command signatures: `capell:navigation-demo`, `capell:navigation-setup`.
+- Console command classes: `DemoCommand`, `SetupCommand`.
+- Health checks: `Capell\Navigation\Health\NavigationHealthCheck`.
+- Blade views: `packages/navigation/resources/views/components/breadcrumbs.blade.php`, `packages/navigation/resources/views/components/header/main-navigation.blade.php`, `packages/navigation/resources/views/components/header/menu/dropdown.blade.php`, `packages/navigation/resources/views/components/header/menu/item.blade.php`, `packages/navigation/resources/views/components/header/navigation.blade.php`, `packages/navigation/resources/views/components/menu-items.blade.php`, `packages/navigation/resources/views/components/menu.blade.php`, `packages/navigation/resources/views/components/page/navigations.blade.php`.
+- Cache tags: `navigation`.
 
-## Migrations
+## Data Model
 
-- Migration: create_navigations_table.php
-- Migration: create_navigation_page_references_table.php
+- Required tables: `navigations`, `navigation_page_references`.
+- Models: `Navigation`.
+- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`.
+- Migration impact: run host migrations through the package install flow before opening package surfaces.
+- Deletion/retention behaviour: Docs gap unless the package has an explicit pruning command, retention setting, or tested cascade path.
 
-## ERD Excerpt
+## Install Impact
 
-```mermaid
-erDiagram
-    SITES ||--o{ NAVIGATIONS : owns
-    LANGUAGES ||--o{ NAVIGATIONS : localizes
-    BLUEPRINTS ||--o{ NAVIGATIONS : classifies
-    PAGES ||..o{ NAVIGATION_PAGE_REFERENCES : referenced
-    NAVIGATIONS ||--o{ NAVIGATION_PAGE_REFERENCES : indexes
-    PAGE_URLS ||..o{ NAVIGATIONS : referenced_in_items_json
+- Admin navigation: adds package-owned Filament classes when registered.
+- Permissions: none declared in `capell.json`.
+- Public routes: route files exist and must be reviewed before public enablement.
+- Database changes: package migrations are declared.
+- Settings: no package settings declared.
+- Queues or schedules: none detected in standard package paths.
+- Cache tags: `navigation`.
+- Commands: `capell:navigation-demo`, `capell:navigation-setup`.
 
-    NAVIGATIONS {
-        bigint id PK
-        string key
-        bigint blueprint_id FK
-        bigint site_id FK
-        bigint language_id FK
-        json items
-        json meta
-        timestamp visible_from
-        timestamp visible_until
-    }
+## Common Pitfalls
 
-    NAVIGATION_PAGE_REFERENCES {
-        bigint id PK
-        bigint navigation_id FK
-        bigint site_id
-        bigint language_id
-        string pageable_type
-        bigint pageable_id
-    }
-```
+- Run migrations before opening package resources or public routes.
+- Review route middleware, throttling, signed URLs, and public-output safety before exposing routes.
+- Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
+- Run package commands from the host app; in this repository use `vendor/bin/pest` for package tests.
+- Keep `composer.json`, `composer.local.json`, `capell.json`, docs, screenshots, and tests aligned when the package surface changes.
 
-## Screenshot Automation
+## Troubleshooting
 
-Deployment should read [screenshots.json](screenshots.json), install the package with demo data, resolve each admin surface or frontend URL, and write light and dark images to `packages/navigation/docs/screenshots`. Marketplace card and hero artwork ship from `docs/assets/marketplace` and are declared directly in `capell.json`.
+| Symptom | Likely cause | Check | Fix |
+| --- | --- | --- | --- |
+| Package surface is missing after install | Provider or manifest is not loaded | Confirm `capell.json`, package `composer.json`, and provider registration | Reinstall the package, refresh Composer autoload, and clear host caches |
+| Admin screen or command fails on missing table | Package migrations have not run | Check the tables listed in `Data Model` | Run host migrations and rerun the focused package test |
+| Route returns unexpected output | Route cache, middleware, or signed URL setup does not match the package route file | Check the route files listed in `Technical Shape` | Clear route cache and verify middleware before exposing public routes |
+| Background work does not run | Queue worker or scheduled command is not active | Check package jobs, commands, and host scheduler configuration | Start the queue or scheduler, then run the focused command or package test |
+| Public output leaks unexpected state | Render data, cache variation, or authoring boundary has regressed | Check public Blade, cache tags, and public-output safety tests | Move data loading out of Blade and rerun the package public-output tests |
 
-- Navigation admin index, light and dark.
-- Create/edit navigation form, light and dark.
-- Site relation manager for navigations, light and dark.
-- Page form navigation tab, light and dark.
-- Frontend menu output, light and dark.
+## Quick Start
+
+1. Install the package: `composer require capell-app/navigation`.
+2. Run the required setup: `php artisan capell:navigation-setup`.
+3. Open the related Capell admin surface and verify Navigation appears.
+
+## Next Steps
+
+- [Package docs index](README.md)
+- [Screenshot contract](screenshots.json)
+- [Marketplace assets](assets/marketplace/)
+- [Capell content language plan](../../../docs/CONTENT_LANGUAGE_PLAN.md)
+- [Capell documentation design system](../../../docs/DESIGN_SYSTEM.md)
+- [Capell and package ERD notes](../../../docs/erd/capell-and-package-erds.md)
+- Focused tests: `vendor/bin/pest packages/navigation/tests --configuration=phpunit.xml`.
+
+<!-- prettier-ignore-end -->

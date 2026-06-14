@@ -13,9 +13,11 @@ use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
-use Capell\Frontend\Data\RenderHookContext;
+use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
+use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
-use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\Frontend\Enums\RenderHookLocation;
+use Capell\Frontend\Support\Render\FrontendHookRegistrar;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -31,6 +33,7 @@ use Capell\Navigation\Listeners\ReplicateSiteNavigationsListener;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
 use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
+use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
 use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
 use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Capell\Navigation\View\Composers\NavigationRenderModelComposer;
@@ -44,14 +47,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
-use WeakMap;
 
 class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
-
-    /** @var WeakMap<RenderHookRegistry<RenderHookContext>, true>|null */
-    private ?WeakMap $frontendRenderHookRegistries = null;
 
     #[Override]
     public function register(): void
@@ -84,6 +83,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerConfigurators()
             ->registerPackageAssets()
             ->registerBladeComponents()
+            ->registerFrontendRuntimeManifestContributors()
             ->registerPolicies()
             ->registerRelationships()
             ->registerEventListeners();
@@ -135,7 +135,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerPageTypes(): self
     {
-        CapellCore::registerPageType(new PageTypeData(
+        app(PackageSurfaceRegistrar::class)->pageType(new PageTypeData(
             name: 'navigation',
             model: Navigation::class,
             label: 'Navigation',
@@ -146,7 +146,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerModels(): self
     {
-        CapellCore::registerModels([Navigation::class]);
+        app(PackageSurfaceRegistrar::class)->models([Navigation::class]);
 
         return $this;
     }
@@ -186,38 +186,43 @@ class NavigationServiceProvider extends ServiceProvider
         return $this;
     }
 
-    private function registerFrontendRenderHooks(): self
+    private function registerFrontendRuntimeManifestContributors(): self
     {
-        $this->app->afterResolving(
-            RenderHookRegistry::class,
-            function (RenderHookRegistry $registry): void {
-                $this->registerFrontendRenderHooksForRegistry($registry);
-            },
-        );
-
-        if ($this->app->bound(RenderHookRegistry::class)) {
-            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
-        }
+        $this->app->tag([NavigationFrontendRuntimeManifestContributor::class], FrontendRuntimeManifestContributor::TAG);
 
         return $this;
     }
 
-    /** @param RenderHookRegistry<RenderHookContext> $registry */
-    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): void
+    private function registerFrontendRenderHooks(): self
     {
-        if (! $this->isPackageInstalled()) {
-            return;
+        if (! $this->isPackageInstalled() || ! $this->app->bound(FrontendHookRegistrar::class)) {
+            return $this;
         }
 
-        $this->frontendRenderHookRegistries ??= new WeakMap;
+        $registrar = resolve(FrontendHookRegistrar::class);
+        $hook = new RegisterFoundationHeaderNavigationHook;
 
-        if (isset($this->frontendRenderHookRegistries[$registry])) {
-            return;
-        }
+        $registrar->contribute(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-default',
+            scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        );
 
-        (new RegisterFoundationHeaderNavigationHook($registry))->register();
+        $registrar->contribute(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-foundation',
+            scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        );
 
-        $this->frontendRenderHookRegistries[$registry] = true;
+        return $this;
     }
 
     private function registerPolicies(): self
