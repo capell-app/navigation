@@ -110,8 +110,6 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
 
     expect(data_get($manifest, 'performance.cacheSafety.cacheable'))->toBeTrue()
         ->and(data_get($manifest, 'performance.cacheSafety.variesBy'))->toBe([
-            'site',
-            'locale',
             'page',
         ]);
 
