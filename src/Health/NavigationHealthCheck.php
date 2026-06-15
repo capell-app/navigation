@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use ReflectionProperty;
 use Throwable;
 
 final class NavigationHealthCheck implements ChecksExtensionHealth
@@ -387,11 +386,9 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     private function registeredRenderHookExtensions(RenderHookRegistry $registry): array
     {
-        $property = new ReflectionProperty($registry, 'extensions');
+        $extensions = $registry->diagnostics();
 
-        $extensions = $property->getValue($registry);
-
-        return is_array($extensions) ? $extensions : [];
+        return $extensions;
     }
 
     /**

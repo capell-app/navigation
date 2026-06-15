@@ -19,6 +19,8 @@ use Illuminate\Foundation\Application;
 use Livewire\LivewireServiceProvider;
 use MichalOravec\PaginateRoute\PaginateRouteServiceProvider;
 use Override;
+use ReflectionMethod;
+use RuntimeException;
 
 class NavigationTestCase extends AbstractTestCase
 {
@@ -27,6 +29,14 @@ class NavigationTestCase extends AbstractTestCase
         NavigationItemsLoader::flushPageCache();
 
         parent::setUp();
+
+        CapellCore::markPackageInstalled(NavigationServiceProvider::$packageName);
+
+        throw_unless($this->app instanceof Application, RuntimeException::class);
+
+        $provider = new NavigationServiceProvider($this->app);
+        $registerInstalledPackage = new ReflectionMethod($provider, 'registerInstalledPackage');
+        $registerInstalledPackage->invoke($provider);
 
         $this->registerAndMigrateSettings(
             CapellCore::getSettingMigrations(),

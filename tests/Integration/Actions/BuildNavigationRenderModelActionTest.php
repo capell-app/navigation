@@ -12,6 +12,7 @@ use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 function navigationRenderItem(NavigationRenderData $renderData, int ...$indexes): NavigationItemRenderData
@@ -247,6 +248,55 @@ it('memoizes navigation render models for the current request', function (): voi
     $secondRenderModel = BuildNavigationRenderModelAction::run($context);
 
     expect($secondRenderModel)->toBe($firstRenderModel)
+        ->and(navigationRenderItem($secondRenderModel, 0)->url)->toBe(navigationRenderPageUrl($linkedPage));
+});
+
+it('hydrates shared render models from scalar cache payloads when cache object unserialization is disabled', function (): void {
+    config()->set('cache.default', 'array');
+    config()->set('cache.stores.array.serialize', true);
+    config()->set('cache.serializable_classes', false);
+    Cache::purge('array');
+
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+    $linkedPage = Page::factory()->site($site)->withTranslations()->create();
+
+    $navigation = Navigation::factory()->create([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $language->id,
+        'items' => [
+            [
+                'type' => NavigationItemType::Page->value,
+                'data' => [
+                    'pageable_id' => $linkedPage->id,
+                    'pageable_type' => $linkedPage->getMorphClass(),
+                ],
+            ],
+        ],
+    ]);
+
+    $context = new NavigationRenderContextData(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $language,
+        siteDomain: $site->siteDomains->first(),
+    );
+
+    $firstRenderModel = BuildNavigationRenderModelAction::run($context);
+    request()->attributes->remove('capell.navigation.render_models');
+
+    DB::table('page_urls')->where('id', $linkedPage->pageUrl->id)->update(['url' => '/shared-cache-change']);
+
+    $secondRenderModel = BuildNavigationRenderModelAction::run($context);
+
+    expect($secondRenderModel)->not->toBe($firstRenderModel)
+        ->and($secondRenderModel)->toBeInstanceOf(NavigationRenderData::class)
         ->and(navigationRenderItem($secondRenderModel, 0)->url)->toBe(navigationRenderPageUrl($linkedPage));
 });
 

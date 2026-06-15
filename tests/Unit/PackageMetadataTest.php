@@ -2,9 +2,47 @@
 
 declare(strict_types=1);
 
+use Capell\Admin\Contracts\Extenders\PageSchemaExtender;
+use Capell\Admin\Contracts\Extenders\SiteSchemaExtender;
+use Capell\Core\Contracts\ContentGraph\ContentGraphExtractor;
+use Capell\Core\Contracts\Extensions\ChecksExtensionHealth;
+use Capell\Core\Contracts\Extensions\ExtensionContribution;
+use Capell\Core\Contracts\Extensions\RegistersExtensionAdminResource;
+use Capell\Core\Contracts\Extensions\RegistersExtensionFrontendComponent;
+use Capell\Core\Contracts\Extensions\RegistersExtensionRenderHook;
+use Capell\Core\Contracts\Extensions\RegistersExtensionRoute;
+use Capell\Core\Contracts\Extensions\RunsExtensionMigration;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
+use Capell\Frontend\Contracts\RenderHookExtensionInterface;
+use Capell\Navigation\Console\Commands\DemoCommand;
+use Capell\Navigation\Console\Commands\SetupCommand;
+use Capell\Navigation\Filament\Configurators\Navigations\DefaultNavigationConfigurator;
+use Capell\Navigation\Filament\Extenders\NavigationPageSchemaExtender;
+use Capell\Navigation\Filament\Extenders\NavigationSiteExtender;
+use Capell\Navigation\Filament\Resources\Navigations\NavigationResource;
+use Capell\Navigation\Health\NavigationHealthCheck;
+use Capell\Navigation\Manifest\NavigationAdminResourceContribution;
+use Capell\Navigation\Manifest\NavigationConfiguratorContribution;
+use Capell\Navigation\Manifest\NavigationConsoleCommandsContribution;
+use Capell\Navigation\Manifest\NavigationContentGraphContribution;
+use Capell\Navigation\Manifest\NavigationFrontendComponentsContribution;
+use Capell\Navigation\Manifest\NavigationFrontendRouteContribution;
+use Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution;
+use Capell\Navigation\Manifest\NavigationHealthContribution;
+use Capell\Navigation\Manifest\NavigationMigrationsContribution;
+use Capell\Navigation\Manifest\NavigationModelsContribution;
+use Capell\Navigation\Manifest\NavigationPageTypeContribution;
+use Capell\Navigation\Manifest\NavigationRenderHookContribution;
+use Capell\Navigation\Manifest\NavigationSchemaExtendersContribution;
 use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\ContentGraph\NavigationContentGraphExtractor;
+use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
+use Capell\Navigation\View\Components\Breadcrumbs;
+use Capell\Navigation\View\Components\Header\MainNavigation;
+use Capell\Navigation\View\Components\Menu;
 
 function navigationPackagePath(string $filename): string
 {
@@ -92,6 +130,125 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
             'events' => ['replicated'],
         ],
     ]);
+});
+
+it('declares navigation extension surfaces and contribution contracts', function (): void {
+    $manifest = navigationPackageJson('capell.json');
+
+    expect(data_get($manifest, 'database.requiredTables', []))->toBe([
+        'navigations',
+        'navigation_page_references',
+    ])
+        ->and(data_get($manifest, 'contributionTraceability.deferredContributions'))->toBe([])
+        ->and($manifest['contributes'] ?? [])->toContain(
+            [
+                'type' => 'admin-resource',
+                'class' => NavigationAdminResourceContribution::class,
+                'resourceClass' => NavigationResource::class,
+            ],
+            [
+                'type' => 'schema-extender',
+                'class' => NavigationSchemaExtendersContribution::class,
+                'extenderClasses' => [
+                    NavigationPageSchemaExtender::class,
+                    NavigationSiteExtender::class,
+                ],
+            ],
+            [
+                'type' => 'configurator',
+                'class' => NavigationConfiguratorContribution::class,
+                'configuratorClasses' => [
+                    DefaultNavigationConfigurator::class,
+                ],
+            ],
+            [
+                'type' => 'page-type',
+                'class' => NavigationPageTypeContribution::class,
+                'name' => 'navigation',
+                'modelClass' => Navigation::class,
+            ],
+            [
+                'type' => 'model',
+                'class' => NavigationModelsContribution::class,
+                'modelClass' => Navigation::class,
+            ],
+            [
+                'type' => 'migration',
+                'class' => NavigationMigrationsContribution::class,
+                'tables' => ['navigations', 'navigation_page_references'],
+            ],
+            [
+                'type' => 'route',
+                'class' => NavigationFrontendRouteContribution::class,
+                'routeNames' => ['capell-navigation.children'],
+            ],
+            [
+                'type' => 'frontend-component',
+                'class' => NavigationFrontendComponentsContribution::class,
+                'componentClasses' => [
+                    Menu::class,
+                    Breadcrumbs::class,
+                    MainNavigation::class,
+                ],
+            ],
+            [
+                'type' => 'configurator',
+                'class' => NavigationFrontendRuntimeContribution::class,
+                'contributorClass' => NavigationFrontendRuntimeManifestContributor::class,
+            ],
+            [
+                'type' => 'render-hook',
+                'class' => NavigationRenderHookContribution::class,
+                'hookClass' => RegisterFoundationHeaderNavigationHook::class,
+                'location' => 'headerAfter',
+                'keys' => [
+                    'foundation-header-navigation-default',
+                    'foundation-header-navigation-foundation',
+                ],
+                'cacheSafe' => true,
+            ],
+            [
+                'type' => 'configurator',
+                'class' => NavigationContentGraphContribution::class,
+                'extractorClass' => NavigationContentGraphExtractor::class,
+            ],
+            [
+                'type' => 'console-command',
+                'class' => NavigationConsoleCommandsContribution::class,
+                'commands' => [
+                    'capell:navigation-setup',
+                    'capell:navigation-demo',
+                ],
+                'commandClasses' => [
+                    SetupCommand::class,
+                    DemoCommand::class,
+                ],
+            ],
+            [
+                'type' => 'health-check',
+                'class' => NavigationHealthContribution::class,
+                'checkClass' => NavigationHealthCheck::class,
+            ],
+        );
+
+    expect(class_implements(NavigationAdminResourceContribution::class))->toContain(RegistersExtensionAdminResource::class)
+        ->and(class_implements(NavigationSchemaExtendersContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationConfiguratorContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationPageTypeContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationModelsContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationMigrationsContribution::class))->toContain(RunsExtensionMigration::class)
+        ->and(class_implements(NavigationFrontendRouteContribution::class))->toContain(RegistersExtensionRoute::class)
+        ->and(class_implements(NavigationFrontendComponentsContribution::class))->toContain(RegistersExtensionFrontendComponent::class)
+        ->and(class_implements(NavigationFrontendRuntimeContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationRenderHookContribution::class))->toContain(RegistersExtensionRenderHook::class)
+        ->and(class_implements(NavigationContentGraphContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationConsoleCommandsContribution::class))->toContain(ExtensionContribution::class)
+        ->and(class_implements(NavigationHealthContribution::class))->toContain(ChecksExtensionHealth::class)
+        ->and(class_implements(NavigationPageSchemaExtender::class))->toContain(PageSchemaExtender::class)
+        ->and(class_implements(NavigationSiteExtender::class))->toContain(SiteSchemaExtender::class)
+        ->and(class_implements(NavigationFrontendRuntimeManifestContributor::class))->toContain(FrontendRuntimeManifestContributor::class)
+        ->and(class_implements(RegisterFoundationHeaderNavigationHook::class))->toContain(RenderHookExtensionInterface::class)
+        ->and(class_implements(NavigationContentGraphExtractor::class))->toContain(ContentGraphExtractor::class);
 });
 
 it('uses marketplace and composer copy that describes the package outcome', function (): void {
