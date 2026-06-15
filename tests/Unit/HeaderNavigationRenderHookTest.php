@@ -12,7 +12,7 @@ it('registers the foundation header navigation render hook from the navigation p
     $provider = navigationFileContents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
     $hook = navigationFileContents(dirname(__DIR__, 2) . '/src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php');
 
-    expect($provider)->toContain('registerFrontendRenderHooks()')
+    expect($provider)->toContain('registerFrontendRenderHooks')
         ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook')
         ->and($provider)->toContain('afterResolving')
         ->and($provider)->toContain('registerFrontendRenderHooksForRegistry')

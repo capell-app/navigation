@@ -15,9 +15,11 @@ use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
+use Capell\Frontend\Data\RenderHookContributionData;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\FrontendHookRegistrar;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -50,7 +52,11 @@ use Override;
 
 class NavigationServiceProvider extends ServiceProvider
 {
+    private const string EventListenersRegisteredFlag = 'capell.navigation.event-listeners-registered';
+
     public static string $packageName = 'capell-app/navigation';
+
+    private bool $installedPackageRegistered = false;
 
     #[Override]
     public function register(): void
@@ -63,15 +69,35 @@ class NavigationServiceProvider extends ServiceProvider
                 $this->registerResources();
             }
         });
+
+        $this->app->booted(function (): void {
+            if ($this->isPackageInstalled()) {
+                $this->registerInstalledPackage();
+            }
+        });
     }
 
     public function boot(): void
     {
-        $this->registerFrontendRenderHooks();
-
         if (! $this->isPackageInstalled()) {
             return;
         }
+
+        $this->registerInstalledPackage();
+    }
+
+    protected function isPackageInstalled(): bool
+    {
+        return CapellCore::isPackageInstalled(static::$packageName);
+    }
+
+    private function registerInstalledPackage(): void
+    {
+        if ($this->installedPackageRegistered) {
+            return;
+        }
+
+        $this->installedPackageRegistered = true;
 
         $this
             ->registerServices()
@@ -81,17 +107,13 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerPageTypes()
             ->registerModels()
             ->registerConfigurators()
+            ->registerFrontendRenderHooks(force: true)
             ->registerPackageAssets()
             ->registerBladeComponents()
             ->registerFrontendRuntimeManifestContributors()
             ->registerPolicies()
             ->registerRelationships()
             ->registerEventListeners();
-    }
-
-    protected function isPackageInstalled(): bool
-    {
-        return CapellCore::isPackageInstalled(static::$packageName);
     }
 
     private function registerServices(): self
@@ -135,11 +157,14 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerPageTypes(): self
     {
-        app(PackageSurfaceRegistrar::class)->pageType(new PageTypeData(
+        $type = new PageTypeData(
             name: 'navigation',
             model: Navigation::class,
             label: 'Navigation',
-        ));
+        );
+
+        app(PackageSurfaceRegistrar::class)->pageType($type);
+        CapellCore::registerPageType($type);
 
         return $this;
     }
@@ -147,6 +172,7 @@ class NavigationServiceProvider extends ServiceProvider
     private function registerModels(): self
     {
         app(PackageSurfaceRegistrar::class)->models([Navigation::class]);
+        CapellCore::registerModels([Navigation::class]);
 
         return $this;
     }
@@ -193,13 +219,30 @@ class NavigationServiceProvider extends ServiceProvider
         return $this;
     }
 
-    private function registerFrontendRenderHooks(): self
+    private function registerFrontendRenderHooks(bool $force = false): self
     {
-        if (! $this->isPackageInstalled() || ! $this->app->bound(FrontendHookRegistrar::class)) {
+        $this->app->afterResolving(
+            RenderHookRegistry::class,
+            fn (RenderHookRegistry $registry): mixed => $this->registerFrontendRenderHooksForRegistry($registry, $force),
+        );
+
+        if (! $force && ! $this->isPackageInstalled()) {
             return $this;
         }
 
-        $registrar = resolve(FrontendHookRegistrar::class);
+        if ($force && ! $this->app->bound(RenderHookRegistry::class)) {
+            $this->app->singleton(RenderHookRegistry::class);
+        }
+
+        if ($this->app->bound(RenderHookRegistry::class)) {
+            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class), $force);
+        }
+
+        if (! $this->app->bound(FrontendHookRegistrar::class)) {
+            return $this;
+        }
+
+        $registrar = $this->app->make(FrontendHookRegistrar::class);
         $hook = new RegisterFoundationHeaderNavigationHook;
 
         $registrar->contribute(
@@ -225,6 +268,37 @@ class NavigationServiceProvider extends ServiceProvider
         return $this;
     }
 
+    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry, bool $force = false): self
+    {
+        if (! $force && ! $this->isPackageInstalled()) {
+            return $this;
+        }
+
+        $hook = new RegisterFoundationHeaderNavigationHook;
+
+        $registry->contribute(RenderHookContributionData::extension(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-default',
+            scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        ));
+
+        $registry->contribute(RenderHookContributionData::extension(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-foundation',
+            scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        ));
+
+        return $this;
+    }
+
     private function registerPolicies(): self
     {
         Gate::policy(Navigation::class, NavigationPolicy::class);
@@ -241,6 +315,12 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerEventListeners(): self
     {
+        if ($this->app->bound(self::EventListenersRegisteredFlag)) {
+            return $this;
+        }
+
+        $this->app->instance(self::EventListenersRegisteredFlag, true);
+
         Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
         Event::listen(PageUrlChanged::class, $this->handlePageUrlChanged(...));
 
