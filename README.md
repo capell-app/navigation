@@ -8,7 +8,7 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 
 Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.
 
-After install, admins get the Navigation resource, page and site schema extenders, setup/demo commands, and foundation header menu rendering through the package-owned frontend route, components, runtime manifest contributor, and render hook.
+After install, admins get package-owned management surfaces and public users may see package-owned frontend output or routes.
 
 Status details:
 
@@ -49,8 +49,8 @@ Screenshot contract: `docs/screenshots.json`.
 - Data objects: `NavigationItemData`, `NavigationItemRenderData`, `NavigationRenderContextData`, `NavigationRenderData`.
 - Command signatures: `capell:navigation-demo`, `capell:navigation-setup`.
 - Console command classes: `DemoCommand`, `SetupCommand`.
+- Manifest contributions: `admin-resource: Capell\Navigation\Manifest\NavigationAdminResourceContribution`, `configurator: Capell\Navigation\Manifest\NavigationConfiguratorContribution`, `configurator: Capell\Navigation\Manifest\NavigationContentGraphContribution`, `configurator: Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution`, `console-command: Capell\Navigation\Manifest\NavigationConsoleCommandsContribution`, `frontend-component: Capell\Navigation\Manifest\NavigationFrontendComponentsContribution`, `health-check: Capell\Navigation\Manifest\NavigationHealthContribution`, `migration: Capell\Navigation\Manifest\NavigationMigrationsContribution`, `model: Capell\Navigation\Manifest\NavigationModelsContribution`, `page-type: Capell\Navigation\Manifest\NavigationPageTypeContribution`, `render-hook: Capell\Navigation\Manifest\NavigationRenderHookContribution`, `route: Capell\Navigation\Manifest\NavigationFrontendRouteContribution`, `schema-extender: Capell\Navigation\Manifest\NavigationSchemaExtendersContribution`.
 - Health checks: `Capell\Navigation\Health\NavigationHealthCheck`.
-- Manifest contributions: admin resource, schema extenders, configurator, page type, model, migrations, frontend route, frontend components, frontend runtime manifest, render hook, content graph extractor, console commands, and health check.
 - Blade views: `packages/navigation/resources/views/components/breadcrumbs.blade.php`, `packages/navigation/resources/views/components/header/main-navigation.blade.php`, `packages/navigation/resources/views/components/header/menu/dropdown.blade.php`, `packages/navigation/resources/views/components/header/menu/item.blade.php`, `packages/navigation/resources/views/components/header/navigation.blade.php`, `packages/navigation/resources/views/components/menu-items.blade.php`, `packages/navigation/resources/views/components/menu.blade.php`, `packages/navigation/resources/views/components/page/navigations.blade.php`.
 - Cache tags: `navigation`.
 
@@ -64,12 +64,12 @@ Screenshot contract: `docs/screenshots.json`.
 
 ## Install Impact
 
-- Admin navigation: adds `NavigationResource`, `NavigationPageSchemaExtender`, `NavigationSiteExtender`, and the default navigation configurator.
+- Admin navigation: adds package-owned Filament classes when registered.
 - Permissions: none declared in `capell.json`.
-- Public routes: `_capell/navigation/children` (`capell-navigation.children`) renders child menu fragments.
-- Database changes: creates `navigations` and `navigation_page_references`.
+- Public routes: route files exist and must be reviewed before public enablement.
+- Database changes: package migrations are declared.
 - Settings: no package settings declared.
-- Queues or schedules: no package queue jobs or scheduler entries.
+- Queues or schedules: none detected in standard package paths.
 - Cache tags: `navigation`.
 - Commands: `capell:navigation-demo`, `capell:navigation-setup`.
 
@@ -94,7 +94,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Quick Start
 
 1. Install the package: `composer require capell-app/navigation`.
-2. Run the host application setup command: `php artisan capell:navigation-setup`.
+2. Run the required setup: `php artisan capell:navigation-setup`.
 3. Open the related Capell admin surface and verify Navigation appears.
 
 ## Next Steps
