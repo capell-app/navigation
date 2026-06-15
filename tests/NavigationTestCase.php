@@ -28,6 +28,9 @@ class NavigationTestCase extends AbstractTestCase
 
         parent::setUp();
 
+        CapellCore::forcePackageInstalled(NavigationServiceProvider::$packageName);
+        (new NavigationServiceProvider($this->app))->boot();
+
         $this->registerAndMigrateSettings(
             CapellCore::getSettingMigrations(),
             __DIR__ . '/../../../vendor/capell-app/core/database/settings',

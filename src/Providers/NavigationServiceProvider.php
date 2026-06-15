@@ -15,9 +15,11 @@ use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
+use Capell\Frontend\Data\RenderHookContributionData;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\FrontendHookRegistrar;
+use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -52,6 +54,8 @@ class NavigationServiceProvider extends ServiceProvider
 {
     public static string $packageName = 'capell-app/navigation';
 
+    private bool $installedPackageRegistered = false;
+
     #[Override]
     public function register(): void
     {
@@ -63,15 +67,30 @@ class NavigationServiceProvider extends ServiceProvider
                 $this->registerResources();
             }
         });
+
+        $this->app->booted(function (): void {
+            if ($this->isPackageInstalled()) {
+                $this->registerInstalledPackage();
+            }
+        });
     }
 
     public function boot(): void
     {
-        $this->registerFrontendRenderHooks();
-
         if (! $this->isPackageInstalled()) {
             return;
         }
+
+        $this->registerInstalledPackage();
+    }
+
+    private function registerInstalledPackage(): void
+    {
+        if ($this->installedPackageRegistered) {
+            return;
+        }
+
+        $this->installedPackageRegistered = true;
 
         $this
             ->registerServices()
@@ -81,6 +100,7 @@ class NavigationServiceProvider extends ServiceProvider
             ->registerPageTypes()
             ->registerModels()
             ->registerConfigurators()
+            ->registerFrontendRenderHooks()
             ->registerPackageAssets()
             ->registerBladeComponents()
             ->registerFrontendRuntimeManifestContributors()
@@ -195,11 +215,24 @@ class NavigationServiceProvider extends ServiceProvider
 
     private function registerFrontendRenderHooks(): self
     {
-        if (! $this->isPackageInstalled() || ! $this->app->bound(FrontendHookRegistrar::class)) {
+        $this->app->afterResolving(
+            RenderHookRegistry::class,
+            fn (RenderHookRegistry $registry): mixed => $this->registerFrontendRenderHooksForRegistry($registry),
+        );
+
+        if (! $this->isPackageInstalled()) {
             return $this;
         }
 
-        $registrar = resolve(FrontendHookRegistrar::class);
+        if ($this->app->bound(RenderHookRegistry::class)) {
+            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
+        }
+
+        if (! $this->app->bound(FrontendHookRegistrar::class)) {
+            return $this;
+        }
+
+        $registrar = $this->app->make(FrontendHookRegistrar::class);
         $hook = new RegisterFoundationHeaderNavigationHook;
 
         $registrar->contribute(
@@ -221,6 +254,37 @@ class NavigationServiceProvider extends ServiceProvider
             target: RegisterFoundationHeaderNavigationHook::Target,
             cacheSafe: true,
         );
+
+        return $this;
+    }
+
+    private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry): self
+    {
+        if (! $this->isPackageInstalled()) {
+            return $this;
+        }
+
+        $hook = new RegisterFoundationHeaderNavigationHook;
+
+        $registry->contribute(RenderHookContributionData::extension(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-default',
+            scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        ));
+
+        $registry->contribute(RenderHookContributionData::extension(
+            location: RenderHookLocation::HeaderAfter,
+            extension: $hook,
+            owner: static::$packageName,
+            key: 'foundation-header-navigation-foundation',
+            scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
+            target: RegisterFoundationHeaderNavigationHook::Target,
+            cacheSafe: true,
+        ));
 
         return $this;
     }
