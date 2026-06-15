@@ -15,6 +15,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
+use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Data\RenderHookContributionData;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Enums\RenderHookLocation;
@@ -269,7 +270,7 @@ class NavigationServiceProvider extends ServiceProvider
     }
 
     /**
-     * @param  RenderHookRegistry<\Capell\Frontend\Support\Render\RenderHookContext>  $registry
+     * @param  RenderHookRegistry<RenderHookContext>  $registry
      */
     private function registerFrontendRenderHooksForRegistry(RenderHookRegistry $registry, bool $force = false): self
     {

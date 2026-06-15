@@ -20,6 +20,7 @@ use Livewire\LivewireServiceProvider;
 use MichalOravec\PaginateRoute\PaginateRouteServiceProvider;
 use Override;
 use ReflectionMethod;
+use RuntimeException;
 
 class NavigationTestCase extends AbstractTestCase
 {
