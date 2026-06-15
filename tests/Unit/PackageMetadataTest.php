@@ -139,11 +139,11 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
 it('declares navigation extension surfaces and contribution contracts', function (): void {
     $manifest = navigationPackageJson('capell.json');
 
-    expect($manifest['database']['requiredTables'] ?? [])->toBe([
+    expect(data_get($manifest, 'database.requiredTables', []))->toBe([
         'navigations',
         'navigation_page_references',
     ])
-        ->and($manifest['contributionTraceability']['deferredContributions'] ?? null)->toBe([])
+        ->and(data_get($manifest, 'contributionTraceability.deferredContributions'))->toBe([])
         ->and($manifest['contributes'] ?? [])->toContain(
             [
                 'type' => 'admin-resource',

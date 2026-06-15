@@ -105,10 +105,7 @@
         {
             "type": "console-command",
             "class": "Capell\\Navigation\\Manifest\\NavigationConsoleCommandsContribution",
-            "commands": [
-                "capell:navigation-setup",
-                "capell:navigation-demo"
-            ],
+            "commands": ["capell:navigation-setup", "capell:navigation-demo"],
             "commandClasses": [
                 "Capell\\Navigation\\Console\\Commands\\SetupCommand",
                 "Capell\\Navigation\\Console\\Commands\\DemoCommand"
