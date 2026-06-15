@@ -18,6 +18,7 @@ use Capell\Navigation\Models\Navigation;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -25,6 +26,8 @@ use Spatie\LaravelData\DataCollection;
 
 class NavigationItemsLoader
 {
+    private const string REQUEST_PAGE_CACHE_KEY = 'capell.navigation.pages_by_morph_key';
+
     /** @var array<string, array<string, Model&Pageable<Model>>> */
     protected static array $pagesByMorphKeyCache = [];
 
@@ -42,6 +45,10 @@ class NavigationItemsLoader
     public static function flushPageCache(): void
     {
         self::$pagesByMorphKeyCache = [];
+
+        if (app()->bound('request')) {
+            request()->attributes->remove(self::REQUEST_PAGE_CACHE_KEY);
+        }
     }
 
     /**
@@ -377,10 +384,12 @@ class NavigationItemsLoader
                 implode(',', $pageableIds),
             ]);
 
-            if (isset(self::$pagesByMorphKeyCache[$cacheKey])) {
+            $cachedPages = $this->cachedPagesByMorphKey($cacheKey);
+
+            if ($cachedPages !== null) {
                 $pagesByMorphKey = [
                     ...$pagesByMorphKey,
-                    ...self::$pagesByMorphKeyCache[$cacheKey],
+                    ...$cachedPages,
                 ];
 
                 continue;
@@ -439,7 +448,7 @@ class NavigationItemsLoader
                 $cachedPages[$lookupKey] = $page;
             }
 
-            self::$pagesByMorphKeyCache[$cacheKey] = $cachedPages;
+            $this->putCachedPagesByMorphKey($cacheKey, $cachedPages);
         }
 
         return $pagesByMorphKey;
@@ -467,6 +476,61 @@ class NavigationItemsLoader
     protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
     {
         return $pageableType . ':' . $pageableId;
+    }
+
+    /**
+     * @return array<string, Model&Pageable<Model>>|null
+     */
+    private function cachedPagesByMorphKey(string $cacheKey): ?array
+    {
+        $request = $this->currentRequest();
+
+        if (! $request instanceof Request) {
+            return self::$pagesByMorphKeyCache[$cacheKey] ?? null;
+        }
+
+        $cache = $this->requestPageCache($request);
+
+        return array_key_exists($cacheKey, $cache) ? $cache[$cacheKey] : null;
+    }
+
+    /**
+     * @param  array<string, Model&Pageable<Model>>  $pages
+     */
+    private function putCachedPagesByMorphKey(string $cacheKey, array $pages): void
+    {
+        $request = $this->currentRequest();
+
+        if (! $request instanceof Request) {
+            self::$pagesByMorphKeyCache[$cacheKey] = $pages;
+
+            return;
+        }
+
+        $cache = $this->requestPageCache($request);
+        $cache[$cacheKey] = $pages;
+        $request->attributes->set(self::REQUEST_PAGE_CACHE_KEY, $cache);
+    }
+
+    /**
+     * @return array<string, array<string, Model&Pageable<Model>>>
+     */
+    private function requestPageCache(Request $request): array
+    {
+        $cache = $request->attributes->get(self::REQUEST_PAGE_CACHE_KEY, []);
+
+        return is_array($cache) ? $cache : [];
+    }
+
+    private function currentRequest(): ?Request
+    {
+        if (! app()->bound('request')) {
+            return null;
+        }
+
+        $request = request();
+
+        return $request instanceof Request ? $request : null;
     }
 
     private function activeMode(NavigationItemData $item): NavigationItemActiveMode
