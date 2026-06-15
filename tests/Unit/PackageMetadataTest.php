@@ -75,8 +75,6 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
             'site',
             'locale',
             'page',
-            'domain',
-            'guest',
         ]);
 
     $invalidationSources = data_get($manifest, 'performance.cacheSafety.invalidationSources');
