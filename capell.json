@@ -182,7 +182,7 @@
         "cacheTags": ["navigation"],
         "cacheSafety": {
             "cacheable": true,
-            "variesBy": ["site", "locale", "page", "domain", "guest"],
+            "variesBy": ["page"],
             "sensitiveOutput": false,
             "invalidationSources": [
                 {

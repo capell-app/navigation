@@ -519,7 +519,29 @@ class NavigationItemsLoader
     {
         $cache = $request->attributes->get(self::REQUEST_PAGE_CACHE_KEY, []);
 
-        return is_array($cache) ? $cache : [];
+        if (! is_array($cache)) {
+            return [];
+        }
+
+        $typedCache = [];
+
+        foreach ($cache as $cacheKey => $pages) {
+            if (! is_string($cacheKey) || ! is_array($pages)) {
+                continue;
+            }
+
+            $typedPages = [];
+
+            foreach ($pages as $morphKey => $page) {
+                if (is_string($morphKey) && $page instanceof Model && $page instanceof Pageable) {
+                    $typedPages[$morphKey] = $page;
+                }
+            }
+
+            $typedCache[$cacheKey] = $typedPages;
+        }
+
+        return $typedCache;
     }
 
     private function currentRequest(): ?Request

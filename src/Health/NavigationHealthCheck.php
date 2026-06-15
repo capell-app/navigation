@@ -388,7 +388,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
     {
         $extensions = $registry->diagnostics();
 
-        return is_array($extensions) ? $extensions : [];
+        return $extensions;
     }
 
     /**
