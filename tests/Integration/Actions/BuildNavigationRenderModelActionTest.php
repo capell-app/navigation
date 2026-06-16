@@ -342,6 +342,59 @@ it('renders heading items without a url', function (): void {
         ->and(navigationRenderItem($renderModel, 1)->url)->toBe('/about');
 });
 
+it('removes unsupported icon component names from public render data', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+
+    $navigation = Navigation::factory()->make([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $language->id,
+        'items' => [
+            [
+                'label' => 'External',
+                'type' => NavigationItemType::Link->value,
+                'data' => [
+                    'url' => 'https://example.com',
+                    'icon' => 'external',
+                    'active_icon' => 'also-missing',
+                ],
+            ],
+            [
+                'label' => 'Docs',
+                'type' => NavigationItemType::Link->value,
+                'data' => [
+                    'url' => '/docs',
+                    'icon' => 'heroicon-o-book-open',
+                    'active_icon' => 'heroicon-s-book-open',
+                ],
+            ],
+        ],
+    ]);
+
+    $renderModel = BuildNavigationRenderModelAction::run(new NavigationRenderContextData(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $language,
+        siteDomain: $site->siteDomains->first(),
+    ));
+
+    expect(navigationRenderItem($renderModel, 0)->icon)->toBeNull()
+        ->and(navigationRenderItem($renderModel, 0)->activeIcon)->toBeNull()
+        ->and(navigationRenderItem($renderModel, 0)->data)->not->toHaveKeys(['icon', 'active_icon'])
+        ->and(navigationRenderItem($renderModel, 1)->icon)->toBe('heroicon-o-book-open')
+        ->and(navigationRenderItem($renderModel, 1)->activeIcon)->toBe('heroicon-s-book-open')
+        ->and(navigationRenderItem($renderModel, 1)->data)->toMatchArray([
+            'icon' => 'heroicon-o-book-open',
+            'active_icon' => 'heroicon-s-book-open',
+        ]);
+});
+
 it('passes mega-menu render settings through public view data', function (): void {
     $language = Language::factory()->default()->create();
     $site = Site::factory()
