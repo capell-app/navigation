@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\View\Compilers\ComponentTagCompiler;
+use InvalidArgumentException;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -270,9 +272,24 @@ class BuildNavigationRenderModelAction
             return null;
         }
 
-        return preg_match('/^heroicon-[omsc]-[a-z0-9-]+$/', $icon) === 1
-            ? $icon
-            : null;
+        try {
+            $this->componentTagCompiler()->componentClass($icon);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return $icon;
+    }
+
+    private function componentTagCompiler(): ComponentTagCompiler
+    {
+        $bladeCompiler = app('blade.compiler');
+
+        return new ComponentTagCompiler(
+            $bladeCompiler->getClassComponentAliases(),
+            $bladeCompiler->getClassComponentNamespaces(),
+            $bladeCompiler,
+        );
     }
 
     /**

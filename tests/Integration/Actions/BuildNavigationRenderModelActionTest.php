@@ -12,6 +12,7 @@ use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -343,6 +344,8 @@ it('renders heading items without a url', function (): void {
 });
 
 it('removes unsupported icon component names from public render data', function (): void {
+    Blade::component('capell-navigation::components.breadcrumbs', 'navigation-test-icon');
+
     $language = Language::factory()->default()->create();
     $site = Site::factory()
         ->language($language)
@@ -369,7 +372,7 @@ it('removes unsupported icon component names from public render data', function 
                 'type' => NavigationItemType::Link->value,
                 'data' => [
                     'url' => '/docs',
-                    'icon' => 'heroicon-o-book-open',
+                    'icon' => 'navigation-test-icon',
                     'active_icon' => 'heroicon-s-book-open',
                 ],
             ],
@@ -387,10 +390,10 @@ it('removes unsupported icon component names from public render data', function 
     expect(navigationRenderItem($renderModel, 0)->icon)->toBeNull()
         ->and(navigationRenderItem($renderModel, 0)->activeIcon)->toBeNull()
         ->and(navigationRenderItem($renderModel, 0)->data)->not->toHaveKeys(['icon', 'active_icon'])
-        ->and(navigationRenderItem($renderModel, 1)->icon)->toBe('heroicon-o-book-open')
+        ->and(navigationRenderItem($renderModel, 1)->icon)->toBe('navigation-test-icon')
         ->and(navigationRenderItem($renderModel, 1)->activeIcon)->toBe('heroicon-s-book-open')
         ->and(navigationRenderItem($renderModel, 1)->data)->toMatchArray([
-            'icon' => 'heroicon-o-book-open',
+            'icon' => 'navigation-test-icon',
             'active_icon' => 'heroicon-s-book-open',
         ]);
 });
