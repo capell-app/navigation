@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\View\Compilers\ComponentTagCompiler;
+use InvalidArgumentException;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -148,6 +150,8 @@ class BuildNavigationRenderModelAction
     {
         $data = $item->data;
         $children = $this->mapItems(collect($item->children?->all() ?? []), $context, $itemPath);
+        $icon = $this->icon($data['icon'] ?? null);
+        $activeIcon = $this->icon($data['active_icon'] ?? null);
 
         return new NavigationItemRenderData(
             label: $item->label,
@@ -155,11 +159,11 @@ class BuildNavigationRenderModelAction
             url: isset($data['url']) && is_string($data['url']) ? $data['url'] : null,
             active: $item->active === true,
             children: $children,
-            data: $this->viewData($data),
+            data: $this->viewData($data, $icon, $activeIcon),
             target: isset($data['target']) && is_string($data['target']) ? $data['target'] : null,
             rel: $this->rel($item, $data),
-            icon: isset($data['icon']) && is_string($data['icon']) ? $data['icon'] : null,
-            activeIcon: isset($data['active_icon']) && is_string($data['active_icon']) ? $data['active_icon'] : null,
+            icon: $icon,
+            activeIcon: $activeIcon,
             class: isset($data['class']) && is_string($data['class']) ? $data['class'] : null,
             component: isset($data['component']) && is_string($data['component']) ? $data['component'] : null,
             componentItem: isset($data['component_item']) && is_string($data['component_item']) ? $data['component_item'] : null,
@@ -220,7 +224,7 @@ class BuildNavigationRenderModelAction
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
-    private function viewData(array $data): array
+    private function viewData(array $data, ?string $icon, ?string $activeIcon): array
     {
         $viewData = [];
 
@@ -247,7 +251,45 @@ class BuildNavigationRenderModelAction
             }
         }
 
+        if ($icon !== null) {
+            $viewData['icon'] = $icon;
+        } else {
+            unset($viewData['icon']);
+        }
+
+        if ($activeIcon !== null) {
+            $viewData['active_icon'] = $activeIcon;
+        } else {
+            unset($viewData['active_icon']);
+        }
+
         return $viewData;
+    }
+
+    private function icon(mixed $icon): ?string
+    {
+        if (! is_string($icon) || $icon === '') {
+            return null;
+        }
+
+        try {
+            $this->componentTagCompiler()->componentClass($icon);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return $icon;
+    }
+
+    private function componentTagCompiler(): ComponentTagCompiler
+    {
+        $bladeCompiler = app('blade.compiler');
+
+        return new ComponentTagCompiler(
+            $bladeCompiler->getClassComponentAliases(),
+            $bladeCompiler->getClassComponentNamespaces(),
+            $bladeCompiler,
+        );
     }
 
     /**
