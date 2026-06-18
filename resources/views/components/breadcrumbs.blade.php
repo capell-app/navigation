@@ -1,6 +1,7 @@
 @php
     use Capell\Navigation\Actions\BuildNavigationBreadcrumbsAction;
     use Capell\Navigation\Data\NavigationRenderData;
+    use Capell\Navigation\Support\SafeUrl;
 
     $breadcrumbs = ($menu ?? null) instanceof NavigationRenderData
         ? BuildNavigationBreadcrumbsAction::run($menu)
@@ -13,10 +14,11 @@
     >
         <ol class="capell-navigation-breadcrumbs">
             @foreach ($breadcrumbs as $breadcrumb)
+                @php($safeBreadcrumbUrl = SafeUrl::sanitise($breadcrumb->url))
                 <li @class(['is-active' => $loop->last])>
-                    @if (! $loop->last && $breadcrumb->url !== null)
+                    @if (! $loop->last && $safeBreadcrumbUrl !== null)
                         <a
-                            href="{{ $breadcrumb->url }}"
+                            href="{{ $safeBreadcrumbUrl }}"
                             @if ($breadcrumb->target !== null) target="{{ $breadcrumb->target }}" @endif
                             @if ($breadcrumb->rel !== null) rel="{{ $breadcrumb->rel }}" @endif
                         >

@@ -5,9 +5,10 @@
 @php
     use Capell\Frontend\Facades\Frontend;
     use Capell\Navigation\Data\NavigationItemData;
+    use Capell\Navigation\Support\SafeUrl;
 
     /** @var NavigationItemData $item */
-    $url = isset($item->data['url']) && is_string($item->data['url']) ? $item->data['url'] : '';
+    $url = isset($item->data['url']) && is_string($item->data['url']) ? (SafeUrl::sanitise($item->data['url']) ?? '') : '';
     $isExternalUrl = preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1;
     $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
     $usesWireNavigate = ($runtimeManifest?->usesWireNavigate ?? false) && ! $isExternalUrl;

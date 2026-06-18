@@ -1,15 +1,17 @@
 @php
     use Capell\Navigation\Enums\NavigationItemType;
+    use Capell\Navigation\Support\SafeUrl;
 @endphp
 
 <ul class="capell-menu-items">
     @foreach ($items as $item)
+        @php($safeUrl = SafeUrl::sanitise($item->url))
         <li @class(['is-active' => $item->active])>
             @if ($item->type === NavigationItemType::Heading)
                 <span>{{ $item->label }}</span>
-            @elseif ($item->url !== null)
+            @elseif ($safeUrl !== null)
                 <a
-                    href="{{ $item->url }}"
+                    href="{{ $safeUrl }}"
                     @if ($item->target !== null) target="{{ $item->target }}" @endif
                     @if ($item->rel !== null) rel="{{ $item->rel }}" @endif
                 >
