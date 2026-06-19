@@ -10,6 +10,7 @@
     use Capell\Frontend\Facades\Frontend;
     use Capell\Navigation\Data\NavigationItemData;
     use Capell\Navigation\Enums\NavigationDropdownLayout;
+    use Capell\Navigation\Support\SafeUrl;
 
     /** @var NavigationItemData $item */
     $currentDropdownName = $dropdownName . '-' . ($id !== null ? (string) $id : hash('sha256', $item->label));
@@ -33,7 +34,7 @@
 @if (! $usesAlpine)
     <li class="capell-navigation-menu-dropdown flex flex-col lg:flex-row">
         <a
-            href="{{ $item->data['url'] ?? '#' }}"
+            href="{{ SafeUrl::sanitise($item->data['url'] ?? null) ?? '#' }}"
             @class([
                 $itemClass,
                 'hover:text-primary focus:text-primary' => ! $item->active,
@@ -165,7 +166,7 @@
 
                     @if (! empty($item->data['mega_panel_url']))
                         <a
-                            href="{{ $item->data['mega_panel_url'] }}"
+                            href="{{ SafeUrl::sanitise($item->data['mega_panel_url']) ?? '#' }}"
                             class="text-primary mt-3 inline-flex text-sm font-semibold hover:underline focus:underline"
                             @if ($usesWireNavigate) wire:navigate @endif
                         >
@@ -194,7 +195,7 @@
                     @else
                         <li class="nav-item">
                             <a
-                                href="{{ $child->data['url'] ?? '' }}"
+                                href="{{ SafeUrl::sanitise($child->data['url'] ?? null) ?? '' }}"
                                 @if (!empty($child->data['target'])) target="{{ $child->data['target'] }}" @endif
                                 @if ($usesWireNavigate) wire:navigate @endif
                                 @class([

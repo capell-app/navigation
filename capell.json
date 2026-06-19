@@ -146,7 +146,9 @@
     "security": {
         "riskTier": "standard",
         "publicSurface": {
-            "routeNames": ["capell-navigation.children"],
+            "routeNames": [
+                "capell-navigation.children"
+            ],
             "auth": "public",
             "csrfExemptRoutes": [],
             "signedRoutes": [],

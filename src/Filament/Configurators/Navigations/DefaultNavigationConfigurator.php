@@ -31,6 +31,7 @@ use Capell\Navigation\Enums\NavigationItemVisibility;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
+use Capell\Navigation\Support\SafeUrl;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -637,27 +638,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
     private function isSafeNavigationUrl(string $url): bool
     {
-        $url = trim($url);
-
-        if ($url === '' || preg_match('/[\x00-\x1F\x7F]/', $url) === 1) {
-            return false;
-        }
-
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-
-        if (is_string($scheme)) {
-            return in_array(strtolower($scheme), ['http', 'https', 'mailto', 'tel'], true);
-        }
-
-        if (str_starts_with($url, '//')) {
-            return false;
-        }
-
-        return str_starts_with($url, '/')
-            || str_starts_with($url, '#')
-            || str_starts_with($url, '?')
-            || str_starts_with($url, './')
-            || str_starts_with($url, '../');
+        return SafeUrl::isSafe($url);
     }
 
     private function getLabelField(): TextInput
