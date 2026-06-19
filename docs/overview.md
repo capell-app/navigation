@@ -35,6 +35,50 @@ Screenshot contract: `screenshots.json`.
 - Page form navigation tab (admin, required).
 - Frontend menu output (frontend, required).
 
+## Screenshot Evidence
+
+These captures are the package-owned visual contract for the admin pages, public pages, actions, workflows, and feature surfaces described above. Keep this section aligned with `docs/screenshots.json` whenever the package surface changes.
+
+### Navigation admin index
+
+![Navigation admin index](screenshots/navigation-admin-index.png)
+
+- Surface: admin · Target: NavigationResource.
+- Documents: An editor reviews site navigation records and their scope/status.
+- Capture notes: Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.
+
+### Create/edit navigation form
+
+![Create/edit navigation form](screenshots/create-edit-navigation-form.png)
+
+- Surface: admin · Target: NavigationResource.
+- Documents: An editor builds a navigation tree with links, page references, headings, and nested items.
+- Capture notes: Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.
+
+### Site relation manager for navigations
+
+![Site relation manager for navigations](screenshots/site-relation-manager-for-navigations.png)
+
+- Surface: admin · Target: NavigationResource.
+- Documents: An editor manages navigations directly from the site edit surface.
+- Capture notes: Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.
+
+### Page form navigation tab
+
+![Page form navigation tab](screenshots/page-form-navigation-tab.png)
+
+- Surface: admin · Target: NavigationResource.
+- Documents: An editor controls page-level navigation metadata from the page form.
+- Capture notes: Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.
+
+### Frontend menu output
+
+![Frontend menu output](screenshots/frontend-menu-output.png)
+
+- Surface: frontend · Target: frontend-url.
+- Documents: An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.
+- Capture notes: Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.
+
 ## Technical Shape
 
 - Service providers: `Capell\Navigation\Providers\NavigationServiceProvider`.

@@ -16,7 +16,12 @@
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor reviews site navigation records and their scope/status.",
             "screenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index.png",
-            "darkScreenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index-dark.png"
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index-dark.png",
+            "covers": [
+                "packages/navigation/src/Filament/Components/Forms/NavigationSelect.php",
+                "packages/navigation/src/Filament/Configurators/Navigations/DefaultNavigationConfigurator.php",
+                "packages/navigation/src/Filament/Resources/Sites/RelationManagers/NavigationsRelationManager.php"
+            ]
         },
         {
             "id": "create-edit-navigation-form",
