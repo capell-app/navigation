@@ -47,6 +47,8 @@ class NavigationResource extends Resource
 
     protected static string $tableConfigurator = NavigationsTable::class;
 
+    protected static ?int $navigationSort = 6;
+
     #[Override]
     public static function form(Schema $configurator): Schema
     {

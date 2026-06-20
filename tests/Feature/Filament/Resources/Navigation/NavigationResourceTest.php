@@ -70,6 +70,11 @@ test('admin can see navigations', function (): void {
         ->assertOk();
 });
 
+test('navigation appears in web pages navigation after sections', function (): void {
+    expect(NavigationResource::getNavigationGroup())->toBe((string) __('capell-admin::navigation.group_websites'))
+        ->and(NavigationResource::getNavigationSort())->toBe(6);
+});
+
 test('cannot see navigations', function (): void {
     test()->actingAsUser();
 
