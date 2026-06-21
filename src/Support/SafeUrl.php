@@ -18,9 +18,9 @@ final class SafeUrl
     /**
      * Schemes that may not appear in a navigation URL.
      *
-     * @var list<string>
+     * @var non-empty-list<'http'|'https'|'mailto'|'tel'>
      */
-    private const ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel'];
+    private const array ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel'];
 
     /**
      * Determine whether a navigation URL is safe to render as an `href`.
