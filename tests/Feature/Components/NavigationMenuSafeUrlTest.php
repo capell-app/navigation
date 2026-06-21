@@ -30,10 +30,14 @@ function renderNavigationMenuWithItems(array $items): TestView
         'items' => $items,
     ]);
 
-    return test()->blade(
+    $view = test()->blade(
         '<x-capell-navigation::menu key="primary" :site="$site" :language="$language" :page="$currentPage" :domain="$siteDomain" />',
         ['site' => $site, 'language' => $language, 'currentPage' => $currentPage, 'siteDomain' => $siteDomain],
     );
+
+    throw_unless($view instanceof TestView, RuntimeException::class, 'Expected rendered navigation menu test view.');
+
+    return $view;
 }
 
 it('neutralises a javascript: url so it never renders as a live href', function (): void {
