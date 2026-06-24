@@ -1,7 +1,3 @@
-# Navigation
-
-<!-- prettier-ignore-start -->
-
 ## What it does for you
 
 Navigation is how you build the menus visitors use to move around your site. You add links, drag them into the order you want, nest items to make dropdowns, and assign a menu to a location like the header or footer.
@@ -27,10 +23,3 @@ Go to **Navigation** in the admin to build and assign your menus.
 - Drag pages into your menu and reorder them by dragging.
 - Create a dropdown by nesting links under a parent item; choose **Standard dropdown** or **Mega menu** for how it opens.
 - Assign a menu to the **Header navigation** or **Footer navigation** so it appears in the right place.
-
----
-
-For how to use Navigation, see the [admin guide](admin-guide.md).
-For developers: see the [README](../README.md).
-
-<!-- prettier-ignore-end -->
