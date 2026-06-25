@@ -51,7 +51,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
 
-class NavigationServiceProvider extends ServiceProvider
+final class NavigationServiceProvider extends ServiceProvider
 {
     private const string EventListenersRegisteredFlag = 'capell.navigation.event-listeners-registered';
 
@@ -89,7 +89,7 @@ class NavigationServiceProvider extends ServiceProvider
 
     protected function isPackageInstalled(): bool
     {
-        return CapellCore::isPackageInstalled(static::$packageName);
+        return CapellCore::isPackageInstalled(self::$packageName);
     }
 
     private function registerInstalledPackage(): void
@@ -249,7 +249,7 @@ class NavigationServiceProvider extends ServiceProvider
         $registrar->contribute(
             location: RenderHookLocation::HeaderAfter,
             extension: $hook,
-            owner: static::$packageName,
+            owner: self::$packageName,
             key: 'foundation-header-navigation-default',
             scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
             target: RegisterFoundationHeaderNavigationHook::Target,
@@ -259,7 +259,7 @@ class NavigationServiceProvider extends ServiceProvider
         $registrar->contribute(
             location: RenderHookLocation::HeaderAfter,
             extension: $hook,
-            owner: static::$packageName,
+            owner: self::$packageName,
             key: 'foundation-header-navigation-foundation',
             scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
             target: RegisterFoundationHeaderNavigationHook::Target,
@@ -283,7 +283,7 @@ class NavigationServiceProvider extends ServiceProvider
         $registry->contribute(RenderHookContributionData::extension(
             location: RenderHookLocation::HeaderAfter,
             extension: $hook,
-            owner: static::$packageName,
+            owner: self::$packageName,
             key: 'foundation-header-navigation-default',
             scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
             target: RegisterFoundationHeaderNavigationHook::Target,
@@ -293,7 +293,7 @@ class NavigationServiceProvider extends ServiceProvider
         $registry->contribute(RenderHookContributionData::extension(
             location: RenderHookLocation::HeaderAfter,
             extension: $hook,
-            owner: static::$packageName,
+            owner: self::$packageName,
             key: 'foundation-header-navigation-foundation',
             scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
             target: RegisterFoundationHeaderNavigationHook::Target,
