@@ -12,9 +12,10 @@ use Capell\Admin\Filament\Components\Forms\IconPicker;
 use Capell\Admin\Filament\Components\Forms\LanguageSelect;
 use Capell\Admin\Filament\Components\Forms\NameInput;
 use Capell\Admin\Filament\Components\Forms\PageMorphToOptionSelect;
-use Capell\Admin\Filament\Components\Forms\PublishSection;
+use Capell\Admin\Filament\Components\Forms\PublishSchema;
 use Capell\Admin\Filament\Components\Forms\SiteSelect;
 use Capell\Admin\Filament\Concerns\HasConfigurator;
+use Capell\Admin\Filament\Livewire\PublishStatusPanel;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\PageVariationEnum;
 use Capell\Core\Models\Language;
@@ -40,6 +41,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
@@ -89,9 +91,37 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             FixedWidthSidebar::make()
                 ->mainSchema($this->getMainFormSchema())
                 ->sidebarSchema(
-                    $this->getSettingsFormSchema($configurator),
+                    [
+                        ...$this->publishPanel($configurator),
+                        ...$this->getSettingsFormSchema($configurator),
+                    ],
                     contained: true,
                 ),
+        ];
+    }
+
+    /**
+     * The WordPress-style publish panel, pinned to the top of the navigation
+     * editor sidebar. Edit only — on create there is no record to act on yet, so
+     * the slim inline publish-date field in the settings schema covers that case.
+     *
+     * @return array<int, Livewire>
+     */
+    protected function publishPanel(Schema $configurator): array
+    {
+        $record = $configurator->getRecord();
+
+        if ($configurator->getOperation() !== 'edit' || ! $record instanceof Navigation) {
+            return [];
+        }
+
+        $key = $record->getKey();
+
+        return [
+            Livewire::make(PublishStatusPanel::class, [
+                'recordClass' => Navigation::class,
+                'recordId' => is_scalar($key) ? (int) $key : 0,
+            ]),
         ];
     }
 
@@ -191,7 +221,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                     ),
                 ),
 
-            PublishSection::make(),
+            PublishSchema::make($configurator),
         ];
     }
 
