@@ -96,16 +96,7 @@ it('publishes truthful package capabilities and cache invalidation sources', fun
     $manifest = navigationPackageJson('capell.json');
 
     expect($manifest['capabilities'] ?? [])->toEqual([
-        'navigation-menu-builder',
-        'navigation-handle-registry',
-        'navigation-mega-menus',
-        'navigation-page-field',
-        'navigation-render-model',
-        'navigation-site-replication',
-        'navigation-external-links',
-        'navigation-active-state-modes',
-        'navigation-breadcrumbs',
-        'navigation-conditional-visibility',
+        'frontend-rendering',
     ]);
 
     expect(data_get($manifest, 'performance.cacheSafety.cacheable'))->toBeTrue()
