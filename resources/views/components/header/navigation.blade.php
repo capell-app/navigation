@@ -402,7 +402,7 @@
                 {!!
                     app(RenderHookRegistry::class)->renderAll(
                         RenderHookLocation::HeaderAfter,
-                        scenario: 'theme-foundation-header-actions',
+                        scenario: 'foundation-theme-header-actions',
                         target: 'capell-navigation::components.header.navigation',
                     )
                 !!}
