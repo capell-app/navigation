@@ -12,7 +12,7 @@ final class RegisterFoundationHeaderNavigationHook implements RenderHookExtensio
 {
     public const string DefaultScenario = 'frontend-default-primary-navigation';
 
-    public const string FoundationScenario = 'foundation-theme-primary-navigation';
+    public const string FoundationScenario = 'theme-foundation-primary-navigation';
 
     public const string Target = 'capell::header.index';
 
