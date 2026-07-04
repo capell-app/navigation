@@ -17,7 +17,7 @@ it('registers the foundation header navigation render hook from the navigation p
         ->and($provider)->toContain('afterResolving')
         ->and($provider)->toContain('registerFrontendRenderHooksForRegistry')
         ->and($hook)->toContain('frontend-default-primary-navigation')
-        ->and($hook)->toContain('foundation-theme-primary-navigation')
+        ->and($hook)->toContain('theme-foundation-primary-navigation')
         ->and($hook)->toContain('capell::header.index')
         ->and($hook)->toContain('capell-navigation::components.header.main-navigation');
 });
