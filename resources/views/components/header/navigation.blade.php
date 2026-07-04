@@ -11,7 +11,7 @@
     $items = ($menu ?? null) instanceof NavigationRenderData ? $menu->items : collect();
 @endphp
 
-@if (($menu ?? null) instanceof NavigationRenderData && $items->isNotEmpty() && ($navigation ?? null) instanceof Navigation)
+@if (($menu ?? null) instanceof NavigationRenderData && $items->isNotEmpty())
     @if ($usesAlpine)
         <script>
             window.capellHeaderNavigation = () => ({
@@ -298,6 +298,7 @@
             id="menu"
             @class([
                 'menu-wrapper relative flex h-full w-full grow justify-center bg-[var(--bg-color-header)] max-lg:fixed max-lg:inset-0 max-lg:z-40 max-lg:h-dvh max-lg:w-screen max-lg:justify-start max-lg:bg-transparent lg:visible lg:w-auto lg:justify-end lg:!bg-transparent',
+                'max-lg:invisible' => $usesAlpine,
                 'visible' => ! $usesAlpine,
             ])
             @if ($usesAlpine) x-bind:class="isMenuOpen || isClosingMenu ? 'visible' : 'max-lg:invisible'" @endif
