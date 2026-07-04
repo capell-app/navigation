@@ -34,9 +34,20 @@ final readonly class NavigationRenderModelComposer
         $language = $this->language($data['language'] ?? null);
         $page = $this->page($data['page'] ?? null);
         $siteDomain = $this->siteDomain($data['domain'] ?? null, $site, $page);
+        $navigationKey = $this->navigationKey($data['navigationKey'] ?? NavigationHandle::Main);
+        $preparedRenderModel = Frontend::getFrontendData(
+            NavigationFrontendRuntimeManifestContributor::renderModelKey($navigationKey),
+        );
+
+        if ($preparedRenderModel instanceof NavigationRenderData) {
+            $view->with('menu', $preparedRenderModel);
+            $view->with('navigation');
+
+            return;
+        }
 
         $navigation = $this->navigation(
-            key: $data['navigationKey'] ?? NavigationHandle::Main,
+            key: $navigationKey,
             site: $site,
             language: $language,
             siteOnlyFallback: ($data['siteOnlyFallback'] ?? true) !== false,
@@ -51,16 +62,6 @@ final readonly class NavigationRenderModelComposer
         }
 
         $view->with('navigation', $navigation);
-        $preparedRenderModel = Frontend::getFrontendData(
-            NavigationFrontendRuntimeManifestContributor::renderModelKey($navigation->key),
-        );
-
-        if ($preparedRenderModel instanceof NavigationRenderData) {
-            $view->with('menu', $preparedRenderModel);
-
-            return;
-        }
-
         $view->with('menu', BuildNavigationRenderModelAction::run(new NavigationRenderContextData(
             navigation: $navigation,
             page: $page,
@@ -145,5 +146,16 @@ final readonly class NavigationRenderModelComposer
         }
 
         return NavigationLoader::getNavigation($navigationKey, $site);
+    }
+
+    private function navigationKey(mixed $key): string
+    {
+        if ($key instanceof NavigationHandle) {
+            return $key->value;
+        }
+
+        return is_string($key) && $key !== ''
+            ? $key
+            : NavigationHandle::Main->value;
     }
 }
