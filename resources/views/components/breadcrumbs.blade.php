@@ -14,8 +14,8 @@
     >
         <ol class="capell-navigation-breadcrumbs">
             @foreach ($breadcrumbs as $breadcrumb)
-                @php($safeBreadcrumbUrl = SafeUrl::sanitise($breadcrumb->url))
-                <li @class(['is-active' => $loop->last])>
+                @php ($safeBreadcrumbUrl = SafeUrl::sanitise($breadcrumb->url))
+                <li @class (['is-active' => $loop->last])>
                     @if (! $loop->last && $safeBreadcrumbUrl !== null)
                         <a
                             href="{{ $safeBreadcrumbUrl }}"
