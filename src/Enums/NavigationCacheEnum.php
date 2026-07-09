@@ -29,9 +29,4 @@ enum NavigationCacheEnum: string
     {
         return self::RenderModels->value . '-' . hash('sha256', $context);
     }
-
-    public static function lazyFragmentKey(string $context): string
-    {
-        return self::LazyFragments->value . '-' . hash('sha256', $context);
-    }
 }

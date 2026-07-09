@@ -9,8 +9,8 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Navigation\Data\NavigationRenderContextData;
-use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\NavigationCacheKeys;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Cache;
@@ -40,7 +40,7 @@ class BuildNavigationChildFragmentAction
             return null;
         }
 
-        $cacheKey = NavigationCacheEnum::lazyFragmentKey(implode('|', [
+        $cacheKey = NavigationCacheKeys::lazyFragmentKey(implode('|', [
             $this->stringValue($context->navigation->getKey()),
             $context->navigation->key,
             $this->stringValue($context->site->getKey()),
