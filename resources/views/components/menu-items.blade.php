@@ -5,8 +5,8 @@
 
 <ul class="capell-menu-items">
     @foreach ($items as $item)
-        @php($safeUrl = SafeUrl::sanitise($item->url))
-        <li @class(['is-active' => $item->active])>
+        @php ($safeUrl = SafeUrl::sanitise($item->url))
+        <li @class (['is-active' => $item->active])>
             @if ($item->type === NavigationItemType::Heading)
                 <span>{{ $item->label }}</span>
             @elseif ($safeUrl !== null)
@@ -28,7 +28,7 @@
                         data-navigation-fragment-url="{{ $item->lazyFragmentUrl }}"
                     ></div>
                 @else
-                    @include('capell-navigation::components.menu-items', [
+                    @include ('capell-navigation::components.menu-items', [
                         'items' => $item->children,
                         'includeNavigationLazyLoader' => $includeNavigationLazyLoader ?? true,
                     ])

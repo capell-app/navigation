@@ -263,7 +263,11 @@
     @endif
 
     <div
-        @if ($usesAlpine) x-data="window.capellHeaderNavigation()" x-on:keydown.escape.prevent.stop="closeMenu()" x-on:keydown.tab="trapFocus($event)" @endif
+        @if ($usesAlpine)
+            x-data="window.capellHeaderNavigation()"
+            x-on:keydown.escape.prevent.stop="closeMenu()"
+            x-on:keydown.tab="trapFocus($event)"
+        @endif
         class="capell-navigation-header contents"
     >
         @if ($usesAlpine)
@@ -288,20 +292,24 @@
                                 : '{{ __('capell-frontend::generic.open_menu') }}'
                         "
                     ></span>
-                    @svg('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
-                    @svg('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
+                    @svg ('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
+                    @svg ('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
                 </button>
             </div>
         @endif
 
         <div
             id="menu"
-            @class([
+            @class ([
                 'menu-wrapper relative flex h-full w-full grow justify-center bg-[var(--bg-color-header)] max-lg:fixed max-lg:inset-0 max-lg:z-40 max-lg:h-dvh max-lg:w-screen max-lg:justify-start max-lg:bg-transparent lg:visible lg:w-auto lg:justify-end lg:!bg-transparent',
                 'max-lg:invisible' => $usesAlpine,
                 'visible' => ! $usesAlpine,
             ])
-            @if ($usesAlpine) x-bind:class="isMenuOpen || isClosingMenu ? 'visible' : 'max-lg:invisible'" @endif
+            @if ($usesAlpine)
+                x-bind:class="
+                    isMenuOpen || isClosingMenu ? 'visible' : 'max-lg:invisible'
+                "
+            @endif
         >
             @if ($usesAlpine)
                 <div
@@ -315,21 +323,23 @@
                 tabindex="-1"
                 x-ref="menuPanel"
                 aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
-                @class([
+                @class ([
                     'navbar top-0 left-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
                     'max-lg:invisible max-lg:absolute' => $usesAlpine,
                     'visible static max-w-none' => ! $usesAlpine,
                 ])
-                @if ($usesAlpine) x-bind:class="
-                    isMenuOpen
-                        ? 'max-lg:!visible max-lg:!translate-x-0'
-                        : isClosingMenu
-                          ? 'max-lg:!visible max-lg:translate-x-[-100%]'
-                          : 'max-lg:invisible max-lg:translate-x-[-100%]'
-                " @endif
+                @if ($usesAlpine)
+                    x-bind:class="
+                        isMenuOpen
+                            ? 'max-lg:!visible max-lg:!translate-x-0'
+                            : isClosingMenu
+                              ? 'max-lg:!visible max-lg:translate-x-[-100%]'
+                              : 'max-lg:invisible max-lg:translate-x-[-100%]'
+                    "
+                @endif
             >
                 <ul
-                    @class([
+                    @class ([
                         'nav-items relative flex w-full flex-col flex-wrap justify-center gap-y-0.5 p-4 pt-6 lg:static lg:w-auto lg:flex-row lg:items-center lg:gap-1 lg:p-0',
                         'lg:justify-start' => $theme->getMeta('header_menu_alignment') === 'left',
                         'lg:justify-center' => $theme->getMeta('header_menu_alignment') === 'center',
@@ -393,8 +403,8 @@
                             </span>
 
                             <span class="ml-auto">
-                                @svg('heroicon-o-sun', 'hidden h-4 w-4 md:h-5 md:w-5 dark:block')
-                                @svg('heroicon-o-moon', 'h-4 w-4 stroke-current md:h-5 md:w-5 dark:hidden')
+                                @svg ('heroicon-o-sun', 'hidden h-4 w-4 md:h-5 md:w-5 dark:block')
+                                @svg ('heroicon-o-moon', 'h-4 w-4 stroke-current md:h-5 md:w-5 dark:hidden')
                             </span>
                         </button>
                     </div>

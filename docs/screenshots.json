@@ -64,6 +64,7 @@
             "surface": "frontend",
             "targetType": "frontend-url",
             "target": null,
+            "url": "/",
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.",

@@ -8,9 +8,11 @@ use Capell\Core\Models\Site;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
+use Capell\Navigation\Enums\NavigationCacheEnum;
 use Capell\Navigation\Enums\NavigationChildrenLoadingEnum;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\NavigationCacheKeys;
 use Illuminate\Support\Collection;
 
 it('returns a lazy navigation child fragment for a valid public payload', function (): void {
@@ -142,6 +144,11 @@ it('can repeatedly load the same lazy mega menu fragment', function (): void {
 it('returns not found for an invalid lazy navigation fragment payload', function (): void {
     $this->get(route('capell-navigation.children', ['payload' => 'invalid']))
         ->assertNotFound();
+});
+
+it('builds lazy fragment cache keys outside the cache enum', function (): void {
+    expect(NavigationCacheKeys::lazyFragmentKey('main|item'))
+        ->toBe(NavigationCacheEnum::LazyFragments->value . '-' . hash('sha256', 'main|item'));
 });
 
 /**
