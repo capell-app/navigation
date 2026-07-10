@@ -130,7 +130,19 @@
         "doctor": null
     },
     "settings": [],
-    "permissions": [],
+    "permissions": [
+        "ViewAny:Navigation",
+        "View:Navigation",
+        "Create:Navigation",
+        "Update:Navigation",
+        "Delete:Navigation",
+        "DeleteAny:Navigation",
+        "Restore:Navigation",
+        "RestoreAny:Navigation",
+        "ForceDelete:Navigation",
+        "ForceDeleteAny:Navigation",
+        "Reorder:Navigation"
+    ],
     "capabilities": ["frontend-rendering"],
     "security": {
         "riskTier": "standard",

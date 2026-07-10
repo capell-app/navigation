@@ -130,6 +130,19 @@ it('declares navigation extension surfaces and contribution contracts', function
         'navigations',
         'navigation_page_references',
     ])
+        ->and(data_get($manifest, 'permissions', []))->toBe([
+            'ViewAny:Navigation',
+            'View:Navigation',
+            'Create:Navigation',
+            'Update:Navigation',
+            'Delete:Navigation',
+            'DeleteAny:Navigation',
+            'Restore:Navigation',
+            'RestoreAny:Navigation',
+            'ForceDelete:Navigation',
+            'ForceDeleteAny:Navigation',
+            'Reorder:Navigation',
+        ])
         ->and(data_get($manifest, 'contributionTraceability.deferredContributions'))->toBe([])
         ->and($manifest['contributes'] ?? [])->toContain(
             [
