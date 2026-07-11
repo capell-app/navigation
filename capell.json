@@ -4,8 +4,8 @@
     "slug": "navigation",
     "displayName": "Navigation",
     "kind": "package",
-    "capellApiVersion": "^4.0",
-    "version": "4.x-dev",
+    "capellApiVersion": "^1.0",
+    "version": "1.x-dev",
     "description": "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.",
     "product": {
         "group": "Capell Foundation",
