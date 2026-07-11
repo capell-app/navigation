@@ -234,16 +234,6 @@
                 "path": "docs/screenshots/create-edit-navigation-form-dark.png",
                 "alt": "Create and edit navigation form in dark mode",
                 "caption": "Build nested menus from the dark-mode create and edit form"
-            },
-            {
-                "path": "docs/screenshots/site-relation-manager-for-navigations.png",
-                "alt": "Site relation manager listing navigations for a site",
-                "caption": "Manage a site's scoped navigations directly from the site edit surface"
-            },
-            {
-                "path": "docs/screenshots/site-relation-manager-for-navigations-dark.png",
-                "alt": "Site relation manager for navigations in dark mode",
-                "caption": "Manage site-scoped navigations from the dark-mode site relation manager"
             }
         ],
         "categories": ["admin", "console", "foundation", "frontend"]
