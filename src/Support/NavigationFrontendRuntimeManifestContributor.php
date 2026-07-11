@@ -42,7 +42,7 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
         $theme = $context->theme();
 
         if ($theme instanceof Theme) {
-            $theme->loadMissing('type');
+            $theme->loadMissing('blueprint');
         }
 
         $this->hydrateSiteNavigations($site);
@@ -60,7 +60,7 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
                 continue;
             }
 
-            $navigation->loadMissing('type');
+            $navigation->loadMissing('blueprint');
 
             $context->setFrontendData(
                 $this->renderModelKey($handle->value),
@@ -78,7 +78,7 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
     private function hydrateSiteNavigations(Site $site): void
     {
         if ($site->relationLoaded('navigations')) {
-            $site->navigations->loadMissing('type');
+            $site->navigations->loadMissing('blueprint');
 
             return;
         }
@@ -89,7 +89,7 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
                 ->where(fn (Builder $query): Builder => $query
                     ->where('site_id', $site->getKey())
                     ->orWhereNull('site_id'))
-                ->with('type')
+                ->with('blueprint')
                 ->publishedDate()
                 ->get(),
         );
