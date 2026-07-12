@@ -11,6 +11,6 @@ final class NavigationMigrationsContribution implements ExtensionContribution, R
 {
     public static function compatibleCapellApiVersion(): string
     {
-        return '^4.0';
+        return '^0.0';
     }
 }
