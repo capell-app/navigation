@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 it('reports a compatible capell api version', function (): void {
-    expect(NavigationHealthCheck::compatibleCapellApiVersion())->toBe('^0.0');
+    expect(NavigationHealthCheck::compatibleCapellApiVersion())->toBe('^4.0');
 });
 
 it('runs real diagnostics returning check results', function (): void {
