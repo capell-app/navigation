@@ -16,7 +16,7 @@ final class NavigationChildFragmentController
 
         abort_unless(is_string($payload) && $payload !== '', Response::HTTP_NOT_FOUND);
 
-        $html = BuildNavigationChildFragmentAction::run($payload);
+        $html = BuildNavigationChildFragmentAction::run($payload, strtolower($request->getHost()));
 
         abort_if($html === null, Response::HTTP_NOT_FOUND);
 

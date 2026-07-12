@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Navigation\Actions\BuildNavigationChildFragmentAction;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
@@ -14,6 +15,7 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\NavigationCacheKeys;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Crypt;
 
 it('returns a lazy navigation child fragment for a valid public payload', function (): void {
     $language = Language::factory()->default()->create();
@@ -69,6 +71,20 @@ it('returns a lazy navigation child fragment for a valid public payload', functi
         ->assertHeader('X-Robots-Tag', 'noindex')
         ->assertSee($currentPage->translation->label)
         ->assertSee('is-active');
+
+    parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+    expect(BuildNavigationChildFragmentAction::run((string) $query['payload'], 'attacker.test'))->toBeNull();
+    $locator = json_decode(Crypt::decryptString((string) $query['payload']), true, flags: JSON_THROW_ON_ERROR);
+    $locator['expires_at'] = now()->subSecond()->getTimestamp();
+    $expiredUrl = route('capell-navigation.children', [
+        'payload' => Crypt::encryptString(json_encode($locator, JSON_THROW_ON_ERROR)),
+    ]);
+
+    $this->get($expiredUrl)->assertNotFound();
+
+    $navigation->update(['name' => 'Changed after locator issue']);
+
+    $this->get($url)->assertNotFound();
 });
 
 it('can repeatedly load the same lazy mega menu fragment', function (): void {

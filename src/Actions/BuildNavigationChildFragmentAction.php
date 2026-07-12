@@ -20,17 +20,21 @@ use Lorisleiva\Actions\Concerns\AsObject;
 use Throwable;
 
 /**
- * @method static string|null run(string $payload)
+ * @method static string|null run(string $payload, string $requestHost)
  */
 class BuildNavigationChildFragmentAction
 {
     use AsObject;
 
-    public function handle(string $payload): ?string
+    public function handle(string $payload, string $requestHost): ?string
     {
         $data = $this->decodePayload($payload);
 
         if ($data === null) {
+            return null;
+        }
+
+        if (! hash_equals($data['host'], strtolower($requestHost))) {
             return null;
         }
 
@@ -67,7 +71,7 @@ class BuildNavigationChildFragmentAction
     }
 
     /**
-     * @param  array{navigation:int, item:string, path:string, page:int, page_type:string, site:int, language:int, domain:int}  $data
+     * @param  array{navigation:int, navigation_version:int, visible_from:int|null, visible_until:int|null, item:string, path:string, page:int, page_type:string, site:int, language:int, domain:int, host:string}  $data
      */
     private function context(array $data): ?NavigationRenderContextData
     {
@@ -88,6 +92,19 @@ class BuildNavigationChildFragmentAction
             return null;
         }
 
+        if ($navigation->updated_at?->getTimestamp() !== $data['navigation_version']
+            || $navigation->visible_from?->getTimestamp() !== $data['visible_from']
+            || $navigation->visible_until?->getTimestamp() !== $data['visible_until']
+            || ! $navigation->newQuery()->whereKey($navigation->getKey())->publishedDate()->exists()
+            || (int) $siteDomain->site_id !== (int) $site->getKey()
+            || (int) $siteDomain->language_id !== (int) $language->getKey()
+            || strtolower($siteDomain->domain) !== $data['host']
+            || (int) $page->site_id !== (int) $site->getKey()
+            || ($navigation->site_id !== null && (int) $navigation->site_id !== (int) $site->getKey())
+            || ($navigation->language_id !== null && (int) $navigation->language_id !== (int) $language->getKey())) {
+            return null;
+        }
+
         return new NavigationRenderContextData(
             navigation: $navigation,
             page: $page,
@@ -98,7 +115,7 @@ class BuildNavigationChildFragmentAction
     }
 
     /**
-     * @return array{navigation:int, item:string, path:string, page:int, page_type:string, site:int, language:int, domain:int}|null
+     * @return array{navigation:int, navigation_version:int, visible_from:int|null, visible_until:int|null, item:string, path:string, page:int, page_type:string, site:int, language:int, domain:int, host:string}|null
      */
     private function decodePayload(string $payload): ?array
     {
@@ -112,13 +129,19 @@ class BuildNavigationChildFragmentAction
             return null;
         }
 
-        foreach (['navigation', 'page', 'site', 'language', 'domain'] as $key) {
+        if (($data['version'] ?? null) !== 1
+            || ! is_int($data['expires_at'] ?? null)
+            || $data['expires_at'] < now()->getTimestamp()) {
+            return null;
+        }
+
+        foreach (['navigation', 'navigation_version', 'page', 'site', 'language', 'domain'] as $key) {
             if (! is_numeric($data[$key] ?? null)) {
                 return null;
             }
         }
 
-        foreach (['item', 'path', 'page_type'] as $key) {
+        foreach (['item', 'path', 'page_type', 'host'] as $key) {
             if (! is_string($data[$key] ?? null) || $data[$key] === '') {
                 return null;
             }
@@ -126,6 +149,9 @@ class BuildNavigationChildFragmentAction
 
         return [
             'navigation' => (int) $data['navigation'],
+            'navigation_version' => (int) $data['navigation_version'],
+            'visible_from' => is_numeric($data['visible_from'] ?? null) ? (int) $data['visible_from'] : null,
+            'visible_until' => is_numeric($data['visible_until'] ?? null) ? (int) $data['visible_until'] : null,
             'item' => $data['item'],
             'path' => $data['path'],
             'page' => (int) $data['page'],
@@ -133,6 +159,7 @@ class BuildNavigationChildFragmentAction
             'site' => (int) $data['site'],
             'language' => (int) $data['language'],
             'domain' => (int) $data['domain'],
+            'host' => strtolower($data['host']),
         ];
     }
 

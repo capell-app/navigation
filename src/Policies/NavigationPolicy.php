@@ -51,13 +51,13 @@ class NavigationPolicy
     public function update(User $user, Navigation $navigation): bool
     {
         return $user->checkPermissionTo(self::permission('update', self::SUBJECT))
-            && $this->canUseNavigationSite($user, $navigation);
+            && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function delete(User $user, Navigation $navigation): bool
     {
         return $user->checkPermissionTo(self::permission('delete', self::SUBJECT))
-            && $this->canUseNavigationSite($user, $navigation);
+            && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function deleteAny(User $user): bool
@@ -68,13 +68,13 @@ class NavigationPolicy
     public function restore(User $user, Navigation $navigation): bool
     {
         return $user->checkPermissionTo(self::permission('restore', self::SUBJECT))
-            && $this->canUseNavigationSite($user, $navigation);
+            && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function forceDelete(User $user, Navigation $navigation): bool
     {
         return $user->checkPermissionTo(self::permission('force_delete', self::SUBJECT))
-            && $this->canUseNavigationSite($user, $navigation);
+            && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function reorder(User $user): bool
@@ -93,5 +93,14 @@ class NavigationPolicy
         } catch (Throwable) {
             return false;
         }
+    }
+
+    private function canMutateNavigationSite(User $user, Navigation $navigation): bool
+    {
+        if ($navigation->site_id === null) {
+            return SiteScope::isGlobalActor($user);
+        }
+
+        return $this->canUseNavigationSite($user, $navigation);
     }
 }

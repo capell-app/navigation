@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 
 it('authorizes navigation resource abilities through shield permissions', function (): void {
     $policy = new NavigationPolicy;
-    $navigation = new Navigation;
+    $navigation = new Navigation(['site_id' => 1]);
     $user = new class extends User
     {
         /** @use HasFactory<Factory<static>> */
@@ -40,7 +40,7 @@ it('authorizes navigation resource abilities through shield permissions', functi
             return false;
         }
     };
-    $user->assignedSiteIds = collect();
+    $user->assignedSiteIds = collect([1]);
 
     expect($policy->viewAny($user))->toBeFalse()
         ->and($policy->view($user, $navigation))->toBeFalse();
@@ -119,7 +119,7 @@ it('enforces navigation site scope on direct record abilities', function (): voi
         ->and($policy->restore($user, $assignedNavigation))->toBeTrue()
         ->and($policy->forceDelete($user, $assignedNavigation))->toBeTrue()
         ->and($policy->view($user, $globalNavigation))->toBeTrue()
-        ->and($policy->update($user, $globalNavigation))->toBeTrue()
+        ->and($policy->update($user, $globalNavigation))->toBeFalse()
         ->and($policy->view($user, $otherNavigation))->toBeFalse()
         ->and($policy->update($user, $otherNavigation))->toBeFalse()
         ->and($policy->delete($user, $otherNavigation))->toBeFalse()

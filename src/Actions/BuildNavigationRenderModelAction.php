@@ -187,7 +187,12 @@ class BuildNavigationRenderModelAction
         }
 
         $payload = Crypt::encryptString(json_encode([
+            'version' => 1,
+            'expires_at' => now()->addMinutes(5)->getTimestamp(),
             'navigation' => $this->integerKey($context->navigation->getKey()),
+            'navigation_version' => $context->navigation->updated_at?->getTimestamp(),
+            'visible_from' => $context->navigation->visible_from?->getTimestamp(),
+            'visible_until' => $context->navigation->visible_until?->getTimestamp(),
             'item' => $item->key,
             'path' => $itemPath,
             'page' => $this->integerKey($context->page->getKey()),
@@ -195,6 +200,7 @@ class BuildNavigationRenderModelAction
             'site' => $this->integerKey($context->site->getKey()),
             'language' => $this->integerKey($context->language->getKey()),
             'domain' => $this->integerKey($context->siteDomain->getKey()),
+            'host' => strtolower($context->siteDomain->domain),
         ], JSON_THROW_ON_ERROR));
 
         return route('capell-navigation.children', ['payload' => $payload]);
