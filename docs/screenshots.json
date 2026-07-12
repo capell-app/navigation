@@ -1,0 +1,75 @@
+{
+    "package": "navigation",
+    "composerName": "capell-app/navigation",
+    "generatedFor": "deployment-screenshot-runner",
+    "requiresInstalledPackage": true,
+    "outputDirectory": "packages/navigation/docs/screenshots",
+    "entries": [
+        {
+            "id": "navigation-admin-index",
+            "title": "Navigation admin index.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "NavigationResource",
+            "required": true,
+            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
+            "useCase": "An editor reviews site navigation records and their scope/status.",
+            "screenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/navigation-admin-index-dark.png"
+        },
+        {
+            "id": "create-edit-navigation-form",
+            "title": "Create/edit navigation form.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "NavigationResource",
+            "required": true,
+            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
+            "useCase": "An editor builds a navigation tree with links, page references, headings, and nested items.",
+            "screenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png"
+        },
+        {
+            "id": "site-relation-manager-for-navigations",
+            "title": "Site relation manager for navigations.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "NavigationResource",
+            "required": false,
+            "notes": "Optional Beta evidence target. The current file is a shared host Site screen rather than proof of Navigation records; replace it with an independently captured populated relation manager before using it as release or Marketplace evidence.",
+            "useCase": "An editor manages navigations directly from the site edit surface.",
+            "screenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png"
+        },
+        {
+            "id": "page-form-navigation-tab",
+            "title": "Page form navigation tab.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "NavigationResource",
+            "required": true,
+            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
+            "useCase": "An editor controls page-level navigation metadata from the page form.",
+            "screenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png"
+        },
+        {
+            "id": "frontend-menu-output",
+            "title": "Frontend menu output.",
+            "package": "navigation",
+            "surface": "frontend",
+            "targetType": "frontend-url",
+            "target": null,
+            "url": "/",
+            "required": false,
+            "notes": "Optional Beta evidence target. The current file is an empty host shell rather than proof of rendered Navigation output; replace it with an independently captured seeded menu before using it as release evidence.",
+            "useCase": "An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.",
+            "screenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output-dark.png"
+        }
+    ]
+}

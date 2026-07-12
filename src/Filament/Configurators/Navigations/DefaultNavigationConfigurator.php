@@ -1,0 +1,693 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Navigation\Filament\Configurators\Navigations;
+
+use Capell\Admin\Contracts\ConfiguratorInterface;
+use Capell\Admin\Contracts\ConfiguratorTypeEnumInterface;
+use Capell\Admin\Enums\SchemaExtenderEnum;
+use Capell\Admin\Filament\Components\Forms\FixedWidthSidebar;
+use Capell\Admin\Filament\Components\Forms\IconPicker;
+use Capell\Admin\Filament\Components\Forms\LanguageSelect;
+use Capell\Admin\Filament\Components\Forms\NameInput;
+use Capell\Admin\Filament\Components\Forms\PageMorphToOptionSelect;
+use Capell\Admin\Filament\Components\Forms\PublishSchema;
+use Capell\Admin\Filament\Components\Forms\SiteSelect;
+use Capell\Admin\Filament\Concerns\HasConfigurator;
+use Capell\Admin\Filament\Livewire\PublishStatusPanel;
+use Capell\Core\Contracts\Pageable;
+use Capell\Core\Enums\PageVariationEnum;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Page;
+use Capell\Core\Support\CapellCoreHelper;
+use Capell\Core\Support\Slug\SlugGenerator;
+use Capell\Navigation\Data\NavigationItemData;
+use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
+use Capell\Navigation\Enums\NavigationDropdownLayout;
+use Capell\Navigation\Enums\NavigationItemActiveMode;
+use Capell\Navigation\Enums\NavigationItemTarget;
+use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationItemVisibility;
+use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
+use Capell\Navigation\Models\Navigation;
+use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
+use Capell\Navigation\Support\SafeUrl;
+use Closure;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Livewire;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema as DatabaseSchema;
+use Illuminate\Validation\Rules\Unique;
+use Saade\FilamentAdjacencyList\Forms\Components\AdjacencyList;
+
+class DefaultNavigationConfigurator implements ConfiguratorInterface
+{
+    use HasConfigurator;
+
+    protected static ConfiguratorTypeEnumInterface $configuratorType = NavigationConfiguratorTypeEnum::Navigation;
+
+    /**
+     * @return iterable<int, mixed>
+     */
+    public static function getExtenders(): iterable
+    {
+        return app()->tagged(SchemaExtenderEnum::Navigation->value);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function make(Schema $configurator): array
+    {
+        return match ($configurator->getOperation()) {
+            'createOption', 'replicate' => $this->getCreateOptionFormSchema($configurator),
+            'editOption' => $this->getEditOptionFormSchema($configurator),
+            default => $this->getFormSchema($configurator),
+        };
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getFormSchema(Schema $configurator): array
+    {
+        return [
+            FixedWidthSidebar::make()
+                ->mainSchema($this->getMainFormSchema())
+                ->sidebarSchema(
+                    [
+                        ...$this->publishPanel($configurator),
+                        ...$this->getSettingsFormSchema($configurator),
+                    ],
+                    contained: true,
+                ),
+        ];
+    }
+
+    /**
+     * The WordPress-style publish panel, pinned to the top of the navigation
+     * editor sidebar. Edit only — on create there is no record to act on yet, so
+     * the slim inline publish-date field in the settings schema covers that case.
+     *
+     * @return array<int, Livewire>
+     */
+    protected function publishPanel(Schema $configurator): array
+    {
+        $record = $configurator->getRecord();
+
+        if ($configurator->getOperation() !== 'edit' || ! $record instanceof Navigation) {
+            return [];
+        }
+
+        $key = $record->getKey();
+
+        return [
+            Livewire::make(PublishStatusPanel::class, [
+                'recordClass' => Navigation::class,
+                'recordId' => is_scalar($key) ? (int) $key : 0,
+            ]),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getMainFormSchema(): array
+    {
+        return [
+            Tabs::make()
+                ->tabs([
+                    Tab::make(__('capell-admin::form.items'))
+                        ->icon(Heroicon::Bars3)
+                        ->schema([
+                            $this->getNavigationItemsField(),
+                        ]),
+                    Tab::make(__('capell-admin::form.settings'))
+                        ->icon(Heroicon::OutlinedCog6Tooth)
+                        ->statePath('meta')
+                        ->columns()
+                        ->schema([
+                            TextInput::make('component')
+                                ->label(__('capell-admin::form.component'))
+                                ->helperText(__('capell-admin::generic.menu_component_info'))
+                                ->placeholder('capell::list'),
+                            TextInput::make('component_item')
+                                ->label(__('capell-admin::form.component_item'))
+                                ->helperText(__('capell-admin::generic.menu_component_item_info'))
+                                ->placeholder('capell::list.item'),
+                        ]),
+                ]),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getSettingsFormSchema(Schema $configurator): array
+    {
+        return [
+            NameInput::make('name')
+                ->required()
+                ->afterStateUpdatedJs(function (string $operation): string {
+                    if (! in_array($operation, ['create', 'createOption', 'replicate'], true)) {
+                        return '';
+                    }
+
+                    return SlugGenerator::slugifyState("\$state ?? ''", 'key');
+                }),
+
+            Select::make('key')
+                ->required()
+                ->options(fn (Get $get, ?Model $record): array => $this->navigationKeyOptions($record, $get('key')))
+                ->searchable()
+                ->allowHtml(false)
+                ->unique(
+                    column: 'key',
+                    ignoreRecord: $configurator->getOperation() !== 'replicate',
+                    modifyRuleUsing: function (Unique $rule, Get $get): Unique {
+                        $languageId = self::uniqueRuleValue($get('language_id'));
+
+                        return $rule
+                            ->withoutTrashed()
+                            ->where('site_id', self::uniqueRuleValue($get('site_id')))
+                            ->when(
+                                $languageId !== null,
+                                fn (Unique $query): Unique => $query->where('language_id', $languageId),
+                                fn (Unique $query): Unique => $query->whereNull('language_id'),
+                            );
+                    },
+                )
+                ->label(__('capell-admin::table.key')),
+
+            TypeSelect::make('blueprint_id')
+                ->live()
+                ->withRelation()
+                ->when(
+                    $configurator->isCreating(),
+                    fn (TypeSelect $component): TypeSelect => $component->withCreateForm(),
+                    fn (TypeSelect $component): TypeSelect => $component->withEditForm(),
+                ),
+
+            SiteSelect::make('site_id')
+                ->required()
+                ->reactive(),
+
+            LanguageSelect::make('language_id')
+                ->reactive()
+                ->withRelationship()
+                ->modifyRelationQueryUsing(
+                    fn (Builder $query, Get $get): Builder => $query->when(
+                        $get('site_id'),
+                        fn (BuilderContract $query, int $siteId): Builder => $query->whereHas(
+                            'sites',
+                            fn (BuilderContract $query): BuilderContract => $query->where('sites.id', $siteId),
+                        ),
+                    ),
+                ),
+
+            PublishSchema::make($configurator),
+        ];
+    }
+
+    protected function getNavigationItemsField(string $navigationFieldsKey = 'navigationTypeFields'): AdjacencyList
+    {
+        return AdjacencyList::make('items')
+            ->label(__('capell-admin::form.navigation_items'))
+            ->hiddenLabel()
+            ->labelKey('label')
+            ->columnSpanFull()
+            ->childrenKey('children')
+            ->itemLabel($this->getItemLabel(...))
+            ->itemUrl($this->getItemUrl(...))
+            ->addAction(
+                fn (Action $action): Action => $action
+                    ->label(__('capell-admin::button.add_navigation_item'))
+                    ->icon('heroicon-o-plus')
+                    ->color('primary'),
+            )
+            ->schema(fn (): array => [
+                Grid::make()
+                    ->schema([
+                        ToggleButtons::make('type')
+                            ->label(__('capell-admin::form.type'))
+                            ->required()
+                            ->live()
+                            ->inline()
+                            ->options(NavigationItemType::class)
+                            ->default(NavigationItemType::Page->value)
+                            ->afterStateUpdated(
+                                function (ToggleButtons $component) use ($navigationFieldsKey): ?Schema {
+                                    $typeFields = $component->getRootContainer()->getComponent($navigationFieldsKey);
+
+                                    if (! $typeFields instanceof Grid) {
+                                        return null;
+                                    }
+
+                                    $schema = $typeFields->getChildSchema();
+                                    $schema?->fill();
+
+                                    return $schema;
+                                },
+                            ),
+                        $this->getLabelField(),
+                        Checkbox::make('is_visible')
+                            ->label(__('capell-admin::form.visible'))
+                            ->default(true),
+                    ]),
+                Grid::make()
+                    ->key($navigationFieldsKey)
+                    ->whenTruthy('type')
+                    ->schema(fn (Get $get): array => $this->getNavigationItemFields($get('type'))),
+            ]);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getCreateOptionFormSchema(Schema $configurator): array
+    {
+        return [
+            Grid::make()
+                ->gridContainer()
+                ->columns(['default' => 1, '@lg' => 2])
+                ->schema($this->getSettingsFormSchema($configurator)),
+            ...$this->getMainFormSchema(),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getEditOptionFormSchema(Schema $configurator): array
+    {
+        return [
+            Grid::make()
+                ->gridContainer()
+                ->columns(['default' => 1, '@lg' => 2])
+                ->schema($this->getSettingsFormSchema($configurator)),
+            ...$this->getSettingsFormSchema($configurator),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getNavigationItemFields(NavigationItemType $type): array
+    {
+        return match ($type) {
+            NavigationItemType::Page => $this->getPageNavigationItemFields(),
+            NavigationItemType::Link => $this->getLinkNavigationItemFields(),
+            NavigationItemType::ExternalLink => $this->getLinkNavigationItemFields(),
+            NavigationItemType::Heading => $this->getHeadingNavigationItemFields(),
+        };
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getPageNavigationItemFields(): array
+    {
+        return [
+            Grid::make()
+                ->statePath('data')
+                ->columnSpanFull()
+                ->schema([
+                    Group::make([
+                        SiteSelect::make('site_id')
+                            ->dehydrated(false)
+                            ->default(fn (Get $get): ?int => is_numeric($get('../../site_id')) ? (int) $get('../../site_id') : null)
+                            ->modifyQueryUsing(
+                                fn (Builder $query, Get $get): Builder => $query->when(
+                                    $get('../../site_id'),
+                                    fn (Builder $query, int $siteId): Builder => $query->whereKey($siteId),
+                                ),
+                            )
+                            ->afterStateUpdatedJs(<<<'JS'
+                                $set('pageable_id', null);
+                                $set('pageable_type', null);
+                            JS),
+                        Checkbox::make('auto_children')
+                            ->label(__('capell-admin::form.auto_children'))
+                            ->helperText(__('capell-admin::generic.auto_children_info'))
+                            ->visible(fn (Get $get): bool => $get('pageable_type') === PageVariationEnum::Page->value),
+                    ]),
+                    PageMorphToOptionSelect::make()
+                        ->whenTruthy('site_id')
+                        ->modifyKeySelectOptionsQueryUsing(
+                            fn (Builder $query, Get $get): Builder => $query->when(
+                                $get('../../site_id') ?? $get('site_id'),
+                                fn (Builder $query, int $siteId): Builder => $query->where('site_id', $siteId),
+                            ),
+                        )
+                        ->modifyTypeSelectUsing(
+                            fn (ToggleButtons $select): ToggleButtons => $select->default(PageVariationEnum::Page->value),
+                        )
+                        ->visibleJs(<<<'JS'
+                            $get('site_id')
+                        JS)
+                        ->required(),
+                    ...$this->getExtraItemFields(),
+                ]),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getLinkNavigationItemFields(): array
+    {
+        return [
+            Grid::make()
+                ->statePath('data')
+                ->columnSpanFull()
+                ->schema([
+                    TextInput::make('url')
+                        ->label(__('capell-admin::form.url'))
+                        ->validationAttribute(strtoupper(__('capell-admin::form.url')))
+                        ->required()
+                        ->rules([
+                            fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                if (! is_string($value) || ! $this->isSafeNavigationUrl($value)) {
+                                    $fail(__('validation.url'));
+                                }
+                            },
+                        ])
+                        ->columnSpanFull()
+                        ->suffixAction(
+                            fn (?string $state): ?Action => $state !== null
+                                ? Action::make('open_url')
+                                    ->icon(Heroicon::ArrowTopRightOnSquare)
+                                    ->url($state, true)
+                                    ->openUrlInNewTab()
+                                : null,
+                        ),
+                    ...$this->getExtraItemFields(),
+                ]),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getHeadingNavigationItemFields(): array
+    {
+        return [
+            Grid::make()
+                ->statePath('data')
+                ->columnSpanFull()
+                ->schema([
+                    Group::make()
+                        ->dense()
+                        ->schema([
+                            IconPicker::make('icon')
+                                ->label(__('capell-admin::form.icon'))
+                                ->nullable(),
+                        ]),
+                ]),
+        ];
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    protected function getExtraItemFields(): array
+    {
+        return [
+            Select::make('target')
+                ->label(__('capell-admin::form.url_target'))
+                ->options(NavigationItemTarget::class),
+            Select::make('active_mode')
+                ->label(__('capell-navigation::generic.active_mode'))
+                ->options(NavigationItemActiveMode::class)
+                ->default(NavigationItemActiveMode::Exact->value),
+            Select::make('visibility')
+                ->label(__('capell-navigation::generic.visibility'))
+                ->options(NavigationItemVisibility::class)
+                ->default(NavigationItemVisibility::Everyone->value)
+                ->live(),
+            TextInput::make('ability')
+                ->label(__('capell-navigation::generic.visibility_ability_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Ability->value),
+            TextInput::make('role')
+                ->label(__('capell-navigation::generic.visibility_role_name'))
+                ->visible(fn (Get $get): bool => $get('visibility') === NavigationItemVisibility::Role->value),
+            TextInput::make('rel')
+                ->label(__('capell-navigation::generic.rel_attribute'))
+                ->helperText(__('capell-navigation::generic.rel_attribute_info'))
+                ->placeholder('noopener noreferrer'),
+            Select::make('dropdown_layout')
+                ->label(__('capell-navigation::generic.dropdown_layout'))
+                ->helperText(__('capell-navigation::generic.dropdown_layout_info'))
+                ->options(NavigationDropdownLayout::class)
+                ->default(NavigationDropdownLayout::Dropdown->value)
+                ->live(),
+            TextInput::make('mega_columns')
+                ->label(__('capell-navigation::generic.mega_columns'))
+                ->helperText(__('capell-navigation::generic.mega_columns_info'))
+                ->numeric()
+                ->minValue(1)
+                ->maxValue(4)
+                ->default(3)
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_heading')
+                ->label(__('capell-navigation::generic.mega_panel_heading'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_description')
+                ->label(__('capell-navigation::generic.mega_panel_description'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value),
+            TextInput::make('mega_panel_url')
+                ->label(__('capell-navigation::generic.mega_panel_url'))
+                ->visible(fn (Get $get): bool => $get('dropdown_layout') === NavigationDropdownLayout::Mega->value)
+                ->rules([
+                    fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        if ($value !== null && $value !== '' && (! is_string($value) || ! $this->isSafeNavigationUrl($value))) {
+                            $fail(__('validation.url'));
+                        }
+                    },
+                ]),
+            Group::make()
+                ->dense()
+                ->schema([
+                    IconPicker::make('icon')
+                        ->label(__('capell-admin::form.icon'))
+                        ->nullable(),
+                    Checkbox::make('hide_label')
+                        ->label(__('capell-admin::form.hide_label'))
+                        ->hint(__('capell-admin::generic.hide_label_info'))
+                        ->whenTruthy('icon')
+                        ->visibleJs(<<<'JS'
+                            return $get('icon') !== null;
+                        JS),
+                ]),
+        ];
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $item
+     * @param  array<array-key, mixed>  $pageCache
+     */
+    protected function getItemLabel(array $item, array &$pageCache = []): ?string
+    {
+        $navigationItem = NavigationItemData::from($item);
+
+        if (filled($navigationItem->label)) {
+            return $navigationItem->label;
+        }
+
+        if ($navigationItem->type === NavigationItemType::Page) {
+            $page = $this->getCachedPageItem($navigationItem->data, $pageCache);
+
+            if (! $page instanceof Pageable) {
+                return null;
+            }
+
+            return $page->name;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $item
+     * @param  array<array-key, mixed>  $pageCache
+     */
+    protected function getItemUrl(array $item, Get $get, array &$pageCache = []): ?string
+    {
+        $navigationItem = NavigationItemData::from($item);
+
+        $url = null;
+
+        switch ($navigationItem->type) {
+            case NavigationItemType::Page:
+                $languageId = $get('language_id');
+                $siteId = $get('../../site_id') ?? $get('site_id');
+
+                if (! is_numeric($siteId)) {
+                    return null;
+                }
+
+                $siteId = (int) $siteId;
+                $language = $this->getLanguageById($languageId, $siteId);
+
+                $page = $this->getCachedPageItem($navigationItem->data, $pageCache, true, $language?->id, $siteId);
+
+                if (! $page instanceof Pageable) {
+                    return null;
+                }
+
+                $url = $page->pageUrl?->full_url;
+                break;
+            case NavigationItemType::Link:
+            case NavigationItemType::ExternalLink:
+                $url = $navigationItem->data['url'];
+                break;
+            case NavigationItemType::Heading:
+                $url = null;
+                break;
+        }
+
+        return $url;
+    }
+
+    protected function getLanguageById(?int $languageId, int $siteId): ?Language
+    {
+        return CapellCoreHelper::getLanguageByIdOrSite($languageId, $siteId);
+    }
+
+    private static function uniqueRuleValue(mixed $value): int|string|null
+    {
+        if (is_string($value)) {
+            return $value !== '' ? $value : null;
+        }
+
+        return is_int($value) ? $value : null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function navigationKeyOptions(?Model $record, mixed $currentKey): array
+    {
+        $options = NavigationHandleRegistry::options();
+
+        if ($record instanceof Navigation) {
+            $this->addNavigationKeyOption($options, $record->key);
+        }
+
+        $this->addNavigationKeyOption($options, is_string($currentKey) ? $currentKey : null);
+
+        return $options;
+    }
+
+    /**
+     * @param  array<string, string>  $options
+     */
+    private function addNavigationKeyOption(array &$options, ?string $key): void
+    {
+        $normalizedKey = $key === null ? '' : trim($key);
+
+        if ($normalizedKey === '' || array_key_exists($normalizedKey, $options)) {
+            return;
+        }
+
+        $options[$normalizedKey] = NavigationHandleRegistry::label($normalizedKey);
+    }
+
+    /**
+     * Get a Page model from cache, loading if necessary.
+     *
+     * @param  array<string, Pageable|null>  $pageCache
+     * @param  array<array-key, mixed>  $data
+     */
+    private function getCachedPageItem(array $data, array &$pageCache, bool $withUrl = false, ?int $languageId = null, ?int $siteId = null): ?Pageable
+    {
+        $pageId = $data['pageable_id'] ?? null;
+        $pageType = $data['pageable_type'] ?? null;
+
+        if ($pageId === null || $pageType === null) {
+            return null;
+        }
+
+        $cacheKey = implode(':', [
+            $pageType,
+            (string) $pageId,
+            $siteId === null ? 'any-site' : (string) $siteId,
+            $withUrl ? (string) ($languageId ?? 'any-language') : 'no-url',
+        ]);
+
+        if (array_key_exists($cacheKey, $pageCache)) {
+            return $pageCache[$cacheKey];
+        }
+
+        /** @var class-string<Pageable&Model> $model */
+        $model = Relation::getMorphedModel($pageType) ?? Page::class;
+
+        $query = $model::query();
+
+        if ($siteId !== null && DatabaseSchema::hasColumn((new $model)->getTable(), 'site_id')) {
+            $query->where('site_id', $siteId);
+        }
+
+        if ($withUrl && $languageId !== null) {
+            $page = $query->with([
+                'pageUrl.siteDomain' => fn (BuilderContract $query): BuilderContract => DB::getDriverName() === 'sqlite'
+                    ? $query->orderByRaw('CASE WHEN language_id = ? THEN 0 ELSE 1 END', [$languageId])
+                    : $query->orderByRaw('FIELD(language_id, ?) DESC', [$languageId]),
+            ])
+                ->find($pageId);
+        } else {
+            $page = $query->find($pageId);
+        }
+
+        if (! $page instanceof Pageable) {
+            $pageCache[$cacheKey] = null;
+
+            return null;
+        }
+
+        $pageCache[$cacheKey] = $page;
+
+        return $page;
+    }
+
+    private function isSafeNavigationUrl(string $url): bool
+    {
+        return SafeUrl::isSafe($url);
+    }
+
+    private function getLabelField(): TextInput
+    {
+        return TextInput::make('label')
+            ->label(__('capell-admin::form.label'))
+            ->requiredIf('type', NavigationItemType::Link->value)
+            ->requiredIf('type', NavigationItemType::ExternalLink->value)
+            ->requiredIf('type', NavigationItemType::Heading->value)
+            ->helperText(
+                function (Get $get): ?string {
+                    if (! in_array($get('type'), [NavigationItemType::Link->value, NavigationItemType::ExternalLink->value], true)) {
+                        return null;
+                    }
+
+                    $text = __('capell-admin::generic.navigation_page_label_info');
+
+                    return is_string($text) ? $text : null;
+                },
+            );
+    }
+}

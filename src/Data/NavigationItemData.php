@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Capell\Navigation\Data;
+
+use Capell\Core\Contracts\Pageable;
+use Capell\Navigation\Enums\NavigationItemType;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
+
+class NavigationItemData extends Data
+{
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  DataCollection<int|string, NavigationItemData>|null  $children
+     */
+    public function __construct(
+        public ?string $label = null,
+        public NavigationItemType $type = NavigationItemType::Link,
+        public array $data = [],
+        #[DataCollectionOf(self::class)]
+        public ?DataCollection $children = null,
+        public ?bool $active = null,
+        public bool $is_visible = true,
+        public ?string $key = null,
+    ) {
+        $this->children ??= new DataCollection(self::class, []);
+    }
+
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return DataCollection<int|string, NavigationItemData>
+     */
+    public static function fromPages(Collection $pages): DataCollection
+    {
+        return new DataCollection(self::class, self::mapPages($pages)->values()->all());
+    }
+
+    /**
+     * @param  Collection<array-key, mixed>  $pages
+     * @return Collection<array-key, mixed>
+     */
+    private static function mapPages(Collection $pages): Collection
+    {
+        return $pages->map(function (Pageable $page): self {
+            $translation = $page->translation;
+            $pageUrl = $page->pageUrl;
+
+            return new NavigationItemData(
+                label: $translation->label ?? $page->name,
+                type: NavigationItemType::Page,
+                data: [
+                    'url' => $pageUrl->full_url ?? '#',
+                    'pageable_id' => $page->getKey(),
+                    'pageable_type' => $page->getMorphClass(),
+                ],
+                children: self::fromPages($page->children),
+            );
+        });
+    }
+}
