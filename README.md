@@ -2,7 +2,7 @@
 
 <!-- prettier-ignore-start -->
 
-## What This Extension Adds
+## What This Plugin Adds
 
 Navigation is an **Available**, **Schema-owning** Capell package in the **Capell Foundation** product group. It ships as `capell-app/navigation` and extends these surfaces: admin, frontend, console.
 
@@ -29,11 +29,15 @@ Status details:
 
 Screenshot contract: `docs/screenshots.json`.
 
+![Navigation admin index](docs/screenshots/navigation-admin-index.png)
+
+![Create/edit navigation form](docs/screenshots/create-edit-navigation-form.png)
+
 - Navigation admin index (admin, required).
 - Create/edit navigation form (admin, required).
-- Site relation manager for navigations (admin, required).
+- Site relation manager for navigations (admin, optional).
 - Page form navigation tab (admin, required).
-- Frontend menu output (frontend, required).
+- Frontend menu output (frontend, optional).
 
 ## Technical Shape
 
@@ -65,7 +69,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Install Impact
 
 - Admin navigation: adds package-owned Filament classes when registered.
-- Permissions: none declared in `capell.json`.
+- Permissions: `ViewAny:Navigation`, `View:Navigation`, `Create:Navigation`, `Update:Navigation`, `Delete:Navigation`, `DeleteAny:Navigation`, `Restore:Navigation`, `RestoreAny:Navigation`, `ForceDelete:Navigation`, `ForceDeleteAny:Navigation`, `Reorder:Navigation`.
 - Public routes: route files exist and must be reviewed before public enablement.
 - Database changes: package migrations are declared.
 - Settings: no package settings declared.
