@@ -69,7 +69,7 @@ class NavigationDemoCreator
     {
         $pages = Page::query()
             ->whereHas(
-                'type',
+                'blueprint',
                 fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
             ->with('children')
@@ -98,7 +98,7 @@ class NavigationDemoCreator
     {
         $pages = Page::query()
             ->whereHas(
-                'type',
+                'blueprint',
                 fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
             ->with('children')
