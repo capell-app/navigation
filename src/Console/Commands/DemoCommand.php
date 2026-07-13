@@ -69,7 +69,7 @@ class DemoCommand extends Command
 
         if (is_string($siteOptions) && $siteOptions !== '') {
             $siteOptions = explode(',', $siteOptions);
-        } elseif (! is_array($siteOptions)) {
+        } else {
             $siteOptions = null;
         }
 
@@ -91,10 +91,6 @@ class DemoCommand extends Command
 
         if (is_string($languageOption) && $languageOption !== '') {
             return explode(',', $languageOption);
-        }
-
-        if (is_array($languageOption)) {
-            return $languageOption;
         }
 
         return null;

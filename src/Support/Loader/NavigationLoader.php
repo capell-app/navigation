@@ -115,10 +115,10 @@ class NavigationLoader
                 ->find($id);
         });
 
-        if ($fromCache && $navigation !== null) {
+        if ($fromCache && $navigation instanceof Navigation) {
             resolve(RenderedModelTracker::class)->track($navigation);
         }
 
-        return $navigation;
+        return $navigation instanceof Navigation ? $navigation : null;
     }
 }

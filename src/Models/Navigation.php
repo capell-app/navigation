@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as AuthenticatableUser;
+use Illuminate\Support\Carbon;
 use Override;
 use Spatie\LaravelData\DataCollection;
 
@@ -39,7 +40,7 @@ use Spatie\LaravelData\DataCollection;
  * @property DataCollection<int, NavigationItemData>|array<int|string, mixed>|null $items
  * @property array<array-key, mixed>|null $meta
  * @property CarbonImmutable|null $visible_from
- * @property string|null $visible_until
+ * @property Carbon|null $visible_until
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property int|null $deleted_by

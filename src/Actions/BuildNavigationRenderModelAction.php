@@ -186,6 +186,12 @@ class BuildNavigationRenderModelAction
             return null;
         }
 
+        $domain = $context->siteDomain->domain;
+
+        if (! is_string($domain)) {
+            return null;
+        }
+
         $payload = Crypt::encryptString(json_encode([
             'version' => 1,
             'expires_at' => now()->addMinutes(5)->getTimestamp(),
@@ -200,7 +206,7 @@ class BuildNavigationRenderModelAction
             'site' => $this->integerKey($context->site->getKey()),
             'language' => $this->integerKey($context->language->getKey()),
             'domain' => $this->integerKey($context->siteDomain->getKey()),
-            'host' => strtolower($context->siteDomain->domain),
+            'host' => strtolower($domain),
         ], JSON_THROW_ON_ERROR));
 
         return route('capell-navigation.children', ['payload' => $payload]);

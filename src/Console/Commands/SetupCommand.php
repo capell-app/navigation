@@ -66,7 +66,7 @@ class SetupCommand extends Command
 
         if (is_string($siteOptions) && $siteOptions !== '') {
             $siteOptions = explode(',', $siteOptions);
-        } elseif (! is_array($siteOptions)) {
+        } else {
             $siteOptions = null;
         }
 

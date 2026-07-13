@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\View;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Throwable;
+use UnexpectedValueException;
 
 /**
  * @method static string|null run(string $payload, string $requestHost)
@@ -96,12 +97,13 @@ class BuildNavigationChildFragmentAction
             || $navigation->visible_from?->getTimestamp() !== $data['visible_from']
             || $navigation->visible_until?->getTimestamp() !== $data['visible_until']
             || ! $navigation->newQuery()->whereKey($navigation->getKey())->publishedDate()->exists()
-            || (int) $siteDomain->site_id !== (int) $site->getKey()
-            || (int) $siteDomain->language_id !== (int) $language->getKey()
+            || $siteDomain->site_id !== $this->integerKey($site->getKey())
+            || $siteDomain->language_id !== $this->integerKey($language->getKey())
+            || ! is_string($siteDomain->domain)
             || strtolower($siteDomain->domain) !== $data['host']
-            || (int) $page->site_id !== (int) $site->getKey()
-            || ($navigation->site_id !== null && (int) $navigation->site_id !== (int) $site->getKey())
-            || ($navigation->language_id !== null && (int) $navigation->language_id !== (int) $language->getKey())) {
+            || $page->site_id !== $this->integerKey($site->getKey())
+            || ($navigation->site_id !== null && $navigation->site_id !== $this->integerKey($site->getKey()))
+            || ($navigation->language_id !== null && $navigation->language_id !== $this->integerKey($language->getKey()))) {
             return null;
         }
 
@@ -112,6 +114,15 @@ class BuildNavigationChildFragmentAction
             language: $language,
             siteDomain: $siteDomain,
         );
+    }
+
+    private function integerKey(mixed $key): int
+    {
+        if (! is_int($key)) {
+            throw new UnexpectedValueException('Expected an integer model key.');
+        }
+
+        return $key;
     }
 
     /**

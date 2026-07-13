@@ -72,17 +72,27 @@ it('returns a lazy navigation child fragment for a valid public payload', functi
         ->assertSee($currentPage->translation->label)
         ->assertSee('is-active');
 
-    parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
-    expect(BuildNavigationChildFragmentAction::run((string) $query['payload'], 'attacker.test'))->toBeNull();
-    $locator = json_decode(Crypt::decryptString((string) $query['payload']), true, flags: JSON_THROW_ON_ERROR);
-    $locator['expires_at'] = now()->subSecond()->getTimestamp();
-    $expiredUrl = route('capell-navigation.children', [
-        'payload' => Crypt::encryptString(json_encode($locator, JSON_THROW_ON_ERROR)),
-    ]);
+    $queryString = parse_url($url, PHP_URL_QUERY);
+    expect($queryString)->toBeString();
+    parse_str(is_string($queryString) ? $queryString : '', $query);
+    $payload = $query['payload'] ?? null;
+    expect($payload)->toBeString();
+    $payload = is_string($payload) ? $payload : '';
+    expect(BuildNavigationChildFragmentAction::run($payload, 'attacker.test'))->toBeNull();
+    $locator = json_decode(Crypt::decryptString($payload), true, flags: JSON_THROW_ON_ERROR);
+    expect($locator)->toBeArray()->toHaveKey('expires_at');
 
-    $this->get($expiredUrl)->assertNotFound();
+    if (! is_array($locator)) {
+        throw new LogicException('Expected a decoded navigation locator.');
+    }
 
-    $navigation->update(['name' => 'Changed after locator issue']);
+    $locator['expires_at'] = now()->subSeconds(2)->getTimestamp();
+    $expiredPayload = Crypt::encryptString(json_encode($locator, JSON_THROW_ON_ERROR));
+    expect(BuildNavigationChildFragmentAction::run($expiredPayload, 'localhost'))->toBeNull();
+
+    $navigation->name = 'Changed after locator issue';
+    $navigation->updated_at = now()->addSecond();
+    $navigation->save();
 
     $this->get($url)->assertNotFound();
 });
