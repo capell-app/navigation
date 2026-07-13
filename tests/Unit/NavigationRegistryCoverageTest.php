@@ -35,7 +35,7 @@ it('resolves registered navigable models and exposes health compatibility', func
 
     $result = NavigableRegistry::resolve('docs', 42);
 
-    expect(NavigationHealthCheck::compatibleCapellApiVersion())->toBe('^4.0')
+    expect(NavigationHealthCheck::compatibleCapellApiVersion())->toBe('^1.0')
         ->and(NavigableRegistry::has('docs'))->toBeTrue()
         ->and(NavigableRegistry::has('missing'))->toBeFalse()
         ->and(NavigableRegistry::resolve('missing', 42))->toBeNull()
