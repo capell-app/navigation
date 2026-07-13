@@ -275,8 +275,6 @@ it('declares shipped marketplace images and screenshot captures', function (): v
         'docs/assets/marketplace/extension-card.jpg',
         'docs/screenshots/create-edit-navigation-form.png',
         'docs/screenshots/create-edit-navigation-form-dark.png',
-        'docs/screenshots/site-relation-manager-for-navigations.png',
-        'docs/screenshots/site-relation-manager-for-navigations-dark.png',
     ];
 
     expect($marketplacePaths)->toEqual($expectedMarketplacePaths);
@@ -302,8 +300,6 @@ it('declares shipped marketplace images and screenshot captures', function (): v
     expect($declaredScreenshotPaths)->toEqual([
         'docs/screenshots/create-edit-navigation-form-dark.png',
         'docs/screenshots/create-edit-navigation-form.png',
-        'docs/screenshots/site-relation-manager-for-navigations-dark.png',
-        'docs/screenshots/site-relation-manager-for-navigations.png',
     ]);
 });
 
