@@ -28,6 +28,7 @@ use Capell\Navigation\Console\Commands\DemoCommand;
 use Capell\Navigation\Console\Commands\SetupCommand;
 use Capell\Navigation\Contracts\NavigationNamesResolver;
 use Capell\Navigation\Contracts\NavigationPageSyncer;
+use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Filament\Extenders\NavigationPageSchemaExtender;
 use Capell\Navigation\Filament\Extenders\NavigationSiteExtender;
@@ -244,11 +245,12 @@ final class NavigationServiceProvider extends ServiceProvider
         }
 
         $registrar = $this->app->make(FrontendHookRegistrar::class);
-        $hook = new RegisterFoundationHeaderNavigationHook;
+        $defaultHook = new RegisterFoundationHeaderNavigationHook;
+        $foundationHook = new RegisterFoundationHeaderNavigationHook(HeaderNavigationBreakpoint::Xl);
 
         $registrar->contribute(
             location: RenderHookLocation::HeaderAfter,
-            extension: $hook,
+            extension: $defaultHook,
             owner: self::$packageName,
             key: 'foundation-header-navigation-default',
             scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
@@ -258,7 +260,7 @@ final class NavigationServiceProvider extends ServiceProvider
 
         $registrar->contribute(
             location: RenderHookLocation::HeaderAfter,
-            extension: $hook,
+            extension: $foundationHook,
             owner: self::$packageName,
             key: 'foundation-header-navigation-foundation',
             scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
@@ -278,11 +280,12 @@ final class NavigationServiceProvider extends ServiceProvider
             return $this;
         }
 
-        $hook = new RegisterFoundationHeaderNavigationHook;
+        $defaultHook = new RegisterFoundationHeaderNavigationHook;
+        $foundationHook = new RegisterFoundationHeaderNavigationHook(HeaderNavigationBreakpoint::Xl);
 
         $registry->contribute(RenderHookContributionData::extension(
             location: RenderHookLocation::HeaderAfter,
-            extension: $hook,
+            extension: $defaultHook,
             owner: self::$packageName,
             key: 'foundation-header-navigation-default',
             scenario: RegisterFoundationHeaderNavigationHook::DefaultScenario,
@@ -292,7 +295,7 @@ final class NavigationServiceProvider extends ServiceProvider
 
         $registry->contribute(RenderHookContributionData::extension(
             location: RenderHookLocation::HeaderAfter,
-            extension: $hook,
+            extension: $foundationHook,
             owner: self::$packageName,
             key: 'foundation-header-navigation-foundation',
             scenario: RegisterFoundationHeaderNavigationHook::FoundationScenario,
