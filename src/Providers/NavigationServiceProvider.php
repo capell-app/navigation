@@ -8,6 +8,7 @@ use Capell\Admin\Data\AdminSurfaceContributionData;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Data\PageTypeData;
+use Capell\Core\Data\VendorAssetData;
 use Capell\Core\Events\PageUrlChanged;
 use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
@@ -195,6 +196,9 @@ final class NavigationServiceProvider extends ServiceProvider
 
     private function registerPackageAssets(): self
     {
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindSource('resources/views/**/*.blade.php', self::$packageName),
+        );
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'capell-navigation');
         View::composer([
