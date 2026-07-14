@@ -1,6 +1,7 @@
 @props ([
     'item' => [],
     'itemClass',
+    'breakpoint' => \Capell\Navigation\Enums\HeaderNavigationBreakpoint::Lg,
 ])
 @php
     use Capell\Frontend\Facades\Frontend;
@@ -32,10 +33,7 @@
         @if ($rel !== null) rel="{{ $rel }}" @endif
     >
         <span
-            @class ([
-                'lg:order-2',
-                'lg:sr-only' => ! empty($item->data['hide_label']),
-            ])
+            class="{{ $breakpoint->itemLabelClasses(! empty($item->data['hide_label'])) }}"
         >
             {{ $item->label }}
         </span>
@@ -43,7 +41,7 @@
         @if (! empty($item->data['icon']))
             <x-dynamic-component
                 :component="$item->active ? ($item->data['active_icon'] ?? str_replace('heroicon-o-', 'heroicon-s-', $item->data['icon'])) : $item->data['icon']"
-                class="h-4 w-4 lg:order-1"
+                class="{{ $breakpoint->itemIconClasses() }}"
             />
         @endif
     </a>
