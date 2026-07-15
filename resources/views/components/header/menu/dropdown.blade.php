@@ -5,6 +5,7 @@
     'dropdownName' => 'header-menu',
     'navigation',
     'item',
+    'breakpoint' => \Capell\Navigation\Enums\HeaderNavigationBreakpoint::Lg,
 ])
 @php
     use Capell\Frontend\Facades\Frontend;
@@ -21,18 +22,13 @@
         ? NavigationDropdownLayout::Mega
         : NavigationDropdownLayout::Dropdown;
     $megaColumns = max(1, min(4, is_numeric($item->data['mega_columns'] ?? null) ? (int) $item->data['mega_columns'] : 3));
-    $megaColumnClass = match ($megaColumns) {
-        1 => 'lg:grid-cols-1',
-        2 => 'lg:grid-cols-2',
-        4 => 'lg:grid-cols-4',
-        default => 'lg:grid-cols-3',
-    };
+    $megaColumnClass = $breakpoint->megaColumnClass($megaColumns);
     $hasMegaPanel = $dropdownLayout === NavigationDropdownLayout::Mega
         && (! empty($item->data['mega_panel_heading']) || ! empty($item->data['mega_panel_description']));
 @endphp
 
 @if (! $usesAlpine)
-    <li class="capell-navigation-menu-dropdown flex flex-col lg:flex-row">
+    <li class="{{ $breakpoint->dropdownWithoutAlpineClasses() }}">
         <a
             href="{{ SafeUrl::sanitise($item->data['url'] ?? null) ?? '#' }}"
             @class ([
@@ -46,7 +42,7 @@
             <span>{{ $item->label }}</span>
         </a>
 
-        <ul class="flex flex-col lg:flex-row">
+        <ul class="{{ $breakpoint->dropdownChildrenClasses() }}">
             @foreach ($item->children as $id => $child)
                 @if ($child->children->count() > 0)
                     @include ('capell-navigation::components.header.menu.dropdown', [
@@ -56,6 +52,7 @@
                         'navigation' => $navigation,
                         'index' => $loop->index,
                         'itemClass' => $itemClass,
+                        'breakpoint' => $breakpoint,
                     ])
                 @else
                     <x-capell-navigation::header.menu.item
@@ -64,6 +61,7 @@
                         :navigation="$navigation"
                         :index="$loop->index"
                         :item-class="$itemClass"
+                        :breakpoint="$breakpoint"
                     />
                 @endif
             @endforeach
@@ -74,14 +72,14 @@
         :name="$currentDropdownName"
         background="bg-white"
         @class([
-            'rounded-xl border border-slate-200 p-2 shadow-xl shadow-slate-900/10 max-lg:inset-0 max-lg:rounded-none max-lg:border-0 max-lg:shadow-none',
-            'lg:w-max lg:min-w-72' => $dropdownLayout === NavigationDropdownLayout::Dropdown,
-            'lg:left-1/2 lg:w-[min(72rem,calc(100vw-2rem))] lg:-translate-x-1/2 lg:p-4' => $dropdownLayout === NavigationDropdownLayout::Mega,
+            $breakpoint->dropdownPanelClasses(),
+            $breakpoint->dropdownWidthClasses() => $dropdownLayout === NavigationDropdownLayout::Dropdown,
+            $breakpoint->megaDropdownClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
         ])
         container-tag="li"
-        container-class="group flex lg:relative"
+        :container-class="$breakpoint->dropdownContainerClasses()"
         panel-tag="div"
-        panel-click-outside="window.matchMedia('(min-width: {{ config('capell-frontend.breakpoints.lg') }}px)').matches ? close($refs['{{ $currentDropdownName }}_toggle']) : null"
+        panel-click-outside="window.matchMedia('{{ $breakpoint->desktopMediaQuery() }}').matches ? close($refs['{{ $currentDropdownName }}_toggle']) : null"
         panel-hidden-class="pointer-events-none invisible opacity-0"
         panel-visible-class="visible opacity-100"
         :stop-trigger-click-propagation="true"
@@ -108,18 +106,18 @@
 
             <span
                 @class ([
-                    'mr-1 lg:sr-only' => ! empty($item->data['hide_label']),
+                    $breakpoint->hiddenLabelClasses() => ! empty($item->data['hide_label']),
                 ])
             >
                 {{ $item->label }}
             </span>
 
-            @svg ('heroicon-o-chevron-right', '-mr-2 ml-auto h-4 w-4 text-gray-400 group-hover:text-inherit group-focus:text-inherit lg:rotate-90')
+            @svg ('heroicon-o-chevron-right', $breakpoint->chevronClasses())
         </x-slot:trigger>
 
         <ul class="flex flex-col gap-1">
             <li
-                class="nav-item-dropdown-header border-b border-gray-200 pb-1 lg:hidden dark:border-gray-700"
+                class="nav-item-dropdown-header border-b border-gray-200 pb-1 {{ $breakpoint->mobileOnlyClass() }} dark:border-gray-700"
             >
                 <button
                     type="button"
@@ -138,9 +136,9 @@
         <div
             @class ([
                 'flex flex-col gap-1',
-                'lg:grid lg:gap-3' => $dropdownLayout === NavigationDropdownLayout::Mega,
+                $breakpoint->megaGridClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
                 $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && ! $hasMegaPanel,
-                'lg:grid-cols-[minmax(12rem,18rem)_1fr]' => $hasMegaPanel,
+                $breakpoint->megaPanelGridClasses() => $hasMegaPanel,
             ])
             @if ($dropdownLayout === NavigationDropdownLayout::Mega) data-capell-navigation-mega-menu @endif
         >
@@ -177,7 +175,7 @@
             <ul
                 @class ([
                     'flex flex-col gap-1',
-                    'lg:grid lg:gap-1' => $dropdownLayout === NavigationDropdownLayout::Mega,
+                    $breakpoint->megaChildrenGridClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
                     $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && $hasMegaPanel,
                 ])
             >
@@ -189,6 +187,7 @@
                             'item' => $child,
                             'navigation' => $navigation,
                             'index' => $loop->index,
+                            'breakpoint' => $breakpoint,
                         ])
                     @else
                         <li class="nav-item">
