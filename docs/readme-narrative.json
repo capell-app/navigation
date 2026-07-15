@@ -1,0 +1,39 @@
+{
+    "whatThisPluginAdds": {
+        "text": "Navigation adds site- and language-scoped menus with page links, external links, nested items, publication state, and reusable handles.",
+        "evidence": [
+            "src/Providers/NavigationServiceProvider.php",
+            "src/Actions/AddPageToNavigationAction.php",
+            "src/Support/Registry/NavigationHandleRegistry.php",
+            "tests/Feature/Filament/Resources/Navigation/NavigationResourceTest.php"
+        ]
+    },
+    "surfaceOutcome": {
+        "text": "Editors build and order menus in admin, and public themes receive hydrated navigation with safe URLs, active states, and nested children.",
+        "evidence": [
+            "src/Actions/BuildNavigationRenderModelAction.php",
+            "src/Support/SafeUrl.php",
+            "tests/Feature/Components/NavigationMenuTest.php",
+            "tests/Feature/Components/NavigationMenuSafeUrlTest.php"
+        ]
+    },
+    "whyItMatters": {
+        "developers": {
+            "text": "The navigable and handle registries let packages contribute linkable records and named menus without reaching into Navigation internals.",
+            "evidence": [
+                "src/Support/Registry/NavigableRegistry.php",
+                "src/Support/Registry/NavigationHandleRegistry.php",
+                "src/Contracts/NavigationNamesResolver.php",
+                "tests/Integration/Actions/BuildNavigationRenderModelActionTest.php"
+            ]
+        },
+        "teams": {
+            "text": "Editors can keep site menus current, reorder links, and reuse the same menu structure across theme output without code changes.",
+            "evidence": [
+                "docs/overview.admin.md",
+                "src/Actions/RemovePageFromNavigationAction.php",
+                "src/Actions/SyncNavigationPageReferencesAction.php"
+            ]
+        }
+    }
+}
