@@ -5,7 +5,10 @@ declare(strict_types=1);
 use Capell\Core\Facades\CapellCore;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
 use Capell\Navigation\Providers\NavigationServiceProvider;
+use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
+use Capell\Navigation\View\Components\Header\MainNavigation;
 use Symfony\Component\Process\Process;
 
 it('registers the foundation header navigation render hook from the navigation package', function (): void {
@@ -20,6 +23,38 @@ it('registers the foundation header navigation render hook from the navigation p
         ->and($hook)->toContain('theme-foundation-primary-navigation')
         ->and($hook)->toContain('capell::header.index')
         ->and($hook)->toContain('capell-navigation::components.header.main-navigation');
+});
+
+it('uses a finite responsive contract for default and foundation header navigation', function (): void {
+    $provider = navigationFileContents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
+
+    expect(HeaderNavigationBreakpoint::cases())->toBe([
+        HeaderNavigationBreakpoint::Lg,
+        HeaderNavigationBreakpoint::Xl,
+    ])
+        ->and((new MainNavigation)->breakpoint)->toBe(HeaderNavigationBreakpoint::Lg)
+        ->and((new MainNavigation(breakpoint: HeaderNavigationBreakpoint::Xl))->breakpoint)->toBe(HeaderNavigationBreakpoint::Xl)
+        ->and(HeaderNavigationBreakpoint::Lg->mobileMediaQuery())->toBe('(max-width: 1023px)')
+        ->and(HeaderNavigationBreakpoint::Xl->mobileMediaQuery())->toBe('(max-width: 1279px)')
+        ->and(HeaderNavigationBreakpoint::Lg->navItemsClasses())->toContain('lg:flex-nowrap')->not->toContain('xl:')
+        ->and(HeaderNavigationBreakpoint::Xl->navItemsClasses())->toContain('xl:flex-nowrap')->not->toContain('lg:')
+        ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook(HeaderNavigationBreakpoint::Xl)');
+});
+
+it('registers default lg and foundation xl hook instances without mixed state', function (): void {
+    $provider = new NavigationServiceProvider(app());
+    $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
+    $breakpointProperty = new ReflectionProperty(RegisterFoundationHeaderNavigationHook::class, 'breakpoint');
+    $registry = new RenderHookRegistry;
+
+    $registerHooks->invoke($provider, $registry);
+
+    $extensions = $registry->get(RenderHookLocation::HeaderAfter);
+
+    expect($extensions[0] ?? null)->toBeInstanceOf(RegisterFoundationHeaderNavigationHook::class)
+        ->and($extensions[1] ?? null)->toBeInstanceOf(RegisterFoundationHeaderNavigationHook::class)
+        ->and($breakpointProperty->getValue($extensions[0] ?? null))->toBe(HeaderNavigationBreakpoint::Lg)
+        ->and($breakpointProperty->getValue($extensions[1] ?? null))->toBe(HeaderNavigationBreakpoint::Xl);
 });
 
 it('owns accessible header menu controls in the navigation package', function (): void {
@@ -46,8 +81,8 @@ it('owns accessible header menu controls in the navigation package', function ()
         ->and($navigation)->toContain('menuTransitionTimeout')
         ->and($navigation)->toContain('window.clearTimeout(this.menuTransitionTimeout)')
         ->and($navigation)->toContain('isClosingMenu')
-        ->and($navigation)->toContain("'max-lg:invisible' => \$usesAlpine")
-        ->and($navigation)->toContain("'max-lg:!visible max-lg:translate-x-[-100%]'")
+        ->and($navigation)->toContain('$breakpoint->mobileInvisibleClass()')
+        ->and($navigation)->toContain('$breakpoint->navbarClosingClasses()')
         ->and($navigation)->toContain('x-on:keydown.tab="trapFocus($event)"')
         ->and($navigation)->toContain('capell-navigation-menu-open-changed')
         ->and($navigation)->toContain('x-bind:aria-label=')
@@ -61,7 +96,7 @@ it('lets active header item icons inherit the active link colour', function (): 
         ->and($item)->not->toContain("'text-primary' => \$item->active");
 });
 
-it('only releases mobile menu inert attributes owned by navigation', function (): void {
+it('only releases mobile menu inert attributes owned by navigation', function (HeaderNavigationBreakpoint $breakpoint): void {
     $nodeVersion = new Process(['node', '--version']);
     $nodeVersion->run();
 
@@ -69,7 +104,11 @@ it('only releases mobile menu inert attributes owned by navigation', function ()
         $this->markTestSkipped('Node.js is required to run the navigation behavior test.');
     }
 
-    $navigation = navigationFileContents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php');
+    $navigation = str_replace(
+        '{{ $breakpoint->mobileMediaQuery() }}',
+        $breakpoint->mobileMediaQuery(),
+        navigationFileContents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php'),
+    );
 
     $matchCount = preg_match('#<script>\s*(.*?)\s*document\.addEventListener#s', $navigation, $matches);
 
@@ -203,7 +242,10 @@ it('only releases mobile menu inert attributes owned by navigation', function ()
     }
 
     expect($process->isSuccessful())->toBeTrue();
-});
+})->with([
+    'default lg breakpoint' => HeaderNavigationBreakpoint::Lg,
+    'foundation xl breakpoint' => HeaderNavigationBreakpoint::Xl,
+]);
 
 function navigationFileContents(string $path): string
 {

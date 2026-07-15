@@ -3,13 +3,24 @@
     use Capell\Frontend\Facades\Frontend;
     use Capell\Frontend\Support\Render\RenderHookRegistry;
     use Capell\Navigation\Data\NavigationRenderData;
+    use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
     use Capell\Navigation\Models\Navigation;
 
     $theme = Frontend::theme();
     $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
     $usesAlpine = $runtimeManifest?->usesAlpine ?? false;
     $items = ($menu ?? null) instanceof NavigationRenderData ? $menu->items : collect();
+    $breakpoint = ($breakpoint ?? null) instanceof HeaderNavigationBreakpoint ? $breakpoint : HeaderNavigationBreakpoint::Lg;
 @endphp
+
+{{--
+    Tailwind breakpoint safelist. HeaderNavigationBreakpoint owns selection,
+    while these complete static tokens keep both finite variants discoverable.
+    dark:lg:bg-transparent lg:!bg-transparent lg:-translate-x-1/2 lg:bg-transparent lg:border-0 lg:divide-none lg:flex lg:flex-nowrap lg:flex-row lg:gap-1 lg:gap-3 lg:gap-x-3 lg:grid lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-[minmax(12rem,18rem)_1fr] lg:h-10 lg:h-auto lg:hidden lg:items-center lg:justify-center lg:justify-end lg:justify-start lg:left-1/2 lg:max-w-none lg:min-w-72 lg:ml-auto lg:mt-0 lg:order-1 lg:order-2 lg:overflow-visible lg:p-0 lg:p-4 lg:px-0 lg:px-4 lg:py-1 lg:py-2 lg:relative lg:rotate-90 lg:rounded-full lg:sr-only lg:static lg:transition-none lg:translate-x-0 lg:visible lg:w-10 lg:w-[min(72rem,calc(100vw-2rem))] lg:w-auto lg:w-max
+    max-lg:!translate-x-0 max-lg:!visible max-lg:absolute max-lg:bg-transparent max-lg:border-0 max-lg:bottom-0 max-lg:fixed max-lg:h-dvh max-lg:inset-0 max-lg:invisible max-lg:justify-start max-lg:max-w-[22rem] max-lg:rounded-none max-lg:shadow-none max-lg:translate-x-[-100%] max-lg:w-screen max-lg:z-40
+    dark:xl:bg-transparent xl:!bg-transparent xl:-translate-x-1/2 xl:bg-transparent xl:border-0 xl:divide-none xl:flex xl:flex-nowrap xl:flex-row xl:gap-1 xl:gap-3 xl:gap-x-3 xl:grid xl:grid-cols-1 xl:grid-cols-2 xl:grid-cols-3 xl:grid-cols-4 xl:grid-cols-[minmax(12rem,18rem)_1fr] xl:h-10 xl:h-auto xl:hidden xl:items-center xl:justify-center xl:justify-end xl:justify-start xl:left-1/2 xl:max-w-none xl:min-w-72 xl:ml-auto xl:mt-0 xl:order-1 xl:order-2 xl:overflow-visible xl:p-0 xl:p-4 xl:px-0 xl:px-4 xl:py-1 xl:py-2 xl:relative xl:rotate-90 xl:rounded-full xl:sr-only xl:static xl:transition-none xl:translate-x-0 xl:visible xl:w-10 xl:w-[min(72rem,calc(100vw-2rem))] xl:w-auto xl:w-max
+    max-xl:!translate-x-0 max-xl:!visible max-xl:absolute max-xl:bg-transparent max-xl:border-0 max-xl:bottom-0 max-xl:fixed max-xl:h-dvh max-xl:inset-0 max-xl:invisible max-xl:justify-start max-xl:max-w-[22rem] max-xl:rounded-none max-xl:shadow-none max-xl:translate-x-[-100%] max-xl:w-screen max-xl:z-40
+--}}
 
 @if (($menu ?? null) instanceof NavigationRenderData && $items->isNotEmpty())
     @if ($usesAlpine)
@@ -23,11 +34,10 @@
                 menuTransitionTimeout: null,
                 init() {
                     this.mobileMenuMediaQuery = window.matchMedia(
-                        '(max-width: 1023px)',
+                        '{{ $breakpoint->mobileMediaQuery() }}',
                     )
                     this.closeMenuListener = () => this.closeMenu()
-                    this.mobileMenuMediaListener = () =>
-                        this.handleMobileMenuMediaChange()
+                    this.mobileMenuMediaListener = () => this.handleMobileMenuMediaChange()
 
                     this.$watch('isMenuOpen', (value) => {
                         if (!value && !this.isMobileMenuViewport()) {
@@ -52,10 +62,7 @@
                         this.dispatchOverlayState()
                     })
 
-                    window.addEventListener(
-                        'close-menu',
-                        this.closeMenuListener,
-                    )
+                    window.addEventListener('close-menu', this.closeMenuListener)
                     this.mobileMenuMediaQuery.addEventListener(
                         'change',
                         this.mobileMenuMediaListener,
@@ -64,10 +71,7 @@
                     this.setPageInert(false)
                 },
                 destroy() {
-                    window.removeEventListener(
-                        'close-menu',
-                        this.closeMenuListener,
-                    )
+                    window.removeEventListener('close-menu', this.closeMenuListener)
                     this.mobileMenuMediaQuery?.removeEventListener(
                         'change',
                         this.mobileMenuMediaListener,
@@ -100,7 +104,7 @@
                 isMobileMenuViewport() {
                     return (
                         this.mobileMenuMediaQuery?.matches ??
-                        window.matchMedia('(max-width: 1023px)').matches
+                        window.matchMedia('{{ $breakpoint->mobileMediaQuery() }}').matches
                     )
                 },
                 handleMobileMenuMediaChange() {
@@ -138,18 +142,13 @@
                     ]
 
                     return elements.filter((element) => {
-                        if (!element || element.disabled || element.inert)
-                            return false
-                        if (element.closest('[inert], [aria-hidden="true"]'))
-                            return false
+                        if (!element || element.disabled || element.inert) return false
+                        if (element.closest('[inert], [aria-hidden="true"]')) return false
                         if (element.getClientRects().length === 0) return false
 
                         const style = window.getComputedStyle(element)
 
-                        return (
-                            style.visibility !== 'hidden' &&
-                            style.display !== 'none'
-                        )
+                        return style.visibility !== 'hidden' && style.display !== 'none'
                     })
                 },
                 focusFirstMenuItem() {
@@ -175,19 +174,13 @@
                     const firstElement = elements[0]
                     const lastElement = elements[elements.length - 1]
 
-                    if (
-                        event.shiftKey &&
-                        document.activeElement === firstElement
-                    ) {
+                    if (event.shiftKey && document.activeElement === firstElement) {
                         event.preventDefault()
                         lastElement.focus()
                         return
                     }
 
-                    if (
-                        !event.shiftKey &&
-                        document.activeElement === lastElement
-                    ) {
+                    if (!event.shiftKey && document.activeElement === lastElement) {
                         event.preventDefault()
                         firstElement.focus()
                     }
@@ -195,8 +188,7 @@
                 setPageInert(value) {
                     const shouldInert = value && this.isMobileMenuViewport()
                     const inertAttribute = 'data-capell-navigation-inert'
-                    const ariaHiddenAttribute =
-                        'data-capell-navigation-aria-hidden'
+                    const ariaHiddenAttribute = 'data-capell-navigation-aria-hidden'
                     const applyNavigationInert = (element) => {
                         if (!element.hasAttribute('inert')) {
                             element.setAttribute('inert', '')
@@ -214,26 +206,22 @@
                             element.removeAttribute(inertAttribute)
                         }
 
-                        if (
-                            element.getAttribute(ariaHiddenAttribute) === 'true'
-                        ) {
+                        if (element.getAttribute(ariaHiddenAttribute) === 'true') {
                             element.removeAttribute('aria-hidden')
                             element.removeAttribute(ariaHiddenAttribute)
                         }
                     }
 
-                    document
-                        .querySelectorAll('main, footer')
-                        .forEach((element) => {
-                            if (this.$el.contains(element)) return
+                    document.querySelectorAll('main, footer').forEach((element) => {
+                        if (this.$el.contains(element)) return
 
-                            if (shouldInert) {
-                                applyNavigationInert(element)
-                                return
-                            }
+                        if (shouldInert) {
+                            applyNavigationInert(element)
+                            return
+                        }
 
-                            releaseNavigationInert(element)
-                        })
+                        releaseNavigationInert(element)
+                    })
 
                     this.$el
                         .closest('header')
@@ -254,10 +242,7 @@
             })
 
             document.addEventListener('alpine:init', () => {
-                Alpine.data(
-                    'capellHeaderNavigation',
-                    window.capellHeaderNavigation,
-                )
+                Alpine.data('capellHeaderNavigation', window.capellHeaderNavigation)
             })
         </script>
     @endif
@@ -271,9 +256,7 @@
         class="capell-navigation-header contents"
     >
         @if ($usesAlpine)
-            <div
-                class="absolute top-[max(2vh,14px)] right-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden"
-            >
+            <div class="{{ $breakpoint->menuToggleClasses() }}">
                 <button
                     type="button"
                     x-ref="toggleMenu"
@@ -303,19 +286,19 @@
         <div
             id="menu"
             @class ([
-                'menu-wrapper relative flex h-full w-full grow justify-center bg-[var(--bg-color-header)] max-lg:fixed max-lg:inset-0 max-lg:z-40 max-lg:h-dvh max-lg:w-screen max-lg:justify-start max-lg:bg-transparent lg:visible lg:w-auto lg:justify-end lg:!bg-transparent',
-                'max-lg:invisible' => $usesAlpine,
+                $breakpoint->menuWrapperClasses(),
+                $breakpoint->mobileInvisibleClass() => $usesAlpine,
                 'visible' => ! $usesAlpine,
             ])
             @if ($usesAlpine)
                 x-bind:class="
-                    isMenuOpen || isClosingMenu ? 'visible' : 'max-lg:invisible'
+                    isMenuOpen || isClosingMenu ? 'visible' : '{{ $breakpoint->mobileInvisibleClass() }}'
                 "
             @endif
         >
             @if ($usesAlpine)
                 <div
-                    class="menu-backdrop fixed inset-0 z-30 h-dvh w-screen bg-black/65 backdrop-blur-sm lg:hidden"
+                    class="{{ $breakpoint->backdropClasses() }}"
                     x-on:click="closeMenu($refs.toggleMenu)"
                 ></div>
             @endif
@@ -326,26 +309,24 @@
                 x-ref="menuPanel"
                 aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
                 @class ([
-                    'navbar top-0 left-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent',
-                    'max-lg:invisible max-lg:absolute' => $usesAlpine,
+                    $breakpoint->navbarClasses(),
+                    $breakpoint->navbarInvisibleClasses() => $usesAlpine,
                     'visible static max-w-none' => ! $usesAlpine,
                 ])
                 @if ($usesAlpine)
                     x-bind:class="
                         isMenuOpen
-                            ? 'max-lg:!visible max-lg:!translate-x-0'
+                            ? '{{ $breakpoint->navbarOpenClasses() }}'
                             : isClosingMenu
-                              ? 'max-lg:!visible max-lg:translate-x-[-100%]'
-                              : 'max-lg:invisible max-lg:translate-x-[-100%]'
+                              ? '{{ $breakpoint->navbarClosingClasses() }}'
+                              : '{{ $breakpoint->navbarClosedClasses() }}'
                     "
                 @endif
             >
                 <ul
                     @class ([
-                        'nav-items relative flex w-full flex-col flex-wrap justify-center gap-y-0.5 p-4 pt-6 lg:static lg:w-auto lg:flex-row lg:items-center lg:gap-1 lg:p-0',
-                        'lg:justify-start' => $theme->getMeta('header_menu_alignment') === 'left',
-                        'lg:justify-center' => $theme->getMeta('header_menu_alignment') === 'center',
-                        'lg:justify-end' => $theme->getMeta('header_menu_alignment') === 'right',
+                        $breakpoint->navItemsClasses(),
+                        $breakpoint->alignmentClass((string) $theme->getMeta('header_menu_alignment', 'right')),
                     ])
                 >
                     @foreach ($items as $id => $item)
@@ -356,6 +337,7 @@
                                 :navigation="$navigation"
                                 :index="$loop->index"
                                 :item-class="$itemClass"
+                                :breakpoint="$breakpoint"
                             />
                         @else
                             <x-capell-navigation::header.menu.item
@@ -364,18 +346,17 @@
                                 :navigation="$navigation"
                                 :index="$loop->index"
                                 :item-class="$itemClass"
+                                :breakpoint="$breakpoint"
                             />
                         @endif
                     @endforeach
                 </ul>
 
                 @if ($theme->getMeta('dark_mode_toggle'))
-                    <div
-                        class="grid grid-cols-2 items-center justify-between gap-x-2 border-t border-gray-100 p-4 lg:mt-0 lg:ml-auto lg:flex lg:h-auto lg:gap-x-3 lg:divide-none lg:border-0 lg:px-0 lg:py-2 dark:border-gray-700"
-                    >
+                    <div class="{{ $breakpoint->darkModeWrapperClasses() }}">
                         <button
                             type="button"
-                            class="hover:text-primary flex h-auto w-full cursor-pointer justify-between rounded-lg border border-gray-100 px-3 py-3 lg:h-10 lg:w-10 lg:items-center lg:justify-center lg:rounded-full lg:p-0 dark:border-gray-600"
+                            class="{{ $breakpoint->darkModeButtonClasses() }}"
                             aria-label="{{ __('capell-frontend::generic.dark_mode') }}"
                             @if ($usesAlpine)
                                 x-on:click="toggleDarkMode"
@@ -392,7 +373,7 @@
                             @endif
                         >
                             <span
-                                class="lg:hidden"
+                                class="{{ $breakpoint->mobileOnlyClass() }}"
                                 @if ($usesAlpine)
                                     x-text="
                                         isDarkMode
