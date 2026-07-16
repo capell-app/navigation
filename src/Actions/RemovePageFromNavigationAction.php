@@ -9,6 +9,7 @@ use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Collection;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -16,6 +17,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 class RemovePageFromNavigationAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(Pageable $page, Navigation $navigation): void

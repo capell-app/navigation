@@ -6,6 +6,7 @@ namespace Capell\Navigation\Actions;
 
 use Capell\Navigation\Data\NavigationItemData;
 use Illuminate\Support\Str;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
@@ -14,6 +15,7 @@ use Spatie\LaravelData\DataCollection;
  */
 class EnsureNavigationItemKeysAction
 {
+    use AsFake;
     use AsObject;
 
     /**

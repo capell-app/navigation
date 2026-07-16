@@ -8,6 +8,7 @@ use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -15,6 +16,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 class ReplicateSiteNavigationsAction
 {
+    use AsFake;
     use AsObject;
 
     /**

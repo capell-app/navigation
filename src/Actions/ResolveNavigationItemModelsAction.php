@@ -8,7 +8,8 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
-use Lorisleiva\Actions\Concerns\AsAction;
+use Lorisleiva\Actions\Concerns\AsFake;
+use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
 /**
@@ -16,7 +17,8 @@ use Spatie\LaravelData\DataCollection;
  */
 class ResolveNavigationItemModelsAction
 {
-    use AsAction;
+    use AsFake;
+    use AsObject;
 
     /**
      * @param  array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed>  $items

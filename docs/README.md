@@ -8,11 +8,12 @@ Start at the [package README](../README.md) when deciding whether to install thi
 
 | Doc                                                             | Use it for                                                                         |
 | --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [Admin Guide](admin-guide.md)                                   | Manage site and language navigation trees.                                         |
 | [Credits And Acknowledgements](credits-and-acknowledgements.md) | Upstream services, dependencies, and acknowledgements.                             |
 | [Overview](overview.md)                                         | Package boundary, runtime surfaces, install notes, and first troubleshooting path. |
 | [Rendering And Sync](rendering-and-sync.md)                     | Focused package workflow, setup, troubleshooting, or implementation details.       |
 
-## Read Next
+## Next
 
 | Related doc                                                 | Why                                                   |
 | ----------------------------------------------------------- | ----------------------------------------------------- |

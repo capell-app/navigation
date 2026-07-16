@@ -1,25 +1,29 @@
 ## What it does for you
 
-Navigation is how you build the menus visitors use to move around your site. You add links, drag them into the order you want, nest items to make dropdowns, and assign a menu to a location like the header or footer.
+Navigation is how you build the menus visitors use to move around a site. Create a menu for a particular site and language, choose the menu key that the theme renders, then add and arrange its items in the menu editor.
 
-## Your screens
+## Create a menu
 
-- **Navigations**: your menus and where each one is assigned.
-- **The menu editor**: where you add, nest, and reorder links.
+Go to **Websites → Navigation** or open the **Navigations** relation on a site. Give the menu a name, choose its **Key**, site, and language, then save it. The built-in keys are **Main**, **Footer**, and **Sub-footer**; selecting a key is how the theme identifies which menu to render. There is no separate Header or Footer assignment control.
 
-## What you can do
+Use the list filters to find menus by site, language, or key. Site-scoped admins see global menus and menus for their assigned sites, not menus belonging to other sites.
 
-- Build a menu and add links to pages or external sites.
-- Reorder links by dragging.
-- Nest links to create a dropdown or mega menu.
-- Assign a menu to a location such as the header or footer.
+## Build menu items
 
-## Where to find it
+In the **Items** tab, use **Add navigation item** and choose the type that fits:
 
-Go to **Navigation** in the admin to build and assign your menus.
+- **Page** for a page or another pageable record; turn on **Auto children** only when child pages should supply the submenu.
+- **Link** or **External link** for a safe URL. Set the target when it should open in a new context.
+- **Heading** for a non-link label that groups surrounding menu items.
+
+Drag items to reorder them or nest them below another item. A parent item can use a standard dropdown or a mega-menu layout; mega menus also expose column, panel-heading, description, and optional panel-link fields.
+
+## Control who sees an item
+
+Each item can be visible to everyone, guests, authenticated visitors, a named ability, or a role. Use the latter two only when the site's access rules already define that ability or role. You can also set the active-link matching mode and the `rel` attribute for a link.
 
 ## Good to know
 
-- Drag pages into your menu and reorder them by dragging.
-- Create a dropdown by nesting links under a parent item; choose **Standard dropdown** or **Mega menu** for how it opens.
-- Assign a menu to the **Header navigation** or **Footer navigation** so it appears in the right place.
+- Page links follow the selected page record; external links are validated as safe URLs.
+- The theme decides how a menu key is rendered. If a custom theme does not show a menu, confirm it asks for the same key before changing the menu content.
+- The editor also has optional component/component-item fields for a theme-specific navigation renderer; leave them unchanged unless your developer has supplied the component names.

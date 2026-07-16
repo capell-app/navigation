@@ -13,11 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
 final class BuildPageNavigationReferencesAction
 {
+    use AsFake;
     use AsObject;
 
     private const string REQUEST_CACHE_KEY = 'capell.navigation.page_references';

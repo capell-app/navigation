@@ -8,6 +8,7 @@ use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
@@ -16,6 +17,7 @@ use Spatie\LaravelData\DataCollection;
  */
 final class SyncNavigationPageReferencesAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(Navigation $navigation): int

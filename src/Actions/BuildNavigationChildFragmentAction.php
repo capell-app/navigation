@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\View;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Throwable;
 use UnexpectedValueException;
@@ -25,6 +26,7 @@ use UnexpectedValueException;
  */
 class BuildNavigationChildFragmentAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(string $payload, string $requestHost): ?string

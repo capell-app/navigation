@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use InvalidArgumentException;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -26,6 +27,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 class BuildNavigationRenderModelAction
 {
+    use AsFake;
     use AsObject;
 
     private const string REQUEST_CACHE_KEY = 'capell.navigation.render_models';

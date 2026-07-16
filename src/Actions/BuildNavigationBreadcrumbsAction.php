@@ -7,6 +7,7 @@ namespace Capell\Navigation\Actions;
 use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderData;
 use Illuminate\Support\Collection;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
 /**
@@ -14,6 +15,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
  */
 final class BuildNavigationBreadcrumbsAction
 {
+    use AsFake;
     use AsObject;
 
     /**

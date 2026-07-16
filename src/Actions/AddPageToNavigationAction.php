@@ -10,6 +10,7 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
@@ -18,6 +19,7 @@ use Spatie\LaravelData\DataCollection;
  */
 class AddPageToNavigationAction
 {
+    use AsFake;
     use AsObject;
 
     public function handle(Pageable $page, Navigation $navigation, ?string $label = null): void
