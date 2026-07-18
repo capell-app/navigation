@@ -93,6 +93,10 @@ class NavigationTestCase extends AbstractTestCase
 
         CapellCore::forcePackageInstalled(AdminServiceProvider::$packageName);
         CapellCore::forcePackageInstalled(FrontendServiceProvider::$packageName);
+        CapellCore::registerPackage(
+            NavigationServiceProvider::$packageName,
+            path: realpath(__DIR__ . '/..') ?: null,
+        );
         CapellCore::forcePackageInstalled(NavigationServiceProvider::$packageName);
     }
 
