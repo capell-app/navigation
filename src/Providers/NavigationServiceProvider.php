@@ -7,6 +7,7 @@ namespace Capell\Navigation\Providers;
 use Capell\Admin\Data\AdminSurfaceContributionData;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Core\Contracts\SiteSpec\SiteSpecApplier;
 use Capell\Core\Data\PageTypeData;
 use Capell\Core\Data\VendorAssetData;
 use Capell\Core\Events\PageUrlChanged;
@@ -22,6 +23,7 @@ use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\FrontendHookRegistrar;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\Navigation\Actions\ApplyNavigationSiteSpecAction;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
@@ -56,6 +58,8 @@ use Override;
 final class NavigationServiceProvider extends ServiceProvider
 {
     private const string EventListenersRegisteredFlag = 'capell.navigation.event-listeners-registered';
+
+    private const string SiteSpecApplierRegisteredFlag = 'capell.navigation.site-spec-applier-registered';
 
     public static string $packageName = 'capell-app/navigation';
 
@@ -121,6 +125,12 @@ final class NavigationServiceProvider extends ServiceProvider
 
     private function registerServices(): self
     {
+        if (! $this->app->bound(self::SiteSpecApplierRegisteredFlag)) {
+            $this->app->singleton(ApplyNavigationSiteSpecAction::class);
+            $this->app->tag([ApplyNavigationSiteSpecAction::class], SiteSpecApplier::TAG);
+            $this->app->instance(self::SiteSpecApplierRegisteredFlag, true);
+        }
+
         $this->app->singleton(NavigationPageSyncer::class, NavigationPageSyncerAdapter::class);
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
         $this->app->singleton(
