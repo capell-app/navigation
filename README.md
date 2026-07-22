@@ -54,7 +54,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Extension contracts: `NavigationNamesResolver`, `NavigationPageSyncer`.
 - Events: `NavigationCreating`.
 - Listeners: `ReplicateSiteNavigationsListener`.
-- Actions: `AddPageToNavigationAction`, `BuildNavigationBreadcrumbsAction`, `BuildNavigationChildFragmentAction`, `BuildNavigationRenderModelAction`, `BuildPageNavigationReferencesAction`, `EnsureNavigationItemKeysAction`, `RemovePageFromNavigationAction`, `ReplicateSiteNavigationsAction`, `ResolveNavigationItemModelsAction`, `SyncNavigationPageReferencesAction`.
+- Actions: `AddPageToNavigationAction`, `ApplyNavigationSiteSpecAction`, `BuildNavigationBreadcrumbsAction`, `BuildNavigationChildFragmentAction`, `BuildNavigationRenderModelAction`, `BuildPageNavigationReferencesAction`, `EnsureNavigationItemKeysAction`, `RemovePageFromNavigationAction`, `ReplicateSiteNavigationsAction`, `ResolveNavigationItemModelsAction`, `SyncNavigationPageReferencesAction`.
 - Data objects: `NavigationItemData`, `NavigationItemRenderData`, `NavigationRenderContextData`, `NavigationRenderData`.
 - Command signatures: `capell:navigation-demo`, `capell:navigation-setup`.
 - Console command classes: `DemoCommand`, `SetupCommand`.
