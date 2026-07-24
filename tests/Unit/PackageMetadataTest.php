@@ -180,6 +180,10 @@ it('declares navigation extension surfaces and contribution contracts', function
                 'type' => 'migration',
                 'class' => NavigationMigrationsContribution::class,
                 'tables' => ['navigations', 'navigation_page_references'],
+                'migrationFiles' => [
+                    '2026_05_10_190860_01_create_navigations_table',
+                    '2026_06_04_000001_create_navigation_page_references_table',
+                ],
             ],
             [
                 'type' => 'route',

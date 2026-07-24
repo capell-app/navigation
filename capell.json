@@ -65,7 +65,11 @@
         {
             "type": "migration",
             "class": "Capell\\Navigation\\Manifest\\NavigationMigrationsContribution",
-            "tables": ["navigations", "navigation_page_references"]
+            "tables": ["navigations", "navigation_page_references"],
+            "migrationFiles": [
+                "2026_05_10_190860_01_create_navigations_table",
+                "2026_06_04_000001_create_navigation_page_references_table"
+            ]
         },
         {
             "type": "route",
