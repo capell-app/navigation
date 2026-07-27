@@ -34,7 +34,7 @@ test('required fields are required', function (): void {
     livewire(CreateNavigation::class)
         ->assertSuccessful()
         ->call('create')
-        ->assertHasAllFormErrors([
+        ->assertHasFormErrors([
             'name' => 'required',
             'key' => 'required',
         ]);

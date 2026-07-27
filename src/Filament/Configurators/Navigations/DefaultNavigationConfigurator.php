@@ -51,7 +51,6 @@ use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as DatabaseSchema;
 use Illuminate\Validation\Rules\Unique;
 use Saade\FilamentAdjacencyList\Forms\Components\AdjacencyList;
@@ -646,9 +645,10 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
 
         if ($withUrl && $languageId !== null) {
             $page = $query->with([
-                'pageUrl.siteDomain' => fn (BuilderContract $query): BuilderContract => DB::getDriverName() === 'sqlite'
-                    ? $query->orderByRaw('CASE WHEN language_id = ? THEN 0 ELSE 1 END', [$languageId])
-                    : $query->orderByRaw('FIELD(language_id, ?) DESC', [$languageId]),
+                'pageUrl.siteDomain' => fn (BuilderContract $query): BuilderContract => $query->orderByRaw(
+                    'CASE WHEN language_id = ? THEN 0 ELSE 1 END',
+                    [$languageId],
+                ),
             ])
                 ->find($pageId);
         } else {
