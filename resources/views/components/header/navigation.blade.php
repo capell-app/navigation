@@ -33,96 +33,85 @@
                 mobileMenuMediaListener: null,
                 menuTransitionTimeout: null,
                 init() {
-                    this.mobileMenuMediaQuery = window.matchMedia(
-                        '{{ $breakpoint->mobileMediaQuery() }}',
-                    )
-                    this.closeMenuListener = () => this.closeMenu()
-                    this.mobileMenuMediaListener = () => this.handleMobileMenuMediaChange()
+                    this.mobileMenuMediaQuery = window.matchMedia('{{ $breakpoint->mobileMediaQuery() }}');
+                    this.closeMenuListener = () => this.closeMenu();
+                    this.mobileMenuMediaListener = () => this.handleMobileMenuMediaChange();
 
                     this.$watch('isMenuOpen', (value) => {
                         if (!value && !this.isMobileMenuViewport()) {
-                            this.isClosingMenu = false
-                            this.setPageInert(false)
-                            document.body.classList.remove('menu-open')
-                            this.dispatchOverlayState()
-                            return
+                            this.isClosingMenu = false;
+                            this.setPageInert(false);
+                            document.body.classList.remove('menu-open');
+                            this.dispatchOverlayState();
+                            return;
                         }
 
-                        this.isClosingMenu = true
-                        this.setPageInert(value || this.isClosingMenu)
+                        this.isClosingMenu = true;
+                        this.setPageInert(value || this.isClosingMenu);
 
-                        window.clearTimeout(this.menuTransitionTimeout)
+                        window.clearTimeout(this.menuTransitionTimeout);
                         this.menuTransitionTimeout = window.setTimeout(() => {
-                            this.isClosingMenu = false
-                            this.setPageInert(this.isMenuOpen)
-                            this.dispatchOverlayState()
-                        }, 450)
+                            this.isClosingMenu = false;
+                            this.setPageInert(this.isMenuOpen);
+                            this.dispatchOverlayState();
+                        }, 450);
 
-                        document.body.classList.toggle('menu-open', value)
-                        this.dispatchOverlayState()
-                    })
+                        document.body.classList.toggle('menu-open', value);
+                        this.dispatchOverlayState();
+                    });
 
-                    window.addEventListener('close-menu', this.closeMenuListener)
-                    this.mobileMenuMediaQuery.addEventListener(
-                        'change',
-                        this.mobileMenuMediaListener,
-                    )
+                    window.addEventListener('close-menu', this.closeMenuListener);
+                    this.mobileMenuMediaQuery.addEventListener('change', this.mobileMenuMediaListener);
 
-                    this.setPageInert(false)
+                    this.setPageInert(false);
                 },
                 destroy() {
-                    window.removeEventListener('close-menu', this.closeMenuListener)
-                    this.mobileMenuMediaQuery?.removeEventListener(
-                        'change',
-                        this.mobileMenuMediaListener,
-                    )
-                    window.clearTimeout(this.menuTransitionTimeout)
-                    document.body.classList.remove('menu-open')
-                    this.setPageInert(false)
+                    window.removeEventListener('close-menu', this.closeMenuListener);
+                    this.mobileMenuMediaQuery?.removeEventListener('change', this.mobileMenuMediaListener);
+                    window.clearTimeout(this.menuTransitionTimeout);
+                    document.body.classList.remove('menu-open');
+                    this.setPageInert(false);
                 },
                 toggleMenu() {
                     if (this.isMenuOpen) {
-                        return this.closeMenu()
+                        return this.closeMenu();
                     }
 
-                    return this.openMenu()
+                    return this.openMenu();
                 },
                 openMenu() {
-                    if (this.isMenuOpen) return
+                    if (this.isMenuOpen) return;
 
-                    this.isMenuOpen = true
+                    this.isMenuOpen = true;
 
-                    this.$nextTick(() => this.focusFirstMenuItem())
+                    this.$nextTick(() => this.focusFirstMenuItem());
                 },
                 closeMenu(focusAfter = this.$refs.toggleMenu) {
-                    if (!this.isMenuOpen) return
+                    if (!this.isMenuOpen) return;
 
-                    this.isMenuOpen = false
+                    this.isMenuOpen = false;
 
-                    focusAfter && focusAfter.focus()
+                    focusAfter && focusAfter.focus();
                 },
                 isMobileMenuViewport() {
-                    return (
-                        this.mobileMenuMediaQuery?.matches ??
-                        window.matchMedia('{{ $breakpoint->mobileMediaQuery() }}').matches
-                    )
+                    return this.mobileMenuMediaQuery?.matches ?? window.matchMedia('{{ $breakpoint->mobileMediaQuery() }}').matches;
                 },
                 handleMobileMenuMediaChange() {
                     if (this.isMobileMenuViewport()) {
-                        this.setPageInert(this.isMenuOpen || this.isClosingMenu)
-                        this.dispatchOverlayState()
-                        return
+                        this.setPageInert(this.isMenuOpen || this.isClosingMenu);
+                        this.dispatchOverlayState();
+                        return;
                     }
 
                     if (this.isMenuOpen) {
-                        this.isMenuOpen = false
-                        return
+                        this.isMenuOpen = false;
+                        return;
                     }
 
-                    this.isClosingMenu = false
-                    document.body.classList.remove('menu-open')
-                    this.setPageInert(false)
-                    this.dispatchOverlayState()
+                    this.isClosingMenu = false;
+                    document.body.classList.remove('menu-open');
+                    this.setPageInert(false);
+                    this.dispatchOverlayState();
                 },
                 dispatchOverlayState() {
                     window.dispatchEvent(
@@ -131,7 +120,7 @@
                                 open: this.isMenuOpen || this.isClosingMenu,
                             },
                         }),
-                    )
+                    );
                 },
                 focusableMenuElements() {
                     const elements = [
@@ -139,111 +128,107 @@
                         ...this.$refs.menuPanel.querySelectorAll(
                             'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
                         ),
-                    ]
+                    ];
 
                     return elements.filter((element) => {
-                        if (!element || element.disabled || element.inert) return false
-                        if (element.closest('[inert], [aria-hidden="true"]')) return false
-                        if (element.getClientRects().length === 0) return false
+                        if (!element || element.disabled || element.inert) return false;
+                        if (element.closest('[inert], [aria-hidden="true"]')) return false;
+                        if (element.getClientRects().length === 0) return false;
 
-                        const style = window.getComputedStyle(element)
+                        const style = window.getComputedStyle(element);
 
-                        return style.visibility !== 'hidden' && style.display !== 'none'
-                    })
+                        return style.visibility !== 'hidden' && style.display !== 'none';
+                    });
                 },
                 focusFirstMenuItem() {
-                    if (!this.isMobileMenuViewport()) return
+                    if (!this.isMobileMenuViewport()) return;
 
-                    const elements = this.focusableMenuElements()
-                    const firstMenuElement = elements.find(
-                        (element) => element !== this.$refs.toggleMenu,
-                    )
+                    const elements = this.focusableMenuElements();
+                    const firstMenuElement = elements.find((element) => element !== this.$refs.toggleMenu);
 
-                    ;(firstMenuElement || this.$refs.menuPanel).focus()
+                    (firstMenuElement || this.$refs.menuPanel).focus();
                 },
                 trapFocus(event) {
-                    if (!this.isMenuOpen || !this.isMobileMenuViewport()) return
+                    if (!this.isMenuOpen || !this.isMobileMenuViewport()) return;
 
-                    const elements = this.focusableMenuElements()
+                    const elements = this.focusableMenuElements();
 
                     if (elements.length === 0) {
-                        event.preventDefault()
-                        return
+                        event.preventDefault();
+                        return;
                     }
 
-                    const firstElement = elements[0]
-                    const lastElement = elements[elements.length - 1]
+                    const firstElement = elements[0];
+                    const lastElement = elements[elements.length - 1];
 
                     if (event.shiftKey && document.activeElement === firstElement) {
-                        event.preventDefault()
-                        lastElement.focus()
-                        return
+                        event.preventDefault();
+                        lastElement.focus();
+                        return;
                     }
 
                     if (!event.shiftKey && document.activeElement === lastElement) {
-                        event.preventDefault()
-                        firstElement.focus()
+                        event.preventDefault();
+                        firstElement.focus();
                     }
                 },
                 setPageInert(value) {
-                    const shouldInert = value && this.isMobileMenuViewport()
-                    const inertAttribute = 'data-capell-navigation-inert'
-                    const ariaHiddenAttribute = 'data-capell-navigation-aria-hidden'
+                    const shouldInert = value && this.isMobileMenuViewport();
+                    const inertAttribute = 'data-capell-navigation-inert';
+                    const ariaHiddenAttribute = 'data-capell-navigation-aria-hidden';
                     const applyNavigationInert = (element) => {
                         if (!element.hasAttribute('inert')) {
-                            element.setAttribute('inert', '')
-                            element.setAttribute(inertAttribute, 'true')
+                            element.setAttribute('inert', '');
+                            element.setAttribute(inertAttribute, 'true');
                         }
 
                         if (element.getAttribute('aria-hidden') !== 'true') {
-                            element.setAttribute('aria-hidden', 'true')
-                            element.setAttribute(ariaHiddenAttribute, 'true')
+                            element.setAttribute('aria-hidden', 'true');
+                            element.setAttribute(ariaHiddenAttribute, 'true');
                         }
-                    }
+                    };
                     const releaseNavigationInert = (element) => {
                         if (element.getAttribute(inertAttribute) === 'true') {
-                            element.removeAttribute('inert')
-                            element.removeAttribute(inertAttribute)
+                            element.removeAttribute('inert');
+                            element.removeAttribute(inertAttribute);
                         }
 
                         if (element.getAttribute(ariaHiddenAttribute) === 'true') {
-                            element.removeAttribute('aria-hidden')
-                            element.removeAttribute(ariaHiddenAttribute)
+                            element.removeAttribute('aria-hidden');
+                            element.removeAttribute(ariaHiddenAttribute);
                         }
-                    }
+                    };
 
                     document.querySelectorAll('main, footer').forEach((element) => {
-                        if (this.$el.contains(element)) return
+                        if (this.$el.contains(element)) return;
 
                         if (shouldInert) {
-                            applyNavigationInert(element)
-                            return
+                            applyNavigationInert(element);
+                            return;
                         }
 
-                        releaseNavigationInert(element)
-                    })
+                        releaseNavigationInert(element);
+                    });
 
                     this.$el
                         .closest('header')
-                        ?.querySelectorAll(
-                            'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
-                        )
+                        ?.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])')
                         .forEach((element) => {
-                            if (this.$el.contains(element)) return
+                            if (this.$el.contains(element)) return;
 
                             if (shouldInert) {
-                                applyNavigationInert(element)
-                                return
+                                applyNavigationInert(element);
+                                return;
                             }
 
-                            releaseNavigationInert(element)
-                        })
+                            releaseNavigationInert(element);
+                        });
                 },
-            })
+            });
 
             document.addEventListener('alpine:init', () => {
-                Alpine.data('capellHeaderNavigation', window.capellHeaderNavigation)
-            })
+                Alpine.data('capellHeaderNavigation', window.capellHeaderNavigation);
+            });
         </script>
     @endif
 
@@ -277,15 +262,15 @@
                                 : '{{ __('capell-frontend::generic.open_menu') }}'
                         "
                     ></span>
-                    @svg ('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
-                    @svg ('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
+                    @svg('heroicon-m-bars-3', 'h-6 w-6', ['x-show' => '!isMenuOpen'])
+                    @svg('heroicon-o-x-mark', 'h-6 w-6', ['x-cloak' => '', 'x-show' => 'isMenuOpen'])
                 </button>
             </div>
         @endif
 
         <div
             id="menu"
-            @class ([
+            @class([
                 $breakpoint->menuWrapperClasses(),
                 $breakpoint->mobileInvisibleClass() => $usesAlpine,
                 'visible' => ! $usesAlpine,
@@ -308,7 +293,7 @@
                 tabindex="-1"
                 x-ref="menuPanel"
                 aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
-                @class ([
+                @class([
                     $breakpoint->navbarClasses(),
                     $breakpoint->navbarInvisibleClasses() => $usesAlpine,
                     'visible static max-w-none' => ! $usesAlpine,
@@ -324,10 +309,10 @@
                 @endif
             >
                 <ul
-                    @class ([
-                        $breakpoint->navItemsClasses(),
-                        $breakpoint->alignmentClass((string) $theme->getMeta('header_menu_alignment', 'right')),
-                    ])
+                    @class([
+                    $breakpoint->navItemsClasses(),
+                    $breakpoint->alignmentClass((string) $theme->getMeta('header_menu_alignment', 'right')),
+                ])
                 >
                     @foreach ($items as $id => $item)
                         @if ($item->children->count() > 0)
@@ -386,8 +371,8 @@
                             </span>
 
                             <span class="ml-auto">
-                                @svg ('heroicon-o-sun', 'hidden h-4 w-4 md:h-5 md:w-5 dark:block')
-                                @svg ('heroicon-o-moon', 'h-4 w-4 stroke-current md:h-5 md:w-5 dark:hidden')
+                                @svg('heroicon-o-sun', 'hidden h-4 w-4 md:h-5 md:w-5 dark:block')
+                                @svg('heroicon-o-moon', 'h-4 w-4 stroke-current md:h-5 md:w-5 dark:hidden')
                             </span>
                         </button>
                     </div>

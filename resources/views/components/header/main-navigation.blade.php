@@ -1,4 +1,4 @@
-@props ([
+@props([
     'itemClass' => null,
     'breakpoint' => \Capell\Navigation\Enums\HeaderNavigationBreakpoint::Lg,
 ])

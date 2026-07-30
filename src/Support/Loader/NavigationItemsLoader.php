@@ -9,6 +9,7 @@ use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\Frontend\Data\PageListingRequestData;
 use Capell\Frontend\Support\Loader\PageLoader;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
@@ -205,20 +206,20 @@ class NavigationItemsLoader
                     return;
                 }
 
-                $children = PageLoader::getPages(
+                $children = PageLoader::list(new PageListingRequestData(
                     language: $this->language,
                     site: $this->site,
                     ordering: PageOrderEnum::Default,
                     optionalLanguage: true,
                     withChildren: true,
-                    cacheKeyPrepend: 'parent-' . $pageableReference['pageable_id'],
+                    cacheKeySuffix: 'parent-' . $pageableReference['pageable_id'],
                     modifyQuery: function (BuilderContract $query) use ($pageableReference): void {
                         $query->where(
                             'parent_id',
                             $pageableReference['pageable_id'],
                         );
                     },
-                );
+                ));
 
                 if ($children->isNotEmpty()) {
                     $menuItem['children'] = NavigationItemData::fromPages($children);

@@ -1,4 +1,4 @@
-@props ([
+@props([
     'id' => null,
     'itemClass',
     'dropdownItemClass' => 'capell-product-dropdown-item disabled:cursor-not-allowed disabled:opacity-50',
@@ -31,13 +31,13 @@
     <li class="{{ $breakpoint->dropdownWithoutAlpineClasses() }}">
         <a
             href="{{ SafeUrl::sanitise($item->data['url'] ?? null) ?? '#' }}"
-            @class ([
+            @class([
                 $itemClass,
                 'hover:text-primary focus:text-primary' => ! $item->active,
                 'active text-primary' => $item->active,
                 $item->data['class'] ?? '',
             ])
-            @if (!empty($item->data['target'])) target="{{ $item->data['target'] }}" @endif
+            @if (! empty($item->data['target'])) target="{{ $item->data['target'] }}" @endif
         >
             <span>{{ $item->label }}</span>
         </a>
@@ -45,7 +45,7 @@
         <ul class="{{ $breakpoint->dropdownChildrenClasses() }}">
             @foreach ($item->children as $id => $child)
                 @if ($child->children->count() > 0)
-                    @include ('capell-navigation::components.header.menu.dropdown', [
+                    @include('capell-navigation::components.header.menu.dropdown', [
                         'id' => $id,
                         'dropdownName' => $currentDropdownName,
                         'item' => $child,
@@ -91,11 +91,11 @@
     >
         <x-slot:trigger
             @class([
-                $itemClass,
-                'hover:text-primary focus:text-primary' => ! $item->active,
-                'active text-primary' => $item->active,
-                $item->data['class'] ?? '',
-            ])
+            $itemClass,
+            'hover:text-primary focus:text-primary' => ! $item->active,
+            'active text-primary' => $item->active,
+            $item->data['class'] ?? '',
+        ])
         >
             @if (! empty($item->data['icon']))
                 <x-dynamic-component
@@ -105,14 +105,14 @@
             @endif
 
             <span
-                @class ([
-                    $breakpoint->hiddenLabelClasses() => ! empty($item->data['hide_label']),
-                ])
+                @class([
+                $breakpoint->hiddenLabelClasses() => ! empty($item->data['hide_label']),
+            ])
             >
                 {{ $item->label }}
             </span>
 
-            @svg ('heroicon-o-chevron-right', $breakpoint->chevronClasses())
+            @svg('heroicon-o-chevron-right', $breakpoint->chevronClasses())
         </x-slot:trigger>
 
         <ul class="flex flex-col gap-1">
@@ -121,20 +121,20 @@
             >
                 <button
                     type="button"
-                    @class ([
+                    @class([
                         $dropdownItemClass,
                         'hover:text-primary focus:text-primary font-semibold',
                     ])
                     x-on:click="close($refs['{{ $currentDropdownName }}_toggle'])"
                 >
-                    @svg ('heroicon-o-arrow-left', 'mr-1 h-5 w-5 stroke-current')
+                    @svg('heroicon-o-arrow-left', 'mr-1 h-5 w-5 stroke-current')
                     <span> {{ $item->label }} </span>
                 </button>
             </li>
         </ul>
 
         <div
-            @class ([
+            @class([
                 'flex flex-col gap-1',
                 $breakpoint->megaGridClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
                 $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && ! $hasMegaPanel,
@@ -145,17 +145,13 @@
             @if ($hasMegaPanel)
                 <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
                     @if (! empty($item->data['mega_panel_heading']))
-                        <p
-                            class="text-sm font-semibold text-slate-950 dark:text-white"
-                        >
+                        <p class="text-sm font-semibold text-slate-950 dark:text-white">
                             {{ $item->data['mega_panel_heading'] }}
                         </p>
                     @endif
 
                     @if (! empty($item->data['mega_panel_description']))
-                        <p
-                            class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300"
-                        >
+                        <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
                             {{ $item->data['mega_panel_description'] }}
                         </p>
                     @endif
@@ -173,15 +169,15 @@
             @endif
 
             <ul
-                @class ([
-                    'flex flex-col gap-1',
-                    $breakpoint->megaChildrenGridClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
-                    $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && $hasMegaPanel,
-                ])
+                @class([
+                'flex flex-col gap-1',
+                $breakpoint->megaChildrenGridClasses() => $dropdownLayout === NavigationDropdownLayout::Mega,
+                $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && $hasMegaPanel,
+            ])
             >
                 @foreach ($item->children as $id => $child)
                     @if ($child->children->count() > 0)
-                        @include ('capell-navigation::components.header.menu.dropdown', [
+                        @include('capell-navigation::components.header.menu.dropdown', [
                             'id' => $id,
                             'dropdownName' => $currentDropdownName,
                             'item' => $child,
@@ -193,9 +189,9 @@
                         <li class="nav-item">
                             <a
                                 href="{{ SafeUrl::sanitise($child->data['url'] ?? null) ?? '' }}"
-                                @if (!empty($child->data['target'])) target="{{ $child->data['target'] }}" @endif
+                                @if (! empty($child->data['target'])) target="{{ $child->data['target'] }}" @endif
                                 @if ($usesWireNavigate) wire:navigate @endif
-                                @class ([
+                                @class([
                                     $dropdownItemClass,
                                     'hover:text-primary focus:text-primary' => ! $child->active,
                                     'active text-primary dark:text-primary' => $child->active,
