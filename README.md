@@ -37,11 +37,11 @@ Screenshot contract: `docs/screenshots.json`.
 
 ![Create/edit navigation form](docs/screenshots/create-edit-navigation-form.png)
 
-- Navigation admin index (admin, required).
-- Create/edit navigation form (admin, required).
-- Site relation manager for navigations (admin, optional).
-- Page form navigation tab (admin, required).
-- Frontend menu output (frontend, optional).
+- Navigation admin index (admin, required evidence).
+- Create/edit navigation form (admin, required evidence).
+- Site relation manager for navigations (admin, supplementary evidence).
+- Page form navigation tab (admin, required evidence).
+- Frontend menu output (frontend, supplementary evidence).
 
 ## Technical Shape
 
@@ -107,7 +107,7 @@ Screenshot contract: `docs/screenshots.json`.
 
 1. Install the package: `composer require capell-app/navigation`.
 2. Run the required setup: `php artisan capell:navigation-setup`.
-3. Open the Navigation admin index and confirm the admin workflow loads.
+3. Open a verified package admin surface and confirm Navigation is available.
 
 ## Next Steps
 
