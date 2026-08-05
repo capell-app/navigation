@@ -65,8 +65,8 @@
             "targetType": "frontend-url",
             "target": null,
             "url": "/",
-            "required": false,
-            "notes": "Optional Beta evidence target. The current file is an empty host shell rather than proof of rendered Navigation output; replace it with an independently captured seeded menu before using it as release evidence.",
+            "required": true,
+            "notes": "Captured from the seeded public root route after capell:navigation-setup on the isolated Packages workbench.",
             "useCase": "An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.",
             "screenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output.png",
             "darkScreenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output-dark.png"

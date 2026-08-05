@@ -48,9 +48,9 @@ class NavigationSelect extends Select
                 return $navigations->mapWithKeys(
                     function (Navigation $navigation): array {
                         $data = [
-                            'label' => $navigation->name,
+                            'label' => $navigation->name ?? '',
                             'icon' => $navigation->language !== null ? 'flag-4x3-' . $navigation->language->flag : '',
-                            'description' => $navigation->site?->name,
+                            'description' => $navigation->site->name ?? '',
                         ];
 
                         return [$navigation->getKey() => static::getSelectOption($navigation, $data)];

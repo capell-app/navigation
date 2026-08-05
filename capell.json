@@ -242,6 +242,12 @@
                 "caption": "Navigation gives Capell editors a visual menu builder for site and language scoped menus"
             },
             {
+                "path": "docs/screenshots/frontend-menu-output.png",
+                "alt": "Published navigation menu rendered on the public frontend",
+                "caption": "Route-backed public navigation output",
+                "required": true
+            },
+            {
                 "path": "docs/screenshots/create-edit-navigation-form.png",
                 "alt": "Create and edit navigation form with links, page references, and nested items",
                 "caption": "Build nested menus from page references, links, and headings"

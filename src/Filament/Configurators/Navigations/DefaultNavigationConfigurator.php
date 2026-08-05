@@ -619,7 +619,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         $pageId = $data['pageable_id'] ?? null;
         $pageType = $data['pageable_type'] ?? null;
 
-        if ($pageId === null || $pageType === null) {
+        if ($pageId === null || ! is_string($pageType)) {
             return null;
         }
 
