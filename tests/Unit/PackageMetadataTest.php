@@ -277,8 +277,7 @@ it('declares shipped marketplace images and screenshot captures', function (): v
     $marketplacePaths = array_column($marketplaceScreenshots, 'path');
     $expectedMarketplacePaths = [
         'docs/assets/marketplace/extension-card.jpg',
-        'docs/screenshots/create-edit-navigation-form.png',
-        'docs/screenshots/create-edit-navigation-form-dark.png',
+        'docs/screenshots/frontend-menu-output.png',
     ];
 
     expect($marketplacePaths)->toEqual($expectedMarketplacePaths);
@@ -302,8 +301,7 @@ it('declares shipped marketplace images and screenshot captures', function (): v
     sort($declaredScreenshotPaths);
 
     expect($declaredScreenshotPaths)->toEqual([
-        'docs/screenshots/create-edit-navigation-form-dark.png',
-        'docs/screenshots/create-edit-navigation-form.png',
+        'docs/screenshots/frontend-menu-output.png',
     ]);
 });
 
@@ -312,7 +310,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
     $entries = $screenshotManifest['entries'] ?? [];
     throw_unless(is_array($entries), RuntimeException::class, 'Navigation screenshot entries must be an array.');
 
-    expect($entries)->toHaveCount(5);
+    expect($entries)->toHaveCount(6);
 
     $expectedScreenshotPaths = [
         'packages/navigation/docs/screenshots/navigation-admin-index.png',
@@ -320,6 +318,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab.png',
         'packages/navigation/docs/screenshots/frontend-menu-output.png',
+        'packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open.png',
     ];
     $expectedDarkScreenshotPaths = [
         'packages/navigation/docs/screenshots/navigation-admin-index-dark.png',
@@ -327,6 +326,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png',
         'packages/navigation/docs/screenshots/frontend-menu-output-dark.png',
+        'packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open-dark.png',
     ];
 
     expect(array_column($entries, 'screenshotPath'))->toEqual($expectedScreenshotPaths);
@@ -340,7 +340,19 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
         throw_unless(is_string($darkScreenshotPath), RuntimeException::class, 'Navigation dark screenshot paths must be strings.');
 
         expect($entry)->toHaveKeys(['id', 'screenshotPath', 'darkScreenshotPath']);
-        expect(navigationRepositoryPath($screenshotPath))->toBeFile();
-        expect(navigationRepositoryPath($darkScreenshotPath))->toBeFile();
+
+        if (($entry['required'] ?? true) === true) {
+            expect(navigationRepositoryPath($screenshotPath))->toBeFile();
+            expect(navigationRepositoryPath($darkScreenshotPath))->toBeFile();
+        }
     }
+
+    $deferredEntry = collect($entries)->firstWhere('id', 'create-edit-navigation-form');
+
+    expect($deferredEntry)
+        ->not->toBeNull()
+        ->and($deferredEntry['required'] ?? true)->toBeFalse()
+        ->and($deferredEntry['notes'] ?? '')->toBe('Deferred: the current non-route evidence has been retired. Replace it with an authentic installed-App route capture before Marketplace promotion.')
+        ->and(navigationRepositoryPath('packages/navigation/docs/screenshots/create-edit-navigation-form.png'))->not->toBeFile()
+        ->and(navigationRepositoryPath('packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png'))->not->toBeFile();
 });

@@ -13,8 +13,6 @@ This guide is for editors who build site menus and owners deciding how menus are
 
 ![An editor reviews site navigation records and their scope and status.](screenshots/navigation-admin-index.png)
 
-![An editor builds a navigation tree with links, page references, headings, and nested items.](screenshots/create-edit-navigation-form.png)
-
 ### How to reorder and nest links
 
 1. Open the menu in the editor.

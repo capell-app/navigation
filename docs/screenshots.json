@@ -12,6 +12,8 @@
             "surface": "admin",
             "targetType": "admin-surface",
             "target": "NavigationResource",
+            "url": "/navigation/navigations",
+            "waitFor": "table",
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor reviews site navigation records and their scope/status.",
@@ -24,9 +26,11 @@
             "package": "navigation",
             "surface": "admin",
             "targetType": "admin-surface",
-            "target": "NavigationResource",
-            "required": true,
-            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
+            "target": "NavigationResource/CreateNavigation",
+            "url": "/navigation/navigations/create",
+            "waitFor": "form",
+            "required": false,
+            "notes": "Deferred: the current non-route evidence has been retired. Replace it with an authentic installed-App route capture before Marketplace promotion.",
             "useCase": "An editor builds a navigation tree with links, page references, headings, and nested items.",
             "screenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form.png",
             "darkScreenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png"
@@ -37,7 +41,9 @@
             "package": "navigation",
             "surface": "admin",
             "targetType": "admin-surface",
-            "target": "NavigationResource",
+            "target": "SiteResource/EditSite/NavigationsRelationManager",
+            "url": "/sites/{first-record}/edit",
+            "waitFor": "form",
             "required": false,
             "notes": "Optional Beta evidence target. The current file is a shared host Site screen rather than proof of Navigation records; replace it with an independently captured populated relation manager before using it as release or Marketplace evidence.",
             "useCase": "An editor manages navigations directly from the site edit surface.",
@@ -50,7 +56,9 @@
             "package": "navigation",
             "surface": "admin",
             "targetType": "admin-surface",
-            "target": "NavigationResource",
+            "target": "PageResource/EditPage",
+            "url": "/pages/{first-record}/edit",
+            "waitFor": "form",
             "required": true,
             "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case.",
             "useCase": "An editor controls page-level navigation metadata from the page form.",
@@ -63,13 +71,34 @@
             "package": "navigation",
             "surface": "frontend",
             "targetType": "frontend-url",
-            "target": null,
-            "url": "/",
+            "target": "/theme-default",
+            "url": "/theme-default",
             "required": true,
-            "notes": "Captured from the seeded public root route after capell:navigation-setup on the isolated Packages workbench.",
+            "notes": "Captured from the seeded public Foundation route after capell:navigation-setup on the isolated Packages workbench.",
             "useCase": "An anonymous visitor sees the seeded public menu without internal page IDs or editor metadata.",
             "screenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output.png",
             "darkScreenshotPath": "packages/navigation/docs/screenshots/frontend-menu-output-dark.png"
+        },
+        {
+            "id": "navigation-admin-sidebar-menu-open",
+            "title": "Navigation admin index with admin sidebar menu open.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "NavigationResource",
+            "url": "/navigation/navigations",
+            "waitFor": "table",
+            "required": false,
+            "notes": "Capture after installing capell-app/navigation in the isolated demo harness and seeding the data required for this use case. Capture this same admin surface with the fully collapsible sidebar opened.",
+            "useCase": "An editor reviews site navigation records and their scope/status.",
+            "screenshotPath": "packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open-dark.png",
+            "beforeWait": [
+                {
+                    "type": "click",
+                    "selector": ".fi-topbar-open-collapse-sidebar-btn"
+                }
+            ]
         }
     ]
 }

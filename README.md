@@ -35,13 +35,13 @@ Screenshot contract: `docs/screenshots.json`.
 
 ![Navigation admin index](docs/screenshots/navigation-admin-index.png)
 
-![Create/edit navigation form](docs/screenshots/create-edit-navigation-form.png)
+![Page form navigation tab](docs/screenshots/page-form-navigation-tab.png)
 
 - Navigation admin index (admin, required evidence).
-- Create/edit navigation form (admin, required evidence).
+- Create/edit navigation form (admin, supplementary evidence).
 - Site relation manager for navigations (admin, supplementary evidence).
 - Page form navigation tab (admin, required evidence).
-- Frontend menu output (frontend, supplementary evidence).
+- Frontend menu output (frontend, required evidence).
 
 ## Technical Shape
 

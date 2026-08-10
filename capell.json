@@ -246,16 +246,6 @@
                 "alt": "Published navigation menu rendered on the public frontend",
                 "caption": "Route-backed public navigation output",
                 "required": true
-            },
-            {
-                "path": "docs/screenshots/create-edit-navigation-form.png",
-                "alt": "Create and edit navigation form with links, page references, and nested items",
-                "caption": "Build nested menus from page references, links, and headings"
-            },
-            {
-                "path": "docs/screenshots/create-edit-navigation-form-dark.png",
-                "alt": "Create and edit navigation form in dark mode",
-                "caption": "Build nested menus from the dark-mode create and edit form"
             }
         ],
         "categories": ["admin", "console", "foundation", "frontend"]
