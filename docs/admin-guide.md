@@ -8,8 +8,10 @@ This guide is for editors who build site menus and owners deciding how menus are
 
 1. Go to **Navigation**.
 2. Create a new menu and give it a name.
-3. Add links to your pages, or add an **External link** to another site.
-4. Save the menu.
+3. Choose a **Key**. Use **Main**, **Footer**, or **Sub-footer** when your theme renders that built-in menu location. A key can be used once for the same site and language.
+4. Choose the site and, when needed, the language for this menu.
+5. Add links to your pages, or add an **External link** to another site.
+6. Save the menu.
 
 ![An editor reviews site navigation records and their scope and status.](screenshots/navigation-admin-index.png)
 
@@ -26,11 +28,12 @@ This guide is for editors who build site menus and owners deciding how menus are
 2. On the parent item, choose how its children open: **Standard dropdown** or **Mega menu**.
 3. Save the menu.
 
-### How to assign a menu to a location
+### How to make a menu appear in a theme location
 
-1. Open the menu.
-2. Assign it to a location such as **Header navigation** or **Footer navigation**.
-3. Save. The menu now appears in that location on the live site.
+1. Check which menu key the theme renders. The built-in keys are **Main**, **Footer**, and **Sub-footer**.
+2. Open or create the menu for that site and language.
+3. Set its **Key** to the matching value and save.
+4. Preview the public page. The theme decides where that key appears; there is no separate Header or Footer assignment control.
 
 ### How to manage menus from a site
 
@@ -68,16 +71,16 @@ This guide is for editors who build site menus and owners deciding how menus are
 
 ### Who does what
 
-| Role       | First useful screen                                          |
-| ---------- | ------------------------------------------------------------ |
-| Editor     | The menu editor: add, nest, and reorder links                |
-| Site owner | **Navigations**: see which menu is assigned to each location |
+| Role       | First useful screen                                                  |
+| ---------- | -------------------------------------------------------------------- |
+| Editor     | The menu editor: add, nest, and reorder links                        |
+| Site owner | **Navigations**: review each menu's site, language, and rendered key |
 
 ## Troubleshooting for editors
 
-| What you see                         | What it means                                          | What to do                                                                     |
-| ------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| A new menu isn't showing on the site | It isn't assigned to a location                        | Open the menu and assign it to **Header navigation** or **Footer navigation**  |
-| A link goes to the wrong place       | The page reference or external URL is wrong            | Open the link and fix its target                                               |
-| A dropdown isn't opening             | Its child links aren't nested, or the layout isn't set | Nest the links under the parent and set **Standard dropdown** or **Mega menu** |
-| A menu item points to a deleted page | The page it linked to no longer exists                 | Remove or repoint the link, then save                                          |
+| What you see                         | What it means                                                                                   | What to do                                                                                                    |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| A new menu isn't showing on the site | Its key is not one the theme renders, or the menu is not eligible for the current site/language | Match the menu **Key** to the theme's rendered key, check the site and language, then preview the public page |
+| A link goes to the wrong place       | The page reference or external URL is wrong                                                     | Open the link and fix its target                                                                              |
+| A dropdown isn't opening             | Its child links aren't nested, or the layout isn't set                                          | Nest the links under the parent and set **Standard dropdown** or **Mega menu**                                |
+| A menu item points to a deleted page | The page it linked to no longer exists                                                          | Remove or repoint the link, then save                                                                         |

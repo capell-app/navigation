@@ -42,6 +42,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Site relation manager for navigations (admin, supplementary evidence).
 - Page form navigation tab (admin, required evidence).
 - Frontend menu output (frontend, required evidence).
+- Navigation admin index with admin sidebar menu open (admin, supplementary evidence).
 
 ## Technical Shape
 
@@ -107,7 +108,7 @@ Screenshot contract: `docs/screenshots.json`.
 
 1. Install the package: `composer require capell-app/navigation`.
 2. Run the required setup: `php artisan capell:navigation-setup`.
-3. Open a verified package admin surface and confirm Navigation is available.
+3. Open the package admin surface at `/navigation/navigations` and confirm Navigation is available.
 
 ## Next Steps
 

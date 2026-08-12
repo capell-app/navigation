@@ -192,7 +192,8 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                             );
                     },
                 )
-                ->label(__('capell-admin::table.key')),
+                ->label(__('capell-admin::table.key'))
+                ->helperText(__('capell-navigation::generic.key_info')),
 
             TypeSelect::make('blueprint_id')
                 ->live()

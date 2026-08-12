@@ -40,6 +40,12 @@ test('required fields are required', function (): void {
         ]);
 });
 
+test('create screen explains how the navigation key is rendered', function (): void {
+    livewire(CreateNavigation::class)
+        ->assertSuccessful()
+        ->assertSeeText(__('capell-navigation::generic.key_info'));
+});
+
 it('can create', function (): void {
     $newData = Navigation::factory()->make();
 

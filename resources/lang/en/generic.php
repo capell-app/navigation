@@ -37,6 +37,7 @@ return [
     'health_storage_tables_label' => 'Navigation storage tables',
     'health_storage_tables_passed' => 'The navigations and navigation_page_references tables are present.',
     'health_storage_tables_remediation' => 'Run the Capell migrations to create the navigation storage tables.',
+    'key_info' => 'Themes render the menu whose key they request. Main, Footer, and Sub-footer are the built-in keys; a key can be used once per site and language.',
     'main_navigation' => 'Main navigation',
     'mega_columns' => 'Mega menu columns',
     'mega_columns_info' => 'Choose one to four columns for child links.',
