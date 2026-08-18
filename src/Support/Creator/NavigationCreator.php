@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Spatie\LaravelData\DataCollection;
 
 class NavigationCreator
 {
@@ -52,21 +53,21 @@ class NavigationCreator
         $label = $translation instanceof Model ? $translation->label : null;
 
         if ($label) {
-            return $label;
+            return self::stripSiteNameSuffix($page, $label);
         }
 
         $title = $translation instanceof Model ? $translation->title : null;
 
         if ($title) {
-            return $title;
+            return self::stripSiteNameSuffix($page, $title);
         }
 
         return $page->name;
     }
 
     /**
-     * @param  Collection<array-key, mixed>  $pages
-     * @param  array<array-key, mixed>  $items
+     * @param  Collection<array-key, Page>  $pages
+     * @param  array<array-key, array<string, mixed>>  $items
      */
     public function footerNavigation(
         Site $site,
@@ -84,14 +85,18 @@ class NavigationCreator
 
         $navigation = self::createNavigation($key, $site, $language, $type);
 
-        $items = collect($navigation->items)
+        $items = $this->normalizePageLabels($this->navigationItemsFromValue($navigation->items), $language)
             ->merge($items);
 
         if ($pages instanceof Collection && $pages->isNotEmpty()) {
             $pages->each(function (Page $page) use (&$items, $language): void {
-                $existingItem = $items->first(fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
-                        && (int) $candidate['data']['pageable_id'] === $page->getKey()
-                        && $candidate['data']['pageable_type'] === $page->getMorphClass());
+                $existingItem = $items->first(function (array $candidate) use ($page): bool {
+                    $reference = self::pageReference($candidate);
+
+                    return $reference !== null
+                        && (int) $reference['pageable_id'] === $page->getKey()
+                        && $reference['pageable_type'] === $page->getMorphClass();
+                });
 
                 if ($existingItem !== null) {
                     return;
@@ -119,8 +124,8 @@ class NavigationCreator
     }
 
     /**
-     * @param  Collection<array-key, mixed>  $pages
-     * @param  array<array-key, mixed>  $items
+     * @param  Collection<array-key, Page>  $pages
+     * @param  array<array-key, array<string, mixed>>  $items
      */
     public function subFooterNavigation(
         Site $site,
@@ -134,7 +139,7 @@ class NavigationCreator
     }
 
     /**
-     * @param  array<array-key, mixed>  $additionalItems
+     * @param  array<array-key, array<string, mixed>>  $additionalItems
      */
     public function mainNavigation(
         Site $site,
@@ -152,14 +157,17 @@ class NavigationCreator
 
         $navigation = self::createNavigation($key, $site, $language, $type);
 
-        $items = collect($navigation->items);
-        $items = $this->backfillMissingPageLabels($items, $language);
+        $items = $this->normalizePageLabels($this->navigationItemsFromValue($navigation->items), $language);
 
         $homePageExists = $home instanceof Page
             ? $items->first(
-                fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
-                    && (int) $candidate['data']['pageable_id'] === $home->getKey()
-                    && $candidate['data']['pageable_type'] === $home->getMorphClass(),
+                function (array $candidate) use ($home): bool {
+                    $reference = self::pageReference($candidate);
+
+                    return $reference !== null
+                        && (int) $reference['pageable_id'] === $home->getKey()
+                        && $reference['pageable_type'] === $home->getMorphClass();
+                },
             )
             : null;
 
@@ -182,12 +190,16 @@ class NavigationCreator
         }
 
         foreach ($additionalItems as $item) {
-            if (isset($item['data']['pageable_id'], $item['data']['pageable_type'])) {
-                $pageExistsKey = $items->search(
-                    fn (array $candidate): bool => isset($candidate['data']['pageable_id'], $candidate['data']['pageable_type'])
-                        && (int) $candidate['data']['pageable_id'] === (int) $item['data']['pageable_id']
-                        && $candidate['data']['pageable_type'] === $item['data']['pageable_type'],
-                );
+            $itemReference = self::pageReference($item);
+
+            if ($itemReference !== null) {
+                $pageExistsKey = $items->search(function (array $candidate) use ($itemReference): bool {
+                    $reference = self::pageReference($candidate);
+
+                    return $reference !== null
+                        && (int) $reference['pageable_id'] === (int) $itemReference['pageable_id']
+                        && $reference['pageable_type'] === $itemReference['pageable_type'];
+                });
 
                 if ($pageExistsKey !== false) {
                     $existingItem = $items->get($pageExistsKey);
@@ -209,39 +221,143 @@ class NavigationCreator
             ]);
         }
 
-        $navigation->items = $items->toArray();
+        $navigation->items = $items->all();
 
         $navigation->save();
 
         return $navigation;
     }
 
+    private static function stripSiteNameSuffix(Page $page, string $value): string
+    {
+        $value = trim($value);
+
+        if (! str_contains($value, '|')) {
+            return $value;
+        }
+
+        $site = $page->relationLoaded('site') ? $page->getRelation('site') : null;
+        $siteName = trim((string) ($site instanceof Site ? $site->name : null));
+
+        if ($siteName === '') {
+            return $value;
+        }
+
+        $segments = preg_split('/\s*\|\s*/u', $value, flags: PREG_SPLIT_NO_EMPTY);
+
+        if (! is_array($segments)) {
+            return $value;
+        }
+
+        $siteNameIndex = array_search($siteName, $segments, true);
+
+        if (! is_int($siteNameIndex) || $siteNameIndex === 0) {
+            return $value;
+        }
+
+        return trim(implode(' | ', array_slice($segments, 0, $siteNameIndex)));
+    }
+
     /**
-     * @param  Collection<array-key, mixed>  $items
-     * @return Collection<array-key, mixed>
+     * @return array<string, mixed>|null
      */
-    private function backfillMissingPageLabels(Collection $items, Language $language): Collection
+    private static function navigationItemArray(mixed $item): ?array
+    {
+        if (! is_array($item)) {
+            return null;
+        }
+
+        $normalized = [];
+
+        foreach ($item as $key => $value) {
+            if (! is_string($key)) {
+                return null;
+            }
+
+            $normalized[$key] = $value;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param  array<string, mixed>  $item
+     * @return array{pageable_id: int|string, pageable_type: string}|null
+     */
+    private static function pageReference(array $item): ?array
+    {
+        $data = $item['data'] ?? null;
+
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $pageableId = $data['pageable_id'] ?? null;
+        $pageableType = $data['pageable_type'] ?? null;
+
+        if ((! is_int($pageableId) && ! is_string($pageableId)) || ! is_string($pageableType)) {
+            return null;
+        }
+
+        return [
+            'pageable_id' => $pageableId,
+            'pageable_type' => $pageableType,
+        ];
+    }
+
+    /**
+     * @return Collection<array-key, array<string, mixed>>
+     */
+    private function navigationItemsFromValue(mixed $items): Collection
+    {
+        if ($items instanceof DataCollection) {
+            $items = $items->toArray();
+        }
+
+        if (! is_array($items)) {
+            return new Collection;
+        }
+
+        $normalized = [];
+
+        foreach ($items as $key => $item) {
+            $normalizedItem = self::navigationItemArray($item);
+
+            if ($normalizedItem !== null) {
+                $normalized[$key] = $normalizedItem;
+            }
+        }
+
+        return new Collection($normalized);
+    }
+
+    /**
+     * @param  Collection<array-key, array<string, mixed>>  $items
+     * @return Collection<array-key, array<string, mixed>>
+     */
+    private function normalizePageLabels(Collection $items, Language $language): Collection
     {
         return $items->map(function (array $item) use ($language): array {
-            if (($item['label'] ?? null) !== null && $item['label'] !== '') {
-                return $item;
+            $reference = self::pageReference($item);
+
+            if ($reference !== null) {
+                $page = ResolvePageableMorphModelAction::run(
+                    $reference['pageable_type'],
+                    $reference['pageable_id'],
+                );
+
+                if ($page instanceof Page) {
+                    $page->loadMissing('translations', 'site');
+                    $label = $item['label'] ?? null;
+                    $item['label'] = is_string($label) && trim($label) !== ''
+                        ? self::stripSiteNameSuffix($page, $label)
+                        : self::getPageNavigationLabel($page, $language);
+                }
             }
 
-            if (! isset($item['data']['pageable_id'], $item['data']['pageable_type'])) {
-                return $item;
+            if (is_array($item['children'] ?? null) && $item['children'] !== []) {
+                $item['children'] = $this->normalizePageLabels($this->navigationItemsFromValue($item['children']), $language)->all();
             }
-
-            $page = ResolvePageableMorphModelAction::run(
-                $item['data']['pageable_type'],
-                $item['data']['pageable_id'],
-            );
-
-            if (! $page instanceof Page) {
-                return $item;
-            }
-
-            $page->loadMissing('translations', 'site.language');
-            $item['label'] = self::getPageNavigationLabel($page, $language);
 
             return $item;
         });

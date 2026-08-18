@@ -9,14 +9,14 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Collection;
 
 /**
- * @method static void dispatch(Navigation $navigation, Collection<array-key, mixed> $items)
+ * @method static void dispatch(Navigation $navigation, Collection<array-key, array<string, mixed>> $items)
  */
 class NavigationCreating
 {
     use Dispatchable;
 
     /**
-     * @param  Collection<array-key, mixed>  $items
+     * @param  Collection<array-key, array<string, mixed>>  $items
      */
     public function __construct(
         public Navigation $navigation,

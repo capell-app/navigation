@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\Creator;
 
+use Aimeos\Nestedset\QueryBuilder as NestedSetQueryBuilder;
+use Capell\Core\Actions\ResolvePageableMorphModelAction;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
+use Capell\Core\Models\Translation;
 use Capell\Navigation\Actions\AddPageToNavigationAction;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
-use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Str;
 
@@ -68,9 +72,10 @@ class NavigationDemoCreator
     public function setupMainNavigation(Site $site, Language $language, Page $home): void
     {
         $pages = Page::query()
+            ->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $this->publicNavigationPageQuery($query))
             ->whereHas(
                 'blueprint',
-                fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
+                fn (Builder $query): Builder => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
             ->with('children')
             ->where('site_id', $site->id)
@@ -92,19 +97,33 @@ class NavigationDemoCreator
             home: $home,
             additionalItems: $this->buildNavigationPageItems($pages, $language),
         );
+
+        $this->removeNonPublicPageItems(
+            Navigation::query()
+                ->where('site_id', $site->id)
+                ->where('key', NavigationHandle::Main->value)
+                ->where('language_id', $language->id)
+                ->firstOrFail(),
+            $language,
+        );
     }
 
     public function setupFooterNavigation(Site $site, Language $language): void
     {
         $pages = Page::query()
+            ->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $this->publicNavigationPageQuery($query))
             ->whereHas(
                 'blueprint',
-                fn (BuilderContract $query): BuilderContract => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
+                fn (Builder $query): Builder => $query->default()->enabled()->accessible()->hiddenSystemGroup(),
             )
             ->with('children')
             ->withWhereHas(
                 'translations',
-                fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
+                fn (Builder|Relation $query): mixed => $query
+                    ->where('language_id', $language->id)
+                    ->where(function (Builder $query): void {
+                        $this->applyFooterNavigationTranslationQuery($query);
+                    }),
             )
             ->where('site_id', $site->id)
             ->notHomePage()
@@ -123,7 +142,17 @@ class NavigationDemoCreator
             site: $site,
             type: $navigationType,
             language: $language,
-            items: $this->buildNavigationPageItems($pages, $language),
+            items: $this->buildNavigationPageItems($pages, $language, true),
+        );
+
+        $this->removeNonPublicPageItems(
+            Navigation::query()
+                ->where('site_id', $site->id)
+                ->where('key', NavigationHandle::Footer->value)
+                ->where('language_id', $language->id)
+                ->firstOrFail(),
+            $language,
+            true,
         );
     }
 
@@ -164,16 +193,22 @@ class NavigationDemoCreator
     }
 
     /**
-     * @param  SupportCollection<array-key, mixed>  $pages
-     * @return array<array-key, mixed>
+     * @param  iterable<array-key, Page>  $pages
+     * @return array<array-key, array<string, mixed>>
      */
-    private function buildNavigationPageItems(SupportCollection $pages, Language $language): array
+    private function buildNavigationPageItems(iterable $pages, Language $language, bool $footer = false): array
     {
         $this->loadPageTranslations($pages, $language);
 
         $items = [];
 
         foreach ($pages as $page) {
+            $page->loadMissing('site');
+
+            if (! $this->isPublicNavigationPage($page, $footer)) {
+                continue;
+            }
+
             $items[(string) Str::uuid()] = [
                 'label' => NavigationCreator::getPageNavigationLabel($page, $language),
                 'type' => NavigationItemType::Page->value,
@@ -183,7 +218,7 @@ class NavigationDemoCreator
                     'pageable_type' => $page->getMorphClass(),
                 ],
                 'children' => $page->relationLoaded('children')
-                    ? $this->buildNavigationPageItems($page->children, $language)
+                    ? $this->buildNavigationPageItems($page->children, $language, $footer)
                     : [],
             ];
         }
@@ -195,7 +230,8 @@ class NavigationDemoCreator
     private function mainNavigationSortKey(Page $page, Language $language): array
     {
         $page->loadMissing([
-            'translations' => fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
+            'site',
+            'translations' => fn (Relation $query): Relation => $query->where('language_id', $language->id),
         ]);
 
         $label = NavigationCreator::getPageNavigationLabel($page, $language);
@@ -207,13 +243,13 @@ class NavigationDemoCreator
     }
 
     /**
-     * @param  SupportCollection<array-key, mixed>  $pages
+     * @param  iterable<array-key, mixed>  $pages
      */
-    private function loadPageTranslations(SupportCollection $pages, Language $language): void
+    private function loadPageTranslations(iterable $pages, Language $language): void
     {
         if ($pages instanceof Collection) {
             $pages->loadMissing([
-                'translations' => fn (BuilderContract $query): BuilderContract => $query->where('language_id', $language->id),
+                'translations' => fn (Relation $query): Relation => $query->where('language_id', $language->id),
             ]);
         }
 
@@ -237,5 +273,117 @@ class NavigationDemoCreator
 
             $this->loadPageTranslations($children, $language);
         }
+    }
+
+    /**
+     * @param  NestedSetQueryBuilder<Page>  $query
+     * @return NestedSetQueryBuilder<Page>
+     */
+    private function publicNavigationPageQuery(NestedSetQueryBuilder $query): NestedSetQueryBuilder
+    {
+        return $query->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query->whereNull('pages.meta')
+            ->orWhere(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query
+                ->whereJsonDoesntContainKey('pages.meta->demo_fixture')
+                ->whereJsonDoesntContainKey('pages.meta->theme_demo')
+                ->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query
+                    ->whereJsonDoesntContainKey('pages.meta->navigation.exclude')
+                    ->orWhereJsonDoesntContain('pages.meta->navigation.exclude', true))));
+    }
+
+    /**
+     * @param Builder<*> $query
+     */
+    private function applyFooterNavigationTranslationQuery(Builder $query): void
+    {
+        $query->where(fn (Builder $query): Builder => $query->whereNull('translations.meta')
+            ->orWhereJsonDoesntContainKey('translations.meta->exclude_from_footer')
+            ->orWhereJsonDoesntContain('translations.meta->exclude_from_footer', true))->where(fn (Builder $query): Builder => $query->whereNull('translations.meta')
+            ->orWhereJsonDoesntContainKey('translations.meta->exclude_from_navigation')
+            ->orWhereJsonDoesntContain('translations.meta->exclude_from_navigation', true));
+    }
+
+    private function removeNonPublicPageItems(Navigation $navigation, Language $language, bool $footer = false): void
+    {
+        $navigation->items = $this->filterPublicNavigationItems(
+            collect($navigation->items),
+            $language,
+            $footer,
+        )->all();
+        $navigation->save();
+    }
+
+    /**
+     * @param  SupportCollection<array-key, mixed>  $items
+     * @return SupportCollection<array-key, mixed>
+     */
+    private function filterPublicNavigationItems(
+        SupportCollection $items,
+        Language $language,
+        bool $footer,
+    ): SupportCollection {
+        $filteredItems = [];
+
+        foreach ($items as $key => $item) {
+            if (! is_array($item)) {
+                $filteredItems[$key] = $item;
+
+                continue;
+            }
+
+            $data = $item['data'] ?? null;
+
+            if (
+                is_array($data)
+                && isset($data['pageable_id'], $data['pageable_type'])
+                && is_string($data['pageable_type'])
+                && (is_int($data['pageable_id']) || is_string($data['pageable_id']))
+            ) {
+                $page = ResolvePageableMorphModelAction::run(
+                    $data['pageable_type'],
+                    $data['pageable_id'],
+                );
+
+                if ($page instanceof Page) {
+                    $page->load([
+                        'site',
+                        'translations' => fn (Relation $query): Relation => $query
+                            ->where('language_id', $language->id),
+                    ]);
+
+                    if (! $this->isPublicNavigationPage($page, $footer)) {
+                        continue;
+                    }
+                }
+            }
+
+            if (is_array($item['children'] ?? null) && $item['children'] !== []) {
+                $item['children'] = $this->filterPublicNavigationItems(
+                    collect($item['children']),
+                    $language,
+                    $footer,
+                )->all();
+            }
+
+            $filteredItems[$key] = $item;
+        }
+
+        return new SupportCollection($filteredItems);
+    }
+
+    private function isPublicNavigationPage(Page $page, bool $footer = false): bool
+    {
+        $translation = $page->relationLoaded('translation')
+            ? $page->getRelation('translation')
+            : ($page->relationLoaded('translations') ? $page->translations->first() : null);
+
+        if (! $translation instanceof Translation) {
+            $translation = null;
+        }
+
+        return data_get($page->meta, 'demo_fixture') === null
+            && data_get($page->meta, 'theme_demo') === null
+            && data_get($page->meta, 'navigation.exclude') !== true
+            && data_get($translation?->meta, 'exclude_from_navigation') !== true
+            && (! $footer || data_get($translation?->meta, 'exclude_from_footer') !== true);
     }
 }

@@ -53,6 +53,8 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
             return;
         }
 
+        $hasMainNavigation = false;
+
         foreach (NavigationHandle::cases() as $handle) {
             $navigation = NavigationLoader::getNavigation($handle, $site, $language);
 
@@ -61,6 +63,10 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
             }
 
             $navigation->loadMissing('blueprint');
+
+            if ($handle === NavigationHandle::Main) {
+                $hasMainNavigation = true;
+            }
 
             $context->setFrontendData(
                 $this->renderModelKey($handle->value),
@@ -72,6 +78,16 @@ final class NavigationFrontendRuntimeManifestContributor implements FrontendRunt
                     siteDomain: $siteDomain,
                 )),
             );
+        }
+
+        // Header navigation is an interactive Alpine surface even when the
+        // active database theme opted out or the demo preview is rendering a
+        // registry theme over a base theme record with no runtime metadata.
+        // The frontend runtime will still honour an explicit hard opt-out in
+        // ResolveFrontendRuntimeAction, but normal navigation previews must
+        // not fall back to the permanently expanded static menu.
+        if ($hasMainNavigation) {
+            $manifest->usesAlpine = true;
         }
     }
 

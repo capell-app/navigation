@@ -7,6 +7,7 @@ namespace Capell\Navigation\Support\Loader;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Models\Language;
+use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Frontend\Data\PageListingRequestData;
@@ -73,7 +74,9 @@ class NavigationItemsLoader
     {
         $hasActive = false;
 
-        $currentUrl = $this->page->pageUrl->full_url ?? '';
+        /** @var PageUrl|null $currentPageUrl */
+        $currentPageUrl = $this->page->getRelationValue('pageUrl');
+        $currentUrl = $currentPageUrl === null ? '' : ($currentPageUrl->full_url ?? '');
 
         foreach ($items as $item) {
             $active = false;
@@ -252,7 +255,9 @@ class NavigationItemsLoader
                     $menuItem['label'] = $page->translation->label ?? $page->name;
                 }
 
-                $menuItem['data']['url'] = $page->pageUrl->full_url ?? '#';
+                /** @var PageUrl|null $pageUrl */
+                $pageUrl = $page->getRelationValue('pageUrl');
+                $menuItem['data']['url'] = $pageUrl === null ? '#' : ($pageUrl->full_url ?? '#');
             }
 
             $result[] = new NavigationItemData(...$menuItem);
@@ -430,17 +435,19 @@ class NavigationItemsLoader
                     continue;
                 }
 
-                if (
-                    $page->pageUrl !== null
-                    && $page->pageUrl->site_id === $this->siteDomain->site_id
-                    && $page->pageUrl->language_id === $this->siteDomain->language_id
-                ) {
-                    $page->pageUrl->setRelation('siteDomain', $this->siteDomain);
-                } elseif ($page->pageUrl !== null) {
-                    $page->pageUrl->setRelation(
-                        'siteDomain',
-                        $siteDomainsByScope[$this->siteDomainScopeKey((int) $page->pageUrl->site_id, (int) $page->pageUrl->language_id)] ?? null,
-                    );
+                $pageUrl = $page->pageUrl;
+                if ($pageUrl !== null) {
+                    if (
+                        $pageUrl->site_id === $this->siteDomain->site_id
+                        && $pageUrl->language_id === $this->siteDomain->language_id
+                    ) {
+                        $pageUrl->setRelation('siteDomain', $this->siteDomain);
+                    } else {
+                        $pageUrl->setRelation(
+                            'siteDomain',
+                            $siteDomainsByScope[$this->siteDomainScopeKey((int) $pageUrl->site_id, (int) $pageUrl->language_id)] ?? null,
+                        );
+                    }
                 }
 
                 $lookupKey = $this->buildMorphLookupKey($pageableType, (int) $page->getKey());
@@ -621,12 +628,13 @@ class NavigationItemsLoader
                 continue;
             }
 
-            if ($page->pageUrl === null) {
+            $pageUrl = $page->pageUrl;
+            if ($pageUrl === null) {
                 continue;
             }
 
-            $siteId = $page->pageUrl->site_id;
-            $languageId = $page->pageUrl->language_id;
+            $siteId = $pageUrl->site_id;
+            $languageId = $pageUrl->language_id;
             if (! is_numeric($siteId)) {
                 continue;
             }
