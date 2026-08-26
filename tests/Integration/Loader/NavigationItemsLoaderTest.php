@@ -283,6 +283,46 @@ it('skips page items that belong to a different site', function (): void {
         ->and(navigationLoaderItem($items, 0)->label)->toBe('Safe Link');
 });
 
+it('does not leak a draft page referenced by an explicit nav item to an anonymous request', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()->language($language)->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+    $draftPage = Page::factory()->site($site)->pending()->withTranslations()->create();
+
+    $navigation = Navigation::factory()->make([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $site->language->id,
+        'items' => [
+            [
+                'type' => NavigationItemType::Page->value,
+                'data' => [
+                    'pageable_id' => $draftPage->id,
+                    'pageable_type' => $draftPage->getMorphClass(),
+                ],
+            ],
+            [
+                'label' => 'Safe Link',
+                'type' => NavigationItemType::Link->value,
+                'data' => ['url' => '/safe'],
+            ],
+        ],
+    ]);
+
+    $loader = new NavigationItemsLoader(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $site->language,
+        siteDomain: $site->siteDomains->first(),
+    );
+
+    $items = $loader->fetchMenuItems();
+
+    expect($items)->toHaveCount(1)
+        ->and(navigationLoaderItem($items, 0)->label)->toBe('Safe Link');
+});
+
 it('excludes hidden navigation items and hidden nested children', function (): void {
     $language = Language::factory()->default()->create();
     $site = Site::factory()->language($language)->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])->create();

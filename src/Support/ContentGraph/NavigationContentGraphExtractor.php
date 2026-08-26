@@ -31,7 +31,7 @@ final class NavigationContentGraphExtractor implements ContentGraphExtractor
             ? $navigation->items->toArray()
             : ($navigation->items ?? []);
 
-        $edges = ResolveNavigationItemModelsAction::run($items)
+        $edges = ResolveNavigationItemModelsAction::run($items, $navigation->site_id)
             ->map(fn (Model $page): ContentGraphEdgeData => new ContentGraphEdgeData(
                 source: $source,
                 target: ContentGraphNodeData::fromModelIdentity($page::class, $page->getKey()),

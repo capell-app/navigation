@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Actions;
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Navigation\Enums\NavigationItemType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
@@ -13,7 +15,7 @@ use Lorisleiva\Actions\Concerns\AsObject;
 use Spatie\LaravelData\DataCollection;
 
 /**
- * @method static Collection<int, Model> run(array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed> $items)
+ * @method static Collection<int, Model> run(array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed> $items, ?int $siteId = null)
  */
 class ResolveNavigationItemModelsAction
 {
@@ -22,9 +24,14 @@ class ResolveNavigationItemModelsAction
 
     /**
      * @param  array<int|string, array<string, mixed>>|Collection<int|string, array<string, mixed>>|DataCollection<int, mixed>  $items
+     * @param  int|null  $siteId  Scopes resolved page models to a single site when provided. Callers
+     *                            resolving items for a specific Navigation record should pass its
+     *                            site_id so a page belonging to another site cannot be resolved.
+     *                            Only applied to Pageable morph types — other referenced models
+     *                            (e.g. Site) have no site_id column to scope against.
      * @return Collection<int, Model>
      */
-    public function handle(array|Collection|DataCollection $items): Collection
+    public function handle(array|Collection|DataCollection $items, ?int $siteId = null): Collection
     {
         if ($items instanceof DataCollection) {
             $items = $items->all();
@@ -38,7 +45,7 @@ class ResolveNavigationItemModelsAction
         $pageableIdsByType = $this->collectPageableIdsByType($items);
 
         return collect($pageableIdsByType)
-            ->flatMap(function (array $pageableIds, string $pageableType): Collection {
+            ->flatMap(function (array $pageableIds, string $pageableType) use ($siteId): Collection {
                 if ($pageableIds === []) {
                     return new Collection;
                 }
@@ -54,6 +61,10 @@ class ResolveNavigationItemModelsAction
 
                 return $modelClass::query()
                     ->whereIn($queryModel->getKeyName(), $pageableIds)
+                    ->when(
+                        $siteId !== null && is_subclass_of($modelClass, Pageable::class),
+                        fn (Builder $query): Builder => $query->where('site_id', $siteId),
+                    )
                     ->get();
             })
             ->values();

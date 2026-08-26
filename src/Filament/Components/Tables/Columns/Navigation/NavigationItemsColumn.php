@@ -20,7 +20,7 @@ class NavigationItemsColumn extends TextColumn
         $this->label(__('capell-admin::table.items'))
             ->getStateUsing(
                 function (Navigation $record): array {
-                    $pageLabelsByLookupKey = ResolveNavigationItemModelsAction::run($record->items ?? [])
+                    $pageLabelsByLookupKey = ResolveNavigationItemModelsAction::run($record->items ?? [], $record->site_id)
                         ->mapWithKeys(
                             fn (Model $model): array => [
                                 $this->buildLookupKey($model->getMorphClass(), (int) $model->getKey()) => $this->resolveModelLabel($model),

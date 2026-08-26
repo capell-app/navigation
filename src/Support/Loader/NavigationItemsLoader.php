@@ -417,12 +417,29 @@ class NavigationItemsLoader
             /** @var class-string<Model&Pageable<Model>> $modelClass */
             $model = new $modelClass;
 
+            // Explicit page references must pass the same publish/permission scope as
+            // the auto_children path (Capell\Frontend\Actions\ListPagesAction::buildIdQuery()),
+            // or an unpublished/disabled/inaccessible page's title and URL leak to
+            // anonymous visitors via public navigation HTML. $modelClass is guaranteed
+            // to extend Capell\Core\Models\Page (Pageable::@phpstan-require-extends),
+            // so publishedDate(), the blueprint relation, and its enabled()/accessible()
+            // scopes are always available.
             $query = $modelClass::query()
                 ->with(['translation', 'pageUrl'])
                 ->whereIn($model->getKeyName(), $pageableIds)
+                ->where('site_id', $this->site->getKey())
+                ->publishedDate()
+                ->whereHas(
+                    'blueprint',
+                    fn (BuilderContract $blueprintQuery): BuilderContract => $blueprintQuery
+                        ->enabled()
+                        ->accessible(),
+                )
+                ->whereHas(
+                    'pageUrl',
+                    fn (BuilderContract $pageUrlQuery): BuilderContract => $pageUrlQuery->enabled(),
+                )
                 ->orderBy($model->getKeyName());
-
-            $query->where('site_id', $this->site->getKey());
 
             $pages = $query->get();
             $siteDomainsByScope = $this->siteDomainsByScope($pages);
