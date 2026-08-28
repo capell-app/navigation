@@ -94,6 +94,10 @@ it('loads a large, deeply nested frontend page efficiently', function (): void {
         )
         ->create();
 
+    // Settle deferred graph rebuilds queued by the fixture writes before the
+    // request budget begins; production reaches the request after that boundary.
+    defer()->invoke();
+
     $url = $ancestor->pageUrl->full_url;
 
     setupQueryLogging();

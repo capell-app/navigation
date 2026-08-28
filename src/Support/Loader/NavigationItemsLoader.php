@@ -448,7 +448,7 @@ class NavigationItemsLoader
             $cachedPages = [];
 
             foreach ($pages as $page) {
-                if (! $page instanceof Pageable) {
+                if (! $page instanceof Model || ! $page instanceof Pageable) {
                     continue;
                 }
 

@@ -183,6 +183,7 @@ it('declares navigation extension surfaces and contribution contracts', function
                 'migrationFiles' => [
                     '2026_05_10_190860_01_create_navigations_table',
                     '2026_06_04_000001_create_navigation_page_references_table',
+                    '2026_08_28_000003_change_navigation_visibility_to_datetime',
                 ],
             ],
             [
@@ -352,7 +353,5 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
     expect($deferredEntry)
         ->not->toBeNull()
         ->and($deferredEntry['required'] ?? true)->toBeFalse()
-        ->and($deferredEntry['notes'] ?? '')->toBe('Deferred: the current non-route evidence has been retired. Replace it with an authentic installed-App route capture before Marketplace promotion.')
-        ->and(navigationRepositoryPath('packages/navigation/docs/screenshots/create-edit-navigation-form.png'))->not->toBeFile()
-        ->and(navigationRepositoryPath('packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png'))->not->toBeFile();
+        ->and($deferredEntry['notes'] ?? '')->toBe('Deferred: this capture is retained as non-promoted evidence. Replace it with an authentic installed-App route receipt before Marketplace promotion.');
 });

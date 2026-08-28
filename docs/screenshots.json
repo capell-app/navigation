@@ -30,7 +30,7 @@
             "url": "/navigation/navigations/create",
             "waitFor": "form",
             "required": false,
-            "notes": "Deferred: the current non-route evidence has been retired. Replace it with an authentic installed-App route capture before Marketplace promotion.",
+            "notes": "Deferred: this capture is retained as non-promoted evidence. Replace it with an authentic installed-App route receipt before Marketplace promotion.",
             "useCase": "An editor builds a navigation tree with links, page references, headings, and nested items.",
             "screenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form.png",
             "darkScreenshotPath": "packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png"

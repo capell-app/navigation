@@ -47,7 +47,7 @@ Screenshot contract: `docs/screenshots.json`.
 ## Technical Shape
 
 - Service providers: `Capell\Navigation\Providers\NavigationServiceProvider`.
-- Migrations: `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`, `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`.
+- Migrations: `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`, `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`, `packages/navigation/database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php`.
 - Models: `Navigation`.
 - Filament classes: `TypeSelect`, `NavigationSelect`, `NavigationTab`, `NavigationItemsColumn`, `DefaultNavigationConfigurator`, `NavigationPageSchemaExtender`, `NavigationSiteExtender`, `NavigationResource`, `CreateNavigation`, `EditNavigation`, `ListNavigations`, `NavigationForm`, `and 2 more`.
 - Route files: `packages/navigation/routes/web.php`.
@@ -69,7 +69,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Required tables: `navigations`, `navigation_page_references`.
 - Models: `Navigation`.
 - Core record references in migrations: `sites via site_id`, `languages via language_id`.
-- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`.
+- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`, `2026_08_28_000003_change_navigation_visibility_to_datetime.php`.
 - Migration impact: run host migrations through the package install flow before opening package surfaces.
 - Deletion/retention behaviour: migrations declare cascade-on-delete relationships; no timed pruning or retention schedule is declared in `capell.json`.
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Database\Factories;
 
-use Capell\Core\Contracts\Pageable;
 use Capell\Core\Database\Factories\Concerns\HasMeta;
 use Capell\Core\Database\Factories\SiteFactory;
 use Capell\Core\Models\Blueprint;
@@ -50,7 +49,7 @@ class NavigationFactory extends Factory
     }
 
     /**
-     * @param  array<array-key, mixed>|Collection<array-key, mixed>  $items
+     * @param  array<array-key, mixed>|Collection<int, Page>  $items
      */
     public function items(array|Collection $items): self
     {
@@ -75,12 +74,12 @@ class NavigationFactory extends Factory
     }
 
     /**
-     * @param  Collection<array-key, mixed>  $pages
+     * @param  Collection<int, Page>  $pages
      * @return array<array-key, mixed>
      */
     private function mapPagesToItems(Collection $pages): array
     {
-        return $pages->map(fn (Pageable $page): array => [
+        return $pages->map(fn (Page $page): array => [
             'type' => NavigationItemType::Page->value,
             'data' => [
                 'pageable_id' => $page->getKey(),
