@@ -311,11 +311,13 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
     $entries = $screenshotManifest['entries'] ?? [];
     throw_unless(is_array($entries), RuntimeException::class, 'Navigation screenshot entries must be an array.');
 
-    expect($entries)->toHaveCount(6);
+    expect($entries)->toHaveCount(8);
 
     $expectedScreenshotPaths = [
         'packages/navigation/docs/screenshots/navigation-admin-index.png',
-        'packages/navigation/docs/screenshots/create-edit-navigation-form.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-desktop.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-tablet.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-mobile.png',
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab.png',
         'packages/navigation/docs/screenshots/frontend-menu-output.png',
@@ -323,7 +325,9 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
     ];
     $expectedDarkScreenshotPaths = [
         'packages/navigation/docs/screenshots/navigation-admin-index-dark.png',
-        'packages/navigation/docs/screenshots/create-edit-navigation-form-dark.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-desktop-dark.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-tablet-dark.png',
+        'packages/navigation/docs/screenshots/create-edit-navigation-form-mobile-dark.png',
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png',
         'packages/navigation/docs/screenshots/frontend-menu-output-dark.png',
@@ -332,6 +336,22 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
 
     expect(array_column($entries, 'screenshotPath'))->toEqual($expectedScreenshotPaths);
     expect(array_column($entries, 'darkScreenshotPath'))->toEqual($expectedDarkScreenshotPaths);
+
+    $createFormEntries = collect($entries)
+        ->filter(static function (mixed $entry): bool {
+            if (! is_array($entry)) {
+                return false;
+            }
+
+            $id = $entry['id'] ?? null;
+
+            return is_string($id) && str_starts_with($id, 'create-edit-navigation-form-');
+        })
+        ->values();
+
+    expect($createFormEntries)->toHaveCount(3)
+        ->and($createFormEntries->pluck('viewport')->all())->toEqual(['desktop', 'tablet', 'mobile'])
+        ->and($createFormEntries->pluck('required')->all())->toEqual([true, true, true]);
 
     foreach ($entries as $entry) {
         throw_unless(is_array($entry), RuntimeException::class, 'Navigation screenshot entries must be arrays.');
@@ -347,11 +367,4 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
             expect(navigationRepositoryPath($darkScreenshotPath))->toBeFile();
         }
     }
-
-    $deferredEntry = collect($entries)->firstWhere('id', 'create-edit-navigation-form');
-
-    expect($deferredEntry)
-        ->not->toBeNull()
-        ->and($deferredEntry['required'] ?? true)->toBeFalse()
-        ->and($deferredEntry['notes'] ?? '')->toBe('Deferred: this capture is retained as non-promoted evidence. Replace it with an authentic installed-App route receipt before Marketplace promotion.');
 });

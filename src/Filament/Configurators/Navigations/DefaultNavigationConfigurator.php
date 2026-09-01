@@ -18,17 +18,23 @@ use Capell\Admin\Filament\Concerns\HasConfigurator;
 use Capell\Admin\Filament\Livewire\PublishStatusPanel;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\PageVariationEnum;
+use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
+use Capell\Core\Models\Site;
 use Capell\Core\Support\CapellCoreHelper;
 use Capell\Core\Support\Slug\SlugGenerator;
+use Capell\Navigation\Actions\BuildNavigationStarterItemsAction;
 use Capell\Navigation\Data\NavigationItemData;
+use Capell\Navigation\Data\NavigationStarterRequestData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
 use Capell\Navigation\Enums\NavigationDropdownLayout;
+use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemTarget;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Enums\NavigationItemVisibility;
+use Capell\Navigation\Enums\NavigationPurpose;
 use Capell\Navigation\Filament\Components\Forms\Navigation\TypeSelect;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
@@ -39,19 +45,26 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions as SchemaActions;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Livewire;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Schema as DatabaseSchema;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 use Saade\FilamentAdjacencyList\Forms\Components\AdjacencyList;
 
@@ -129,88 +142,204 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
      */
     protected function getMainFormSchema(): array
     {
+        /** @var view-string $impactPreviewView */
+        $impactPreviewView = 'capell-navigation::filament.forms.navigation-impact-preview';
+
         return [
             Tabs::make()
                 ->tabs([
                     Tab::make(__('capell-admin::form.items'))
                         ->icon(Heroicon::Bars3)
                         ->schema([
+                            $this->getStarterSection(),
                             $this->getNavigationItemsField(),
                         ]),
                     Tab::make(__('capell-admin::form.settings'))
                         ->icon(Heroicon::OutlinedCog6Tooth)
                         ->statePath('meta')
-                        ->columns()
                         ->schema([
-                            TextInput::make('component')
-                                ->label(__('capell-admin::form.component'))
-                                ->helperText(__('capell-admin::generic.menu_component_info'))
-                                ->placeholder('capell::list'),
-                            TextInput::make('component_item')
-                                ->label(__('capell-admin::form.component_item'))
-                                ->helperText(__('capell-admin::generic.menu_component_item_info'))
-                                ->placeholder('capell::list.item'),
+                            Section::make(__('capell-navigation::generic.component_overrides'))
+                                ->description(__('capell-navigation::generic.component_overrides_info'))
+                                ->columns()
+                                ->columnSpanFull()
+                                ->collapsible()
+                                ->collapsed(fn (Get $get): bool => blank($get('component')) && blank($get('component_item')))
+                                ->schema([
+                                    TextInput::make('component')
+                                        ->label(__('capell-admin::form.component'))
+                                        ->helperText(__('capell-admin::generic.menu_component_info'))
+                                        ->placeholder('capell::list'),
+                                    TextInput::make('component_item')
+                                        ->label(__('capell-admin::form.component_item'))
+                                        ->helperText(__('capell-admin::generic.menu_component_item_info'))
+                                        ->placeholder('capell::list.item'),
+                                ]),
                         ]),
+                ]),
+            Section::make(__('capell-navigation::generic.impact_preview'))
+                ->description(__('capell-navigation::generic.impact_preview_description'))
+                ->columnSpanFull()
+                ->hiddenOn(['create', 'createOption', 'replicate'])
+                ->schema([
+                    View::make($impactPreviewView)
+                        ->viewData(fn (Get $get): array => [
+                            'siteId' => $this->stateId($get('site_id')),
+                            'languageId' => $this->stateId($get('language_id')),
+                        ])
+                        ->columnSpanFull(),
                 ]),
         ];
     }
 
     /**
+     * The empty-item state.
+     *
+     * Three starting points, none of which produces a special menu type: each
+     * one leaves ordinary items the editor can rename, reorder, nest, or
+     * delete. Disappears as soon as the menu has an item.
+     */
+    protected function getStarterSection(): Section
+    {
+        return Section::make(__('capell-navigation::generic.starter_empty_heading'))
+            ->description(__('capell-navigation::generic.starter_empty_description'))
+            ->columnSpanFull()
+            ->visible(fn (Get $get): bool => $this->itemsAreEmpty($get('items')))
+            ->schema([
+                SchemaActions::make([
+                    Action::make('start_with_page')
+                        ->label(__('capell-navigation::generic.starter_with_page'))
+                        ->icon(Heroicon::OutlinedDocumentText)
+                        ->action(fn (Get $get, Set $set): null => $this->applyBlankStarter(
+                            $set,
+                            NavigationItemType::Page,
+                            $get('site_id'),
+                        )),
+
+                    Action::make('start_with_link')
+                        ->label(__('capell-navigation::generic.starter_with_link'))
+                        ->icon(Heroicon::OutlinedLink)
+                        ->color('gray')
+                        ->action(fn (Set $set): null => $this->applyBlankStarter(
+                            $set,
+                            NavigationItemType::Link,
+                            null,
+                        )),
+
+                    Action::make('start_from_published_pages')
+                        ->label(__('capell-navigation::generic.starter_from_pages'))
+                        ->icon(Heroicon::OutlinedSquares2x2)
+                        ->color('gray')
+                        ->tooltip(__('capell-navigation::generic.starter_from_pages_info'))
+                        ->action(fn (Get $get, Set $set): null => $this->applyPublishedPagesStarter($get, $set)),
+                ])->key('starterActions'),
+            ]);
+    }
+
+    protected function applyBlankStarter(Set $set, NavigationItemType $type, mixed $siteId): null
+    {
+        $set('items', $this->blankStarterItems($type, $siteId));
+
+        return null;
+    }
+
+    /**
+     * Fill the item list from the site's published top-level pages.
+     */
+    protected function applyPublishedPagesStarter(Get $get, Set $set): null
+    {
+        $siteId = $this->stateId($get('site_id'));
+
+        if ($siteId === null) {
+            Notification::make()
+                ->warning()
+                ->title(__('capell-navigation::generic.starter_from_pages_site_required'))
+                ->send();
+
+            return null;
+        }
+
+        $starter = BuildNavigationStarterItemsAction::run(
+            NavigationStarterRequestData::fromState($siteId, $get('language_id')),
+        );
+
+        if ($starter->isEmpty()) {
+            Notification::make()
+                ->warning()
+                ->title(__('capell-navigation::generic.starter_from_pages_none'))
+                ->send();
+
+            return null;
+        }
+
+        $set('items', $starter->items);
+
+        Notification::make()
+            ->success()
+            ->title(__('capell-navigation::generic.starter_from_pages_added', ['count' => $starter->pageCount]))
+            ->send();
+
+        return null;
+    }
+
+    /**
+     * The navigation settings sidebar.
+     *
+     * Purpose leads: an editor picks Main, Footer, Sub-footer, or Custom and
+     * the built-in key, suggested name, and current site/language follow from
+     * that choice. The key control only surfaces when the editor actually has
+     * a decision to make - a custom key, or a derived key that already exists
+     * for this site and language and would otherwise fail validation silently.
+     * Blueprint and scheduling sit under Advanced until their state needs
+     * attention.
+     *
      * @return array<array-key, mixed>
      */
     protected function getSettingsFormSchema(Schema $configurator): array
     {
+        $isCreating = $this->isCreateOperation($configurator);
+
         return [
+            ...$this->getPurposeField($configurator, $isCreating),
+
             NameInput::make('name')
                 ->required()
+                ->default($isCreating ? NavigationPurpose::Main->defaultName() : null)
                 ->afterStateUpdatedJs(function (string $operation): string {
                     if (! in_array($operation, ['create', 'createOption', 'replicate'], true)) {
                         return '';
                     }
 
-                    return SlugGenerator::slugifyState("\$state ?? ''", 'key');
+                    $slugify = SlugGenerator::slugifyState("\$state ?? ''", 'key');
+                    $customPurpose = NavigationPurpose::Custom->value;
+
+                    // Only a custom menu derives its key from the name; the
+                    // built-in purposes own their key.
+                    return <<<JS
+                        if (\$get('purpose') === '{$customPurpose}') {
+                            {$slugify}
+                        }
+                    JS;
                 }),
 
-            Select::make('key')
-                ->required()
-                ->options(fn (Get $get, ?Model $record): array => $this->navigationKeyOptions($record, $get('key')))
-                ->searchable()
-                ->allowHtml(false)
-                ->unique(
-                    column: 'key',
-                    ignoreRecord: $configurator->getOperation() !== 'replicate',
-                    modifyRuleUsing: function (Unique $rule, Get $get): Unique {
-                        $languageId = self::uniqueRuleValue($get('language_id'));
-
-                        return $rule
-                            ->withoutTrashed()
-                            ->where('site_id', self::uniqueRuleValue($get('site_id')))
-                            ->when(
-                                $languageId !== null,
-                                fn (Unique $query): Unique => $query->where('language_id', $languageId),
-                                fn (Unique $query): Unique => $query->whereNull('language_id'),
-                            );
-                    },
-                )
-                ->label(__('capell-admin::table.key'))
-                ->helperText(__('capell-navigation::generic.key_info')),
-
-            TypeSelect::make('blueprint_id')
-                ->live()
-                ->withRelation()
-                ->when(
-                    $configurator->isCreating(),
-                    fn (TypeSelect $component): TypeSelect => $component->withCreateForm(),
-                    fn (TypeSelect $component): TypeSelect => $component->withEditForm(),
-                ),
+            $this->getKeyField($configurator, $isCreating),
 
             SiteSelect::make('site_id')
                 ->required()
-                ->reactive(),
+                ->reactive()
+                ->afterStateUpdated(function (mixed $state, Set $set) use ($isCreating): void {
+                    if (! $isCreating) {
+                        return;
+                    }
+
+                    $set('language_id', $this->defaultLanguageId($this->stateId($state)));
+                }),
 
             LanguageSelect::make('language_id')
                 ->reactive()
                 ->withRelationship()
+                ->default(fn (Get $get): ?int => $isCreating
+                    ? $this->defaultLanguageId($this->stateId($get('site_id')))
+                    : null)
                 ->modifyRelationQueryUsing(
                     fn (Builder $query, Get $get): Builder => $query->when(
                         $get('site_id'),
@@ -221,8 +350,124 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                     ),
                 ),
 
-            PublishSchema::make($configurator),
+            Section::make(__('capell-navigation::generic.advanced'))
+                ->description(__('capell-navigation::generic.advanced_info'))
+                ->icon(Heroicon::OutlinedAdjustmentsHorizontal)
+                ->collapsible()
+                ->collapsed(fn (Get $get): bool => ! $this->advancedRequiresAttention($get, $configurator))
+                ->schema([
+                    TypeSelect::make('blueprint_id')
+                        ->live()
+                        ->withRelation()
+                        ->when(
+                            $configurator->isCreating(),
+                            fn (TypeSelect $component): TypeSelect => $component->withCreateForm(),
+                            fn (TypeSelect $component): TypeSelect => $component->withEditForm(),
+                        ),
+
+                    PublishSchema::make($configurator),
+                ]),
         ];
+    }
+
+    /**
+     * The purpose selector. Creation only - an existing navigation's key is
+     * already rendered by a theme, so its purpose is not a free choice.
+     *
+     * @return array<int, ToggleButtons>
+     */
+    protected function getPurposeField(Schema $configurator, bool $isCreating): array
+    {
+        if (! $isCreating) {
+            return [];
+        }
+
+        $record = $configurator->getRecord();
+        $rawState = $configurator->getRawState();
+        $state = $rawState instanceof Arrayable ? $rawState->toArray() : $rawState;
+        $sourceKey = $record instanceof Navigation
+            ? $record->key
+            : (is_array($state) && is_string($state['key'] ?? null) ? $state['key'] : null);
+        $purpose = $configurator->getOperation() === 'replicate'
+            ? NavigationPurpose::fromKey($sourceKey)
+            : NavigationPurpose::Main;
+
+        return [
+            ToggleButtons::make('purpose')
+                ->label(__('capell-navigation::generic.purpose'))
+                ->helperText(__('capell-navigation::generic.purpose_info'))
+                ->options(NavigationPurpose::class)
+                ->default($purpose->value)
+                ->dehydrated(false)
+                ->disabled($configurator->getOperation() === 'replicate')
+                ->live()
+                ->afterStateHydrated(fn (Set $set): mixed => $set('purpose', $purpose->value))
+                ->afterStateUpdated(function (mixed $state, Get $get, Set $set): void {
+                    $purpose = $this->purposeFromState($state);
+
+                    if (! $purpose instanceof NavigationPurpose) {
+                        return;
+                    }
+
+                    $handle = $purpose->handle();
+
+                    $nameIsDerived = $this->nameIsDerived($get('name'));
+
+                    if (! $handle instanceof NavigationHandle) {
+                        $set('key', null);
+
+                        if ($nameIsDerived) {
+                            $set('name', null);
+                        }
+
+                        return;
+                    }
+
+                    $set('key', $handle->value);
+
+                    if ($nameIsDerived) {
+                        $set('name', $purpose->defaultName());
+                    }
+                }),
+        ];
+    }
+
+    /**
+     * The navigation key.
+     *
+     * Hidden while a built-in purpose derives it, but still dehydrated and
+     * validated so the unique-per-site-and-language rule keeps working. It
+     * reappears the moment the derived key would collide, so the editor sees
+     * the conflict rather than an error attached to an invisible field.
+     */
+    protected function getKeyField(Schema $configurator, bool $isCreating): Select
+    {
+        return Select::make('key')
+            ->required()
+            ->default($isCreating ? NavigationHandle::Main->value : null)
+            ->hidden(fn (Get $get): bool => $isCreating && $this->keyIsDerived($get))
+            ->dehydratedWhenHidden()
+            ->options(fn (Get $get, ?Model $record): array => $this->navigationKeyOptions($record, $get('key')))
+            ->searchable()
+            ->allowHtml(false)
+            ->unique(
+                column: 'key',
+                ignoreRecord: $configurator->getOperation() !== 'replicate',
+                modifyRuleUsing: function (Unique $rule, Get $get): Unique {
+                    $languageId = $this->uniqueRuleValue($get('language_id'));
+
+                    return $rule
+                        ->withoutTrashed()
+                        ->where('site_id', $this->uniqueRuleValue($get('site_id')))
+                        ->when(
+                            $languageId !== null,
+                            fn (Unique $query): Unique => $query->where('language_id', $languageId),
+                            fn (Unique $query): Unique => $query->whereNull('language_id'),
+                        );
+                },
+            )
+            ->label(__('capell-admin::table.key'))
+            ->helperText(__('capell-navigation::generic.key_info'));
     }
 
     protected function getNavigationItemsField(string $navigationFieldsKey = 'navigationTypeFields'): AdjacencyList
@@ -570,13 +815,28 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         return CapellCoreHelper::getLanguageByIdOrSite($languageId, $siteId);
     }
 
-    private static function uniqueRuleValue(mixed $value): int|string|null
+    private function uniqueRuleValue(mixed $value): int|string|null
     {
         if (is_string($value)) {
             return $value !== '' ? $value : null;
         }
 
         return is_int($value) ? $value : null;
+    }
+
+    private function stateId(mixed $value): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        $integer = filter_var($value, FILTER_VALIDATE_INT);
+
+        return is_int($integer) ? $integer : null;
     }
 
     /**
@@ -665,6 +925,164 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         $pageCache[$cacheKey] = $page;
 
         return $page;
+    }
+
+    private function isCreateOperation(Schema $configurator): bool
+    {
+        return in_array($configurator->getOperation(), ['create', 'createOption', 'replicate'], true);
+    }
+
+    private function purposeFromState(mixed $state): ?NavigationPurpose
+    {
+        if ($state instanceof NavigationPurpose) {
+            return $state;
+        }
+
+        return is_string($state) ? NavigationPurpose::tryFrom($state) : null;
+    }
+
+    /**
+     * True when the name is still one of the suggested purpose names, so
+     * switching purpose may safely replace it.
+     */
+    private function nameIsDerived(mixed $name): bool
+    {
+        if (! is_string($name) || trim($name) === '') {
+            return true;
+        }
+
+        $name = trim($name);
+
+        return array_any(
+            NavigationPurpose::cases(),
+            fn (NavigationPurpose $purpose): bool => $purpose->defaultName() === $name,
+        );
+    }
+
+    /**
+     * True when the purpose derives the key and that key is still free for the
+     * selected site and language.
+     */
+    private function keyIsDerived(Get $get): bool
+    {
+        $purpose = $this->purposeFromState($get('purpose'));
+
+        if (! $purpose instanceof NavigationPurpose || ! $purpose->handle() instanceof NavigationHandle) {
+            return false;
+        }
+
+        return ! $this->keyConflictExists($get);
+    }
+
+    private function keyConflictExists(Get $get): bool
+    {
+        $key = $get('key');
+
+        if (! is_string($key) || trim($key) === '') {
+            return false;
+        }
+
+        $siteId = $this->stateId($get('site_id'));
+        $languageId = $this->stateId($get('language_id'));
+
+        return Navigation::query()
+            ->where('key', trim($key))
+            ->where('site_id', $siteId)
+            ->when(
+                $languageId !== null,
+                fn (Builder $query): Builder => $query->where('language_id', $languageId),
+                fn (Builder $query): Builder => $query->whereNull('language_id'),
+            )
+            ->exists();
+    }
+
+    /**
+     * The language a new navigation should default to: the selected site's own
+     * language, falling back to the installation default.
+     */
+    private function defaultLanguageId(?int $siteId): ?int
+    {
+        if ($siteId === null) {
+            return null;
+        }
+
+        $site = Site::query()->find($siteId);
+
+        if (! $site instanceof Site) {
+            return null;
+        }
+
+        // Only a language the site actually offers is a valid default; anything
+        // else would be rejected by the language select's own options.
+        $languageId = Language::query()
+            ->whereHas('sites', fn (Builder $query): Builder => $query->where('sites.id', $siteId))
+            ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$site->getAttribute('language_id')])
+            ->orderByDesc('default')
+            ->orderBy('id')
+            ->value('id');
+
+        return is_numeric($languageId) ? (int) $languageId : null;
+    }
+
+    /**
+     * Advanced settings stay collapsed unless something in them already needs
+     * a decision: a custom key, a schedule, or a non-default blueprint.
+     */
+    private function advancedRequiresAttention(Get $get, Schema $configurator): bool
+    {
+        if ($this->isCreateOperation($configurator)
+            && $this->purposeFromState($get('purpose')) === NavigationPurpose::Custom) {
+            return true;
+        }
+
+        if (filled($get('visible_from')) || filled($get('visible_until'))) {
+            return true;
+        }
+
+        $blueprintId = $this->stateId($get('blueprint_id'));
+
+        if ($blueprintId === null) {
+            return false;
+        }
+
+        $defaultBlueprintId = Blueprint::query()
+            ->where('type', 'navigation')
+            ->orderBy('id')
+            ->value('id');
+
+        return is_numeric($defaultBlueprintId) && (int) $defaultBlueprintId !== $blueprintId;
+    }
+
+    private function itemsAreEmpty(mixed $items): bool
+    {
+        if ($items instanceof Arrayable) {
+            $items = $items->toArray();
+        }
+
+        return ! is_array($items) || $items === [];
+    }
+
+    /**
+     * One ordinary, empty navigation item of the requested type, ready to be
+     * edited in the item list.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function blankStarterItems(NavigationItemType $type, mixed $siteId): array
+    {
+        $data = $type === NavigationItemType::Page
+            ? array_filter(['site_id' => $this->stateId($siteId)], fn (mixed $value): bool => $value !== null)
+            : ['url' => null];
+
+        return [
+            (string) Str::uuid() => [
+                'label' => null,
+                'type' => $type->value,
+                'data' => $data,
+                'children' => [],
+                'is_visible' => true,
+            ],
+        ];
     }
 
     private function isSafeNavigationUrl(string $url): bool

@@ -13,6 +13,11 @@ This guide is for editors who build site menus and owners deciding how menus are
 5. Add links to your pages, or add an **External link** to another site.
 6. Save the menu.
 
+The promoted create-form evidence covers desktop (1440x900), tablet
+(768x1024), and mobile (360x780), with both light and dark captures for each
+viewport. The six images are generated only by the installed-App screenshot
+runner described by the [screenshot contract](screenshots.json).
+
 ![An editor reviews site navigation records and their scope and status.](screenshots/navigation-admin-index.png)
 
 ### How to reorder and nest links

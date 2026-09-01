@@ -8,6 +8,7 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Enums\NavigationPurpose;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\CreateNavigation;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\EditNavigation;
 use Capell\Navigation\Models\Navigation;
@@ -24,15 +25,23 @@ uses(CreatesAdminUser::class)
 
 beforeEach(function (): void {
     Language::factory()->default()->create();
-    Site::factory()->default()->create();
+    Site::factory()->default()->withTranslations()->create();
     Blueprint::factory()->navigation()->create();
 
     test()->actingAsAdmin();
 });
 
+// Creation is purpose-led since CAP-0323: name and key arrive pre-derived from
+// the selected purpose, so "required" is proven by clearing them rather than by
+// submitting an untouched form.
 test('required fields are required', function (): void {
     livewire(CreateNavigation::class)
         ->assertSuccessful()
+        ->fillForm([
+            'purpose' => NavigationPurpose::Custom->value,
+            'name' => '',
+            'key' => null,
+        ])
         ->call('create')
         ->assertHasFormErrors([
             'name' => 'required',
@@ -40,9 +49,14 @@ test('required fields are required', function (): void {
         ]);
 });
 
+// The key explanation moved onto the purpose control in CAP-0323: on the common
+// path the key is derived, so the screen explains the purpose instead and only
+// falls back to the key detail once the editor takes that decision on.
 test('create screen explains how the navigation key is rendered', function (): void {
     livewire(CreateNavigation::class)
         ->assertSuccessful()
+        ->assertSeeText(__('capell-navigation::generic.purpose_info'))
+        ->fillForm(['purpose' => NavigationPurpose::Custom->value])
         ->assertSeeText(__('capell-navigation::generic.key_info'));
 });
 

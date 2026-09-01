@@ -15,6 +15,7 @@ use Filament\Actions\ActionGroup;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -58,9 +59,15 @@ class EditNavigation extends EditRecord
                     ->groupedIcon('heroicon-o-plus-circle')
                     ->slideOver(),
                 ReplicateAction::make()
+                    ->schema($this->replicateNavigationSchema(...))
                     ->hidden($this->record->trashed()),
             ]),
         ];
+    }
+
+    protected function replicateNavigationSchema(Schema $schema): Schema
+    {
+        return NavigationResource::form($schema->operation('replicate')->model($this->record));
     }
 
     protected function afterSave(): void

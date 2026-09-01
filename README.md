@@ -33,12 +33,16 @@ Evidence: [`src/Support/Registry/NavigableRegistry.php`](src/Support/Registry/Na
 
 Screenshot contract: `docs/screenshots.json`.
 
+The create/edit form's required evidence covers the exact desktop (1440x900),
+tablet (768x1024), and mobile (360x780) viewports in both light and dark
+colour schemes: six authentic installed-App captures in total.
+
 ![Navigation admin index](docs/screenshots/navigation-admin-index.png)
 
 ![Page form navigation tab](docs/screenshots/page-form-navigation-tab.png)
 
 - Navigation admin index (admin, required evidence).
-- Create/edit navigation form (admin, supplementary evidence).
+- Create/edit navigation form (admin, required at desktop, tablet, and mobile in light and dark).
 - Site relation manager for navigations (admin, supplementary evidence).
 - Page form navigation tab (admin, required evidence).
 - Frontend menu output (frontend, required evidence).
