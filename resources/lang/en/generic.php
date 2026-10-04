@@ -62,6 +62,8 @@ return [
     'mega_panel_heading' => 'Mega panel heading',
     'mega_panel_url' => 'Mega panel link',
     'navigation' => 'Navigation',
+    'navigations_empty' => 'No navigations found',
+    'navigations_empty_description' => 'Create a navigation, or adjust the filters to see available records.',
     'purpose' => 'What is this menu for?',
     'purpose_custom' => 'Custom menu',
     'purpose_custom_description' => 'Any other menu. You choose the key your theme requests.',

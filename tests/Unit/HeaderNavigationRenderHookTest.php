@@ -206,13 +206,13 @@ it('only releases mobile menu inert attributes owned by navigation', function (H
 
         menu.setPageInert(true)
 
-        assert.equal(existingMain.hasAttribute('data-capell-navigation-inert'), false)
-        assert.equal(existingMain.hasAttribute('data-capell-navigation-aria-hidden'), false)
-        assert.equal(navigationOwnedMain.getAttribute('data-capell-navigation-inert'), 'true')
-        assert.equal(navigationOwnedMain.getAttribute('data-capell-navigation-aria-hidden'), 'true')
-        assert.equal(navigationOwnedFooter.getAttribute('data-capell-navigation-inert'), 'true')
-        assert.equal(existingHeaderButton.hasAttribute('data-capell-navigation-inert'), false)
-        assert.equal(navigationOwnedHeaderLink.getAttribute('data-capell-navigation-inert'), 'true')
+        assert.equal(existingMain.hasAttribute('data-capell-interaction-navigation-inert'), false)
+        assert.equal(existingMain.hasAttribute('data-capell-interaction-navigation-aria-hidden'), false)
+        assert.equal(navigationOwnedMain.getAttribute('data-capell-interaction-navigation-inert'), 'true')
+        assert.equal(navigationOwnedMain.getAttribute('data-capell-interaction-navigation-aria-hidden'), 'true')
+        assert.equal(navigationOwnedFooter.getAttribute('data-capell-interaction-navigation-inert'), 'true')
+        assert.equal(existingHeaderButton.hasAttribute('data-capell-interaction-navigation-inert'), false)
+        assert.equal(navigationOwnedHeaderLink.getAttribute('data-capell-interaction-navigation-inert'), 'true')
 
         menu.setPageInert(false)
 

@@ -140,7 +140,7 @@
                 $megaColumnClass => $dropdownLayout === NavigationDropdownLayout::Mega && ! $hasMegaPanel,
                 $breakpoint->megaPanelGridClasses() => $hasMegaPanel,
             ])
-            @if ($dropdownLayout === NavigationDropdownLayout::Mega) data-capell-navigation-mega-menu @endif
+            @if ($dropdownLayout === NavigationDropdownLayout::Mega) data-capell-interaction-navigation-mega-menu @endif
         >
             @if ($hasMegaPanel)
                 <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-900">

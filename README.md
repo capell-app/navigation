@@ -10,8 +10,6 @@ Navigation adds site- and language-scoped menus with page links, external links,
 
 Editors build and order menus in admin, and public themes receive hydrated navigation with safe URLs, active states, and nested children.
 
-Evidence: [`src/Providers/NavigationServiceProvider.php`](src/Providers/NavigationServiceProvider.php), [`src/Actions/AddPageToNavigationAction.php`](src/Actions/AddPageToNavigationAction.php), [`src/Support/Registry/NavigationHandleRegistry.php`](src/Support/Registry/NavigationHandleRegistry.php), [`tests/Feature/Filament/Resources/Navigation/NavigationResourceTest.php`](tests/Feature/Filament/Resources/Navigation/NavigationResourceTest.php), [`src/Actions/BuildNavigationRenderModelAction.php`](src/Actions/BuildNavigationRenderModelAction.php), [`src/Support/SafeUrl.php`](src/Support/SafeUrl.php), [`tests/Feature/Components/NavigationMenuTest.php`](tests/Feature/Components/NavigationMenuTest.php), [`tests/Feature/Components/NavigationMenuSafeUrlTest.php`](tests/Feature/Components/NavigationMenuSafeUrlTest.php).
-
 Status details:
 
 - Status: Available
@@ -26,8 +24,6 @@ Status details:
 **For developers:** The navigable and handle registries let packages contribute linkable records and named menus without reaching into Navigation internals.
 
 **For teams:** Editors can keep site menus current, reorder links, and reuse the same menu structure across theme output without code changes.
-
-Evidence: [`src/Support/Registry/NavigableRegistry.php`](src/Support/Registry/NavigableRegistry.php), [`src/Support/Registry/NavigationHandleRegistry.php`](src/Support/Registry/NavigationHandleRegistry.php), [`src/Contracts/NavigationNamesResolver.php`](src/Contracts/NavigationNamesResolver.php), [`tests/Integration/Actions/BuildNavigationRenderModelActionTest.php`](tests/Integration/Actions/BuildNavigationRenderModelActionTest.php), [`docs/overview.admin.md`](docs/overview.admin.md), [`src/Actions/RemovePageFromNavigationAction.php`](src/Actions/RemovePageFromNavigationAction.php), [`src/Actions/SyncNavigationPageReferencesAction.php`](src/Actions/SyncNavigationPageReferencesAction.php).
 
 ## Screens And Workflow
 
@@ -114,6 +110,7 @@ Screenshot contract: `docs/screenshots.json`.
 - `RemovePageFromNavigationAction`
 - `ReplicateSiteNavigationsAction`
 - `ResolveNavigationItemModelsAction`
+- `SeedNavigationScreenshotFixtureAction`
 - `SyncNavigationPageReferencesAction`
 
 ### Data objects
@@ -129,10 +126,12 @@ Screenshot contract: `docs/screenshots.json`.
 
 - `capell:navigation-demo`
 - `capell:navigation-setup`
+- `capell:navigation:screenshot-fixture`
 
 ### Console command classes
 
 - `DemoCommand`
+- `SeedNavigationScreenshotFixtureCommand`
 - `SetupCommand`
 
 ### Manifest contributions
@@ -193,7 +192,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Settings: no package settings declared.
 - Queues or schedules: none declared.
 - Cache tags: `navigation`.
-- Commands: `capell:navigation-demo`, `capell:navigation-setup`.
+- Commands: `capell:navigation-demo`, `capell:navigation-setup`, `capell:navigation:screenshot-fixture`.
 
 ## Common Pitfalls
 
@@ -217,7 +216,7 @@ Screenshot contract: `docs/screenshots.json`.
 1. Install the package: `composer require capell-app/navigation`.
 2. Run the package setup: `php artisan capell:navigation-setup`.
 3. See it working: run `php artisan capell:navigation-demo`.
-4. Open the package admin surface at `/navigation/navigations` and confirm Navigation is available.
+4. Open the package admin surface at `/admin/navigation/navigations` and confirm Navigation is available.
 
 ## Next Steps
 
@@ -231,6 +230,5 @@ Screenshot contract: `docs/screenshots.json`.
 - [Capell content language plan](../../docs/CONTENT_LANGUAGE_PLAN.md)
 - [Capell documentation design system](../../docs/DESIGN_SYSTEM.md)
 - [Capell and package ERD notes](../../docs/erd/capell-and-package-erds.md)
-- Focused tests: `vendor/bin/pest packages/navigation/tests --configuration=phpunit.xml`.
 
 <!-- prettier-ignore-end -->

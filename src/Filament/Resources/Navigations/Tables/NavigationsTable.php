@@ -31,12 +31,16 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Override;
 
 class NavigationsTable implements TableConfigurator
 {
+    #[Override]
     public static function configure(Table $table): Table
     {
         return $table
+            ->emptyStateHeading(__('capell-navigation::generic.navigations_empty'))
+            ->emptyStateDescription(__('capell-navigation::generic.navigations_empty_description'))
             ->modifyQueryUsing(
                 fn (Builder $query): Builder => $query->with([
                     'creator',

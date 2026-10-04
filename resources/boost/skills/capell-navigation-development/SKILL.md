@@ -1,6 +1,6 @@
 ---
 name: capell-navigation-development
-description: Use when editing Capell Navigation trees, page navigation fields, or frontend loading.
+description: Site and language scoped navigation trees, page fields, sync actions, and frontend lookup. Use when editing Capell Navigation trees, page navigation fields, or frontend loading.
 ---
 
 # Capell Navigation

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Capell\Core\Models\Language;
+use Capell\Core\Models\Site;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\ListNavigations;
 use Capell\Navigation\Models\Navigation;
 use Capell\Tests\Support\Concerns\CreatesAdminUser;
@@ -28,6 +29,30 @@ test('can list navigations', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(5)
         ->assertCanSeeTableRecords($navigations);
+});
+
+test('uses filter-safe empty state copy when a site filter excludes an existing navigation', function (): void {
+    $navigation = Navigation::factory()->create();
+    $excludedSite = Site::factory()->create();
+
+    livewire(ListNavigations::class)
+        ->assertSuccessful()
+        ->assertCountTableRecords(1)
+        ->assertCanSeeTableRecords([$navigation])
+        ->filterTable('filter', [
+            'site_id' => (string) $excludedSite->getKey(),
+            'language_id' => null,
+            'key' => null,
+        ])
+        ->assertCountTableRecords(0)
+        ->assertCanNotSeeTableRecords([$navigation])
+        ->assertSee(__('capell-navigation::generic.navigations_empty'))
+        ->assertSee(__('capell-navigation::generic.navigations_empty_description'));
+
+    expect(Navigation::query()->count())->toBe(1)
+        ->and(__('capell-navigation::generic.navigations_empty'))->toBe('No navigations found')
+        ->and(__('capell-navigation::generic.navigations_empty_description'))
+        ->toBe('Create a navigation, or adjust the filters to see available records.');
 });
 
 test('can search navigations', function (): void {

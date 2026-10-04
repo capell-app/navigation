@@ -174,8 +174,8 @@
                 },
                 setPageInert(value) {
                     const shouldInert = value && this.isMobileMenuViewport();
-                    const inertAttribute = 'data-capell-navigation-inert';
-                    const ariaHiddenAttribute = 'data-capell-navigation-aria-hidden';
+                    const inertAttribute = 'data-capell-interaction-navigation-inert';
+                    const ariaHiddenAttribute = 'data-capell-interaction-navigation-aria-hidden';
                     const applyNavigationInert = (element) => {
                         if (!element.hasAttribute('inert')) {
                             element.setAttribute('inert', '');
