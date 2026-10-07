@@ -18,4 +18,4 @@ Site and language scoped navigation trees, page fields, sync actions, and fronte
 - Keep navigation scoped by site and language.
 - Resolve page links through adapters instead of hard-coding URL logic.
 - Preserve sync/import actions when changing item shape.
-- Run `vendor/bin/pest packages/navigation/tests`.
+- Verify customisations in the consuming application's test suite.

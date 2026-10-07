@@ -28,7 +28,7 @@ it('can list navigations', function (): void {
         ->assertSuccessful()
         ->assertCountTableRecords(10)
         ->assertCanSeeTableRecords($site->navigations)
-        ->assertTableColumnStateSet('name', [$navigation->name], record: $navigation);
+        ->assertTableColumnStateSet('name', $navigation->name, record: $navigation);
 });
 
 it('can search navigations', function (): void {

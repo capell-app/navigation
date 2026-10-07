@@ -1,0 +1,80 @@
+{
+    "version": 3,
+    "package": "navigation",
+    "scenarios": {
+        "default": {
+            "source": {
+                "ref": "origin/main",
+                "commit": "646068b2d21e233ea517c342d62bc0eca1762192",
+                "providers": {
+                    "Providers/ConsoleServiceProvider.php": "dc6f76f2a4f612611d94c87bfe3489792a8369978d28e0a20bb6798aa6f0ce90",
+                    "Providers/NavigationServiceProvider.php": "c91bb7bc0aa8c399352c9f565182a46ef046b8adc7a97beecdfdbc0abfbaa586"
+                }
+            },
+            "disabledContributions": [],
+            "surfaces": {
+                "routes": ["capell-navigation.children"],
+                "livewire": [
+                    "capell-admin::header.navigation-tree=Capell\\Admin\\Livewire\\Header\\NavigationTree"
+                ],
+                "filament": [
+                    "configurator:Capell\\Navigation\\Filament\\Configurators\\Navigations\\DefaultNavigationConfigurator",
+                    "resource:Capell\\Navigation\\Filament\\Resources\\Navigations\\NavigationResource"
+                ],
+                "listeners": [
+                    "Capell\\Core\\Events\\PageUrlChanged|Capell\\Navigation\\Providers\\NavigationServiceProvider::handlePageUrlChanged(Capell\\Core\\Events\\PageUrlChanged $event):void bound=Capell\\Navigation\\Providers\\NavigationServiceProvider",
+                    "Capell\\Core\\Events\\SiteReplicated|Capell\\Navigation\\Listeners\\ReplicateSiteNavigationsListener",
+                    "composing: capell-navigation::components.breadcrumbs|Capell\\Navigation\\View\\Composers\\NavigationRenderModelComposer",
+                    "composing: capell-navigation::components.header.navigation|Capell\\Navigation\\View\\Composers\\NavigationRenderModelComposer",
+                    "composing: capell-navigation::components.menu|Capell\\Navigation\\View\\Composers\\NavigationRenderModelComposer",
+                    "eloquent.creating: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Models\\Navigation(Illuminate\\Database\\Eloquent\\Model&Capell\\Core\\Models\\Contracts\\Userstampable $model):void",
+                    "eloquent.deleted: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Observers\\NavigationObserver@deleted",
+                    "eloquent.deleting: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Models\\Navigation(Illuminate\\Database\\Eloquent\\Model&Capell\\Core\\Models\\Contracts\\Userstampable $model):void",
+                    "eloquent.restored: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Observers\\NavigationObserver@restored",
+                    "eloquent.restoring: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Models\\Navigation(Illuminate\\Database\\Eloquent\\Model&Capell\\Core\\Models\\Contracts\\Userstampable $model):void",
+                    "eloquent.saved: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Observers\\NavigationObserver@saved",
+                    "eloquent.saving: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Observers\\NavigationObserver@saving",
+                    "eloquent.updating: Capell\\Navigation\\Models\\Navigation|Capell\\Navigation\\Models\\Navigation(Illuminate\\Database\\Eloquent\\Model&Capell\\Core\\Models\\Contracts\\Userstampable $model):void"
+                ],
+                "gates": [],
+                "policies": [
+                    "Capell\\Navigation\\Models\\Navigation=Capell\\Navigation\\Policies\\NavigationPolicy"
+                ],
+                "commands": [
+                    "capell:navigation-demo",
+                    "capell:navigation-setup",
+                    "capell:navigation:screenshot-fixture"
+                ],
+                "view-namespaces": ["capell-navigation"],
+                "config-keys": [],
+                "migrations": [
+                    "2026_05_10_190860_01_create_navigations_table",
+                    "2026_06_04_000001_create_navigation_page_references_table",
+                    "2026_08_28_000003_change_navigation_visibility_to_datetime"
+                ]
+            },
+            "uninstalledSurfaces": {
+                "routes": [],
+                "livewire": [
+                    "capell-admin::header.navigation-tree=Capell\\Admin\\Livewire\\Header\\NavigationTree"
+                ],
+                "filament": [],
+                "listeners": [],
+                "gates": [],
+                "policies": [],
+                "commands": [
+                    "capell:navigation-demo",
+                    "capell:navigation-setup",
+                    "capell:navigation:screenshot-fixture"
+                ],
+                "view-namespaces": [],
+                "config-keys": [],
+                "migrations": [
+                    "2026_05_10_190860_01_create_navigations_table",
+                    "2026_06_04_000001_create_navigation_page_references_table",
+                    "2026_08_28_000003_change_navigation_visibility_to_datetime"
+                ]
+            }
+        }
+    }
+}

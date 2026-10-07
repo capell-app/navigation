@@ -24,8 +24,10 @@
         "conflicts": []
     },
     "providers": {
-        "metadata": [],
-        "install": [],
+        "metadata": [
+            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
+        ],
+        "install": ["Capell\\Navigation\\Providers\\ConsoleServiceProvider"],
         "runtime": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"],
         "admin": [],
         "frontend": []

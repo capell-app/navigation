@@ -41,12 +41,14 @@ use Capell\Navigation\Support\Registry\NavigationHandleRegistry;
 use Capell\Navigation\Support\SafeUrl;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions as SchemaActions;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Livewire;
@@ -60,6 +62,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -83,7 +86,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     public function make(Schema $configurator): array
     {
@@ -95,7 +98,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getFormSchema(Schema $configurator): array
     {
@@ -138,7 +141,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getMainFormSchema(): array
     {
@@ -292,7 +295,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
      * Blueprint and scheduling sit under Advanced until their state needs
      * attention.
      *
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getSettingsFormSchema(Schema $configurator): array
     {
@@ -523,7 +526,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getCreateOptionFormSchema(Schema $configurator): array
     {
@@ -537,7 +540,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getEditOptionFormSchema(Schema $configurator): array
     {
@@ -551,7 +554,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getNavigationItemFields(NavigationItemType $type): array
     {
@@ -564,7 +567,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getPageNavigationItemFields(): array
     {
@@ -613,7 +616,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getLinkNavigationItemFields(): array
     {
@@ -648,7 +651,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getHeadingNavigationItemFields(): array
     {
@@ -669,7 +672,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<int, Component | Action | ActionGroup | string | Htmlable>
      */
     protected function getExtraItemFields(): array
     {

@@ -47,6 +47,7 @@ Screenshot contract: `docs/screenshots.json`.
 ### Service providers
 
 - `Capell\Navigation\Providers\NavigationServiceProvider`
+- `Capell\Navigation\Providers\ConsoleServiceProvider`
 
 ### Migrations
 

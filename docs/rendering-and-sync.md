@@ -90,9 +90,3 @@ SyncNavigationPageReferencesAction::run($navigation);
 ## Cache Notes
 
 Navigation changes clear frontend navigation cache keys through `NavigationObserver`. If another package caches rendered menus, it should clear those keys when it writes navigation items.
-
-## Verification
-
-```bash
-vendor/bin/pest packages/navigation/tests --configuration=phpunit.xml
-```
