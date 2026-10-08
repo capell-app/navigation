@@ -22,7 +22,7 @@ final class NavigationChildFragmentController
 
         return response($html)
             ->header('Content-Type', 'text/html; charset=UTF-8')
-            ->header('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
+            ->header('Cache-Control', 'private, no-store')
             ->header('X-Robots-Tag', 'noindex');
     }
 }

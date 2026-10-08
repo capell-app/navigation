@@ -13,6 +13,7 @@ use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\NavigationCacheKeys;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\View;
@@ -47,7 +48,13 @@ class BuildNavigationChildFragmentAction
             return null;
         }
 
+        if (auth()->check()) {
+            return $this->renderFragment($context, $data['item'], $data['path']);
+        }
+
         $cacheKey = NavigationCacheKeys::lazyFragmentKey(implode('|', [
+            // Earlier unscoped entries may contain authenticated HTML.
+            'guest',
             $this->stringValue($context->navigation->getKey()),
             $context->navigation->key,
             $this->stringValue($context->site->getKey()),
@@ -180,7 +187,7 @@ class BuildNavigationChildFragmentAction
     {
         $items = (new BuildNavigationRenderModelAction)->childRenderItems($context, $itemKey, $itemPath);
 
-        if ($items === null) {
+        if (! $items instanceof Collection) {
             return null;
         }
 
