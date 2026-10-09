@@ -4,11 +4,11 @@
     "scenarios": {
         "default": {
             "source": {
-                "ref": "origin/main",
-                "commit": "646068b2d21e233ea517c342d62bc0eca1762192",
+                "ref": "22531cf02e726f08ff0a7bceb45260854d8d1ff6",
+                "commit": "22531cf02e726f08ff0a7bceb45260854d8d1ff6",
                 "providers": {
                     "Providers/ConsoleServiceProvider.php": "dc6f76f2a4f612611d94c87bfe3489792a8369978d28e0a20bb6798aa6f0ce90",
-                    "Providers/NavigationServiceProvider.php": "c91bb7bc0aa8c399352c9f565182a46ef046b8adc7a97beecdfdbc0abfbaa586"
+                    "Providers/NavigationServiceProvider.php": "5f17e5156907cb4d15f1442c840a0e76b77145f78d6c12f7cc4d35b2269e60c5"
                 }
             },
             "disabledContributions": [],
@@ -46,7 +46,11 @@
                     "capell:navigation:screenshot-fixture"
                 ],
                 "view-namespaces": ["capell-navigation"],
-                "config-keys": [],
+                "config-keys": [
+                    "capell-navigation",
+                    "capell-navigation.children",
+                    "capell-navigation.children.rate_limit_per_minute"
+                ],
                 "migrations": [
                     "2026_05_10_190860_01_create_navigations_table",
                     "2026_06_04_000001_create_navigation_page_references_table",

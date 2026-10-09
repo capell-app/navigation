@@ -8,6 +8,7 @@ use Capell\Core\Contracts\Pageable;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
+use Capell\Core\Support\SiteDomains\SiteDomainAddressing;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\NavigationCacheKeys;
@@ -44,7 +45,7 @@ class BuildNavigationChildFragmentAction
 
         $context = $this->context($data);
 
-        if (! $context instanceof NavigationRenderContextData) {
+        if (! $context instanceof NavigationRenderContextData || ! $this->matchesRequestOrigin($context->siteDomain)) {
             return null;
         }
 
@@ -59,6 +60,7 @@ class BuildNavigationChildFragmentAction
             $context->navigation->key,
             $this->stringValue($context->site->getKey()),
             $this->stringValue($context->language->getKey()),
+            $this->stringValue($context->siteDomain->getKey()),
             $data['item'],
             $data['path'],
             (string) $context->navigation->updated_at?->getTimestamp(),
@@ -123,6 +125,29 @@ class BuildNavigationChildFragmentAction
             language: $language,
             siteDomain: $siteDomain,
         );
+    }
+
+    /**
+     * Applies the scheme and port constraints Core uses to resolve a request to a site domain.
+     * The mounted path is deliberately not compared: Core derives it from the request path,
+     * while this route is always served from the origin root.
+     */
+    private function matchesRequestOrigin(SiteDomain $siteDomain): bool
+    {
+        $request = request();
+        $scheme = SiteDomainAddressing::normalizeScheme($siteDomain->getRawOriginal('scheme'));
+
+        if ($scheme !== null && $scheme !== $request->getScheme()) {
+            return false;
+        }
+
+        $port = filter_var($siteDomain->getRawOriginal('port'), FILTER_VALIDATE_INT);
+
+        if (is_int($port)) {
+            return $port === $request->getPort();
+        }
+
+        return SiteDomainAddressing::defaultPort($request->getScheme()) === $request->getPort();
     }
 
     private function integerKey(mixed $key): int

@@ -46,14 +46,17 @@ use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
 use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
 use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Capell\Navigation\View\Composers\NavigationRenderModelComposer;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
@@ -114,8 +117,15 @@ final class NavigationServiceProvider extends ServiceProvider
 
         $this->installedPackageRegistered = true;
 
+        $this->mergeConfigFrom(__DIR__ . '/../../config/capell-navigation.php', 'capell-navigation');
+
+        $this->publishes([
+            __DIR__ . '/../../config/capell-navigation.php' => config_path('capell-navigation.php'),
+        ], 'capell-navigation-config');
+
         $this
             ->registerServices()
+            ->registerRateLimiters()
             ->registerRoutes()
             ->registerSchemaExtenders()
             ->registerResources()
@@ -152,6 +162,18 @@ final class NavigationServiceProvider extends ServiceProvider
                 $app->make(Factory::class)->store(),
             ),
         );
+
+        return $this;
+    }
+
+    private function registerRateLimiters(): self
+    {
+        RateLimiter::for('capell-navigation-children', static function (Request $request): Limit {
+            $configuredLimit = config('capell-navigation.children.rate_limit_per_minute', 300);
+            $limit = is_int($configuredLimit) && $configuredLimit > 0 ? $configuredLimit : 300;
+
+            return Limit::perMinute($limit)->by($request->ip() ?? 'unknown');
+        });
 
         return $this;
     }

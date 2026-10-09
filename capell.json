@@ -166,7 +166,7 @@
             "signedRoutes": [],
             "tokenizedRoutes": [],
             "webhookRoutes": [],
-            "throttledRoutes": []
+            "throttledRoutes": ["capell-navigation.children"]
         },
         "sensitiveData": {
             "encryptedFields": [],

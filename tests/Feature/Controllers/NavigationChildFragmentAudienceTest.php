@@ -214,7 +214,7 @@ function createNavigationAudienceFragmentUrl(NavigationItemVisibility $parentVis
 {
     $language = Language::factory()->default()->create();
     $site = Site::factory()->language($language)
-        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->withTranslations(siteDomainData: ['scheme' => 'http', 'domain' => 'localhost', 'path' => null])
         ->create();
     $page = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
     $domain = $site->siteDomains()->where('language_id', $language->getKey())->firstOrFail();

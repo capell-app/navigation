@@ -9,5 +9,7 @@ Route::middleware('web')
     ->prefix('_capell/navigation')
     ->name('capell-navigation.')
     ->group(function (): void {
-        Route::get('children', NavigationChildFragmentController::class)->name('children');
+        Route::get('children', NavigationChildFragmentController::class)
+            ->middleware('throttle:capell-navigation-children')
+            ->name('children');
     });
