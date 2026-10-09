@@ -75,7 +75,7 @@ class BuildNavigationChildFragmentAction
         /** @var string|null $html */
         $html = $repository->remember(
             $cacheKey,
-            now()->addMinutes(5),
+            ResolveNavigationCacheExpiryAction::run([$context->navigation->key]),
             fn (): ?string => $this->renderFragment($context, $data['item'], $data['path']),
         );
 

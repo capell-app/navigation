@@ -42,3 +42,13 @@ final class ExampleNavigationPageSyncerImplementation implements \Capell\Navigat
 
 app()->bind(\Capell\Navigation\Contracts\NavigationPageSyncer::class, ExampleNavigationPageSyncerImplementation::class);
 ```
+
+## Shared cache lifetime
+
+`ResolveNavigationCacheExpiryAction::run($handles, $ttlSeconds = 300)` returns the
+earlier of the maximum lifetime and the next navigation/item visibility boundary.
+It includes unpublished scheduled candidates, recursively checks both starts and
+ends, and ignores malformed dates. Render-model and child-fragment caches use the
+same calculation; existing after-commit invalidation and cache stores remain intact.
+Applications caching prepared navigation can use this action with their handle
+selection and `ScalarizeNavigationDataAction` for enum-free scalar cache payloads.
