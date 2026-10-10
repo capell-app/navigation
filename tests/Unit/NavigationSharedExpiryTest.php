@@ -36,6 +36,28 @@ it('includes unpublished scheduled navigation records in the expiry query', func
     expect(ResolveNavigationCacheExpiryAction::run(['scheduled-footer'], 300, $now))->toEqual($now->addSeconds(20));
 });
 
+it('uses the prepared navigation schedule without querying other records with the same handle', function (): void {
+    $now = CarbonImmutable::parse('2026-10-09 12:00:00');
+    Navigation::factory()->create(['key' => 'shared-handle', 'visible_from' => $now->addSeconds(5)]);
+    $navigation = new Navigation([
+        'key' => 'shared-handle',
+        'visible_until' => $now->addSeconds(20),
+        'items' => [['label' => 'Scheduled', 'type' => NavigationItemType::Link->value, 'data' => ['url' => '/scheduled', 'visible_from' => $now->addSeconds(30)->toDateTimeString()]]],
+    ]);
+    DB::enableQueryLog();
+    DB::flushQueryLog();
+
+    try {
+        expect(ResolveNavigationCacheExpiryAction::make()->forNavigation($navigation, 300, $now))->toEqual($now->addSeconds(20));
+        $navigation->visible_until = null;
+        expect(ResolveNavigationCacheExpiryAction::make()->forNavigation($navigation, 300, $now))->toEqual($now->addSeconds(30))
+            ->and(DB::getQueryLog())->toBe([]);
+    } finally {
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+    }
+});
+
 it('expires a shared render model at a visibility boundary without a save event', function (): void {
     $this->travelTo(CarbonImmutable::parse('2026-10-09 12:00:00'));
     $language = Language::factory()->default()->create();

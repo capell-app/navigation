@@ -75,7 +75,7 @@ class BuildNavigationChildFragmentAction
         /** @var string|null $html */
         $html = $repository->remember(
             $cacheKey,
-            ResolveNavigationCacheExpiryAction::run([$context->navigation->key]),
+            ResolveNavigationCacheExpiryAction::make()->forNavigation($context->navigation),
             fn (): ?string => $this->renderFragment($context, $data['item'], $data['path']),
         );
 

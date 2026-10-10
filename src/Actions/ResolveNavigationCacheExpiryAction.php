@@ -30,6 +30,17 @@ final class ResolveNavigationCacheExpiryAction
         return $this->forItems($items, $ttlSeconds, $now);
     }
 
+    public function forNavigation(Navigation $navigation, int $ttlSeconds = 300, ?CarbonImmutable $now = null): CarbonImmutable
+    {
+        $payload = $navigation->items;
+
+        return $this->forItems([
+            'visible_from' => $navigation->visible_from,
+            'visible_until' => $navigation->visible_until,
+            'items' => $payload instanceof DataCollection ? $payload->toArray() : ($payload ?? []),
+        ], $ttlSeconds, $now);
+    }
+
     /** @param array<array-key, mixed> $items */
     public function forItems(array $items, int $ttlSeconds = 300, ?CarbonImmutable $now = null): CarbonImmutable
     {

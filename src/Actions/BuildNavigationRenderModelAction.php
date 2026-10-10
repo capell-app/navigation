@@ -106,7 +106,7 @@ class BuildNavigationRenderModelAction
 
         $renderModel = $this->buildRenderModel($context);
 
-        $repository->put($sharedCacheKey, $this->renderModelCachePayload($renderModel), ResolveNavigationCacheExpiryAction::run([$context->navigation->key]));
+        $repository->put($sharedCacheKey, $this->renderModelCachePayload($renderModel), ResolveNavigationCacheExpiryAction::make()->forNavigation($context->navigation));
 
         return $renderModel;
     }
@@ -196,7 +196,7 @@ class BuildNavigationRenderModelAction
 
         $payload = Crypt::encryptString(json_encode([
             'version' => 1,
-            'expires_at' => ResolveNavigationCacheExpiryAction::run([$context->navigation->key])->getTimestamp(),
+            'expires_at' => ResolveNavigationCacheExpiryAction::make()->forNavigation($context->navigation)->getTimestamp(),
             'navigation' => $this->integerKey($context->navigation->getKey()),
             'navigation_version' => $context->navigation->updated_at?->getTimestamp(),
             'visible_from' => $context->navigation->visible_from?->getTimestamp(),
