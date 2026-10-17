@@ -88,8 +88,19 @@
                 {
                     "type": "click",
                     "selector": "[role=\"tab\"]:has-text(\"Navigations\")"
+                },
+                {
+                    "type": "scrollIntoView",
+                    "selector": "[role=\"tabpanel\"]:visible",
+                    "block": "center"
+                },
+                {
+                    "type": "scrollIntoView",
+                    "selector": ".fi-ta-row:has-text(\"Screenshot main menu\")",
+                    "block": "center"
                 }
-            ]
+            ],
+            "fullPage": false
         },
         {
             "id": "page-form-navigation-tab",
@@ -111,8 +122,14 @@
                 {
                     "type": "click",
                     "selector": "[role=\"tab\"]:has-text(\"Navigation\")"
+                },
+                {
+                    "type": "scrollIntoView",
+                    "selector": "[role=\"tabpanel\"]:has-text(\"Screenshot main menu\")",
+                    "block": "center"
                 }
-            ]
+            ],
+            "fullPage": false
         },
         {
             "id": "frontend-menu-output",

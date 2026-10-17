@@ -279,3 +279,13 @@ it('can edit items with page', function (): void {
         ->label->toBe('Test')
         ->type->toBe($linkType);
 });
+
+it('keeps the edited menu site when creating another menu', function (): void {
+    Site::factory()->default()->withTranslations()->create();
+    $site = Site::factory()->withTranslations()->create();
+    $navigation = Navigation::factory()->site($site)->create();
+
+    livewire(EditNavigation::class, ['record' => $navigation->getRouteKey()])
+        ->mountAction('create')
+        ->assertActionDataSet(['site_id' => $site->getKey()]);
+});

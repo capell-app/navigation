@@ -193,9 +193,11 @@ it('rejects a navigation site outside the actor assignment', function (): void {
     $user->assignedSiteIds = collect([(int) $this->site->getKey()]);
 
     test()->actingAs($user);
+    session()->put('capell.current_site_id', $otherSite->getKey());
 
     livewire(CreateNavigation::class)
         ->assertSuccessful()
+        ->assertFormSet(['site_id' => $this->site->getKey()])
         ->fillForm([
             'site_id' => $otherSite->getKey(),
             'purpose' => NavigationPurpose::Custom->value,
@@ -280,4 +282,23 @@ it('explains when no published pages are available to build from', function (): 
         ->callAction(TestAction::make('start_from_published_pages')->schemaComponent('starterActions'))
         ->assertNotified(__('capell-navigation::generic.starter_from_pages_none'))
         ->assertSeeText(__('capell-navigation::generic.starter_empty_heading'));
+});
+
+it('defaults menu creation to the selected site', function (): void {
+    $selectedSite = Site::factory()->language($this->language)->withTranslations()->create();
+    session()->put('capell.current_site_id', $selectedSite->getKey());
+
+    livewire(CreateNavigation::class)
+        ->assertSuccessful()
+        ->assertFormSet(['site_id' => $selectedSite->getKey()]);
+});
+
+it('prefers an explicit site link over the selected site', function (): void {
+    $linkedSite = Site::factory()->language($this->language)->withTranslations()->create();
+    session()->put('capell.current_site_id', $this->site->getKey());
+
+    Livewire\Livewire::withQueryParams(['site_id' => $linkedSite->getKey()])
+        ->test(CreateNavigation::class)
+        ->assertSuccessful()
+        ->assertFormSet(['site_id' => $linkedSite->getKey()]);
 });

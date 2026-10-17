@@ -5,10 +5,13 @@ declare(strict_types=1);
 use Capell\Core\Models\Site;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Policies\NavigationPolicy;
+use Capell\Tests\Support\Concerns\CreatesAdminUser;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Collection;
+
+uses(CreatesAdminUser::class);
 
 it('authorizes navigation resource abilities through shield permissions', function (): void {
     $policy = new NavigationPolicy;
@@ -43,7 +46,9 @@ it('authorizes navigation resource abilities through shield permissions', functi
     $user->assignedSiteIds = collect([1]);
 
     expect($policy->viewAny($user))->toBeFalse()
-        ->and($policy->view($user, $navigation))->toBeFalse();
+        ->and($policy->view($user, $navigation))->toBeFalse()
+        ->and($policy->restoreAny($user))->toBeFalse()
+        ->and($policy->forceDeleteAny($user))->toBeFalse();
 
     $user->permissions = ['View:Navigation'];
 
@@ -59,6 +64,9 @@ it('authorizes navigation resource abilities through shield permissions', functi
         'Restore:Navigation',
         'ForceDelete:Navigation',
         'Reorder:Navigation',
+        'RestoreAny:Navigation',
+        'ForceDeleteAny:Navigation',
+        'Replicate:Navigation',
     ];
 
     expect($policy->create($user))->toBeTrue()
@@ -67,7 +75,10 @@ it('authorizes navigation resource abilities through shield permissions', functi
         ->and($policy->deleteAny($user))->toBeTrue()
         ->and($policy->restore($user, $navigation))->toBeTrue()
         ->and($policy->forceDelete($user, $navigation))->toBeTrue()
-        ->and($policy->reorder($user))->toBeTrue();
+        ->and($policy->reorder($user))->toBeTrue()
+        ->and($policy->restoreAny($user))->toBeTrue()
+        ->and($policy->forceDeleteAny($user))->toBeTrue()
+        ->and($policy->replicate($user, $navigation))->toBeTrue();
 });
 
 it('enforces navigation site scope on direct record abilities', function (): void {
@@ -90,6 +101,7 @@ it('enforces navigation site scope on direct record abilities', function (): voi
             'Delete:Navigation',
             'Restore:Navigation',
             'ForceDelete:Navigation',
+            'Replicate:Navigation',
         ];
 
         /** @var Collection<int, int> */
@@ -118,6 +130,7 @@ it('enforces navigation site scope on direct record abilities', function (): voi
         ->and($policy->delete($user, $assignedNavigation))->toBeTrue()
         ->and($policy->restore($user, $assignedNavigation))->toBeTrue()
         ->and($policy->forceDelete($user, $assignedNavigation))->toBeTrue()
+        ->and($policy->replicate($user, $assignedNavigation))->toBeTrue()
         ->and($policy->view($user, $globalNavigation))->toBeTrue()
         ->and($policy->update($user, $globalNavigation))->toBeFalse()
         ->and($policy->view($user, $otherNavigation))->toBeFalse()
@@ -125,4 +138,23 @@ it('enforces navigation site scope on direct record abilities', function (): voi
         ->and($policy->delete($user, $otherNavigation))->toBeFalse()
         ->and($policy->restore($user, $otherNavigation))->toBeFalse()
         ->and($policy->forceDelete($user, $otherNavigation))->toBeFalse();
+});
+
+it('allows a global admin to manage menus without generated navigation permissions', function (): void {
+    config()->set('filament-shield.super_admin.define_via_gate', false);
+    $this->actingAsAdmin();
+    $user = $this->authenticatedUser();
+    $navigation = Navigation::factory()->create();
+    $policy = new NavigationPolicy;
+
+    expect($user->isGlobalAdmin())->toBeTrue()
+        ->and($user->checkPermissionTo('ViewAny:Navigation'))->toBeFalse();
+
+    foreach (['viewAny', 'create', 'deleteAny', 'restoreAny', 'forceDeleteAny', 'reorder'] as $ability) {
+        expect($policy->{$ability}($user))->toBeTrue($ability);
+    }
+
+    foreach (['view', 'update', 'delete', 'restore', 'forceDelete', 'replicate'] as $ability) {
+        expect($policy->{$ability}($user, $navigation))->toBeTrue($ability);
+    }
 });

@@ -3,97 +3,84 @@
 declare(strict_types=1);
 
 use Capell\Core\Facades\CapellCore;
+use Capell\Core\Models\Theme;
+use Capell\Frontend\Contracts\FrontendContextReader;
+use Capell\Frontend\Data\FrontendContext;
+use Capell\Frontend\Data\FrontendRuntimeManifestData;
 use Capell\Frontend\Enums\RenderHookLocation;
+use Capell\Frontend\Enums\RenderingStrategyEnum;
+use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
+use Capell\Navigation\Data\NavigationItemData;
+use Capell\Navigation\Data\NavigationItemRenderData;
+use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
+use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Providers\NavigationServiceProvider;
-use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
-use Capell\Navigation\View\Components\Header\MainNavigation;
+use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
+use Capell\Tests\Support\RenderedHtml;
+use Illuminate\Support\Facades\View;
+use Livewire\Blaze\Blaze;
 use Symfony\Component\Process\Process;
 
-it('registers the foundation header navigation render hook from the navigation package', function (): void {
-    $provider = navigationFileContents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
-    $hook = navigationFileContents(dirname(__DIR__, 2) . '/src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php');
+function navigationRenderedMenu(HeaderNavigationBreakpoint $breakpoint = HeaderNavigationBreakpoint::Lg): string
+{
+    Blaze::disable();
+    $context = new FrontendContext(null, null, null, null, new Theme(['meta' => ['dark_mode_toggle' => false]]), [], null);
+    $context->setFrontendData('runtimeManifest', FrontendRuntimeManifestData::forRenderingStrategy(RenderingStrategyEnum::FullLivewire));
+    app()->instance(FrontendContextReader::class, $context);
+    Frontend::clearResolvedInstance(FrontendContextReader::class);
+    $menu = new NavigationRenderData(null, 'main', 'Main', 'menu', collect([
+        new NavigationItemRenderData('Home', NavigationItemType::Link, '/home', true, collect(), ['url' => '/home']),
+    ]));
+    $context->setFrontendData(NavigationFrontendRuntimeManifestContributor::renderModelKey('main'), $menu);
+    View::share('menu', $menu);
+    View::share('navigation', null);
 
-    expect($provider)->toContain('registerFrontendRenderHooks')
-        ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook')
-        ->and($provider)->toContain('afterResolving')
-        ->and($provider)->toContain('registerFrontendRenderHooksForRegistry')
-        ->and($hook)->toContain('frontend-default-primary-navigation')
-        ->and($hook)->toContain('theme-foundation-primary-navigation')
-        ->and($hook)->toContain('capell::header.index')
-        ->and($hook)->toContain('capell-navigation::components.header.main-navigation');
-});
+    return view('capell-navigation::components.header.navigation', [
+        'menu' => $menu, 'itemClass' => '', 'breakpoint' => $breakpoint,
+    ])->render();
+}
 
-it('uses a finite responsive contract for default and foundation header navigation', function (): void {
-    $provider = navigationFileContents(dirname(__DIR__, 2) . '/src/Providers/NavigationServiceProvider.php');
-
-    expect(HeaderNavigationBreakpoint::cases())->toBe([
-        HeaderNavigationBreakpoint::Lg,
-        HeaderNavigationBreakpoint::Xl,
-    ])
-        ->and((new MainNavigation)->breakpoint)->toBe(HeaderNavigationBreakpoint::Lg)
-        ->and((new MainNavigation(breakpoint: HeaderNavigationBreakpoint::Xl))->breakpoint)->toBe(HeaderNavigationBreakpoint::Xl)
+it('returns the supported default and foundation responsive boundaries', function (): void {
+    expect(HeaderNavigationBreakpoint::cases())->toBe([HeaderNavigationBreakpoint::Lg, HeaderNavigationBreakpoint::Xl])
         ->and(HeaderNavigationBreakpoint::Lg->mobileMediaQuery())->toBe('(max-width: 1023px)')
-        ->and(HeaderNavigationBreakpoint::Xl->mobileMediaQuery())->toBe('(max-width: 1279px)')
-        ->and(HeaderNavigationBreakpoint::Lg->navItemsClasses())->toContain('lg:flex-nowrap')->not->toContain('xl:')
-        ->and(HeaderNavigationBreakpoint::Xl->navItemsClasses())->toContain('xl:flex-nowrap')->not->toContain('lg:')
-        ->and($provider)->toContain('new RegisterFoundationHeaderNavigationHook(HeaderNavigationBreakpoint::Xl)');
+        ->and(HeaderNavigationBreakpoint::Xl->mobileMediaQuery())->toBe('(max-width: 1279px)');
 });
 
-it('registers default lg and foundation xl hook instances without mixed state', function (): void {
-    $provider = new NavigationServiceProvider(app());
-    $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
-    $breakpointProperty = new ReflectionProperty(RegisterFoundationHeaderNavigationHook::class, 'breakpoint');
+it('renders both registered header scenarios with independent responsive menus', function (): void {
+    navigationRenderedMenu();
     $registry = new RenderHookRegistry;
+    app()->instance(RenderHookRegistry::class, $registry);
+    (new NavigationServiceProvider(app()))->registerInstalledPackage();
 
-    $registerHooks->invoke($provider, $registry);
-
-    $extensions = $registry->get(RenderHookLocation::HeaderAfter);
-
-    expect($extensions[0] ?? null)->toBeInstanceOf(RegisterFoundationHeaderNavigationHook::class)
-        ->and($extensions[1] ?? null)->toBeInstanceOf(RegisterFoundationHeaderNavigationHook::class)
-        ->and($breakpointProperty->getValue($extensions[0] ?? null))->toBe(HeaderNavigationBreakpoint::Lg)
-        ->and($breakpointProperty->getValue($extensions[1] ?? null))->toBe(HeaderNavigationBreakpoint::Xl);
+    foreach ([
+        'frontend-default-primary-navigation' => 'lg',
+        'theme-foundation-primary-navigation' => 'xl',
+    ] as $scenario => $breakpoint) {
+        $html = $registry->renderAll(RenderHookLocation::HeaderAfter, scenario: $scenario, target: 'capell::header.index');
+        $xpath = (new RenderedHtml($html));
+        expect($xpath->count('//a[@href="/home"]'))->toBe(1)
+            ->and($xpath->count('//button[@aria-controls="main-menu"]'))->toBe(1);
+    }
+    expect($registry->renderAll(RenderHookLocation::HeaderAfter, scenario: 'unrelated', target: 'capell::header.index'))->toBe('');
 });
 
-it('owns accessible header menu controls in the navigation package', function (): void {
-    $navigation = file_get_contents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php');
-
-    expect($navigation)->toContain('aria-controls="main-menu"')
-        ->and($navigation)->toContain('aria-label="{{ __(\'capell-frontend::generic.open_menu\') }}"')
-        ->and($navigation)->toContain('use Capell\Frontend\Enums\RenderHookLocation;')
-        ->and($navigation)->toContain('use Capell\Frontend\Support\Render\RenderHookRegistry;')
-        ->and($navigation)->toContain('x-bind:aria-expanded="isMenuOpen.toString()"')
-        ->and($navigation)->toContain('capell-product-menu-toggle')
-        ->and($navigation)->toContain('x-text=')
-        ->and($navigation)->toContain('isMenuOpen')
-        ->and($navigation)->toContain("{{ __('capell-frontend::generic.close_menu') }}")
-        ->and($navigation)->toContain("{{ __('capell-frontend::generic.open_menu') }}")
-        ->and($navigation)->toContain('toggleMenu()')
-        ->and($navigation)->toContain('trapFocus(event)')
-        ->and($navigation)->toContain('setPageInert(value)')
-        ->and($navigation)->toContain("element.setAttribute('inert', '')")
-        ->and($navigation)->toContain("element.setAttribute(inertAttribute, 'true')")
-        ->and($navigation)->toContain("element.setAttribute(ariaHiddenAttribute, 'true')")
-        ->and($navigation)->toContain("if (element.getAttribute(inertAttribute) === 'true')")
-        ->and($navigation)->toContain('element.getAttribute(ariaHiddenAttribute)')
-        ->and($navigation)->toContain('menuTransitionTimeout')
-        ->and($navigation)->toContain('window.clearTimeout(this.menuTransitionTimeout)')
-        ->and($navigation)->toContain('isClosingMenu')
-        ->and($navigation)->toContain('$breakpoint->mobileInvisibleClass()')
-        ->and($navigation)->toContain('$breakpoint->navbarClosingClasses()')
-        ->and($navigation)->toContain('x-on:keydown.tab="trapFocus($event)"')
-        ->and($navigation)->toContain('capell-navigation-menu-open-changed')
-        ->and($navigation)->toContain('x-bind:aria-label=')
-        ->and($navigation)->not->toContain("\$refs.toggleMenu.setAttribute('aria-expanded', 'true')");
+it('renders a labelled menu toggle whose controlled navigation exists', function (): void {
+    $html = navigationRenderedMenu();
+    $xpath = (new RenderedHtml($html));
+    $button = $xpath->element('//button[@aria-controls]');
+    expect($button->getAttribute('aria-label'))->toBe(__('capell-frontend::generic.open_menu'))
+        ->and($xpath->count('//*[@id="' . $button->getAttribute('aria-controls') . '"]'))->toBe(1);
 });
 
-it('lets active header item icons inherit the active link colour', function (): void {
-    $item = file_get_contents(dirname(__DIR__, 2) . '/resources/views/components/header/menu/item.blade.php');
-
-    expect($item)->toContain("'active text-primary' => \$item->active")
-        ->and($item)->not->toContain("'text-primary' => \$item->active");
+it('renders the active item and its icon under the active link', function (): void {
+    $item = new NavigationItemData(label: 'Home', data: ['url' => '/home', 'icon' => 'heroicon-o-home'], active: true);
+    $html = view('capell-navigation::components.header.menu.item', ['item' => $item, 'itemClass' => ''])->render();
+    $xpath = (new RenderedHtml($html));
+    $link = $xpath->element('//a[@href="/home"]');
+    expect(explode(' ', $link->getAttribute('class')))->toContain('active')
+        ->and($xpath->count('//a[@href="/home"]//*[local-name()="svg"]'))->toBe(1);
 });
 
 it('only releases mobile menu inert attributes owned by navigation', function (HeaderNavigationBreakpoint $breakpoint): void {
@@ -104,19 +91,8 @@ it('only releases mobile menu inert attributes owned by navigation', function (H
         $this->markTestSkipped('Node.js is required to run the navigation behavior test.');
     }
 
-    $navigation = str_replace(
-        '{{ $breakpoint->mobileMediaQuery() }}',
-        $breakpoint->mobileMediaQuery(),
-        navigationFileContents(dirname(__DIR__, 2) . '/resources/views/components/header/navigation.blade.php'),
-    );
-
-    $matchCount = preg_match('#<script>\s*(.*?)\s*document\.addEventListener#s', $navigation, $matches);
-
-    expect($matchCount)->toBe(1);
-
-    throw_if($matchCount !== 1 || ! isset($matches[1]), RuntimeException::class, 'Expected navigation Blade file to contain the mobile menu script.');
-
-    $navigationScript = base64_encode($matches[1]);
+    $html = (new RenderedHtml(navigationRenderedMenu($breakpoint)));
+    $navigationScript = base64_encode($html->element('//script')->textContent);
     $nodeScript = <<<JS
         const assert = require('assert')
         const source = Buffer.from('{$navigationScript}', 'base64').toString('utf8')
@@ -247,46 +223,30 @@ it('only releases mobile menu inert attributes owned by navigation', function (H
     'foundation xl breakpoint' => HeaderNavigationBreakpoint::Xl,
 ]);
 
-function navigationFileContents(string $path): string
-{
-    $contents = file_get_contents($path);
-
-    if (! is_string($contents)) {
-        throw new RuntimeException(sprintf('Expected %s to be readable.', $path));
+it('registers each header scenario once when a provider or registry is resolved repeatedly', function (): void {
+    navigationRenderedMenu();
+    foreach ([new RenderHookRegistry, new RenderHookRegistry] as $registry) {
+        app()->instance(RenderHookRegistry::class, $registry);
+        foreach ([new NavigationServiceProvider(app()), new NavigationServiceProvider(app())] as $provider) {
+            $provider->registerInstalledPackage();
+        }
+        $html = $registry->renderAll(RenderHookLocation::HeaderAfter, scenario: 'frontend-default-primary-navigation', target: 'capell::header.index');
+        expect((new RenderedHtml($html))->count('//a[@href="/home"]'))->toBe(1);
     }
-
-    return $contents;
-}
-
-it('registers frontend render hooks once per registry instance', function (): void {
-    $provider = new NavigationServiceProvider(app());
-    $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
-
-    $firstRegistry = new RenderHookRegistry;
-    $secondRegistry = new RenderHookRegistry;
-
-    $registerHooks->invoke($provider, $firstRegistry);
-    $registerHooks->invoke($provider, $firstRegistry);
-    $registerHooks->invoke($provider, $secondRegistry);
-
-    expect($firstRegistry->get(RenderHookLocation::HeaderAfter))->toHaveCount(2)
-        ->and($secondRegistry->get(RenderHookLocation::HeaderAfter))->toHaveCount(2);
 });
 
-it('defers frontend render hook registration until navigation is installed', function (): void {
-    $provider = new NavigationServiceProvider(app());
-    $registerHooks = new ReflectionMethod($provider, 'registerFrontendRenderHooksForRegistry');
-
+it('defers rendered navigation until the package is installed', function (): void {
+    navigationRenderedMenu();
     CapellCore::forcePackageInstalled(NavigationServiceProvider::$packageName, false);
-
-    $notInstalledRegistry = new RenderHookRegistry;
-    $registerHooks->invoke($provider, $notInstalledRegistry);
+    $registry = new RenderHookRegistry;
+    app()->instance(RenderHookRegistry::class, $registry);
+    $provider = new NavigationServiceProvider(app());
+    $provider->register();
+    $provider->boot();
+    expect($registry->renderAll(RenderHookLocation::HeaderAfter, scenario: 'frontend-default-primary-navigation', target: 'capell::header.index'))->toBe('');
 
     CapellCore::forcePackageInstalled(NavigationServiceProvider::$packageName);
-
-    $installedRegistry = new RenderHookRegistry;
-    $registerHooks->invoke($provider, $installedRegistry);
-
-    expect($notInstalledRegistry->get(RenderHookLocation::HeaderAfter))->toBeEmpty()
-        ->and($installedRegistry->get(RenderHookLocation::HeaderAfter))->toHaveCount(2);
+    $provider->registerInstalledPackage();
+    $html = $registry->renderAll(RenderHookLocation::HeaderAfter, scenario: 'frontend-default-primary-navigation', target: 'capell::header.index');
+    expect((new RenderedHtml($html))->count('//a[@href="/home"]'))->toBe(1);
 });

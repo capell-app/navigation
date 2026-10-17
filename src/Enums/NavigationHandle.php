@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Enums;
 
 use Filament\Support\Contracts\HasLabel;
+use Override;
 
 enum NavigationHandle: string implements HasLabel
 {
@@ -22,12 +23,13 @@ enum NavigationHandle: string implements HasLabel
         return self::cases();
     }
 
+    #[Override]
     public function getLabel(): string
     {
         return match ($this) {
-            self::Main => __('capell::generic.main'),
-            self::Footer => __('capell::generic.footer'),
-            self::SubFooter => __('capell::generic.sub_footer'),
+            self::Main => NavigationPurpose::Main->getLabel(),
+            self::Footer => NavigationPurpose::Footer->getLabel(),
+            self::SubFooter => NavigationPurpose::SubFooter->getLabel(),
         };
     }
 }

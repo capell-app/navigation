@@ -23,6 +23,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\CapellCoreHelper;
+use Capell\Core\Support\Permissions\SiteAccess;
 use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Actions\BuildNavigationStarterItemsAction;
 use Capell\Navigation\Data\NavigationItemData;
@@ -47,6 +48,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Actions as SchemaActions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
@@ -69,6 +73,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Schema as DatabaseSchema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
+use Livewire\Component as LivewireComponent;
 use Saade\FilamentAdjacencyList\Forms\Components\AdjacencyList;
 
 class DefaultNavigationConfigurator implements ConfiguratorInterface
@@ -327,6 +332,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
             $this->getKeyField($configurator, $isCreating),
 
             SiteSelect::make('site_id')
+                ->default(fn (LivewireComponent $livewire): ?int => $this->creationSiteId($livewire))
                 ->required()
                 ->reactive()
                 ->afterStateUpdated(function (mixed $state, Set $set) use ($isCreating): void {
@@ -997,6 +1003,30 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                 fn (Builder $query): Builder => $query->whereNull('language_id'),
             )
             ->exists();
+    }
+
+    private function creationSiteId(LivewireComponent $livewire): ?int
+    {
+        $siteId = null;
+
+        if ($livewire instanceof RelationManager && $livewire->getOwnerRecord() instanceof Site) {
+            $siteId = $livewire->getOwnerRecord()->getKey();
+        } elseif ($livewire instanceof EditRecord) {
+            $siteId = $livewire->getRecord()->getAttribute('site_id');
+        } elseif ($livewire instanceof ListRecords) {
+            $siteId = is_numeric($livewire->activeTab)
+                ? $livewire->activeTab
+                : ($livewire->getTableFilterState('filter')['site_id'] ?? null);
+        }
+
+        $siteId ??= request()->integer('site_id') ?: request()->integer('site')
+            ?: session()->get('capell.current_site_id');
+
+        $access = SiteAccess::current();
+        $site = $access->site(is_numeric($siteId) ? (int) $siteId : null)
+            ?? $access->query(Site::class)->first();
+
+        return $site?->id;
     }
 
     /**

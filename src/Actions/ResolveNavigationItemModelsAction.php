@@ -33,12 +33,9 @@ class ResolveNavigationItemModelsAction
      */
     public function handle(array|Collection|DataCollection $items, ?int $siteId = null): Collection
     {
-        if ($items instanceof DataCollection) {
-            $items = $items->all();
-        }
-
-        if ($items instanceof Collection) {
-            $items = $items->all();
+        if ($items instanceof DataCollection || $items instanceof Collection) {
+            // Transform data objects, enums and nested children before array traversal.
+            $items = $items->toArray();
         }
 
         /** @var Collection<string, array<int, int>> $pageableIdsByType */

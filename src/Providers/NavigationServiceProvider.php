@@ -7,6 +7,7 @@ namespace Capell\Navigation\Providers;
 use Capell\Admin\Data\AdminSurfaceContributionData;
 use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
+use Capell\Core\Actions\Install\RegisterCommandsInCurrentProcessAction;
 use Capell\Core\Contracts\SiteSpec\SiteSpecApplier;
 use Capell\Core\Data\PageTypeData;
 use Capell\Core\Data\VendorAssetData;
@@ -15,8 +16,10 @@ use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Site;
 use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
+use Capell\Core\Support\Packages\InstalledRuntimeLifecycle;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Core\Support\Packages\RegistersInstalledRuntime;
+use Capell\Core\Support\Packages\RouteGroupIsolation;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Data\RenderHookContributionData;
@@ -60,7 +63,6 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
-use ReflectionProperty;
 
 final class NavigationServiceProvider extends ServiceProvider
 {
@@ -72,51 +74,42 @@ final class NavigationServiceProvider extends ServiceProvider
 
     public static string $packageName = 'capell-app/navigation';
 
-    private bool $installedPackageRegistered = false;
-
-    private bool $resourcesRegistered = false;
-
     #[Override]
     public function register(): void
     {
         $this->app->register(ConsoleServiceProvider::class);
 
         $this->registerContentGraphExtractors();
-        $this->commands([DemoCommand::class, SetupCommand::class]);
-        $this->registerInstalledRuntime(self::$packageName, 'runtime');
+        $commands = [DemoCommand::class, SetupCommand::class];
+        $this->commands($commands);
+        if ($this->app->runningInConsole() && $this->app->isBooted()) {
+            RegisterCommandsInCurrentProcessAction::run($commands);
+        }
 
-        $this->app->booting(function (): void {
-            if ($this->isPackageInstalled()) {
-                $this->registerResources();
-            }
-        });
+        $this->registerInstalledRuntime(self::$packageName, 'runtime');
     }
 
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([SeedNavigationScreenshotFixtureCommand::class]);
+            if ($this->app->isBooted()) {
+                RegisterCommandsInCurrentProcessAction::run([SeedNavigationScreenshotFixtureCommand::class]);
+            }
         }
-
     }
 
     public function registerInstalledPackage(): void
     {
-        if ($this->installedPackageRegistered) {
-            return;
-        }
+        $this->app->make(InstalledRuntimeLifecycle::class)->refresh(self::$packageName);
 
-        $this->bootInstalledRuntime();
+        if (CapellCore::isPackageEnabled(self::$packageName) && $this->app->bound(RenderHookRegistry::class)) {
+            $this->registerFrontendRenderHooksForRegistry($this->app->make(RenderHookRegistry::class));
+        }
     }
 
     protected function bootInstalledRuntime(): void
     {
-        if ($this->installedPackageRegistered) {
-            return;
-        }
-
-        $this->installedPackageRegistered = true;
-
         $this->mergeConfigFrom(__DIR__ . '/../../config/capell-navigation.php', 'capell-navigation');
 
         $this->publishes([
@@ -180,15 +173,9 @@ final class NavigationServiceProvider extends ServiceProvider
 
     private function registerRoutes(): self
     {
-        $router = $this->app->make(Router::class);
-        $groups = new ReflectionProperty(Router::class, 'groupStack');
-        $previous = $groups->getValue($router);
-        $groups->setValue($router, []);
-        try {
+        RouteGroupIsolation::run($this->app->make(Router::class), function (): void {
             $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
-        } finally {
-            $groups->setValue($router, $previous);
-        }
+        });
 
         return $this;
     }
@@ -203,15 +190,10 @@ final class NavigationServiceProvider extends ServiceProvider
 
     private function registerResources(): self
     {
-        if ($this->resourcesRegistered) {
-            return $this;
-        }
-
         CapellAdmin::contributeToAdminSurface(AdminSurfaceContributionData::resource(
             class: NavigationResource::class,
             group: 'Navigation',
         ));
-        $this->resourcesRegistered = true;
 
         return $this;
     }
@@ -398,7 +380,7 @@ final class NavigationServiceProvider extends ServiceProvider
 
     private function registerContentGraphExtractors(): self
     {
-        if (class_exists(ContentGraphRegistry::class)) {
+        if (class_exists(ContentGraphRegistry::class) && ! $this->app->bound(NavigationContentGraphExtractor::class)) {
             $this->app->singleton(NavigationContentGraphExtractor::class);
             $this->app->tag(NavigationContentGraphExtractor::class, ContentGraphRegistry::TAG);
         }

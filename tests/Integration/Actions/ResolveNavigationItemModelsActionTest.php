@@ -7,8 +7,58 @@ use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Actions\ResolveNavigationItemModelsAction;
 use Capell\Navigation\Enums\NavigationItemType;
+use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Spatie\LaravelData\DataCollection;
+
+it('resolves stored navigation page items and children in each supported input format', function (string $format): void {
+    $site = Site::factory()->create();
+    $pages = Page::factory()->count(2)->create(['site_id' => $site->getKey()]);
+    $otherSitePage = Page::factory()->create();
+    $items = [
+        'parent' => [
+            'type' => NavigationItemType::Page->value,
+            'data' => [
+                'pageable_type' => $pages[0]->getMorphClass(),
+                'pageable_id' => $pages[0]->getKey(),
+            ],
+            'children' => [
+                'child' => [
+                    'type' => NavigationItemType::Page->value,
+                    'data' => [
+                        'pageable_type' => $pages[1]->getMorphClass(),
+                        'pageable_id' => $pages[1]->getKey(),
+                    ],
+                ],
+            ],
+        ],
+        'other-site' => [
+            'type' => NavigationItemType::Page->value,
+            'data' => [
+                'pageable_type' => $otherSitePage->getMorphClass(),
+                'pageable_id' => $otherSitePage->getKey(),
+            ],
+        ],
+    ];
+    $navigation = Navigation::factory()->create([
+        'site_id' => $site->getKey(),
+        'items' => $items,
+    ])->refresh();
+
+    expect($navigation->items)->toBeInstanceOf(DataCollection::class);
+
+    $input = match ($format) {
+        'array' => $items,
+        'collection' => collect($items),
+        default => $navigation->items ?? [],
+    };
+
+    $models = ResolveNavigationItemModelsAction::run($input, $navigation->site_id);
+
+    expect($models->map(fn (Model $model): mixed => $model->getKey())->all())
+        ->toEqualCanonicalizing($pages->modelKeys());
+})->with(['data collection', 'array', 'collection']);
 
 it('resolves models for each morph type independently', function (): void {
     $site = Site::factory()->create();

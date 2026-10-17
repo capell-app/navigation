@@ -7,7 +7,7 @@ namespace Capell\Navigation\Support\RenderHooks;
 use Capell\Frontend\Contracts\RenderHookExtensionInterface;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
-use Livewire\Blaze\Blaze;
+use Override;
 
 final class RegisterFoundationHeaderNavigationHook implements RenderHookExtensionInterface
 {
@@ -21,6 +21,7 @@ final class RegisterFoundationHeaderNavigationHook implements RenderHookExtensio
         private readonly HeaderNavigationBreakpoint $breakpoint = HeaderNavigationBreakpoint::Lg,
     ) {}
 
+    #[Override]
     public function render(RenderHookContext $context): string
     {
         $view = view('capell-navigation::components.header.main-navigation', [
@@ -29,15 +30,7 @@ final class RegisterFoundationHeaderNavigationHook implements RenderHookExtensio
                 : null,
             'breakpoint' => $this->breakpoint,
         ]);
-        $wasBlazeEnabled = Blaze::isEnabled();
-        Blaze::disable();
 
-        try {
-            return $view->render();
-        } finally {
-            if ($wasBlazeEnabled) {
-                Blaze::enable();
-            }
-        }
+        return $view->render();
     }
 }

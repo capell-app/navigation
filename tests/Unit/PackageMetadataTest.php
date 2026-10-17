@@ -271,7 +271,7 @@ it('uses marketplace and composer copy that describes the package outcome', func
         ->toBe('Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.');
 
     expect(data_get($manifest, 'marketplace.summary'))
-        ->toBe('Build and manage multilingual, per-site menus visually — link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.');
+        ->toBe('Build and manage multilingual, per-site menus visually: link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.');
 });
 
 it('declares shipped marketplace images and screenshot captures', function (): void {

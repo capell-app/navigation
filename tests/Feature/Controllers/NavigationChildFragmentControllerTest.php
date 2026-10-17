@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 
 it('returns a lazy navigation child fragment for a valid public payload', function (): void {
+    $this->freezeTime();
+
     $language = Language::factory()->default()->create();
     $site = Site::factory()
         ->language($language)

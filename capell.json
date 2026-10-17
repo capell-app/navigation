@@ -243,7 +243,7 @@
         "privateDocsRequested": false
     },
     "marketplace": {
-        "summary": "Build and manage multilingual, per-site menus visually \u2014 link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
+        "summary": "Build and manage multilingual, per-site menus visually: link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",

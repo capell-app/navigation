@@ -4,6 +4,12 @@ All notable changes to `capell-app/navigation` will be documented in this file.
 
 ## Unreleased
 
+- Blueprint selectors use the registered subject so unrelated blueprint types are not offered or selected by default.
+
+- Global administrators can manage navigation without generated menu permissions; site editors remain restricted to their assigned sites.
+- Menu creation keeps the selected, linked, filtered or relation-manager site, and site tab counts refresh after changes.
+- Built-in menu handles and item types show translated labels.
+
 - Prepared package metadata and documentation for ongoing Capell 0.0.x package work.
 - Added the `navigation_page_references` index table and sync action so page navigation panels can resolve references without scanning the `items` JSON column.
 - Navigation health diagnostics now require both navigation storage tables.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Filament\Components\Forms\Page\Tab;
 
+use Capell\Core\Contracts\Pageable;
 use Capell\Navigation\Filament\Components\Forms\NavigationSelect;
 use Filament\Forms\Components\ViewField;
 use Filament\Schemas\Components\Grid;
@@ -15,6 +16,8 @@ class NavigationTab
     {
         return Tab::make(__('capell-admin::tab.navigation'))
             ->icon('heroicon-o-globe-alt')
+            // Replication has form state but no page for references or the page tree.
+            ->visible(fn (?Pageable $record): bool => $record instanceof Pageable)
             ->schema([
                 Grid::make()
                     ->schema([

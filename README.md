@@ -49,6 +49,10 @@ Screenshot contract: `docs/screenshots.json`.
 - `Capell\Navigation\Providers\NavigationServiceProvider`
 - `Capell\Navigation\Providers\ConsoleServiceProvider`
 
+### Config files
+
+- `packages/navigation/config/capell-navigation.php`
+
 ### Migrations
 
 - `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`
@@ -110,7 +114,9 @@ Screenshot contract: `docs/screenshots.json`.
 - `EnsureNavigationItemKeysAction`
 - `RemovePageFromNavigationAction`
 - `ReplicateSiteNavigationsAction`
+- `ResolveNavigationCacheExpiryAction`
 - `ResolveNavigationItemModelsAction`
+- `ScalarizeNavigationDataAction`
 - `SeedNavigationScreenshotFixtureAction`
 - `SyncNavigationPageReferencesAction`
 
@@ -189,7 +195,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Permissions: `ViewAny:Navigation`, `View:Navigation`, `Create:Navigation`, `Update:Navigation`, `Delete:Navigation`, `DeleteAny:Navigation`, `Restore:Navigation`, `RestoreAny:Navigation`, `ForceDelete:Navigation`, `ForceDeleteAny:Navigation`, `Reorder:Navigation`; access also governed by package policies: `NavigationPolicy`.
 - Public routes: loads `routes/web.php`; registers `NavigationFrontendRouteContribution`.
 - Database changes: package migrations are declared.
-- Config: no package config files.
+- Config: `config/capell-navigation.php`.
 - Settings: no package settings declared.
 - Queues or schedules: none declared.
 - Cache tags: `navigation`.
@@ -199,6 +205,7 @@ Screenshot contract: `docs/screenshots.json`.
 
 - Keep required Capell packages on compatible v4 releases: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`.
 - Run migrations before opening package resources or public routes.
+- Review package configuration before production-like verification: `config/capell-navigation.php`.
 - Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
 - Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
 - Custom write integrations must preserve invalidation for `navigation` cache tags.
@@ -225,6 +232,7 @@ Screenshot contract: `docs/screenshots.json`.
 - [Overview](docs/overview.md)
 - [Worked extension examples](docs/extension-contracts.md)
 - [Admin guide](docs/admin-guide.md)
+- Configuration files: [`config/capell-navigation.php`](config/capell-navigation.php).
 - [Troubleshooting](#troubleshooting)
 - [Screenshot contract](docs/screenshots.json)
 - [Marketplace assets](docs/assets/marketplace/)

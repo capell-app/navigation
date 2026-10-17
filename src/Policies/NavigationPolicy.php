@@ -27,59 +27,80 @@ class NavigationPolicy
 
     public function viewAny(User $user): bool
     {
-        if ($user->checkPermissionTo(self::permission('view_any', self::SUBJECT))) {
+        if ($this->hasPermission($user, self::permission('view_any', self::SUBJECT))) {
             return true;
         }
 
-        return $user->checkPermissionTo(self::permission('view', self::SUBJECT));
+        return $this->hasPermission($user, self::permission('view', self::SUBJECT));
     }
 
     public function view(User $user, Navigation $navigation): bool
     {
         return (
-            $user->checkPermissionTo(self::permission('view_any', self::SUBJECT))
-            || $user->checkPermissionTo(self::permission('view', self::SUBJECT))
+            $this->hasPermission($user, self::permission('view_any', self::SUBJECT))
+            || $this->hasPermission($user, self::permission('view', self::SUBJECT))
         )
             && $this->canUseNavigationSite($user, $navigation);
     }
 
     public function create(User $user): bool
     {
-        return $user->checkPermissionTo(self::permission('create', self::SUBJECT));
+        return $this->hasPermission($user, self::permission('create', self::SUBJECT));
     }
 
     public function update(User $user, Navigation $navigation): bool
     {
-        return $user->checkPermissionTo(self::permission('update', self::SUBJECT))
+        return $this->hasPermission($user, self::permission('update', self::SUBJECT))
             && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function delete(User $user, Navigation $navigation): bool
     {
-        return $user->checkPermissionTo(self::permission('delete', self::SUBJECT))
+        return $this->hasPermission($user, self::permission('delete', self::SUBJECT))
             && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->checkPermissionTo(self::permission('delete_any', self::SUBJECT));
+        return $this->hasPermission($user, self::permission('delete_any', self::SUBJECT));
     }
 
     public function restore(User $user, Navigation $navigation): bool
     {
-        return $user->checkPermissionTo(self::permission('restore', self::SUBJECT))
+        return $this->hasPermission($user, self::permission('restore', self::SUBJECT))
+            && $this->canMutateNavigationSite($user, $navigation);
+    }
+
+    public function restoreAny(User $user): bool
+    {
+        return $this->hasPermission($user, self::permission('restore_any', self::SUBJECT));
+    }
+
+    public function forceDeleteAny(User $user): bool
+    {
+        return $this->hasPermission($user, self::permission('force_delete_any', self::SUBJECT));
+    }
+
+    public function replicate(User $user, Navigation $navigation): bool
+    {
+        return $this->hasPermission($user, self::permission('replicate', self::SUBJECT))
             && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function forceDelete(User $user, Navigation $navigation): bool
     {
-        return $user->checkPermissionTo(self::permission('force_delete', self::SUBJECT))
+        return $this->hasPermission($user, self::permission('force_delete', self::SUBJECT))
             && $this->canMutateNavigationSite($user, $navigation);
     }
 
     public function reorder(User $user): bool
     {
-        return $user->checkPermissionTo(self::permission('reorder', self::SUBJECT));
+        return $this->hasPermission($user, self::permission('reorder', self::SUBJECT));
+    }
+
+    private function hasPermission(User $user, string $permission): bool
+    {
+        return SiteScope::isGlobalActor($user) || $user->checkPermissionTo($permission);
     }
 
     private function canUseNavigationSite(User $user, Navigation $navigation): bool
