@@ -7,6 +7,7 @@ namespace Capell\Navigation\Actions;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Models\Navigation;
+use Capell\ScreenshotFixtures\FixtureState;
 use RuntimeException;
 
 final class SeedNavigationScreenshotFixtureAction
@@ -17,10 +18,15 @@ final class SeedNavigationScreenshotFixtureAction
         throw_unless(
             app()->environment(['local', 'testing'])
                 && in_array(getenv('CAPELL_SCREENSHOT_FIXTURE'), ['1', 'true', 'record-state'], true)
-                && is_string($path) && realpath($path) === realpath(base_path()),
+                && is_string($path) && realpath($path) === realpath(base_path())
+                && (realpath(base_path()) === realpath(dirname(__DIR__, 4) . '/vendor/orchestra/testbench-core/laravel')
+                    || str_starts_with((string) realpath(base_path()), dirname(__DIR__, 4) . '/tmp/testbench-skeletons/')),
             RuntimeException::class,
             'Screenshot fixtures require the explicit disposable local screenshot environment.',
         );
+
+        require_once dirname(__DIR__, 4) . '/scripts/screenshots/FixtureState.php';
+        FixtureState::boot();
 
         $site = Site::query()->firstOrFail();
         $page = Page::query()->where('site_id', $site->id)->where('name', 'Navigation screenshot guide')->first();
