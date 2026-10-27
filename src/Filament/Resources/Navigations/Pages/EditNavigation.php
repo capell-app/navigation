@@ -52,8 +52,12 @@ class EditNavigation extends EditRecord
     {
         return [
             RestoreAction::make(),
-            DeleteAction::make(),
-            ForceDeleteAction::make(),
+            DeleteAction::make()
+                ->modalHeading(__('capell-navigation::navigation.delete_modal.heading'))
+                ->modalDescription(__('capell-navigation::navigation.delete_modal.description')),
+            ForceDeleteAction::make()
+                ->modalHeading(__('capell-navigation::navigation.force_delete_modal.heading'))
+                ->modalDescription(__('capell-navigation::navigation.force_delete_modal.description')),
             ActionGroup::make([
                 CreateAction::make()
                     ->groupedIcon('heroicon-o-plus-circle')

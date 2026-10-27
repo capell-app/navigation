@@ -6,6 +6,7 @@ use Capell\Core\Database\Factories\UserFactory;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Theme;
+use Capell\Core\Support\Themes\ThemeChromeRegistry;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
@@ -221,6 +222,11 @@ function registerThemedHeaderComponentForRendering(): void
 {
     Blade::componentNamespace('Capell\\Navigation\\Tests\\Fixtures\\View\\Components', 'capell-navigation-test');
     View::addNamespace('capell-navigation-test', __DIR__ . '/../../../Fixtures/views');
+
+    // Stored theme selectors must be registered; the theme packages that own these are not loaded here.
+    $chrome = resolve(ThemeChromeRegistry::class);
+    $chrome->registerHeader('capell::header.index', 'Default header');
+    $chrome->registerHeader('capell-navigation-test::header', 'Navigation test header');
 
     clearDynamicComponentResolverCache();
 }

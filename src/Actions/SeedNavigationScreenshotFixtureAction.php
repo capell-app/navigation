@@ -12,7 +12,7 @@ use RuntimeException;
 
 final class SeedNavigationScreenshotFixtureAction
 {
-    public function handle(): Page
+    public function handle(bool $landingPage = false): Page
     {
         $path = getenv('CAPELL_SCREENSHOT_APP_PATH');
         throw_unless(
@@ -27,6 +27,17 @@ final class SeedNavigationScreenshotFixtureAction
 
         require_once dirname(__DIR__, 4) . '/scripts/screenshots/FixtureState.php';
         FixtureState::boot();
+
+        if ($landingPage) {
+            $site = FixtureState::selectedSite();
+
+            return Page::query()
+                ->where('site_id', $site->id)
+                ->where('meta->theme_demo->surface', 'homepage')
+                ->whereRelation('blueprint', 'admin->configurator', 'Landing')
+                ->whereRelation('pageUrl', ['url' => '/', 'language_id' => $site->language_id])
+                ->sole();
+        }
 
         $site = Site::query()->firstOrFail();
         $page = Page::query()->where('site_id', $site->id)->where('name', 'Navigation screenshot guide')->first();

@@ -26,6 +26,7 @@ use Capell\Core\Support\CapellCoreHelper;
 use Capell\Core\Support\Permissions\SiteAccess;
 use Capell\Core\Support\Slug\SlugGenerator;
 use Capell\Navigation\Actions\BuildNavigationStarterItemsAction;
+use Capell\Navigation\Actions\CheckSavedNavigationItemsAction;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Data\NavigationStarterRequestData;
 use Capell\Navigation\Enums\NavigationConfiguratorTypeEnum;
@@ -67,6 +68,7 @@ use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -161,6 +163,17 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                         ->schema([
                             $this->getStarterSection(),
                             $this->getNavigationItemsField(),
+                            SchemaActions::make([
+                                Action::make('check_saved_items')
+                                    ->label(__('capell-navigation::generic.saved_items_check'))
+                                    ->modalHeading(__('capell-navigation::generic.saved_items_check'))
+                                    ->modalDescription(__('capell-navigation::generic.saved_items_scope'))
+                                    ->authorize('update')
+                                    ->modalSubmitAction(false)
+                                    ->modalContent(fn (Navigation $record): ViewContract => view('capell-navigation::filament.forms.saved-items-check', [
+                                        'rows' => CheckSavedNavigationItemsAction::run($record),
+                                    ])),
+                            ])->key('savedItemActions')->hiddenOn(['create', 'createOption', 'replicate']),
                         ]),
                     Tab::make(__('capell-admin::form.settings'))
                         ->icon(Heroicon::OutlinedCog6Tooth)

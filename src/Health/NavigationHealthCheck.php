@@ -74,6 +74,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             remediation: $missingTables === []
                 ? null
                 : (string) __('capell-navigation::generic.health_storage_tables_remediation'),
+            id: 'legacy.navigation.storage.tables',
         );
     }
 
@@ -93,6 +94,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             remediation: $aliasRegistered
                 ? null
                 : (string) __('capell-navigation::generic.health_morph_alias_remediation'),
+            id: 'legacy.navigation.model.morph.alias',
         );
     }
 
@@ -112,6 +114,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             remediation: $hookRegistered
                 ? null
                 : (string) __('capell-navigation::generic.health_header_render_hook_remediation'),
+            id: 'legacy.navigation.header.render.hook',
         );
     }
 
@@ -126,6 +129,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
                 passed: false,
                 message: (string) __('capell-navigation::generic.health_main_navigation_coverage_missing_tables'),
                 remediation: (string) __('capell-navigation::generic.health_main_navigation_coverage_missing_tables_remediation'),
+                id: 'legacy.navigation.main.menu.coverage',
             );
         }
 
@@ -140,6 +144,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             remediation: $missingSiteIds === []
                 ? null
                 : (string) __('capell-navigation::generic.health_main_navigation_coverage_remediation'),
+            id: 'legacy.navigation.main.menu.coverage',
         );
     }
 
@@ -154,6 +159,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
                 passed: false,
                 message: (string) __('capell-navigation::generic.health_page_reference_integrity_missing_table'),
                 remediation: (string) __('capell-navigation::generic.health_page_reference_integrity_missing_table_remediation'),
+                id: 'legacy.navigation.page.reference.integrity',
             );
         }
 
@@ -168,6 +174,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             remediation: $orphanedReferenceCount === 0
                 ? null
                 : (string) __('capell-navigation::generic.health_page_reference_integrity_remediation'),
+            id: 'legacy.navigation.page.reference.integrity',
         );
     }
 
@@ -386,9 +393,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     private function registeredRenderHookExtensions(RenderHookRegistry $registry): array
     {
-        $extensions = $registry->diagnostics();
-
-        return $extensions;
+        return $registry->diagnostics();
     }
 
     /**

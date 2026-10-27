@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use Capell\Admin\Filament\Resources\Sites\Pages\EditSite;
+use Capell\Core\Models\Blueprint;
+use Capell\Core\Models\Language;
+use Capell\Core\Models\Page;
+use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Actions\SeedNavigationScreenshotFixtureAction;
 use Capell\Navigation\Filament\Resources\Sites\RelationManagers\NavigationsRelationManager;
@@ -29,8 +33,8 @@ afterEach(function (): void {
 it('opens the seeded page navigation tab and populated site relation manager', function (): void {
     $site = Site::factory()->withTranslations()->create();
     require __DIR__ . '/../../workbench/routes/screenshot-fixtures.php';
-    $page = app(SeedNavigationScreenshotFixtureAction::class)->handle();
-    app(SeedNavigationScreenshotFixtureAction::class)->handle();
+    $page = resolve(SeedNavigationScreenshotFixtureAction::class)->handle();
+    resolve(SeedNavigationScreenshotFixtureAction::class)->handle();
     expect(Navigation::query()->where('key', 'screenshot-main-menu')->count())->toBe(1);
     $response = $this->get(navigationSuppressedCaptureUrl('page-form-navigation-tab'));
     $pageRouteKey = $page->getRouteKey();
@@ -60,3 +64,60 @@ function navigationSuppressedCaptureUrl(string $key): string
 {
     return ScreenshotManifest::captureUrl(__DIR__ . '/../../docs/screenshots.json', $key);
 }
+
+it('opens only the selected site prepared landing editor without changing content', function (bool $hasSelectedLanding, bool $otherLanguage): void {
+    $this->actingAsAdmin(['email' => 'admin@example.com']);
+    $site = Site::factory()->withTranslations()->create();
+    $otherSite = Site::factory()->withTranslations()->create();
+    $blueprint = Blueprint::factory()->page()->create(['admin' => ['type_configurator' => 'page', 'configurator' => 'Landing']]);
+    $landingSite = $hasSelectedLanding || $otherLanguage ? $site : $otherSite;
+    $landing = Page::factory()->site($landingSite)->withTranslations()->create([
+        'blueprint_id' => $blueprint->id,
+        'meta' => ['theme_demo' => ['surface' => 'homepage']],
+    ]);
+    $lookalike = Page::factory()->site($site)->withTranslations()->create([
+        'meta' => ['theme_demo' => ['surface' => 'homepage']],
+    ]);
+    PageUrl::factory()->site($landingSite)->page($landing)->create([
+        'url' => '/',
+        'language_id' => $otherLanguage ? Language::factory()->create()->id : $landingSite->language_id,
+    ]);
+    $preview = Page::factory()->site($site)->withTranslations()->create([
+        'blueprint_id' => $blueprint->id,
+        'meta' => ['theme_demo' => ['surface' => 'homepage']],
+    ]);
+    PageUrl::factory()->site($site)->page($preview)->create(['url' => '/theme-default', 'language_id' => $site->language_id]);
+    $beforeUrls = PageUrl::query()->orderBy('id')->get()->map->getRawOriginal()->all();
+    $beforePreview = $preview->refresh()->getRawOriginal();
+    $beforeLanding = $landing->refresh()->getRawOriginal();
+    $beforeLookalike = $lookalike->refresh()->getRawOriginal();
+    $pages = Page::query()->count();
+    $navigations = Navigation::query()->count();
+    $priorSite = getenv('CAPELL_SCREENSHOT_SITE_ID');
+    putenv('CAPELL_SCREENSHOT_SITE_ID=' . $site->id);
+
+    try {
+        require __DIR__ . '/../../workbench/routes/screenshot-fixtures.php';
+        $response = $this->get('/screenshot-fixtures/navigation/landing-page');
+        if ($hasSelectedLanding) {
+            $key = $landing->getRouteKey();
+            throw_unless(is_int($key) || is_string($key), RuntimeException::class, 'The landing page route key must be scalar.');
+            $response->assertRedirect('/admin/pages/' . $key . '/edit');
+        } else {
+            $response->assertNotFound();
+        }
+    } finally {
+        putenv($priorSite === false ? 'CAPELL_SCREENSHOT_SITE_ID' : 'CAPELL_SCREENSHOT_SITE_ID=' . $priorSite);
+    }
+
+    expect($landing->fresh()?->getRawOriginal())->toBe($beforeLanding)
+        ->and($lookalike->fresh()?->getRawOriginal())->toBe($beforeLookalike)
+        ->and($preview->fresh()?->getRawOriginal())->toBe($beforePreview)
+        ->and(PageUrl::query()->orderBy('id')->get()->map->getRawOriginal()->all())->toBe($beforeUrls)
+        ->and(Page::query()->count())->toBe($pages)
+        ->and(Navigation::query()->count())->toBe($navigations);
+})->with([
+    'selected landing' => [true, false],
+    'only foreign landing' => [false, false],
+    'only other-language root' => [false, true],
+]);

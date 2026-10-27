@@ -4,6 +4,7 @@ All notable changes to `capell-app/navigation` will be documented in this file.
 
 ## Unreleased
 
+- The page form's navigation tab now lists, read-only, the menus that already contain the page and points editors to the Navigation editor to add or remove it, instead of implying the field adds the page.
 - Blueprint selectors use the registered subject so unrelated blueprint types are not offered or selected by default.
 
 - Global administrators can manage navigation without generated menu permissions; site editors remain restricted to their assigned sites.

@@ -65,13 +65,19 @@ class NavigationsTable implements TableConfigurator
                 EditAction::make('edit'),
                 ActionGroup::make([
                     ReplicateAction::make('replicate'),
-                    DeleteAction::make('delete'),
+                    DeleteAction::make('delete')
+                        ->modalHeading(__('capell-navigation::navigation.delete_modal.heading'))
+                        ->modalDescription(__('capell-navigation::navigation.delete_modal.description')),
                 ])
                     ->color('gray'),
             ])
             ->toolbarActions([
-                DeleteBulkAction::make('delete'),
-                ForceDeleteBulkAction::make('forceDelete'),
+                DeleteBulkAction::make('delete')
+                    ->modalHeading(__('capell-navigation::navigation.delete_bulk_modal.heading'))
+                    ->modalDescription(__('capell-navigation::navigation.delete_bulk_modal.description')),
+                ForceDeleteBulkAction::make('forceDelete')
+                    ->modalHeading(__('capell-navigation::navigation.force_delete_bulk_modal.heading'))
+                    ->modalDescription(__('capell-navigation::navigation.force_delete_bulk_modal.description')),
                 RestoreBulkAction::make('restore'),
             ]);
     }

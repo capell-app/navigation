@@ -314,7 +314,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
     $entries = $screenshotManifest['entries'] ?? [];
     throw_unless(is_array($entries), RuntimeException::class, 'Navigation screenshot entries must be an array.');
 
-    expect($entries)->toHaveCount(8);
+    expect($entries)->toHaveCount(9);
 
     $expectedScreenshotPaths = [
         'packages/navigation/docs/screenshots/navigation-admin-index.png',
@@ -323,6 +323,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
         'packages/navigation/docs/screenshots/create-edit-navigation-form-mobile.png',
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab.png',
+        'packages/navigation/docs/screenshots/landing-page-configuration-tabs.png',
         'packages/navigation/docs/screenshots/frontend-menu-output.png',
         'packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open.png',
     ];
@@ -333,6 +334,7 @@ it('keeps the screenshot capture manifest aligned with shipped captures', functi
         'packages/navigation/docs/screenshots/create-edit-navigation-form-mobile-dark.png',
         'packages/navigation/docs/screenshots/site-relation-manager-for-navigations-dark.png',
         'packages/navigation/docs/screenshots/page-form-navigation-tab-dark.png',
+        'packages/navigation/docs/screenshots/landing-page-configuration-tabs-dark.png',
         'packages/navigation/docs/screenshots/frontend-menu-output-dark.png',
         'packages/navigation/docs/screenshots/navigation-admin-sidebar-menu-open-dark.png',
     ];

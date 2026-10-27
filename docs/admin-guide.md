@@ -8,7 +8,7 @@ This guide is for editors who build site menus and owners deciding how menus are
 
 1. Go to **Navigation**.
 2. Create a new menu and give it a name.
-3. Choose a **Key**. Use **Main**, **Footer**, or **Sub-footer** when your theme renders that built-in menu location. A key can be used once for the same site and language.
+3. Choose a **Key**. Use `main`, `footer`, or `sub-footer` when your theme renders that built-in menu location. A key can be used once for the same site and language.
 4. Choose the site and, when needed, the language for this menu.
 5. Add links to your pages, or add an **External link** to another site.
 6. Save the menu.
@@ -35,7 +35,7 @@ runner described by the [screenshot contract](screenshots.json).
 
 ### How to make a menu appear in a theme location
 
-1. Check which menu key the theme renders. The built-in keys are **Main**, **Footer**, and **Sub-footer**.
+1. Check which menu key the theme renders. The built-in keys are `main`, `footer`, and `sub-footer`.
 2. Open or create the menu for that site and language.
 3. Set its **Key** to the matching value and save.
 4. Preview the public page. The theme decides where that key appears; there is no separate Header or Footer assignment control.
@@ -48,11 +48,11 @@ runner described by the [screenshot contract](screenshots.json).
 
 ![An editor manages navigations directly from the site edit screen.](screenshots/site-relation-manager-for-navigations.png)
 
-### How to set page-level navigation options
+### How to see which menus contain a page
 
 1. Open the page you want to control.
 2. Go to its navigation tab.
-3. Set how that page behaves in menus, then save.
+3. Review the menus that already contain the page. The list is read-only; to add or remove the page, edit the menu in Navigation.
 
 ![An editor controls page-level navigation options from the page form.](screenshots/page-form-navigation-tab.png)
 
@@ -60,7 +60,7 @@ runner described by the [screenshot contract](screenshots.json).
 
 ### Turn on first
 
-- **A header menu with your main pages.** Get the primary navigation right before adding footer menus or dropdowns.
+- A header menu with your main pages. Get the primary navigation right before adding footer menus or dropdowns.
 
 ### Add when needed
 

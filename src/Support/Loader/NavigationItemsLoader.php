@@ -12,6 +12,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Frontend\Data\PageListingRequestData;
 use Capell\Frontend\Support\Loader\PageLoader;
+use Capell\Navigation\Actions\ResolvePublicNavigationPagesAction;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Enums\NavigationItemActiveMode;
 use Capell\Navigation\Enums\NavigationItemType;
@@ -411,43 +412,13 @@ class NavigationItemsLoader
             }
 
             /** @var class-string<Model&Pageable<Model>> $modelClass */
-            $model = new $modelClass;
-
-            // Explicit page references must pass the same publish/permission scope as
-            // the auto_children path (Capell\Frontend\Actions\ListPagesAction::buildIdQuery()),
-            // or an unpublished/disabled/inaccessible page's title and URL leak to
-            // anonymous visitors via public navigation HTML. $modelClass is guaranteed
-            // to extend Capell\Core\Models\Page (Pageable::@phpstan-require-extends),
-            // so publishedDate(), the blueprint relation, and its enabled()/accessible()
-            // scopes are always available.
-            $query = $modelClass::query()
-                ->with(['translation', 'pageUrl'])
-                ->whereIn($model->getKeyName(), $pageableIds)
-                ->where('site_id', $this->site->getKey())
-                ->publishedDate()
-                ->whereHas(
-                    'blueprint',
-                    fn (BuilderContract $blueprintQuery): BuilderContract => $blueprintQuery
-                        ->enabled()
-                        ->accessible(),
-                )
-                ->whereHas(
-                    'pageUrl',
-                    fn (BuilderContract $pageUrlQuery): BuilderContract => $pageUrlQuery->enabled(),
-                )
-                ->orderBy($model->getKeyName());
-
-            $pages = $query->get();
+            $pages = ResolvePublicNavigationPagesAction::run($modelClass, array_values($pageableIds), $this->site->id);
             $siteDomainsByScope = $this->siteDomainsByScope($pages);
 
             /** @var array<string, Model&Pageable<Model>> $cachedPages */
             $cachedPages = [];
 
             foreach ($pages as $page) {
-                if (! $page instanceof Model || ! $page instanceof Pageable) {
-                    continue;
-                }
-
                 $pageUrl = $page->pageUrl;
                 if ($pageUrl !== null) {
                     if (
@@ -631,7 +602,7 @@ class NavigationItemsLoader
     }
 
     /**
-     * @param  Collection<int, Model>  $pages
+     * @param  Collection<int, Model&Pageable<Model>>  $pages
      * @return array<string, SiteDomain>
      */
     private function siteDomainsByScope(Collection $pages): array

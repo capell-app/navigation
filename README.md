@@ -39,6 +39,7 @@ Screenshot contract: `docs/screenshots.json`.
 - Create/edit navigation form on mobile (admin, required evidence).
 - Site relation manager for navigations (admin, supplementary evidence).
 - Page form navigation tab (admin, required evidence).
+- Landing page configuration tabs (admin, supplementary evidence).
 - Frontend menu output (frontend, required evidence).
 - Navigation admin index with admin sidebar menu open (admin, supplementary evidence).
 
@@ -111,17 +112,20 @@ Screenshot contract: `docs/screenshots.json`.
 - `BuildNavigationRenderModelAction`
 - `BuildNavigationStarterItemsAction`
 - `BuildPageNavigationReferencesAction`
+- `CheckSavedNavigationItemsAction`
 - `EnsureNavigationItemKeysAction`
 - `RemovePageFromNavigationAction`
 - `ReplicateSiteNavigationsAction`
 - `ResolveNavigationCacheExpiryAction`
 - `ResolveNavigationItemModelsAction`
+- `ResolvePublicNavigationPagesAction`
 - `ScalarizeNavigationDataAction`
 - `SeedNavigationScreenshotFixtureAction`
 - `SyncNavigationPageReferencesAction`
 
 ### Data objects
 
+- `NavigationItemAvailabilityData`
 - `NavigationItemData`
 - `NavigationItemRenderData`
 - `NavigationRenderContextData`
@@ -172,6 +176,7 @@ Screenshot contract: `docs/screenshots.json`.
 - `packages/navigation/resources/views/components/menu.blade.php`
 - `packages/navigation/resources/views/components/page/navigations.blade.php`
 - `packages/navigation/resources/views/filament/forms/navigation-impact-preview.blade.php`
+- `packages/navigation/resources/views/filament/forms/saved-items-check.blade.php`
 
 ### Cache tags
 
@@ -225,6 +230,12 @@ Screenshot contract: `docs/screenshots.json`.
 2. Run the package setup: `php artisan capell:navigation-setup`.
 3. See it working: run `php artisan capell:navigation-demo`.
 4. Open the package admin surface at `/admin/navigation/navigations` and confirm Navigation is available.
+
+## Upgrading
+
+No manual steps between minor versions.
+
+Read [CHANGELOG.md](CHANGELOG.md) before upgrading.
 
 ## Next Steps
 

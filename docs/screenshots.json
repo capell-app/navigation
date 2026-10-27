@@ -132,6 +132,35 @@
             "fullPage": false
         },
         {
+            "id": "landing-page-configuration-tabs",
+            "title": "Landing page configuration tabs.",
+            "package": "navigation",
+            "surface": "admin",
+            "targetType": "admin-surface",
+            "target": "PageResource/EditPage/LandingPageConfigurator",
+            "url": "/screenshot-fixtures/navigation/landing-page",
+            "scenario": "admin-form",
+            "user": "admin",
+            "required": false,
+            "fullPage": false,
+            "notes": "Read-only fixture opens the prepared selected-site/default-language canonical homepage only when it uses the real Landing configurator. Shows native extension tabs with Navigation selected and its existing unassigned reference field; do not assign a menu or save. Other installed extension tabs provide consuming-editor context rather than capabilities supplied by Navigation alone.",
+            "useCase": "An editor moves between landing-page configuration sections and opens its navigation references.",
+            "screenshotPath": "packages/navigation/docs/screenshots/landing-page-configuration-tabs.png",
+            "darkScreenshotPath": "packages/navigation/docs/screenshots/landing-page-configuration-tabs-dark.png",
+            "beforeWait": [
+                {
+                    "type": "waitFor",
+                    "selector": "[role=\"tablist\"]"
+                },
+                {
+                    "type": "click",
+                    "selector": "[role=\"tab\"]:has-text(\"Navigation\")"
+                }
+            ],
+            "waitFor": "[role=\"tab\"][aria-selected=\"true\"]:has-text(\"Navigation\")",
+            "frameSelector": "[role=\"tab\"]:has-text(\"Navigation\")"
+        },
+        {
             "id": "frontend-menu-output",
             "title": "Frontend menu output.",
             "package": "navigation",
