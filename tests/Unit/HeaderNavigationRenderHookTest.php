@@ -18,9 +18,14 @@ use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Providers\NavigationServiceProvider;
 use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
+use Capell\Navigation\Support\OptionalBladeComponent;
 use Capell\Tests\Support\RenderedHtml;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\View;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\FileViewFinder;
 use Livewire\Blaze\Blaze;
+use Spatie\LaravelData\DataCollection;
 use Symfony\Component\Process\Process;
 
 function navigationRenderedMenu(HeaderNavigationBreakpoint $breakpoint = HeaderNavigationBreakpoint::Lg): string
@@ -249,4 +254,72 @@ it('defers rendered navigation until the package is installed', function (): voi
     $provider->registerInstalledPackage();
     $html = $registry->renderAll(RenderHookLocation::HeaderAfter, scenario: 'frontend-default-primary-navigation', target: 'capell::header.index');
     expect((new RenderedHtml($html))->count('//a[@href="/home"]'))->toBe(1);
+});
+
+it('renders an item with an unsafe URL as text rather than a link with an empty destination', function (): void {
+    $item = new NavigationItemData(label: 'Unsafe item', data: ['url' => 'javascript:alert(1)']);
+    $html = view('capell-navigation::components.header.menu.item', ['item' => $item, 'itemClass' => ''])->render();
+    $xpath = (new RenderedHtml($html));
+
+    expect($xpath->count('//a'))->toBe(0)
+        ->and($xpath->count('//li//*[contains(normalize-space(.), "Unsafe item")]'))->toBeGreaterThan(0)
+        ->and($html)->not->toContain('javascript:');
+});
+
+it('renders a dropdown child with an unsafe URL as text rather than a link with an empty destination', function (): void {
+    Blaze::disable();
+    $context = new FrontendContext(null, null, null, null, new Theme(['meta' => ['dark_mode_toggle' => false]]), [], null);
+    $context->setFrontendData('runtimeManifest', FrontendRuntimeManifestData::forRenderingStrategy(RenderingStrategyEnum::FullLivewire));
+    app()->instance(FrontendContextReader::class, $context);
+    Frontend::clearResolvedInstance(FrontendContextReader::class);
+
+    $safe = new NavigationItemData(label: 'Safe child', data: ['url' => '/safe']);
+    $unsafe = new NavigationItemData(label: 'Unsafe child', data: ['url' => 'javascript:alert(1)']);
+    $parent = new NavigationItemData(label: 'Parent', data: ['url' => '/parent'], children: new DataCollection(NavigationItemData::class, [$safe, $unsafe]));
+    $html = view('capell-navigation::components.header.menu.dropdown', [
+        'id' => 1, 'item' => $parent, 'navigation' => null, 'index' => 0, 'itemClass' => '',
+        'breakpoint' => HeaderNavigationBreakpoint::Lg, 'dropdownName' => 'parent',
+    ])->render();
+    $xpath = (new RenderedHtml($html));
+
+    expect($xpath->count('//a[@href=""]'))->toBe(0)
+        ->and($xpath->count('//a[@href="/safe"]'))->toBeGreaterThan(0)
+        ->and($html)->not->toContain('javascript:');
+});
+
+it('renders menu children as a plain nested list when no theme provides the dropdown', function (): void {
+    // The monorepo test application registers Theme Foundation, so remove its views and give the guard a Blade compiler without it.
+    $finder = View::getFinder();
+    assert($finder instanceof FileViewFinder);
+    View::replaceNamespace('capell', array_values(array_filter(
+        $finder->getHints()['capell'],
+        static fn (string $path): bool => ! str_contains($path, '/theme-foundation/'),
+    )));
+    app()->instance(OptionalBladeComponent::class, new OptionalBladeComponent(new BladeCompiler(app(Filesystem::class), sys_get_temp_dir())));
+    expect(app(OptionalBladeComponent::class)->resolves('capell::dropdown'))->toBeFalse()
+        ->and(app(BladeCompiler::class)->getAnonymousComponentPaths())->not->toBeEmpty();
+
+    Blaze::disable();
+    $context = new FrontendContext(null, null, null, null, new Theme(['meta' => ['dark_mode_toggle' => false]]), [], null);
+    $manifest = FrontendRuntimeManifestData::forRenderingStrategy(RenderingStrategyEnum::FullLivewire);
+    $manifest->usesAlpine = true;
+    $context->setFrontendData('runtimeManifest', $manifest);
+    app()->instance(FrontendContextReader::class, $context);
+    Frontend::clearResolvedInstance(FrontendContextReader::class);
+    $menu = new NavigationRenderData(null, 'main', 'Main', 'menu', collect([
+        new NavigationItemRenderData('Products', NavigationItemType::Link, '/products', false, collect([
+            new NavigationItemRenderData('Widgets', NavigationItemType::Link, '/products/widgets', false, collect(), ['url' => '/products/widgets']),
+        ]), ['url' => '/products']),
+    ]));
+    $context->setFrontendData(NavigationFrontendRuntimeManifestContributor::renderModelKey('main'), $menu);
+    View::share('menu', $menu);
+    View::share('navigation', null);
+
+    $html = view('capell-navigation::components.header.navigation', [
+        'menu' => $menu, 'itemClass' => '', 'breakpoint' => HeaderNavigationBreakpoint::Lg,
+    ])->render();
+    $xpath = new RenderedHtml($html);
+
+    expect($xpath->count('//li[a[@href="/products"]]/ul//a[@href="/products/widgets"]'))->toBe(1)
+        ->and($html)->not->toContain('_toggle');
 });

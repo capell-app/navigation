@@ -11,6 +11,7 @@
     use Capell\Frontend\Facades\Frontend;
     use Capell\Navigation\Data\NavigationItemData;
     use Capell\Navigation\Enums\NavigationDropdownLayout;
+    use Capell\Navigation\Support\OptionalBladeComponent;
     use Capell\Navigation\Support\SafeUrl;
 
     /** @var NavigationItemData $item */
@@ -18,6 +19,8 @@
     $runtimeManifest = Frontend::getFrontendData('runtimeManifest');
     $usesAlpine = $runtimeManifest?->usesAlpine ?? false;
     $usesWireNavigate = $runtimeManifest?->usesWireNavigate ?? false;
+    // Theme Foundation provides the interactive dropdown; without it the menu renders as a plain nested list.
+    $usesDropdownComponent = $usesAlpine && app(OptionalBladeComponent::class)->resolves('capell::dropdown');
     $dropdownLayout = ($item->data['dropdown_layout'] ?? NavigationDropdownLayout::Dropdown->value) === NavigationDropdownLayout::Mega->value
         ? NavigationDropdownLayout::Mega
         : NavigationDropdownLayout::Dropdown;
@@ -27,7 +30,7 @@
         && (! empty($item->data['mega_panel_heading']) || ! empty($item->data['mega_panel_description']));
 @endphp
 
-@if (! $usesAlpine)
+@if (! $usesDropdownComponent)
     <li class="{{ $breakpoint->dropdownWithoutAlpineClasses() }}">
         <a
             href="{{ SafeUrl::sanitise($item->data['url'] ?? null) ?? '#' }}"
@@ -68,7 +71,9 @@
         </ul>
     </li>
 @else
-    <x-capell::dropdown
+    {{-- Theme Foundation requires Navigation, so its dropdown resolves at render time rather than when Navigation's views compile. --}}
+    <x-dynamic-component
+        component="capell::dropdown"
         :name="$currentDropdownName"
         background="bg-white"
         @class([
@@ -186,11 +191,13 @@
                             'breakpoint' => $breakpoint,
                         ])
                     @else
+                        @php($childUrl = SafeUrl::sanitise($child->data['url'] ?? null))
                         <li class="nav-item">
-                            <a
-                                href="{{ SafeUrl::sanitise($child->data['url'] ?? null) ?? '' }}"
-                                @if (! empty($child->data['target'])) target="{{ $child->data['target'] }}" @endif
-                                @if ($usesWireNavigate) wire:navigate @endif
+                            {{-- No safe destination: show text, never an anchor with an empty href. --}}
+                            <{{ $childUrl !== null ? 'a' : 'span' }}
+                                @if ($childUrl !== null) href="{{ $childUrl }}" @endif
+                                @if ($childUrl !== null && ! empty($child->data['target'])) target="{{ $child->data['target'] }}" @endif
+                                @if ($childUrl !== null && $usesWireNavigate) wire:navigate @endif
                                 @class([
                                     $dropdownItemClass,
                                     'hover:text-primary focus:text-primary' => ! $child->active,
@@ -199,11 +206,11 @@
                                 ])
                             >
                                 <span> {{ $child->label }} </span>
-                            </a>
+                            </{{ $childUrl !== null ? 'a' : 'span' }}>
                         </li>
                     @endif
                 @endforeach
             </ul>
         </div>
-    </x-capell::dropdown>
+    </x-dynamic-component>
 @endif

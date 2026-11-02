@@ -11,6 +11,8 @@ use Capell\Core\Actions\Install\RegisterCommandsInCurrentProcessAction;
 use Capell\Core\Contracts\SiteSpec\SiteSpecApplier;
 use Capell\Core\Data\PageTypeData;
 use Capell\Core\Data\VendorAssetData;
+use Capell\Core\Events\PageDeleted;
+use Capell\Core\Events\PageSaved;
 use Capell\Core\Events\PageUrlChanged;
 use Capell\Core\Events\SiteReplicated;
 use Capell\Core\Facades\CapellCore;
@@ -374,6 +376,7 @@ final class NavigationServiceProvider extends ServiceProvider
         $this->app->instance(self::EventListenersRegisteredFlag, true);
         Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
         Event::listen(PageUrlChanged::class, $this->handlePageUrlChanged(...));
+        Event::listen([PageSaved::class, PageDeleted::class], $this->handlePageEligibilityChanged(...));
 
         return $this;
     }
@@ -386,6 +389,15 @@ final class NavigationServiceProvider extends ServiceProvider
         }
 
         return $this;
+    }
+
+    /**
+     * A menu item resolves its target page through public eligibility (publish dates, blueprint, URL status), so
+     * any page save or delete can change which cached menu items are still allowed to render.
+     */
+    private function handlePageEligibilityChanged(PageSaved|PageDeleted $event): void
+    {
+        BuildNavigationRenderModelAction::flushPageCache();
     }
 
     private function handlePageUrlChanged(PageUrlChanged $event): void

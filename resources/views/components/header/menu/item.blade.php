@@ -19,18 +19,21 @@
         : ($target === '_blank' && $isExternalUrl ? 'noopener noreferrer' : null);
 @endphp
 
+@php($isLink = $url !== '')
+
 <li class="capell-navigation-menu-item flex">
-    <a
-        href="{{ $url }}"
-        @if ($usesWireNavigate) wire:navigate @endif
+    {{-- An item without a safe destination is shown as text; an anchor with an empty href would reload the current page. --}}
+    <{{ $isLink ? 'a' : 'span' }}
+        @if ($isLink) href="{{ $url }}" @endif
+        @if ($isLink && $usesWireNavigate) wire:navigate @endif
         @class([
             $itemClass,
             'color-header hover:text-primary focus:text-primary' => ! $item->active,
             'active text-primary' => $item->active,
             $item->data['class'] ?? '',
         ])
-        @if ($target !== null) target="{{ $target }}" @endif
-        @if ($rel !== null) rel="{{ $rel }}" @endif
+        @if ($isLink && $target !== null) target="{{ $target }}" @endif
+        @if ($isLink && $rel !== null) rel="{{ $rel }}" @endif
     >
         <span
             class="{{ $breakpoint->itemLabelClasses(! empty($item->data['hide_label'])) }}"
@@ -44,5 +47,5 @@
                 class="{{ $breakpoint->itemIconClasses() }}"
             />
         @endif
-    </a>
+    </{{ $isLink ? 'a' : 'span' }}>
 </li>

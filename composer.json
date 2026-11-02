@@ -23,6 +23,9 @@
         "capell-app/core": "^1.0.72",
         "capell-app/frontend": "^1.0.72"
     },
+    "suggest": {
+        "capell-app/theme-foundation": "Provides the dropdown that renders header menu children."
+    },
     "autoload": {
         "psr-4": {
             "Capell\\Navigation\\": "src/",

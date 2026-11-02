@@ -169,8 +169,6 @@ class NavigationItemsLoader
         /** @var DataCollection<int, NavigationItemData> $navigationItems */
         $navigationItems = NavigationItemData::collect(array_values($result->all()), DataCollection::class);
 
-        $this->navigation->items = $navigationItems;
-
         return collect($navigationItems->all());
     }
 
@@ -291,6 +289,8 @@ class NavigationItemsLoader
         return $items
             ->filter(fn (NavigationItemData $item): bool => $item->is_visible && $this->passesVisibilityCondition($item))
             ->map(function (NavigationItemData $item): NavigationItemData {
+                // The saved items are shared with the cached Navigation, so filter a copy rather than the original.
+                $item = clone $item;
                 $children = $this->visibleMenuItems(collect($item->children?->all() ?? []));
 
                 $item->children = NavigationItemData::collect($children->all(), DataCollection::class);
@@ -351,31 +351,9 @@ class NavigationItemsLoader
      */
     protected function getPagesByMorphKey(array $pageableIdsByType): array
     {
-        $currentPageType = $this->page->getMorphClass();
-        $currentPageId = (int) $this->page->getKey();
-        $currentPageLookupKey = $this->buildMorphLookupKey($currentPageType, $currentPageId);
-        $currentPage = $this->page;
-
-        if (! $currentPage instanceof Model) {
-            return [];
-        }
-
-        $pagesByMorphKey = [
-            $currentPageLookupKey => $currentPage,
-        ];
+        $pagesByMorphKey = $this->publishedCurrentPageByMorphKey();
 
         foreach ($pageableIdsByType as $pageableType => $pageableIds) {
-            if ($pageableIds === []) {
-                continue;
-            }
-
-            if ($pageableType === $currentPageType) {
-                $pageableIds = array_values(array_filter(
-                    $pageableIds,
-                    static fn (int $pageableId): bool => $pageableId !== $currentPageId,
-                ));
-            }
-
             if ($pageableIds === []) {
                 continue;
             }
@@ -468,6 +446,27 @@ class NavigationItemsLoader
     protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
     {
         return $pageableType . ':' . $pageableId;
+    }
+
+    /**
+     * The page being rendered is reused without a second lookup, but only while it is itself published: a
+     * scheduled or draft page (for example one answered by a not-found fallback) must not leak into the menu.
+     *
+     * @return array<string, Model&Pageable<Model>>
+     */
+    private function publishedCurrentPageByMorphKey(): array
+    {
+        $currentPage = $this->page;
+
+        if (! $currentPage instanceof Model) {
+            return [];
+        }
+
+        if (! $currentPage::query()->whereKey($currentPage->getKey())->publishedDate()->exists()) {
+            return [];
+        }
+
+        return [$this->buildMorphLookupKey($currentPage->getMorphClass(), (int) $currentPage->getKey()) => $currentPage];
     }
 
     /**
