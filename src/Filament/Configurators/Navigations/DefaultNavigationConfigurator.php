@@ -25,6 +25,7 @@ use Capell\Core\Models\Site;
 use Capell\Core\Support\CapellCoreHelper;
 use Capell\Core\Support\Permissions\SiteAccess;
 use Capell\Core\Support\Slug\SlugGenerator;
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Actions\BuildNavigationStarterItemsAction;
 use Capell\Navigation\Actions\CheckSavedNavigationItemsAction;
 use Capell\Navigation\Data\NavigationItemData;
@@ -367,7 +368,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
                         $get('site_id'),
                         fn (BuilderContract $query, int $siteId): Builder => $query->whereHas(
                             'sites',
-                            fn (BuilderContract $query): BuilderContract => $query->where('sites.id', $siteId),
+                            fn (BuilderContract $query): BuilderContract => $query->where(TableName::resolve('sites') . '.id', $siteId),
                         ),
                     ),
                 ),
@@ -1061,7 +1062,7 @@ class DefaultNavigationConfigurator implements ConfiguratorInterface
         // Only a language the site actually offers is a valid default; anything
         // else would be rejected by the language select's own options.
         $languageId = Language::query()
-            ->whereHas('sites', fn (Builder $query): Builder => $query->where('sites.id', $siteId))
+            ->whereHas('sites', fn (Builder $query): Builder => $query->where(TableName::resolve('sites') . '.id', $siteId))
             ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$site->getAttribute('language_id')])
             ->orderByDesc('default')
             ->orderBy('id')

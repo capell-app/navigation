@@ -11,6 +11,7 @@ use Capell\Core\Enums\UrlTypeEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Data\NavigationStarterItemsData;
 use Capell\Navigation\Data\NavigationStarterRequestData;
 use Capell\Navigation\Enums\NavigationItemType;
@@ -144,7 +145,7 @@ final class BuildNavigationStarterItemsAction
                         $request->languageId !== null,
                         fn (Builder $query): Builder => $query->where('language_id', $request->languageId),
                     )
-                    ->where('page_urls.site_id', $request->siteId)
+                    ->where(TableName::resolve('page_urls') . '.site_id', $request->siteId)
                     ->whereHas(
                         'siteDomain',
                         fn (Builder $query): Builder => $query->where('status', true),

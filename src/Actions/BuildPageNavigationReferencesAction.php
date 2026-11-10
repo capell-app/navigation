@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Actions;
 
 use Capell\Core\Contracts\Pageable;
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,7 +49,7 @@ final class BuildPageNavigationReferencesAction
             return $cache[$cacheKey];
         }
 
-        if (! Schema::hasTable('navigation_page_references')) {
+        if (! Schema::hasTable(TableName::resolve('navigation_page_references'))) {
             return new Collection;
         }
 
@@ -93,11 +94,11 @@ final class BuildPageNavigationReferencesAction
         ?int $recordSiteId,
     ): QueryBuilder {
         $query
-            ->from('navigation_page_references')
-            ->select('navigation_page_references.navigation_id')
-            ->whereColumn('navigation_page_references.navigation_id', 'navigations.id')
-            ->where('navigation_page_references.pageable_type', $recordMorphClass)
-            ->where('navigation_page_references.pageable_id', $recordId);
+            ->from(TableName::resolve('navigation_page_references'))
+            ->select(TableName::resolve('navigation_page_references') . '.navigation_id')
+            ->whereColumn(TableName::resolve('navigation_page_references') . '.navigation_id', TableName::resolve('navigations') . '.id')
+            ->where(TableName::resolve('navigation_page_references') . '.pageable_type', $recordMorphClass)
+            ->where(TableName::resolve('navigation_page_references') . '.pageable_id', $recordId);
 
         if ($recordSiteId !== null) {
             $this->whereReferenceMatchesSite($query, $recordSiteId);
@@ -121,8 +122,8 @@ final class BuildPageNavigationReferencesAction
     private function whereReferenceMatchesSite(QueryBuilder $query, int $recordSiteId): QueryBuilder
     {
         return $query->where(
-            fn (QueryBuilder $query): QueryBuilder => $query->whereNull('navigation_page_references.site_id')
-                ->orWhere('navigation_page_references.site_id', $recordSiteId),
+            fn (QueryBuilder $query): QueryBuilder => $query->whereNull(TableName::resolve('navigation_page_references') . '.site_id')
+                ->orWhere(TableName::resolve('navigation_page_references') . '.site_id', $recordSiteId),
         );
     }
 

@@ -8,7 +8,7 @@
     "version": "1.0.0",
     "description": "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.",
     "product": {
-        "group": "Capell Foundation",
+        "group": "Capell Essentials",
         "tier": "free",
         "bundle": "foundation"
     },
@@ -25,7 +25,8 @@
     },
     "providers": {
         "metadata": [
-            "Capell\\Navigation\\Providers\\NavigationServiceProvider"
+            "Capell\\Navigation\\Providers\\NavigationServiceProvider",
+            "Capell\\Navigation\\Providers\\MigrationMetadataServiceProvider"
         ],
         "install": ["Capell\\Navigation\\Providers\\ConsoleServiceProvider"],
         "runtime": ["Capell\\Navigation\\Providers\\NavigationServiceProvider"],
@@ -160,13 +161,17 @@
     "security": {
         "riskTier": "standard",
         "publicSurface": {
-            "routeNames": ["capell-navigation.children"],
+            "routeNames": [
+                "GET /_capell/navigation/children (capell-navigation.children)"
+            ],
             "auth": "public",
             "csrfExemptRoutes": [],
             "signedRoutes": [],
             "tokenizedRoutes": [],
             "webhookRoutes": [],
-            "throttledRoutes": ["capell-navigation.children"]
+            "throttledRoutes": [
+                "GET /_capell/navigation/children (capell-navigation.children)"
+            ]
         },
         "sensitiveData": {
             "encryptedFields": [],
@@ -244,6 +249,22 @@
     },
     "marketplace": {
         "summary": "Build and manage multilingual, per-site menus visually: link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
+        "problem": "Editors managing menus by hand can lose track of link order across sites and languages.",
+        "outcome": "A site has managed menus available to its public theme.",
+        "faq": [
+            {
+                "question": "Can menus vary by site and language?",
+                "answer": "Yes. Menus are scoped by site and language."
+            },
+            {
+                "question": "Which links can editors add?",
+                "answer": "Menus support page links, external links and nested items."
+            },
+            {
+                "question": "How are menus presented publicly?",
+                "answer": "Themes receive navigation with safe URLs, active states and nested children."
+            }
+        ],
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",

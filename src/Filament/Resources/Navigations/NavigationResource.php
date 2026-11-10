@@ -64,19 +64,19 @@ class NavigationResource extends Resource
     #[Override]
     public static function getPluralModelLabel(): string
     {
-        return __('capell-admin::generic.navigations');
+        return __('capell-navigation::generic.menus');
     }
 
     #[Override]
     public static function getModelLabel(): string
     {
-        return __('capell-admin::generic.navigation');
+        return __('capell-navigation::generic.menu');
     }
 
     #[Override]
     public static function getNavigationLabel(): string
     {
-        return (string) (__('capell-admin::navigation.navigations'));
+        return (string) (__('capell-navigation::generic.menus'));
     }
 
     #[Override]

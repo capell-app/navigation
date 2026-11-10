@@ -31,13 +31,13 @@ class NavigationsRelationManager extends RelationManager
 
     public static function getLabel(): ?string
     {
-        return __('capell-admin::generic.navigations');
+        return __('capell-navigation::generic.menus');
     }
 
     #[Override]
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('capell-admin::tab.navigations');
+        return __('capell-navigation::generic.menus');
     }
 
     public function table(Table $table): Table
@@ -70,6 +70,6 @@ class NavigationsRelationManager extends RelationManager
     #[Override]
     protected static function getPluralModelLabel(): string
     {
-        return __('capell-admin::generic.navigations');
+        return __('capell-navigation::generic.menus');
     }
 }

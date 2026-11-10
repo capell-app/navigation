@@ -114,3 +114,11 @@ it('classifies navigation url schemes via the shared SafeUrl helper', function (
     expect(SafeUrl::sanitise('https://example.com'))->toBe('https://example.com');
     expect(SafeUrl::sanitise(null))->toBeNull();
 });
+
+it('rejects backslash forms that browsers read as another host', function (string $url): void {
+    expect(SafeUrl::isSafe($url))->toBeFalse();
+})->with([
+    'slash then backslash' => ['/\\evil.example.com'],
+    'leading backslashes' => ['\\\\evil.example.com'],
+    'backslash inside a relative path' => ['./\\evil.example.com'],
+]);

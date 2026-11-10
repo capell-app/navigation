@@ -2,195 +2,58 @@
 
 <!-- prettier-ignore-start -->
 
-## What This Plugin Adds
-
-Navigation is an **Available**, **Schema-owning** Capell package in the **Capell Foundation** product group. It ships as `capell-app/navigation` and extends these surfaces: admin, frontend, console.
+## What It Does
 
 Navigation adds site- and language-scoped menus with page links, external links, nested items, publication state, and reusable handles.
 
+- **Price and availability:** Check current availability and price on the [Capell Marketplace listing](https://capell.app/extensions/navigation).
+- **Licence:** Check the licence terms on the [Capell Marketplace listing](https://capell.app/extensions/navigation).
+- **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0.66`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0.72`.
+- **Install:** `composer require capell-app/navigation`.
+
 Editors build and order menus in admin, and public themes receive hydrated navigation with safe URLs, active states, and nested children.
 
-Status details:
-
-- Status: Available
-- Tier: free
-- Bundle: foundation
-- Composer package: `capell-app/navigation`
-- Namespace: `Capell\Navigation`
-- Theme key: not applicable
-
-## Why It Matters
+## Who It Is For
 
 **For developers:** The navigable and handle registries let packages contribute linkable records and named menus without reaching into Navigation internals.
 
 **For teams:** Editors can keep site menus current, reorder links, and reuse the same menu structure across theme output without code changes.
 
-## Screens And Workflow
+## Quick Start
 
-Screenshot contract: `docs/screenshots.json`.
+1. Install the package: `composer require capell-app/navigation`.
+2. Run the package setup: `php artisan capell:navigation-setup`.
+3. See it working: run `php artisan capell:navigation-demo`.
+4. Open the package admin surface at `/admin/navigation/navigations` and confirm Navigation is available.
+
+## Configure
+
+- **Configuration files:** `config/capell-navigation.php`.
+- **Commands:** `php artisan capell:navigation-demo`, `php artisan capell:navigation-setup`, `php artisan capell:navigation:screenshot-fixture`.
+
+## Limits And Pitfalls
+
+- Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0.66`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0.72`.
+- Run migrations before opening package resources or public routes.
+- Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
+- Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
+- Custom write integrations must preserve invalidation for `navigation` cache tags.
+
+## Screens And Workflow
 
 ![Navigation admin index](docs/screenshots/navigation-admin-index.png)
 
 ![Create/edit navigation form on desktop](docs/screenshots/create-edit-navigation-form-desktop.png)
 
-- Navigation admin index (admin, required evidence).
-- Create/edit navigation form on desktop (admin, required evidence).
-- Create/edit navigation form on tablet (admin, required evidence).
-- Create/edit navigation form on mobile (admin, required evidence).
-- Site relation manager for navigations (admin, supplementary evidence).
-- Page form navigation tab (admin, required evidence).
-- Landing page configuration tabs (admin, supplementary evidence).
-- Frontend menu output (frontend, required evidence).
-- Navigation admin index with admin sidebar menu open (admin, supplementary evidence).
-
-## Technical Shape
-
-### Service providers
-
-- `Capell\Navigation\Providers\NavigationServiceProvider`
-- `Capell\Navigation\Providers\ConsoleServiceProvider`
-
-### Config files
-
-- `packages/navigation/config/capell-navigation.php`
-
-### Migrations
-
-- `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`
-- `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`
-- `packages/navigation/database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php`
-
-### Models
-
-- `Navigation`
-
-### Filament classes
-
-- `TypeSelect`
-- `NavigationSelect`
-- `NavigationTab`
-- `NavigationItemsColumn`
-- `DefaultNavigationConfigurator`
-- `NavigationPageSchemaExtender`
-- `NavigationSiteExtender`
-- `NavigationResource`
-- `CreateNavigation`
-- `EditNavigation`
-- `ListNavigations`
-- `NavigationForm`
-- `NavigationsTable`
-- `NavigationsRelationManager`
-
-### Route files
-
-- `packages/navigation/routes/web.php`
-
-### Policies
-
-- `NavigationPolicy`
-
-### Extension contracts
-
-- `NavigationNamesResolver`
-- `NavigationPageSyncer`
-
-### Events
-
-- `NavigationCreating`
-
-### Listeners
-
-- `ReplicateSiteNavigationsListener`
-
-### Actions
-
-- `AddPageToNavigationAction`
-- `ApplyNavigationSiteSpecAction`
-- `BuildNavigationBreadcrumbsAction`
-- `BuildNavigationChildFragmentAction`
-- `BuildNavigationImpactPreviewAction`
-- `BuildNavigationRenderModelAction`
-- `BuildNavigationStarterItemsAction`
-- `BuildPageNavigationReferencesAction`
-- `CheckSavedNavigationItemsAction`
-- `EnsureNavigationItemKeysAction`
-- `RemovePageFromNavigationAction`
-- `ReplicateSiteNavigationsAction`
-- `ResolveNavigationCacheExpiryAction`
-- `ResolveNavigationItemModelsAction`
-- `ResolvePublicNavigationPagesAction`
-- `ScalarizeNavigationDataAction`
-- `SeedNavigationScreenshotFixtureAction`
-- `SyncNavigationPageReferencesAction`
-
-### Data objects
-
-- `NavigationItemAvailabilityData`
-- `NavigationItemData`
-- `NavigationItemRenderData`
-- `NavigationRenderContextData`
-- `NavigationRenderData`
-- `NavigationStarterItemsData`
-- `NavigationStarterRequestData`
-
-### Command signatures
-
-- `capell:navigation-demo`
-- `capell:navigation-setup`
-- `capell:navigation:screenshot-fixture`
-
-### Console command classes
-
-- `DemoCommand`
-- `SeedNavigationScreenshotFixtureCommand`
-- `SetupCommand`
-
-### Manifest contributions
-
-- `admin-resource: Capell\Navigation\Manifest\NavigationAdminResourceContribution`
-- `configurator: Capell\Navigation\Manifest\NavigationConfiguratorContribution`
-- `configurator: Capell\Navigation\Manifest\NavigationContentGraphContribution`
-- `configurator: Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution`
-- `console-command: Capell\Navigation\Manifest\NavigationConsoleCommandsContribution`
-- `frontend-component: Capell\Navigation\Manifest\NavigationFrontendComponentsContribution`
-- `health-check: Capell\Navigation\Manifest\NavigationHealthContribution`
-- `migration: Capell\Navigation\Manifest\NavigationMigrationsContribution`
-- `model: Capell\Navigation\Manifest\NavigationModelsContribution`
-- `page-type: Capell\Navigation\Manifest\NavigationPageTypeContribution`
-- `render-hook: Capell\Navigation\Manifest\NavigationRenderHookContribution`
-- `route: Capell\Navigation\Manifest\NavigationFrontendRouteContribution`
-- `schema-extender: Capell\Navigation\Manifest\NavigationSchemaExtendersContribution`
-
-### Health checks
-
-- `Capell\Navigation\Health\NavigationHealthCheck`
-
-### Blade views
-
-- `packages/navigation/resources/views/components/breadcrumbs.blade.php`
-- `packages/navigation/resources/views/components/header/main-navigation.blade.php`
-- `packages/navigation/resources/views/components/header/menu/dropdown.blade.php`
-- `packages/navigation/resources/views/components/header/menu/item.blade.php`
-- `packages/navigation/resources/views/components/header/navigation.blade.php`
-- `packages/navigation/resources/views/components/menu-items.blade.php`
-- `packages/navigation/resources/views/components/menu.blade.php`
-- `packages/navigation/resources/views/components/page/navigations.blade.php`
-- `packages/navigation/resources/views/filament/forms/navigation-impact-preview.blade.php`
-- `packages/navigation/resources/views/filament/forms/saved-items-check.blade.php`
-
-### Cache tags
-
-- `navigation`
-
-
-## Data Model
-
-- Required tables: `navigations`, `navigation_page_references`.
-- Models: `Navigation`.
-- Core record references in migrations: `sites via site_id`, `languages via language_id`.
-- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`, `2026_08_28_000003_change_navigation_visibility_to_datetime.php`.
-- Migration impact: run host migrations through the package install flow before opening package surfaces.
-- Deletion/retention behaviour: migrations declare cascade-on-delete relationships; no timed pruning or retention schedule is declared in `capell.json`.
+- Navigation admin index (admin).
+- Create/edit navigation form on desktop (admin).
+- Create/edit navigation form on tablet (admin).
+- Create/edit navigation form on mobile (admin).
+- Site relation manager for navigations (admin).
+- Page form navigation tab (admin).
+- Landing page configuration tabs (admin).
+- Frontend menu output (frontend).
+- Navigation admin index with admin sidebar menu open (admin).
 
 ## Install Impact
 
@@ -206,15 +69,6 @@ Screenshot contract: `docs/screenshots.json`.
 - Cache tags: `navigation`.
 - Commands: `capell:navigation-demo`, `capell:navigation-setup`, `capell:navigation:screenshot-fixture`.
 
-## Common Pitfalls
-
-- Keep required Capell packages on compatible v4 releases: `capell-app/admin`, `capell-app/core`, `capell-app/frontend`.
-- Run migrations before opening package resources or public routes.
-- Review package configuration before production-like verification: `config/capell-navigation.php`.
-- Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
-- Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
-- Custom write integrations must preserve invalidation for `navigation` cache tags.
-
 ## Troubleshooting
 
 | Symptom | Likely cause | Check | Fix |
@@ -223,13 +77,6 @@ Screenshot contract: `docs/screenshots.json`.
 | Admin screen or command fails on missing table | Package migrations have not run | Check the tables listed in `Data Model` | Run host migrations and rerun the focused package test |
 | Route returns unexpected output | Route cache, middleware, or signed URL setup does not match the package route file | Check the route files listed in `Technical Shape` | Clear route cache and verify middleware before exposing public routes |
 | Public output leaks unexpected state | Render data, cache variation, or authoring boundary has regressed | Check public Blade, cache tags, and public-output safety tests | Move data loading out of Blade and rerun the package public-output tests |
-
-## Quick Start
-
-1. Install the package: `composer require capell-app/navigation`.
-2. Run the package setup: `php artisan capell:navigation-setup`.
-3. See it working: run `php artisan capell:navigation-demo`.
-4. Open the package admin surface at `/admin/navigation/navigations` and confirm Navigation is available.
 
 ## Upgrading
 
@@ -245,11 +92,11 @@ Read [CHANGELOG.md](CHANGELOG.md) before upgrading.
 - [Admin guide](docs/admin-guide.md)
 - Configuration files: [`config/capell-navigation.php`](config/capell-navigation.php).
 - [Troubleshooting](#troubleshooting)
-- [Screenshot contract](docs/screenshots.json)
+- [Developer reference](docs/reference.md)
 - [Marketplace assets](docs/assets/marketplace/)
 - [Capell content language plan](../../docs/CONTENT_LANGUAGE_PLAN.md)
 - [Capell documentation design system](../../docs/DESIGN_SYSTEM.md)
 - [Capell and package ERD notes](../../docs/erd/capell-and-package-erds.md)
-- Related packages: [Theme Foundation](../theme-foundation/README.md).
+- Related packages: [Foundation Theme](../theme-foundation/README.md).
 
 <!-- prettier-ignore-end -->

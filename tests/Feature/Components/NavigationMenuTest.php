@@ -53,7 +53,7 @@ it('renders a package menu component with explicit frontend context', function (
         ->assertDontSee('Hidden');
 
     $view
-        ->assertElementExists('nav[aria-label="Navigation"]')
+        ->assertElementExists('nav[aria-label="' . __('capell-navigation::public.landmark.menu') . '"]')
         ->assertElementExists('a[href="/docs"]')
         ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('a[href=""]'));
 });

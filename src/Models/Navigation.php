@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Models;
 
 use Bkwld\Cloner\Cloneable;
+use Capell\Core\Concerns\HasCapellTable;
 use Capell\Core\Models\Blueprint;
 use Capell\Core\Models\Concerns\HasBlueprint;
 use Capell\Core\Models\Concerns\HasMetaData;
@@ -84,6 +85,7 @@ class Navigation extends Model implements Blueprintable, Publishable, Userstampa
 {
     use Cloneable;
     use HasBlueprint;
+    use HasCapellTable;
 
     /** @use HasFactory<NavigationFactory> */
     use HasFactory;

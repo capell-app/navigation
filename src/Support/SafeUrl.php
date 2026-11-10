@@ -35,7 +35,8 @@ final class SafeUrl
     {
         $trimmedUrl = trim($url);
 
-        if ($trimmedUrl === '' || preg_match('/[\x00-\x1F\x7F]/', $trimmedUrl) === 1) {
+        // Browsers read a backslash as a slash, so "/\host" is scheme-relative.
+        if ($trimmedUrl === '' || str_contains($trimmedUrl, '\\') || preg_match('/[\x00-\x1F\x7F]/', $trimmedUrl) === 1) {
             return false;
         }
 

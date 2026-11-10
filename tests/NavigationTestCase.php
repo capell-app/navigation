@@ -8,6 +8,7 @@ use Capell\Admin\Facades\CapellAdmin;
 use Capell\Admin\Providers\AdminServiceProvider;
 use Capell\Admin\Providers\Filament\AdminPanelProvider;
 use Capell\Core\Facades\CapellCore;
+use Capell\FoundationTheme\Providers\FoundationThemeServiceProvider;
 use Capell\Frontend\Contracts\SettingsMigrationProviderInterface;
 use Capell\Frontend\Providers\FrontendServiceProvider;
 use Capell\Navigation\Providers\NavigationServiceProvider;
@@ -82,6 +83,7 @@ class NavigationTestCase extends AbstractTestCase
             LivewireServiceProvider::class,
             PaginateRouteServiceProvider::class,
             NavigationServiceProvider::class,
+            FoundationThemeServiceProvider::class,
             AdminPanelProvider::class,
         ];
     }

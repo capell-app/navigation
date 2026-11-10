@@ -1,0 +1,22 @@
+{
+    "create_navigation_page_references_table": {
+        "names": [
+            "2026_06_04_000001_create_navigation_page_references_table"
+        ],
+        "sha256": [
+            "48bf29bf323d500fc69ff7ef6e4acdcb482ee6368c673b49e594cd63d6857a20",
+            "fd6afeb1b35fd5e065291ff5ae7981ab3e972482fa964fcbc4b3ae43f8ffff43"
+        ]
+    },
+    "create_navigations_table": {
+        "names": [
+            "2026_05_10_190860_01_create_navigations_table"
+        ],
+        "sha256": [
+            "6768a78cc5ebd2b056bdf66100d138deab9a12a6a213f73b61a3a61815e0e020",
+            "c37f054ebfd7507215e743dfcc589410f9dfdf7551275bcbe035ef86e880ba9b",
+            "cafb607dd623de33422bb653a2ba758fa65ef00db5ecdc1cdb1463360e74a094",
+            "f26a453c29f7c329c7efc6b49ddadab0dd43b1a75f1f91121f3a281da610d5d1"
+        ]
+    }
+}

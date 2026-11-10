@@ -12,6 +12,7 @@ use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\Translation;
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Actions\AddPageToNavigationAction;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Enums\NavigationItemType;
@@ -281,13 +282,13 @@ class NavigationDemoCreator
      */
     private function publicNavigationPageQuery(NestedSetQueryBuilder $query): NestedSetQueryBuilder
     {
-        return $query->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query->whereNull('pages.meta')
+        return $query->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query->whereNull(TableName::resolve('pages') . '.meta')
             ->orWhere(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query
-                ->whereJsonDoesntContainKey('pages.meta->demo_fixture')
-                ->whereJsonDoesntContainKey('pages.meta->theme_demo')
+                ->whereJsonDoesntContainKey(TableName::resolve('pages') . '.meta->demo_fixture')
+                ->whereJsonDoesntContainKey(TableName::resolve('pages') . '.meta->theme_demo')
                 ->where(fn (NestedSetQueryBuilder $query): NestedSetQueryBuilder => $query
-                    ->whereJsonDoesntContainKey('pages.meta->navigation.exclude')
-                    ->orWhereJsonDoesntContain('pages.meta->navigation.exclude', true))));
+                    ->whereJsonDoesntContainKey(TableName::resolve('pages') . '.meta->navigation.exclude')
+                    ->orWhereJsonDoesntContain(TableName::resolve('pages') . '.meta->navigation.exclude', true))));
     }
 
     /**
@@ -295,11 +296,11 @@ class NavigationDemoCreator
      */
     private function applyFooterNavigationTranslationQuery(Builder $query): void
     {
-        $query->where(fn (Builder $query): Builder => $query->whereNull('translations.meta')
-            ->orWhereJsonDoesntContainKey('translations.meta->exclude_from_footer')
-            ->orWhereJsonDoesntContain('translations.meta->exclude_from_footer', true))->where(fn (Builder $query): Builder => $query->whereNull('translations.meta')
-            ->orWhereJsonDoesntContainKey('translations.meta->exclude_from_navigation')
-            ->orWhereJsonDoesntContain('translations.meta->exclude_from_navigation', true));
+        $query->where(fn (Builder $query): Builder => $query->whereNull(TableName::resolve('translations') . '.meta')
+            ->orWhereJsonDoesntContainKey(TableName::resolve('translations') . '.meta->exclude_from_footer')
+            ->orWhereJsonDoesntContain(TableName::resolve('translations') . '.meta->exclude_from_footer', true))->where(fn (Builder $query): Builder => $query->whereNull(TableName::resolve('translations') . '.meta')
+            ->orWhereJsonDoesntContainKey(TableName::resolve('translations') . '.meta->exclude_from_navigation')
+            ->orWhereJsonDoesntContain(TableName::resolve('translations') . '.meta->exclude_from_navigation', true));
     }
 
     private function removeNonPublicPageItems(Navigation $navigation, Language $language, bool $footer = false): void

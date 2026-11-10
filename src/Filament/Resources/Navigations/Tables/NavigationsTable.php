@@ -14,6 +14,7 @@ use Capell\Admin\Filament\Components\Tables\Columns\SiteColumn;
 use Capell\Admin\Filament\Contracts\TableConfigurator;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Filament\Components\Tables\Columns\Navigation\NavigationItemsColumn;
 use Capell\Navigation\Filament\Resources\Navigations\Pages\ListNavigations;
 use Capell\Navigation\Models\Navigation;
@@ -150,7 +151,7 @@ class NavigationsTable implements TableConfigurator
                                     $get('data.site_id', true),
                                     fn (Builder $query, int $site_id): Builder => $query->whereHas(
                                         'sites',
-                                        fn (BuilderContract $query): BuilderContract => $query->where('sites.id', $site_id),
+                                        fn (BuilderContract $query): BuilderContract => $query->where(TableName::resolve('sites') . '.id', $site_id),
                                     ),
                                 )
                                 ->ordered()

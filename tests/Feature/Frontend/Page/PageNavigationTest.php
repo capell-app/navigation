@@ -60,7 +60,7 @@ test('frontend default theme displays the main navigation menu', function (): vo
         ->assertSee('window.capellHeaderNavigation', false);
 
     $response
-        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
+        ->assertElementExists('#main-menu[aria-label="' . __('capell-navigation::public.landmark.main') . '"]')
         ->assertElementExists('[aria-controls="main-menu"]')
         ->assertElementExists(fn (AssertElement $body): BaseAssert => $body->doesntContain('#header'));
 });
@@ -88,7 +88,7 @@ test('themed header displays the main navigation menu', function (): void {
         ->assertSee('window.capellHeaderNavigation', false);
 
     $response
-        ->assertElementExists('#main-menu[aria-label="Main navigation"]')
+        ->assertElementExists('#main-menu[aria-label="' . __('capell-navigation::public.landmark.main') . '"]')
         ->assertElementExists('[aria-controls="main-menu"]')
         ->assertElementExists('#header');
 });

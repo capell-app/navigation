@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Actions;
 
+use Capell\Core\Support\TableName;
 use Capell\Navigation\Data\NavigationItemData;
 use Capell\Navigation\Models\Navigation;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ final class SyncNavigationPageReferencesAction
 
     public function handle(Navigation $navigation): int
     {
-        if (! $navigation->exists || ! Schema::hasTable('navigation_page_references')) {
+        if (! $navigation->exists || ! Schema::hasTable(TableName::resolve('navigation_page_references'))) {
             return 0;
         }
 
@@ -30,7 +31,7 @@ final class SyncNavigationPageReferencesAction
         $now = now();
 
         DB::transaction(function () use ($navigation, $now, $references): void {
-            DB::table('navigation_page_references')
+            DB::table(TableName::resolve('navigation_page_references'))
                 ->where('navigation_id', (int) $navigation->getKey())
                 ->delete();
 
@@ -38,7 +39,7 @@ final class SyncNavigationPageReferencesAction
                 return;
             }
 
-            DB::table('navigation_page_references')->insert(array_map(
+            DB::table(TableName::resolve('navigation_page_references'))->insert(array_map(
                 static fn (array $reference): array => [
                     'navigation_id' => (int) $navigation->getKey(),
                     'site_id' => is_numeric($navigation->site_id) ? (int) $navigation->site_id : null,

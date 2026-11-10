@@ -43,10 +43,10 @@ class Menu extends Component
             : NavigationHandle::tryFrom($this->key);
 
         return match ($handle) {
-            NavigationHandle::Main => __('capell-navigation::generic.main_navigation'),
-            NavigationHandle::Footer => __('capell-navigation::generic.footer_navigation'),
-            NavigationHandle::SubFooter => __('capell-navigation::generic.sub_footer_navigation'),
-            default => __('capell-navigation::generic.navigation'),
+            NavigationHandle::Main => __('capell-navigation::public.landmark.main'),
+            NavigationHandle::Footer => __('capell-navigation::public.landmark.footer'),
+            NavigationHandle::SubFooter => __('capell-navigation::public.landmark.sub_footer'),
+            default => __('capell-navigation::public.landmark.menu'),
         };
     }
 }

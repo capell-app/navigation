@@ -6,6 +6,7 @@ namespace Capell\Navigation\Health;
 
 use Capell\Core\Contracts\Extensions\ChecksExtensionHealth;
 use Capell\Core\Data\Diagnostics\DoctorCheckResultData;
+use Capell\Core\Support\TableName;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Enums\RenderHookLocation;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
@@ -123,7 +124,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     public function mainNavigationCoverageCheck(): DoctorCheckResultData
     {
-        if (! Schema::hasTable('sites') || ! Schema::hasTable('navigations')) {
+        if (! Schema::hasTable(TableName::resolve('sites')) || ! Schema::hasTable(TableName::resolve('navigations'))) {
             return new DoctorCheckResultData(
                 label: (string) __('capell-navigation::generic.health_main_navigation_coverage_label'),
                 passed: false,
@@ -153,7 +154,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     public function pageReferenceIntegrityCheck(): DoctorCheckResultData
     {
-        if (! Schema::hasTable('navigation_page_references')) {
+        if (! Schema::hasTable(TableName::resolve('navigation_page_references'))) {
             return new DoctorCheckResultData(
                 label: (string) __('capell-navigation::generic.health_page_reference_integrity_label'),
                 passed: false,
@@ -164,13 +165,14 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
         }
 
         $orphanedReferenceCount = $this->orphanedPageReferenceCount();
+        $affectedNavigationCount = $this->navigationsWithOrphanedPageReferencesCount();
 
         return new DoctorCheckResultData(
             label: (string) __('capell-navigation::generic.health_page_reference_integrity_label'),
             passed: $orphanedReferenceCount === 0,
             message: $orphanedReferenceCount === 0
                 ? (string) __('capell-navigation::generic.health_page_reference_integrity_passed')
-                : (string) __('capell-navigation::generic.health_page_reference_integrity_failed', ['count' => $orphanedReferenceCount]),
+                : (string) __('capell-navigation::generic.health_page_reference_integrity_failed', ['menus' => $affectedNavigationCount, 'count' => $orphanedReferenceCount]),
             remediation: $orphanedReferenceCount === 0
                 ? null
                 : (string) __('capell-navigation::generic.health_page_reference_integrity_remediation'),
@@ -188,7 +190,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     public function missingStorageTables(): array
     {
-        return array_values(collect(self::StorageTableNames)
+        return array_values(collect(array_map(TableName::resolve(...), self::StorageTableNames))
             ->reject(static fn (string $tableName): bool => Schema::hasTable($tableName))
             ->values()
             ->all());
@@ -220,7 +222,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     public function missingMainNavigationSiteIds(): array
     {
-        if (! Schema::hasTable('sites') || ! Schema::hasTable('navigations')) {
+        if (! Schema::hasTable(TableName::resolve('sites')) || ! Schema::hasTable(TableName::resolve('navigations'))) {
             return [];
         }
 
@@ -228,7 +230,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             return [];
         }
 
-        $missingSiteIds = DB::table('sites')
+        $missingSiteIds = DB::table(TableName::resolve('sites'))
             ->orderBy('id')
             ->pluck('id')
             ->map(static fn (mixed $siteId): int => (int) $siteId)
@@ -251,19 +253,36 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
 
     public function orphanedPageReferenceCount(): int
     {
-        if (! Schema::hasTable('navigation_page_references')) {
-            return 0;
+        return count($this->orphanedReferenceNavigationIds());
+    }
+
+    /**
+     * The number of menus that hold at least one orphaned page reference; these are the menus an
+     * operator re-saves to repair the references.
+     */
+    public function navigationsWithOrphanedPageReferencesCount(): int
+    {
+        return count(array_unique($this->orphanedReferenceNavigationIds()));
+    }
+
+    /**
+     * @return list<int> The owning navigation id of every orphaned page reference.
+     */
+    private function orphanedReferenceNavigationIds(): array
+    {
+        if (! Schema::hasTable(TableName::resolve('navigation_page_references'))) {
+            return [];
         }
 
-        $orphanedReferenceCount = 0;
-        $pageableTypes = DB::table('navigation_page_references')
+        $navigationIds = [];
+        $pageableTypes = DB::table(TableName::resolve('navigation_page_references'))
             ->select(['pageable_type'])
             ->distinct()
             ->pluck('pageable_type');
 
         foreach ($pageableTypes as $pageableType) {
             if (! is_string($pageableType) || $pageableType === '') {
-                $orphanedReferenceCount += $this->referenceCountForPageableType($pageableType);
+                $navigationIds = [...$navigationIds, ...$this->referenceNavigationIdsForPageableType($pageableType)];
 
                 continue;
             }
@@ -271,21 +290,21 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
             $modelClass = Relation::getMorphedModel($pageableType) ?? $pageableType;
 
             if (! is_string($modelClass) || ! is_subclass_of($modelClass, Model::class)) {
-                $orphanedReferenceCount += $this->referenceCountForPageableType($pageableType);
+                $navigationIds = [...$navigationIds, ...$this->referenceNavigationIdsForPageableType($pageableType)];
 
                 continue;
             }
 
             /** @var class-string<Model> $modelClass */
-            $orphanedReferenceCount += $this->orphanedReferenceCountForModel($pageableType, $modelClass);
+            $navigationIds = [...$navigationIds, ...$this->orphanedReferenceNavigationIdsForModel($pageableType, $modelClass)];
         }
 
-        return $orphanedReferenceCount;
+        return $navigationIds;
     }
 
     private function globalMainNavigationExists(): bool
     {
-        return DB::table('navigations')
+        return DB::table(TableName::resolve('navigations'))
             ->where('key', NavigationHandle::Main->value)
             ->whereNull('site_id')
             ->whereNull('deleted_at')
@@ -294,7 +313,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
 
     private function siteMainNavigationExists(int $siteId): bool
     {
-        return DB::table('navigations')
+        return DB::table(TableName::resolve('navigations'))
             ->where('key', NavigationHandle::Main->value)
             ->where('site_id', $siteId)
             ->whereNull('deleted_at')
@@ -306,7 +325,7 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
      */
     private function pageableReferenceIds(string $pageableType): array
     {
-        $pageableIds = DB::table('navigation_page_references')
+        $pageableIds = DB::table(TableName::resolve('navigation_page_references'))
             ->where('pageable_type', $pageableType)
             ->pluck('pageable_id')
             ->map(static fn (mixed $pageableId): int => (int) $pageableId)
@@ -317,23 +336,28 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
         return array_values($pageableIds);
     }
 
-    private function referenceCountForPageableType(mixed $pageableType): int
+    /**
+     * @return list<int>
+     */
+    private function referenceNavigationIdsForPageableType(mixed $pageableType): array
     {
-        return DB::table('navigation_page_references')
+        return $this->navigationIds(DB::table(TableName::resolve('navigation_page_references'))
             ->where('pageable_type', $pageableType)
-            ->count();
+            ->pluck('navigation_id')
+            ->all());
     }
 
     /**
      * @param  class-string<Model>  $modelClass
+     * @return list<int>
      */
-    private function orphanedReferenceCountForModel(string $pageableType, string $modelClass): int
+    private function orphanedReferenceNavigationIdsForModel(string $pageableType, string $modelClass): array
     {
         $model = new $modelClass;
         $pageableIds = $this->pageableReferenceIds($pageableType);
 
         if ($pageableIds === []) {
-            return 0;
+            return [];
         }
 
         $existingIds = $modelClass::query()
@@ -344,13 +368,23 @@ final class NavigationHealthCheck implements ChecksExtensionHealth
         $orphanedIds = array_diff($pageableIds, $existingIds);
 
         if ($orphanedIds === []) {
-            return 0;
+            return [];
         }
 
-        return DB::table('navigation_page_references')
+        return $this->navigationIds(DB::table(TableName::resolve('navigation_page_references'))
             ->where('pageable_type', $pageableType)
             ->whereIn('pageable_id', $orphanedIds)
-            ->count();
+            ->pluck('navigation_id')
+            ->all());
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $navigationIds
+     * @return list<int>
+     */
+    private function navigationIds(array $navigationIds): array
+    {
+        return array_values(array_map(static fn (mixed $navigationId): int => is_numeric($navigationId) ? (int) $navigationId : 0, $navigationIds));
     }
 
     /**

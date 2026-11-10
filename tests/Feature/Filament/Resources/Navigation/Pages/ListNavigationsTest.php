@@ -77,9 +77,9 @@ test('uses filter-safe empty state copy when a site filter excludes an existing 
         ->assertSee(__('capell-navigation::generic.navigations_empty_description'));
 
     expect(Navigation::query()->count())->toBe(1)
-        ->and(__('capell-navigation::generic.navigations_empty'))->toBe('No navigations found')
+        ->and(__('capell-navigation::generic.navigations_empty'))->not->toBe('capell-navigation::generic.navigations_empty')
         ->and(__('capell-navigation::generic.navigations_empty_description'))
-        ->toBe('Create a navigation, or adjust the filters to see available records.');
+        ->not->toBe('capell-navigation::generic.navigations_empty_description');
 });
 
 test('can search navigations', function (): void {

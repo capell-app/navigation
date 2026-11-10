@@ -292,7 +292,7 @@
                 id="main-menu"
                 tabindex="-1"
                 x-ref="menuPanel"
-                aria-label="{{ __('capell-navigation::generic.main_navigation') }}"
+                aria-label="{{ __('capell-navigation::public.landmark.main') }}"
                 @class([
                     $breakpoint->navbarClasses(),
                     $breakpoint->navbarInvisibleClasses() => $usesAlpine,

@@ -6,25 +6,19 @@ This guide is for editors who build site menus and owners deciding how menus are
 
 ### How to build a menu
 
-1. Go to **Navigation**.
-2. Create a new menu and give it a name.
-3. Choose a **Key**. Use `main`, `footer`, or `sub-footer` when your theme renders that built-in menu location. A key can be used once for the same site and language.
-4. Choose the site and, when needed, the language for this menu.
-5. Add links to your pages, or add an **External link** to another site.
-6. Save the menu.
-
-The promoted create-form evidence covers desktop (1440x900), tablet
-(768x1024), and mobile (360x780), with both light and dark captures for each
-viewport. The six images are generated only by the installed-App screenshot
-runner described by the [screenshot contract](screenshots.json).
+1. Go to **Menus**.
+2. Create a new menu. Under **What is this menu for?**, choose **Main menu**, **Footer menu**, **Sub-footer menu** or **Custom menu**. The first three connect the menu to the matching place in your theme. Choose **Custom menu** only when your developer gave you a key.
+3. Choose the site and, when needed, the language for this menu. A menu of each kind can be used once for the same site and language.
+4. Start with **Build from published pages** to add your top-level pages, or add items one at a time with **Add a page** or **Add a custom link**. Use **Add a custom link** for another site.
+5. Save the menu.
 
 ![An editor reviews site navigation records and their scope and status.](screenshots/navigation-admin-index.png)
 
 ### How to reorder and nest links
 
 1. Open the menu in the editor.
-2. Drag a link up or down to change its order.
-3. Drag a link underneath another to nest it. Nested links become a dropdown.
+2. Drag a link by its handle, or use its **Move up** and **Move down** buttons.
+3. To nest a link under the one above it, drag it across or choose **Indent**. **Dedent** moves it back.
 4. Save the menu.
 
 ### How to make a dropdown or mega menu
@@ -35,15 +29,15 @@ runner described by the [screenshot contract](screenshots.json).
 
 ### How to make a menu appear in a theme location
 
-1. Check which menu key the theme renders. The built-in keys are `main`, `footer`, and `sub-footer`.
-2. Open or create the menu for that site and language.
-3. Set its **Key** to the matching value and save.
+1. Create a menu and choose **Main menu**, **Footer menu** or **Sub-footer menu** under **What is this menu for?**. The theme renders the menu that matches its place.
+2. For any other place your theme offers, choose **Custom menu** and enter the key your developer gave you.
+3. Choose the site and language, then save.
 4. Preview the public page. The theme decides where that key appears; there is no separate Header or Footer assignment control.
 
 ### How to manage menus from a site
 
 1. Open the site you are working on.
-2. Use the navigations area on the site to add or edit the menus that belong to it.
+2. Use the **Menus** area on the site to add or edit the menus that belong to it.
 3. Save. This keeps each site's menus together in one place.
 
 ![An editor manages navigations directly from the site edit screen.](screenshots/site-relation-manager-for-navigations.png)
@@ -52,7 +46,7 @@ runner described by the [screenshot contract](screenshots.json).
 
 1. Open the page you want to control.
 2. Go to its navigation tab.
-3. Review the menus that already contain the page. The list is read-only; to add or remove the page, edit the menu in Navigation.
+3. Review the menus that already contain the page. The list is read-only; to add or remove the page, edit the menu under **Menus**.
 
 ![An editor controls page-level navigation options from the page form.](screenshots/page-form-navigation-tab.png)
 
@@ -68,7 +62,7 @@ runner described by the [screenshot contract](screenshots.json).
 | -------------------------------------- | -------------------------------------- |
 | Group related pages under one heading  | Nested links (a **Standard dropdown**) |
 | A large menu with sections and columns | A **Mega menu**                        |
-| Links at the bottom of every page      | A **Footer navigation** menu           |
+| Links at the bottom of every page      | A **Footer menu**                      |
 
 ### Don't enable yet
 
@@ -76,10 +70,10 @@ runner described by the [screenshot contract](screenshots.json).
 
 ### Who does what
 
-| Role       | First useful screen                                                  |
-| ---------- | -------------------------------------------------------------------- |
-| Editor     | The menu editor: add, nest, and reorder links                        |
-| Site owner | **Navigations**: review each menu's site, language, and rendered key |
+| Role       | First useful screen                                            |
+| ---------- | -------------------------------------------------------------- |
+| Editor     | The menu editor: add, nest, and reorder links                  |
+| Site owner | **Menus**: review each menu's site, language, and rendered key |
 
 ## Troubleshooting for editors
 

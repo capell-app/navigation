@@ -79,6 +79,7 @@ final class NavigationServiceProvider extends ServiceProvider
     #[Override]
     public function register(): void
     {
+
         $this->app->register(ConsoleServiceProvider::class);
 
         $this->registerContentGraphExtractors();

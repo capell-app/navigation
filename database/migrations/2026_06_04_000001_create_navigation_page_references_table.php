@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Support\TableName;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -12,10 +13,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('navigation_page_references')) {
-            Schema::create('navigation_page_references', function (Blueprint $table): void {
+        if (! TableName::existsAndIsOwned('navigation_page_references', basename(__FILE__, '.php'))) {
+            Schema::create(TableName::resolve('navigation_page_references'), function (Blueprint $table): void {
                 $table->id();
-                $table->foreignId('navigation_id')->constrained('navigations')->cascadeOnDelete();
+                $table->foreignId('navigation_id')->constrained(TableName::resolve('navigations'))->cascadeOnDelete();
                 $table->foreignId('site_id')->nullable()->index();
                 $table->foreignId('language_id')->nullable()->index();
                 $table->string('pageable_type')->index();
@@ -24,11 +25,11 @@ return new class extends Migration
 
                 $table->unique(
                     ['navigation_id', 'pageable_type', 'pageable_id'],
-                    'navigation_page_refs_unique',
+                    TableName::namedIndex('navigation_page_references', 'navigation_page_refs_unique'),
                 );
                 $table->index(
                     ['pageable_type', 'pageable_id', 'site_id'],
-                    'navigation_page_refs_lookup',
+                    TableName::namedIndex('navigation_page_references', 'navigation_page_refs_lookup'),
                 );
             });
         }
@@ -38,16 +39,16 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('navigation_page_references');
+        Schema::dropIfExists(TableName::resolve('navigation_page_references'));
     }
 
     private function backfillReferences(): void
     {
-        if (! Schema::hasTable('navigations') || ! Schema::hasTable('navigation_page_references')) {
+        if (! Schema::hasTable(TableName::resolve('navigations')) || ! Schema::hasTable(TableName::resolve('navigation_page_references'))) {
             return;
         }
 
-        DB::table('navigations')
+        DB::table(TableName::resolve('navigations'))
             ->whereNull('deleted_at')
             ->select(['id', 'site_id', 'language_id', 'items'])
             ->orderBy('id')
@@ -71,7 +72,7 @@ return new class extends Migration
 
                     $now = now();
 
-                    DB::table('navigation_page_references')->insertOrIgnore(array_map(
+                    DB::table(TableName::resolve('navigation_page_references'))->insertOrIgnore(array_map(
                         static fn (array $reference): array => [
                             'navigation_id' => (int) $navigation->id,
                             'site_id' => is_numeric($navigation->site_id) ? (int) $navigation->site_id : null,

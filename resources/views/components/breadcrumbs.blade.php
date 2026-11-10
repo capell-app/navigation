@@ -10,7 +10,7 @@
 
 @if ($breadcrumbs->isNotEmpty())
     <nav
-        {{ $attributes->merge(['aria-label' => __('capell-navigation::generic.breadcrumb_navigation')]) }}
+        {{ $attributes->merge(['aria-label' => __('capell-navigation::public.landmark.breadcrumb')]) }}
     >
         <ol class="capell-navigation-breadcrumbs">
             @foreach ($breadcrumbs as $breadcrumb)

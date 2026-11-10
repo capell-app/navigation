@@ -155,6 +155,39 @@ it('passes the main navigation coverage check when a global main menu exists', f
         ->and($result->remediation)->toBeNull();
 });
 
+it('reports how many menus link to missing pages alongside the orphaned reference count', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()->language($language)->withTranslations()->create();
+    $page = Page::factory()->site($site)->withTranslations()->create();
+    $mainMenu = Navigation::factory()->site($site)->language($language)->create(['key' => NavigationHandle::Main->value]);
+    $footerMenu = Navigation::factory()->site($site)->language($language)->create(['key' => NavigationHandle::Footer->value]);
+    $healthyMenu = Navigation::factory()->site($site)->language($language)->create(['key' => NavigationHandle::SubFooter->value]);
+    $reference = static fn (Navigation $navigation, int $pageableId): array => [
+        'navigation_id' => $navigation->getKey(),
+        'site_id' => $site->getKey(),
+        'language_id' => $language->getKey(),
+        'pageable_type' => $page->getMorphClass(),
+        'pageable_id' => $pageableId,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ];
+
+    DB::table('navigation_page_references')->insert([
+        $reference($mainMenu, 999_991),
+        $reference($mainMenu, 999_992),
+        $reference($footerMenu, 999_991),
+        $reference($healthyMenu, (int) $page->getKey()),
+    ]);
+
+    $check = new NavigationHealthCheck;
+    $result = $check->pageReferenceIntegrityCheck();
+
+    expect($check->orphanedPageReferenceCount())->toBe(3)
+        ->and($check->navigationsWithOrphanedPageReferencesCount())->toBe(2)
+        ->and($result->passed)->toBeFalse()
+        ->and($result->message)->toBe((string) __('capell-navigation::generic.health_page_reference_integrity_failed', ['menus' => 2, 'count' => 3]));
+});
+
 it('fails the page reference integrity check when references point at missing pageable records', function (): void {
     $language = Language::factory()->default()->create();
     $site = Site::factory()
@@ -199,7 +232,7 @@ it('fails the page reference integrity check when references point at missing pa
         ->and($check->orphanedPageReferenceCount())->toBe(1)
         ->and($result->passed)->toBeFalse()
         ->and($result->label)->toBe((string) __('capell-navigation::generic.health_page_reference_integrity_label'))
-        ->and($result->message)->toBe((string) __('capell-navigation::generic.health_page_reference_integrity_failed', ['count' => 1]))
+        ->and($result->message)->toBe((string) __('capell-navigation::generic.health_page_reference_integrity_failed', ['menus' => 1, 'count' => 1]))
         ->and($result->remediation)->toBe((string) __('capell-navigation::generic.health_page_reference_integrity_remediation'))
         ->and(NavigationHealthCheck::passed())->toBeFalse();
 });
