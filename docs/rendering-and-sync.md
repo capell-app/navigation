@@ -8,7 +8,7 @@ Navigation owns editable navigation trees, render models, header render hooks, a
 | ---------------------------------------- | ------------------------------------------------------------ |
 | `BuildNavigationRenderModelAction`       | Builds the frontend render model.                            |
 | `NavigationNamesResolver`                | Resolves navigation names for a site and languages.          |
-| `NavigationPageSyncer`                   | Removes deleted or detached pages from navigation items.     |
+| `NavigationPageSyncer`                   | Removes permanently deleted pages from navigation items.     |
 | `SyncNavigationPageReferencesAction`     | Rebuilds the indexed page-reference rows for one navigation. |
 | `RegisterFoundationHeaderNavigationHook` | Adds the foundation header navigation render hook.           |
 | `NavigationObserver`                     | Clears frontend navigation cache keys after changes.         |
@@ -73,6 +73,8 @@ final class DemoNavigationPageSyncer implements NavigationPageSyncer
 }
 ```
 
+The default adapter runs when a page is permanently deleted: it removes the page's items from every menu, including menus in the bin, and drops the page's reference rows. A page moved to the bin keeps its menu items so that restoring the page restores its links; until then the items are skipped when the menu renders.
+
 Bind a replacement only when another package owns the navigation payload shape. Otherwise use the default adapter.
 
 ## Page Reference Index
@@ -89,4 +91,10 @@ SyncNavigationPageReferencesAction::run($navigation);
 
 ## Cache Notes
 
-Navigation changes clear frontend navigation cache keys through `NavigationObserver`. If another package caches rendered menus, it should clear those keys when it writes navigation items.
+Navigation changes clear frontend navigation cache keys through `NavigationObserver`. The shared guest render-model cache is versioned, so a menu, page or page URL change makes every cached entry unreachable on any cache store, with or without tags. If another package caches rendered menus, it should clear those keys when it writes navigation items, or call `BuildNavigationRenderModelAction::flushSharedRenderModelCache()`.
+
+Child items are always rendered in the menu markup, so crawlers and visitors without JavaScript see the whole menu.
+
+## Breadcrumbs
+
+`<x-capell-navigation::breadcrumbs>` renders the active trail of a menu and, when the trail has at least two crumbs with web addresses, a schema.org `BreadcrumbList` in JSON-LD built by `BuildNavigationBreadcrumbListSchemaAction`. It holds only each crumb's public label and absolute URL.

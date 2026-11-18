@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Capell\Navigation\Filament\Resources\Navigations;
 
 use BackedEnum;
+use Capell\Admin\Enums\NavigationGroupEnum;
 use Capell\Admin\Filament\Concerns\HasConfiguredForm;
 use Capell\Admin\Filament\Concerns\HasConfiguredTable;
 use Capell\Admin\Filament\Concerns\HasNavigationBadge;
@@ -80,9 +81,9 @@ class NavigationResource extends Resource
     }
 
     #[Override]
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): NavigationGroupEnum
     {
-        return (string) (__('capell-admin::navigation.group_websites'));
+        return NavigationGroupEnum::Website;
     }
 
     #[Override]

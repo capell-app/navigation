@@ -76,3 +76,15 @@ it('renders translated delete consequences in the real admin surface', function 
     'NavigationsTable DeleteBulkAction' => [ListNavigations::class, fn (): Model => Navigation::factory()->create(), 'bulk', 'delete', 'capell-navigation::navigation.delete_bulk_modal', false],
     'NavigationsTable ForceDeleteBulkAction' => [ListNavigations::class, fn (): Model => Navigation::factory()->create(), 'bulk', 'forceDelete', 'capell-navigation::navigation.force_delete_bulk_modal', true],
 ]);
+
+it('tells editors that a theme header or footer showing the menu loses its navigation', function (string $translation): void {
+    $description = __($translation . '.description');
+
+    expect($description)->toBeString()
+        ->and(mb_strtolower((string) $description))->toContain('header', 'footer', 'loses');
+})->with([
+    'delete' => 'capell-navigation::navigation.delete_modal',
+    'delete bulk' => 'capell-navigation::navigation.delete_bulk_modal',
+    'force delete' => 'capell-navigation::navigation.force_delete_modal',
+    'force delete bulk' => 'capell-navigation::navigation.force_delete_bulk_modal',
+]);

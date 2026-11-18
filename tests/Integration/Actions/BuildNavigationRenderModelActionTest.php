@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use BladeUI\Icons\Components\Svg;
 use Capell\Core\Events\PageUrlChanged;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
@@ -344,7 +345,7 @@ it('renders heading items without a url', function (): void {
 });
 
 it('removes unsupported icon component names from public render data', function (): void {
-    Blade::component('capell-navigation::components.breadcrumbs', 'navigation-test-icon');
+    Blade::component(Svg::class, 'navigation-test-icon');
 
     $language = Language::factory()->default()->create();
     $site = Site::factory()
@@ -505,4 +506,91 @@ it('flushes stale page lookup cache when a page url changed event is received', 
     $renderModel = BuildNavigationRenderModelAction::run($context);
 
     expect(navigationRenderItem($renderModel, 0)->url)->toContain('/event-changed');
+});
+
+it('drops a stale guest menu on a cache store without tags once the menu cache is flushed', function (): void {
+    config()->set('cache.default', 'file');
+    config()->set('cache.stores.file.path', storage_path('framework/cache/navigation-render-model-' . getmypid()));
+    Cache::purge('file');
+    Cache::flush();
+
+    expect(Cache::supportsTags())->toBeFalse();
+
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+    $linkedPage = Page::factory()->site($site)->withTranslations()->create();
+
+    $navigation = Navigation::factory()->create([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $language->id,
+        'items' => [[
+            'type' => NavigationItemType::Page->value,
+            'data' => [
+                'pageable_id' => $linkedPage->id,
+                'pageable_type' => $linkedPage->getMorphClass(),
+            ],
+        ]],
+    ]);
+
+    $context = new NavigationRenderContextData(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $language,
+        siteDomain: $site->siteDomains->first(),
+    );
+
+    expect(BuildNavigationRenderModelAction::run($context)->items)->toHaveCount(1);
+
+    // Unpublish the linked page without touching anything the shared cache key is built from.
+    DB::table('pages')->where('id', $linkedPage->id)->update(['visible_until' => now()->subDay()]);
+    BuildNavigationRenderModelAction::flushPageCache();
+
+    expect(BuildNavigationRenderModelAction::run($context)->items)->toBeEmpty();
+});
+
+it('renders child links in the page markup for crawlers and visitors without JavaScript', function (): void {
+    $language = Language::factory()->default()->create();
+    $site = Site::factory()
+        ->language($language)
+        ->withTranslations(siteDomainData: ['scheme' => 'https', 'domain' => 'localhost', 'path' => null])
+        ->create();
+    $currentPage = Page::factory()->site($site)->home()->withTranslations(slug: '/')->create();
+
+    $navigation = Navigation::factory()->make([
+        'key' => 'main',
+        'site_id' => $site->id,
+        'language_id' => $language->id,
+        'items' => [[
+            'key' => 'services',
+            'label' => 'Services',
+            'type' => NavigationItemType::Link->value,
+            // Menus saved while on-demand child loading existed keep this flag.
+            'data' => ['url' => '/services', 'children_loading' => 'lazy'],
+            'children' => [[
+                'key' => 'consulting',
+                'label' => 'Consulting',
+                'type' => NavigationItemType::Link->value,
+                'data' => ['url' => '/services/consulting'],
+            ]],
+        ]],
+    ]);
+
+    $renderModel = BuildNavigationRenderModelAction::run(new NavigationRenderContextData(
+        navigation: $navigation,
+        page: $currentPage,
+        site: $site,
+        language: $language,
+        siteDomain: $site->siteDomains->first(),
+    ));
+
+    $html = view('capell-navigation::components.menu-items', ['items' => $renderModel->items])->render();
+
+    expect($html)->toContain('href="/services/consulting"')
+        ->and($html)->not->toContain('data-navigation-fragment-url');
 });

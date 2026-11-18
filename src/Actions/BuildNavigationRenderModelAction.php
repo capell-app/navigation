@@ -9,16 +9,13 @@ use Capell\Navigation\Data\NavigationItemRenderData;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Data\NavigationRenderData;
 use Capell\Navigation\Enums\NavigationCacheEnum;
-use Capell\Navigation\Enums\NavigationChildrenLoadingEnum;
 use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\Loader\NavigationItemsLoader;
+use Capell\Navigation\Support\SafeIcon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\View\Compilers\ComponentTagCompiler;
-use InvalidArgumentException;
 use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
 
@@ -42,11 +39,17 @@ class BuildNavigationRenderModelAction
         }
     }
 
+    /**
+     * Stores without tags (file, database) cannot flush a group of keys, so every shared key carries a version that
+     * a flush moves on; the superseded entries are never read again and expire with their own lifetime.
+     */
     public static function flushSharedRenderModelCache(): void
     {
         if (Cache::supportsTags()) {
             Cache::tags(['navigation'])->flush();
         }
+
+        Cache::forever(NavigationCacheEnum::RenderModelsVersion->value, bin2hex(random_bytes(8)));
     }
 
     public function handle(NavigationRenderContextData $context): NavigationRenderData
@@ -69,15 +72,23 @@ class BuildNavigationRenderModelAction
         return $renderModel;
     }
 
-    /**
-     * @return Collection<int, NavigationItemRenderData>|null
-     */
-    public function childRenderItems(NavigationRenderContextData $context, string $itemKey, string $itemPath): ?Collection
+    private static function sharedRenderModelCacheVersion(): string
     {
-        $renderModel = $this->handle($context);
-        $item = $this->findRenderItem($renderModel->items, $itemKey);
+        $version = Cache::get(NavigationCacheEnum::RenderModelsVersion->value);
 
-        return $item instanceof NavigationItemRenderData ? $item->children : null;
+        if (is_string($version) && $version !== '') {
+            return $version;
+        }
+
+        $version = bin2hex(random_bytes(8));
+
+        if (Cache::add(NavigationCacheEnum::RenderModelsVersion->value, $version)) {
+            return $version;
+        }
+
+        $storedVersion = Cache::get(NavigationCacheEnum::RenderModelsVersion->value);
+
+        return is_string($storedVersion) && $storedVersion !== '' ? $storedVersion : $version;
     }
 
     private function rememberSharedRenderModel(NavigationRenderContextData $context): NavigationRenderData
@@ -128,7 +139,7 @@ class BuildNavigationRenderModelAction
             navigationKey: $context->navigation->key,
             navigationName: $context->navigation->name,
             listComponent: $this->listComponent($context->navigation),
-            items: $this->mapItems($items, $context),
+            items: $this->mapItems($items),
         );
     }
 
@@ -136,22 +147,18 @@ class BuildNavigationRenderModelAction
      * @param  Collection<int, NavigationItemData>  $items
      * @return Collection<int, NavigationItemRenderData>
      */
-    private function mapItems(Collection $items, NavigationRenderContextData $context, string $parentPath = ''): Collection
+    private function mapItems(Collection $items): Collection
     {
         return $items
             ->values()
-            ->map(fn (NavigationItemData $item, int $itemIndex): NavigationItemRenderData => $this->mapItem(
-                item: $item,
-                context: $context,
-                itemPath: $parentPath === '' ? (string) $itemIndex : $parentPath . '.' . $itemIndex,
-            ))
+            ->map(fn (NavigationItemData $item): NavigationItemRenderData => $this->mapItem($item))
             ->values();
     }
 
-    private function mapItem(NavigationItemData $item, NavigationRenderContextData $context, string $itemPath): NavigationItemRenderData
+    private function mapItem(NavigationItemData $item): NavigationItemRenderData
     {
         $data = $item->data;
-        $children = $this->mapItems(collect($item->children?->all() ?? []), $context, $itemPath);
+        $children = $this->mapItems(collect($item->children?->all() ?? []));
         $icon = $this->icon($data['icon'] ?? null);
         $activeIcon = $this->icon($data['active_icon'] ?? null);
 
@@ -171,67 +178,7 @@ class BuildNavigationRenderModelAction
             componentItem: isset($data['component_item']) && is_string($data['component_item']) ? $data['component_item'] : null,
             hideLabel: ($data['hide_label'] ?? false) === true,
             key: $item->key,
-            lazyFragmentUrl: $this->lazyFragmentUrl($item, $context, $itemPath, $children),
         );
-    }
-
-    /**
-     * @param  Collection<int, NavigationItemRenderData>  $children
-     */
-    private function lazyFragmentUrl(NavigationItemData $item, NavigationRenderContextData $context, string $itemPath, Collection $children): ?string
-    {
-        if ($item->key === null || $children->isEmpty()) {
-            return null;
-        }
-
-        if (NavigationChildrenLoadingEnum::fromItemData($item->data) !== NavigationChildrenLoadingEnum::Lazy) {
-            return null;
-        }
-
-        $domain = $context->siteDomain->domain;
-
-        if (! is_string($domain)) {
-            return null;
-        }
-
-        $payload = Crypt::encryptString(json_encode([
-            'version' => 1,
-            'expires_at' => ResolveNavigationCacheExpiryAction::make()->forNavigation($context->navigation)->getTimestamp(),
-            'navigation' => $this->integerKey($context->navigation->getKey()),
-            'navigation_version' => $context->navigation->updated_at?->getTimestamp(),
-            'visible_from' => $context->navigation->visible_from?->getTimestamp(),
-            'visible_until' => $context->navigation->visible_until?->getTimestamp(),
-            'item' => $item->key,
-            'path' => $itemPath,
-            'page' => $this->integerKey($context->page->getKey()),
-            'page_type' => $context->page->getMorphClass(),
-            'site' => $this->integerKey($context->site->getKey()),
-            'language' => $this->integerKey($context->language->getKey()),
-            'domain' => $this->integerKey($context->siteDomain->getKey()),
-            'host' => strtolower($domain),
-        ], JSON_THROW_ON_ERROR));
-
-        return route('capell-navigation.children', ['payload' => $payload]);
-    }
-
-    /**
-     * @param  Collection<int, NavigationItemRenderData>  $items
-     */
-    private function findRenderItem(Collection $items, string $itemKey): ?NavigationItemRenderData
-    {
-        foreach ($items as $item) {
-            if ($item->key === $itemKey) {
-                return $item;
-            }
-
-            $child = $this->findRenderItem($item->children, $itemKey);
-
-            if ($child instanceof NavigationItemRenderData) {
-                return $child;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -282,28 +229,7 @@ class BuildNavigationRenderModelAction
 
     private function icon(mixed $icon): ?string
     {
-        if (! is_string($icon) || $icon === '') {
-            return null;
-        }
-
-        try {
-            $this->componentTagCompiler()->componentClass($icon);
-        } catch (InvalidArgumentException) {
-            return null;
-        }
-
-        return $icon;
-    }
-
-    private function componentTagCompiler(): ComponentTagCompiler
-    {
-        $bladeCompiler = app('blade.compiler');
-
-        return new ComponentTagCompiler(
-            $bladeCompiler->getClassComponentAliases(),
-            $bladeCompiler->getClassComponentNamespaces(),
-            $bladeCompiler,
-        );
+        return SafeIcon::resolve($icon);
     }
 
     /**
@@ -370,21 +296,13 @@ class BuildNavigationRenderModelAction
         }
 
         return NavigationCacheEnum::renderModelKey(implode('|', [
+            self::sharedRenderModelCacheVersion(),
             $this->cacheKey($context),
             (string) $context->page->updated_at?->getTimestamp(),
             (string) $context->site->updated_at?->getTimestamp(),
             (string) $context->language->updated_at?->getTimestamp(),
             (string) $context->siteDomain->updated_at?->getTimestamp(),
         ]));
-    }
-
-    private function integerKey(mixed $value): int
-    {
-        if (is_int($value)) {
-            return $value;
-        }
-
-        return is_string($value) && ctype_digit($value) ? (int) $value : 0;
     }
 
     /**
@@ -428,7 +346,6 @@ class BuildNavigationRenderModelAction
             'componentItem' => $item->componentItem,
             'hideLabel' => $item->hideLabel,
             'key' => $item->key,
-            'lazyFragmentUrl' => $item->lazyFragmentUrl,
         ];
     }
 
@@ -524,7 +441,6 @@ class BuildNavigationRenderModelAction
             componentItem: $this->nullableString($payload, 'componentItem'),
             hideLabel: ($payload['hideLabel'] ?? false) === true,
             key: $this->nullableString($payload, 'key'),
-            lazyFragmentUrl: $this->nullableString($payload, 'lazyFragmentUrl'),
         );
     }
 

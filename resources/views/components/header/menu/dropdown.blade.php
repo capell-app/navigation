@@ -12,6 +12,7 @@
     use Capell\Navigation\Data\NavigationItemData;
     use Capell\Navigation\Enums\NavigationDropdownLayout;
     use Capell\Navigation\Support\OptionalBladeComponent;
+    use Capell\Navigation\Support\SafeIcon;
     use Capell\Navigation\Support\SafeUrl;
 
     /** @var NavigationItemData $item */
@@ -102,10 +103,10 @@
             $item->data['class'] ?? '',
         ])
         >
-            @if (! empty($item->data['icon']))
+            @if (SafeIcon::resolve($item->data['icon'] ?? null) !== null)
                 <x-dynamic-component
                     class="h-6 w-6"
-                    :component="$item->data['icon']"
+                    :component="SafeIcon::resolve($item->data['icon'])"
                 />
             @endif
 
@@ -132,7 +133,7 @@
                     ])
                     x-on:click="close($refs['{{ $currentDropdownName }}_toggle'])"
                 >
-                    @svg('heroicon-o-arrow-left', 'mr-1 h-5 w-5 stroke-current')
+                    @svg('heroicon-o-arrow-left', 'me-1 h-5 w-5 stroke-current rtl:rotate-180')
                     <span> {{ $item->label }} </span>
                 </button>
             </li>

@@ -21,7 +21,6 @@ use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Core\Support\Packages\InstalledRuntimeLifecycle;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Core\Support\Packages\RegistersInstalledRuntime;
-use Capell\Core\Support\Packages\RouteGroupIsolation;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
 use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Data\RenderHookContributionData;
@@ -51,17 +50,14 @@ use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;
 use Capell\Navigation\Support\NavigationNamesResolver as ConcreteNavigationNamesResolver;
 use Capell\Navigation\Support\RenderHooks\RegisterFoundationHeaderNavigationHook;
 use Capell\Navigation\View\Composers\NavigationRenderModelComposer;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Override;
@@ -113,16 +109,8 @@ final class NavigationServiceProvider extends ServiceProvider
 
     protected function bootInstalledRuntime(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/capell-navigation.php', 'capell-navigation');
-
-        $this->publishes([
-            __DIR__ . '/../../config/capell-navigation.php' => config_path('capell-navigation.php'),
-        ], 'capell-navigation-config');
-
         $this
             ->registerServices()
-            ->registerRateLimiters()
-            ->registerRoutes()
             ->registerSchemaExtenders()
             ->registerResources()
             ->registerPageTypes()
@@ -158,27 +146,6 @@ final class NavigationServiceProvider extends ServiceProvider
                 $app->make(Factory::class)->store(),
             ),
         );
-
-        return $this;
-    }
-
-    private function registerRateLimiters(): self
-    {
-        RateLimiter::for('capell-navigation-children', static function (Request $request): Limit {
-            $configuredLimit = config('capell-navigation.children.rate_limit_per_minute', 300);
-            $limit = is_int($configuredLimit) && $configuredLimit > 0 ? $configuredLimit : 300;
-
-            return Limit::perMinute($limit)->by($request->ip() ?? 'unknown');
-        });
-
-        return $this;
-    }
-
-    private function registerRoutes(): self
-    {
-        RouteGroupIsolation::run($this->app->make(Router::class), function (): void {
-            $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
-        });
 
         return $this;
     }
@@ -242,6 +209,10 @@ final class NavigationServiceProvider extends ServiceProvider
     {
         CapellCore::registerVendorAsset(
             VendorAssetData::tailwindSource('resources/views/**/*.blade.php', self::$packageName),
+        );
+        // The header's responsive utility classes are built in this enum, not in a view.
+        CapellCore::registerVendorAsset(
+            VendorAssetData::tailwindSource('src/Enums/HeaderNavigationBreakpoint.php', self::$packageName),
         );
 
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'capell-navigation');
@@ -378,6 +349,7 @@ final class NavigationServiceProvider extends ServiceProvider
         Event::listen(SiteReplicated::class, ReplicateSiteNavigationsListener::class);
         Event::listen(PageUrlChanged::class, $this->handlePageUrlChanged(...));
         Event::listen([PageSaved::class, PageDeleted::class], $this->handlePageEligibilityChanged(...));
+        Event::listen(PageDeleted::class, $this->handlePageDeleted(...));
 
         return $this;
     }
@@ -399,6 +371,21 @@ final class NavigationServiceProvider extends ServiceProvider
     private function handlePageEligibilityChanged(PageSaved|PageDeleted $event): void
     {
         BuildNavigationRenderModelAction::flushPageCache();
+    }
+
+    /**
+     * A page in the bin can be restored, so its menu items stay and are skipped while it renders as unavailable.
+     * Once the page is permanently deleted its items can never resolve again, so they are removed from every menu.
+     */
+    private function handlePageDeleted(PageDeleted $event): void
+    {
+        $page = $event->page;
+
+        if (! $page instanceof Model || $page->exists) {
+            return;
+        }
+
+        $this->app->make(NavigationPageSyncer::class)->removePageFromAllNavigations($page);
     }
 
     private function handlePageUrlChanged(PageUrlChanged $event): void

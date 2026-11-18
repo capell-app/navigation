@@ -1,0 +1,90 @@
+[
+    {
+        "claim": "Editors can arrange a site's header and footer menus by dragging items into place and nesting them under a parent.",
+        "evidence": [
+            "src/Filament/Configurators/Navigations/DefaultNavigationConfigurator.php",
+            "src/Filament/Resources/Navigations/NavigationResource.php"
+        ]
+    },
+    {
+        "claim": "Each item has a type, such as a page, a link or a heading.",
+        "evidence": ["src/Enums/NavigationItemType.php"]
+    },
+    {
+        "claim": "A parent can open as a dropdown or as a wide menu with several columns.",
+        "evidence": [
+            "src/Enums/NavigationDropdownLayout.php",
+            "resources/lang/en/generic.php"
+        ]
+    },
+    {
+        "claim": "Every menu belongs to a site and can be set to a language, so the Welsh header can differ from the English one.",
+        "evidence": [
+            "src/Filament/Configurators/Navigations/DefaultNavigationConfigurator.php",
+            "src/Support/Loader/NavigationLoader.php"
+        ]
+    },
+    {
+        "claim": "If no menu exists for a language, the menu with no language set is used.",
+        "evidence": ["src/Support/Loader/NavigationLoader.php"]
+    },
+    {
+        "claim": "Main, Footer and Sub-footer come with the setup command, which gives each site that has a home page its starting menus.",
+        "evidence": [
+            "src/Console/Commands/SetupCommand.php",
+            "src/Support/Creator/NavigationCreator.php",
+            "src/Enums/NavigationHandle.php",
+            "capell.json"
+        ]
+    },
+    {
+        "claim": "You can add menus under your own names.",
+        "evidence": [
+            "src/Enums/NavigationPurpose.php",
+            "resources/lang/en/generic.php"
+        ]
+    },
+    {
+        "claim": "Every item can be shown to everyone, to guests, to signed-in visitors or to a role.",
+        "evidence": ["src/Enums/NavigationItemVisibility.php"]
+    },
+    {
+        "claim": "Anyone who has the address can still open the page, because this hides only the link.",
+        "evidence": [
+            "src/Enums/NavigationItemVisibility.php",
+            "src/Support/Loader/NavigationItemsLoader.php"
+        ]
+    },
+    {
+        "claim": "The Foundation theme shows all three built-in menus, and a custom menu shows only where a theme or a layout widget asks for it by name.",
+        "evidence": [
+            "src/Providers/NavigationServiceProvider.php",
+            "src/Support/RenderHooks/RegisterFoundationHeaderNavigationHook.php",
+            "src/View/Components/Menu.php",
+            "src/Filament/Components/Forms/NavigationSelect.php",
+            "resources/lang/en/generic.php"
+        ]
+    },
+    {
+        "claim": "Menus can be published at once or on a date you choose.",
+        "evidence": [
+            "src/Filament/Configurators/Navigations/DefaultNavigationConfigurator.php",
+            "database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php"
+        ]
+    },
+    {
+        "claim": "Copying a site copies its menus and points the copies at the copied pages.",
+        "evidence": [
+            "src/Listeners/ReplicateSiteNavigationsListener.php",
+            "src/Actions/ReplicateSiteNavigationsAction.php"
+        ]
+    },
+    {
+        "claim": "When you edit a menu, a preview lists the pages and sites that can show it before you save.",
+        "evidence": [
+            "src/Filament/Configurators/Navigations/DefaultNavigationConfigurator.php",
+            "src/Actions/BuildNavigationImpactPreviewAction.php",
+            "resources/views/filament/forms/navigation-impact-preview.blade.php"
+        ]
+    }
+]

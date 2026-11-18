@@ -36,7 +36,7 @@ enum HeaderNavigationBreakpoint: string
     public function menuToggleClasses(): string
     {
         return match ($this) {
-            self::Lg => 'absolute top-[max(2vh,14px)] right-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden', self::Xl => 'absolute top-[max(2vh,14px)] right-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 xl:hidden'
+            self::Lg => 'absolute top-[max(2vh,14px)] end-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 lg:hidden', self::Xl => 'absolute top-[max(2vh,14px)] end-4 z-50 flex items-center justify-end gap-x-2 md:gap-x-1 xl:hidden'
         };
     }
 
@@ -64,7 +64,7 @@ enum HeaderNavigationBreakpoint: string
     public function navbarClasses(): string
     {
         return match ($this) {
-            self::Lg => 'navbar top-0 left-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent', self::Xl => 'navbar top-0 left-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-xl:fixed max-xl:bottom-0 max-xl:h-dvh max-xl:max-w-[22rem] xl:visible xl:static xl:max-w-none xl:translate-x-0 xl:flex-row xl:items-center xl:overflow-visible xl:border-0 xl:bg-transparent xl:transition-none dark:border-gray-700 dark:bg-gray-950 dark:xl:bg-transparent'
+            self::Lg => 'navbar top-0 start-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-lg:fixed max-lg:bottom-0 max-lg:h-dvh max-lg:max-w-[22rem] lg:visible lg:static lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:overflow-visible lg:border-0 lg:bg-transparent lg:transition-none dark:border-gray-700 dark:bg-gray-950 dark:lg:bg-transparent', self::Xl => 'navbar top-0 start-0 z-40 flex h-full w-full max-w-md transform flex-col overflow-x-hidden overflow-y-auto border-t border-gray-100 bg-white transition-[translate,visibility] duration-500 ease-in-out max-xl:fixed max-xl:bottom-0 max-xl:h-dvh max-xl:max-w-[22rem] xl:visible xl:static xl:max-w-none xl:translate-x-0 xl:flex-row xl:items-center xl:overflow-visible xl:border-0 xl:bg-transparent xl:transition-none dark:border-gray-700 dark:bg-gray-950 dark:xl:bg-transparent'
         };
     }
 
@@ -85,14 +85,14 @@ enum HeaderNavigationBreakpoint: string
     public function navbarClosingClasses(): string
     {
         return match ($this) {
-            self::Lg => 'max-lg:!visible max-lg:translate-x-[-100%]', self::Xl => 'max-xl:!visible max-xl:translate-x-[-100%]'
+            self::Lg => 'max-lg:!visible max-lg:translate-x-[-100%] max-lg:rtl:translate-x-[100%]', self::Xl => 'max-xl:!visible max-xl:translate-x-[-100%] max-xl:rtl:translate-x-[100%]'
         };
     }
 
     public function navbarClosedClasses(): string
     {
         return match ($this) {
-            self::Lg => 'max-lg:invisible max-lg:translate-x-[-100%]', self::Xl => 'max-xl:invisible max-xl:translate-x-[-100%]'
+            self::Lg => 'max-lg:invisible max-lg:translate-x-[-100%] max-lg:rtl:translate-x-[100%]', self::Xl => 'max-xl:invisible max-xl:translate-x-[-100%] max-xl:rtl:translate-x-[100%]'
         };
     }
 
@@ -194,14 +194,14 @@ enum HeaderNavigationBreakpoint: string
     public function hiddenLabelClasses(): string
     {
         return match ($this) {
-            self::Lg => 'mr-1 lg:sr-only', self::Xl => 'mr-1 xl:sr-only'
+            self::Lg => 'me-1 lg:sr-only', self::Xl => 'me-1 xl:sr-only'
         };
     }
 
     public function chevronClasses(): string
     {
         return match ($this) {
-            self::Lg => '-mr-2 ml-auto h-4 w-4 text-gray-400 group-hover:text-inherit group-focus:text-inherit lg:rotate-90', self::Xl => '-mr-2 ml-auto h-4 w-4 text-gray-400 group-hover:text-inherit group-focus:text-inherit xl:rotate-90'
+            self::Lg => '-me-2 ms-auto h-4 w-4 text-gray-400 group-hover:text-inherit group-focus:text-inherit lg:rotate-90', self::Xl => '-me-2 ms-auto h-4 w-4 text-gray-400 group-hover:text-inherit group-focus:text-inherit xl:rotate-90'
         };
     }
 

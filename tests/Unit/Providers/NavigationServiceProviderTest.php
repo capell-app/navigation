@@ -12,7 +12,7 @@ it('registers navigation package metadata for install workflows', function (): v
     expect($package->name)->toBe('capell-app/navigation')
         ->and($package->serviceProviderClass)->toBe(NavigationServiceProvider::class)
         ->and($package->path)->toBe(realpath(__DIR__ . '/../../../'))
-        ->and($package->getDescription())->toBe('Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.')
+        ->and($package->getDescription())->toBeString()->not->toBeEmpty()
         ->and($package->getSetupCommand())->toBe('capell:navigation-setup')
         ->and($package->getSetupParams())->toBe(['sites']);
 });

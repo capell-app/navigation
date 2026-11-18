@@ -6,7 +6,7 @@ Developer reference for `capell-app/navigation`. Start with the [README](../READ
 
 ## Package Details
 
-Navigation is an **Available**, **Schema-owning** Capell package in the **Capell Essentials** product group. It ships as `capell-app/navigation` and extends these surfaces: admin, frontend, console.
+Navigation is an **Available** Capell package in the **Capell Essentials** product group. It ships as `capell-app/navigation` and extends these surfaces: admin, frontend, console.
 
 - Status: Available
 - Tier: free
@@ -23,15 +23,12 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 - `Capell\Navigation\Providers\MigrationMetadataServiceProvider`
 - `Capell\Navigation\Providers\ConsoleServiceProvider`
 
-### Config files
-
-- `packages/navigation/config/capell-navigation.php`
-
 ### Migrations
 
 - `packages/navigation/database/migrations/2026_05_10_190860_01_create_navigations_table.php`
 - `packages/navigation/database/migrations/2026_06_04_000001_create_navigation_page_references_table.php`
 - `packages/navigation/database/migrations/2026_08_28_000003_change_navigation_visibility_to_datetime.php`
+- `packages/navigation/database/migrations/2026_11_14_000001_scope_navigation_key_uniqueness_to_active_menus.php`
 
 ### Models
 
@@ -54,10 +51,6 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 - `NavigationsTable`
 - `NavigationsRelationManager`
 
-### Route files
-
-- `packages/navigation/routes/web.php`
-
 ### Policies
 
 - `NavigationPolicy`
@@ -79,8 +72,8 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 
 - `AddPageToNavigationAction`
 - `ApplyNavigationSiteSpecAction`
+- `BuildNavigationBreadcrumbListSchemaAction`
 - `BuildNavigationBreadcrumbsAction`
-- `BuildNavigationChildFragmentAction`
 - `BuildNavigationImpactPreviewAction`
 - `BuildNavigationRenderModelAction`
 - `BuildNavigationStarterItemsAction`
@@ -131,7 +124,6 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 - `model: Capell\Navigation\Manifest\NavigationModelsContribution`
 - `page-type: Capell\Navigation\Manifest\NavigationPageTypeContribution`
 - `render-hook: Capell\Navigation\Manifest\NavigationRenderHookContribution`
-- `route: Capell\Navigation\Manifest\NavigationFrontendRouteContribution`
 - `schema-extender: Capell\Navigation\Manifest\NavigationSchemaExtendersContribution`
 
 ### Health checks
@@ -161,7 +153,7 @@ Navigation is an **Available**, **Schema-owning** Capell package in the **Capell
 - Required tables: `navigations`, `navigation_page_references`.
 - Models: `Navigation`.
 - Core record references in migrations: `sites via site_id`, `languages via language_id`.
-- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`, `2026_08_28_000003_change_navigation_visibility_to_datetime.php`.
+- Migration files: `2026_05_10_190860_01_create_navigations_table.php`, `2026_06_04_000001_create_navigation_page_references_table.php`, `2026_08_28_000003_change_navigation_visibility_to_datetime.php`, `2026_11_14_000001_scope_navigation_key_uniqueness_to_active_menus.php`.
 - Migration impact: run host migrations through the package install flow before opening package surfaces.
 - Deletion/retention behaviour: migrations declare cascade-on-delete relationships; no timed pruning or retention schedule is declared in `capell.json`.
 

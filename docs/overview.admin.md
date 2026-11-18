@@ -8,7 +8,7 @@ Install the package and run its migrations before creating menus. An integrator 
 
 ## Create a menu
 
-Go to **Websites → Navigation** or open the **Navigations** relation on a site. Give the menu a name, choose its **Key**, site, and language, then save it. The built-in keys are **Main**, **Footer**, and **Sub-footer**; selecting a key is how the theme identifies which menu to render. There is no separate Header or Footer assignment control.
+Go to **Websites → Menus** or open the **Menus** list on a site. Give the menu a name, choose its **Key**, site, and language, then save it. The built-in keys are **Main**, **Footer**, and **Sub-footer**; selecting a key is how the theme identifies which menu to render. There is no separate Header or Footer assignment control.
 
 A key can be used only once for the same site and language. Use a language-specific menu when its labels or structure differ; a menu without a language acts as a fallback. At render time, Capell prefers an eligible menu for the current site over a global menu. A language-specific match is used when available.
 
@@ -42,7 +42,7 @@ Saving, deleting, or restoring a menu invalidates its frontend caches. Page URL 
 
 When cloning a site, enable **Copy navigations** if its menus should be copied. Page items are remapped when the corresponding pages are copied; review the cloned menus when pages were not copied or were replaced through a different workflow.
 
-A normal delete is recoverable through the trashed filter and **Restore** action. **Force delete** is permanent. Site-scoped admins can view global menus but only global admins can update, delete, restore, or force-delete them; the corresponding Navigation permissions are still required for each action.
+A normal delete is recoverable through the trashed filter and **Restore** action, and frees the menu's key so a replacement can be created; a menu cannot be restored while another live menu uses its key for the same site and language. **Force delete** is permanent. A theme header, footer or layout that shows a deleted menu renders without it. Permanently deleting a page removes its items from every menu; a page in the bin keeps its items, which are hidden until the page is restored. Site-scoped admins can view global menus but only global admins can update, delete, restore, or force-delete them; the corresponding Navigation permissions are still required for each action.
 
 ## Good to know
 

@@ -2,22 +2,18 @@
 
 <!-- prettier-ignore-start -->
 
-## What It Does
+Editors can arrange a site's header and footer menus by dragging items into place and nesting them under a parent. Each item has a type, such as a page, a link or a heading. A parent can open as a dropdown or as a wide menu with several columns.
 
-Navigation adds site- and language-scoped menus with page links, external links, nested items, publication state, and reusable handles.
+Every menu belongs to a site and can be set to a language, so the Welsh header can differ from the English one. If no menu exists for a language, the menu with no language set is used. Main, Footer and Sub-footer come with the setup command, which gives each site that has a home page its starting menus. You can add menus under your own names.
+
+Every item can be shown to everyone, to guests, to signed-in visitors or to a role. Anyone who has the address can still open the page, because this hides only the link. The Foundation theme shows all three built-in menus, and a custom menu shows only where a theme or a layout widget asks for it by name.
+
+Menus can be published at once or on a date you choose. Copying a site copies its menus and points the copies at the copied pages. When you edit a menu, a preview lists the pages and sites that can show it before you save.
 
 - **Price and availability:** Check current availability and price on the [Capell Marketplace listing](https://capell.app/extensions/navigation).
 - **Licence:** Check the licence terms on the [Capell Marketplace listing](https://capell.app/extensions/navigation).
 - **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0.66`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0.72`.
 - **Install:** `composer require capell-app/navigation`.
-
-Editors build and order menus in admin, and public themes receive hydrated navigation with safe URLs, active states, and nested children.
-
-## Who It Is For
-
-**For developers:** The navigable and handle registries let packages contribute linkable records and named menus without reaching into Navigation internals.
-
-**For teams:** Editors can keep site menus current, reorder links, and reuse the same menu structure across theme output without code changes.
 
 ## Quick Start
 
@@ -26,16 +22,18 @@ Editors build and order menus in admin, and public themes receive hydrated navig
 3. See it working: run `php artisan capell:navigation-demo`.
 4. Open the package admin surface at `/admin/navigation/navigations` and confirm Navigation is available.
 
+## For Developers
+
+The handle registry lets packages and themes contribute named menus without reaching into Navigation internals.
+
 ## Configure
 
-- **Configuration files:** `config/capell-navigation.php`.
 - **Commands:** `php artisan capell:navigation-demo`, `php artisan capell:navigation-setup`, `php artisan capell:navigation:screenshot-fixture`.
 
 ## Limits And Pitfalls
 
 - Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0.66`, `capell-app/core ^1.0.75`, `capell-app/frontend ^1.0.72`.
 - Run migrations before opening package resources or public routes.
-- Review middleware, throttling, signatures, and public-output safety in `routes/web.php` before exposing routes.
 - Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
 - Custom write integrations must preserve invalidation for `navigation` cache tags.
 
@@ -61,9 +59,9 @@ Editors build and order menus in admin, and public themes receive hydrated navig
 - Admin navigation: declares `admin-resource: NavigationAdminResourceContribution`; each Filament page or resource controls its own navigation visibility.
 - Admin/editor extensions: `configurator: NavigationConfiguratorContribution`, `configurator: NavigationContentGraphContribution`, `configurator: NavigationFrontendRuntimeContribution`, `schema-extender: NavigationSchemaExtendersContribution`.
 - Permissions: `ViewAny:Navigation`, `View:Navigation`, `Create:Navigation`, `Update:Navigation`, `Delete:Navigation`, `DeleteAny:Navigation`, `Restore:Navigation`, `RestoreAny:Navigation`, `ForceDelete:Navigation`, `ForceDeleteAny:Navigation`, `Reorder:Navigation`; access also governed by package policies: `NavigationPolicy`.
-- Public routes: loads `routes/web.php`; registers `NavigationFrontendRouteContribution`.
+- Public routes: none declared.
 - Database changes: package migrations are declared.
-- Config: `config/capell-navigation.php`.
+- Config: no package config files.
 - Settings: no package settings declared.
 - Queues or schedules: none declared.
 - Cache tags: `navigation`.
@@ -75,7 +73,6 @@ Editors build and order menus in admin, and public themes receive hydrated navig
 | --- | --- | --- | --- |
 | Package surface is missing after install | Provider or manifest is not loaded | Confirm `capell.json`, package `composer.json`, and provider registration | Reinstall the package, refresh Composer autoload, and clear host caches |
 | Admin screen or command fails on missing table | Package migrations have not run | Check the tables listed in `Data Model` | Run host migrations and rerun the focused package test |
-| Route returns unexpected output | Route cache, middleware, or signed URL setup does not match the package route file | Check the route files listed in `Technical Shape` | Clear route cache and verify middleware before exposing public routes |
 | Public output leaks unexpected state | Render data, cache variation, or authoring boundary has regressed | Check public Blade, cache tags, and public-output safety tests | Move data loading out of Blade and rerun the package public-output tests |
 
 ## Upgrading
@@ -90,7 +87,6 @@ Read [CHANGELOG.md](CHANGELOG.md) before upgrading.
 - [Overview](docs/overview.md)
 - [Worked extension examples](docs/extension-contracts.md)
 - [Admin guide](docs/admin-guide.md)
-- Configuration files: [`config/capell-navigation.php`](config/capell-navigation.php).
 - [Troubleshooting](#troubleshooting)
 - [Developer reference](docs/reference.md)
 - [Marketplace assets](docs/assets/marketplace/)

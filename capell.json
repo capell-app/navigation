@@ -6,7 +6,7 @@
     "kind": "package",
     "capellApiVersion": "^1.0",
     "version": "1.0.0",
-    "description": "Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.",
+    "description": "Build site menus by dragging, per site and language, with visitor-group links, scheduled publishing and a change preview.",
     "product": {
         "group": "Capell Essentials",
         "tier": "free",
@@ -72,13 +72,9 @@
             "migrationFiles": [
                 "2026_05_10_190860_01_create_navigations_table",
                 "2026_06_04_000001_create_navigation_page_references_table",
-                "2026_08_28_000003_change_navigation_visibility_to_datetime"
+                "2026_08_28_000003_change_navigation_visibility_to_datetime",
+                "2026_11_14_000001_scope_navigation_key_uniqueness_to_active_menus"
             ]
-        },
-        {
-            "type": "route",
-            "class": "Capell\\Navigation\\Manifest\\NavigationFrontendRouteContribution",
-            "routeNames": ["capell-navigation.children"]
         },
         {
             "type": "frontend-component",
@@ -161,17 +157,13 @@
     "security": {
         "riskTier": "standard",
         "publicSurface": {
-            "routeNames": [
-                "GET /_capell/navigation/children (capell-navigation.children)"
-            ],
-            "auth": "public",
+            "routeNames": [],
+            "auth": "none",
             "csrfExemptRoutes": [],
             "signedRoutes": [],
             "tokenizedRoutes": [],
             "webhookRoutes": [],
-            "throttledRoutes": [
-                "GET /_capell/navigation/children (capell-navigation.children)"
-            ]
+            "throttledRoutes": []
         },
         "sensitiveData": {
             "encryptedFields": [],
@@ -248,39 +240,71 @@
         "privateDocsRequested": false
     },
     "marketplace": {
-        "summary": "Build and manage multilingual, per-site menus visually: link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.",
-        "problem": "Editors managing menus by hand can lose track of link order across sites and languages.",
-        "outcome": "A site has managed menus available to its public theme.",
+        "summary": "Drag-and-drop header, footer and sub-footer menus per site and language, with audience rules, publish dates and site-copy support.",
+        "description": "Build header, footer and sub-footer menus without code. Nest items, link to pages or addresses, add headings, choose dropdown or wide layouts and set when each menu goes live. Show links to guests, signed-in visitors or roles, check what a change affects first, and carry menus across when a site is copied.",
+        "problem": "Editors lose track of menu links and their order across sites and languages.",
+        "outcome": "Each site and language gets its own menu, ready to publish on a date.",
         "faq": [
             {
-                "question": "Can menus vary by site and language?",
-                "answer": "Yes. Menus are scoped by site and language."
+                "question": "Can the Welsh menu differ from the English one?",
+                "answer": "Yes. A menu can be set to a language. If no menu exists for a language, the menu with no language set is used."
             },
             {
-                "question": "Which links can editors add?",
-                "answer": "Menus support page links, external links and nested items."
+                "question": "If I hide a menu link from guests, is the page protected?",
+                "answer": "No. Anyone who has the address can still open the page, because hiding only removes the link from the menu. Protect the page itself separately."
             },
             {
-                "question": "How are menus presented publicly?",
-                "answer": "Themes receive navigation with safe URLs, active states and nested children."
+                "question": "Will a menu I add appear on my site by itself?",
+                "answer": "Not always. The Foundation theme shows the three built-in menus, and a menu you create shows only where a theme or layout widget asks for it by name."
+            },
+            {
+                "question": "Can I publish a menu on a later date?",
+                "answer": "Yes. A menu can be published at once or on a date you choose."
             }
         ],
         "screenshots": [
             {
                 "path": "docs/assets/marketplace/extension-card.jpg",
-                "alt": "Navigation marketplace card showing editor-managed site menus",
-                "caption": "Navigation gives Capell editors a visual menu builder for site and language scoped menus"
+                "alt": "Marketplace card titled Navigation with an empty Create Navigation form, light and dark, beside Link, Nest and Render.",
+                "caption": "The Marketplace card for Navigation, the menu builder for each site and language."
             },
             {
                 "path": "docs/screenshots/frontend-menu-output.png",
-                "alt": "Published navigation menu rendered on the public frontend",
-                "caption": "Route-backed public navigation output",
+                "alt": "Public home page of an example consultancy with a header menu of Work, Field notes, Approach and Contact, and a footer menu.",
+                "caption": "Header and footer menus as visitors see them on the public site.",
                 "required": true
             }
         ],
         "categories": ["admin", "console", "foundation", "frontend"]
     },
     "contributionTraceability": {
-        "deferredContributions": []
+        "deferredContributions": [],
+        "contributions": [
+            {
+                "type": "admin-resource",
+                "key": "resource:Navigation:default",
+                "providerBucket": "runtime"
+            },
+            {
+                "type": "model",
+                "key": "model:Capell\\Navigation\\Models\\Navigation",
+                "providerBucket": "runtime"
+            },
+            {
+                "type": "configurator",
+                "key": "configurator:Navigations:Default",
+                "providerBucket": "runtime"
+            },
+            {
+                "type": "render-hook",
+                "key": "foundation-header-navigation-default",
+                "providerBucket": "runtime"
+            },
+            {
+                "type": "render-hook",
+                "key": "foundation-header-navigation-foundation",
+                "providerBucket": "runtime"
+            }
+        ]
     }
 }

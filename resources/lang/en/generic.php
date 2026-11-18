@@ -22,8 +22,6 @@ return [
     'active_mode_starts_with' => 'Section starts with URL',
     'advanced' => 'Advanced',
     'advanced_info' => 'Page type, scheduling, and component overrides. Defaults are correct for most menus.',
-    'children_loading_eager' => 'Load with the menu',
-    'children_loading_lazy' => 'Load when opened',
     'component_overrides' => 'Component overrides',
     'component_overrides_info' => 'Render this menu through a specific theme component instead of the theme default.',
     'dropdown_layout' => 'Dropdown layout',

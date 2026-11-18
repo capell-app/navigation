@@ -88,6 +88,15 @@ it('renders the active item and its icon under the active link', function (): vo
         ->and($xpath->count('//a[@href="/home"]//*[local-name()="svg"]'))->toBe(1);
 });
 
+it('renders an item whose stored icon names a non-icon component without the icon', function (): void {
+    $item = new NavigationItemData(label: 'Home', data: ['url' => '/home', 'icon' => 'dynamic-component'], active: false);
+    $html = view('capell-navigation::components.header.menu.item', ['item' => $item, 'itemClass' => ''])->render();
+    $xpath = new RenderedHtml($html);
+
+    expect($xpath->count('//a[@href="/home"]'))->toBe(1)
+        ->and($xpath->count('//a[@href="/home"]//*[local-name()="svg"]'))->toBe(0);
+});
+
 it('only releases mobile menu inert attributes owned by navigation', function (HeaderNavigationBreakpoint $breakpoint): void {
     $nodeVersion = new Process(['node', '--version']);
     $nodeVersion->run();
@@ -322,4 +331,18 @@ it('renders menu children as a plain nested list when no theme provides the drop
 
     expect($xpath->count('//li[a[@href="/products"]]/ul//a[@href="/products/widgets"]'))->toBe(1)
         ->and($html)->not->toContain('_toggle');
+});
+
+it('keeps apostrophes in the header toggle labels from breaking the Alpine expressions', function (): void {
+    app('translator')->addLines([
+        'generic.open_menu' => "Ouvrir l'menu",
+        'generic.close_menu' => "Fermer l'menu",
+    ], app()->getLocale(), 'capell-frontend');
+
+    $html = navigationRenderedMenu();
+
+    expect($html)
+        ->toContain('Ouvrir l\\u0027menu')
+        ->not->toContain("'Fermer l&#039;menu'")
+        ->not->toContain("'Ouvrir l&#039;menu'");
 });

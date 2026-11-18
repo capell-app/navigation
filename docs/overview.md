@@ -2,6 +2,14 @@
 
 <!-- prettier-ignore-start -->
 
+Editors can arrange a site's header and footer menus by dragging items into place and nesting them under a parent. Each item has a type, such as a page, a link or a heading. A parent can open as a dropdown or as a wide menu with several columns.
+
+Every menu belongs to a site and can be set to a language, so the Welsh header can differ from the English one. If no menu exists for a language, the menu with no language set is used. Main, Footer and Sub-footer come with the setup command, which gives each site that has a home page its starting menus. You can add menus under your own names.
+
+Every item can be shown to everyone, to guests, to signed-in visitors or to a role. Anyone who has the address can still open the page, because this hides only the link. The Foundation theme shows all three built-in menus, and a custom menu shows only where a theme or a layout widget asks for it by name.
+
+Menus can be published at once or on a date you choose. Copying a site copies its menus and points the copies at the copied pages. When you edit a menu, a preview lists the pages and sites that can show it before you save.
+
 ## What it does for you
 
 Navigation is how you build the menus visitors use to move around a site. Create a menu for a particular site and language, choose the menu key that the theme renders, then add and arrange its items in the menu editor.
@@ -12,7 +20,7 @@ Install the package and run its migrations before creating menus. An integrator 
 
 ## Create a menu
 
-Go to **Websites → Navigation** or open the **Navigations** relation on a site. Give the menu a name, choose its **Key**, site, and language, then save it. The built-in keys are **Main**, **Footer**, and **Sub-footer**; selecting a key is how the theme identifies which menu to render. There is no separate Header or Footer assignment control.
+Go to **Websites → Menus** or open the **Menus** list on a site. Give the menu a name, choose its **Key**, site, and language, then save it. The built-in keys are **Main**, **Footer**, and **Sub-footer**; selecting a key is how the theme identifies which menu to render. There is no separate Header or Footer assignment control.
 
 A key can be used only once for the same site and language. Use a language-specific menu when its labels or structure differ; a menu without a language acts as a fallback. At render time, Capell prefers an eligible menu for the current site over a global menu. A language-specific match is used when available.
 
@@ -46,7 +54,7 @@ Saving, deleting, or restoring a menu invalidates its frontend caches. Page URL 
 
 When cloning a site, enable **Copy navigations** if its menus should be copied. Page items are remapped when the corresponding pages are copied; review the cloned menus when pages were not copied or were replaced through a different workflow.
 
-A normal delete is recoverable through the trashed filter and **Restore** action. **Force delete** is permanent. Site-scoped admins can view global menus but only global admins can update, delete, restore, or force-delete them; the corresponding Navigation permissions are still required for each action.
+A normal delete is recoverable through the trashed filter and **Restore** action, and frees the menu's key so a replacement can be created; a menu cannot be restored while another live menu uses its key for the same site and language. **Force delete** is permanent. A theme header, footer or layout that shows a deleted menu renders without it. Permanently deleting a page removes its items from every menu; a page in the bin keeps its items, which are hidden until the page is restored. Site-scoped admins can view global menus but only global admins can update, delete, restore, or force-delete them; the corresponding Navigation permissions are still required for each action.
 
 ## Good to know
 

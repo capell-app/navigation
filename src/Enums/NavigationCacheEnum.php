@@ -11,7 +11,7 @@ enum NavigationCacheEnum: string
 {
     case NavigationNames = 'navigation-names';
     case RenderModels = 'navigation-render-models';
-    case LazyFragments = 'navigation-lazy-fragments';
+    case RenderModelsVersion = 'navigation-render-models-version';
 
     /**
      * Cache key for navigation name set filtered by site and languages.

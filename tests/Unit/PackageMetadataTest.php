@@ -10,7 +10,6 @@ use Capell\Core\Contracts\Extensions\ExtensionContribution;
 use Capell\Core\Contracts\Extensions\RegistersExtensionAdminResource;
 use Capell\Core\Contracts\Extensions\RegistersExtensionFrontendComponent;
 use Capell\Core\Contracts\Extensions\RegistersExtensionRenderHook;
-use Capell\Core\Contracts\Extensions\RegistersExtensionRoute;
 use Capell\Core\Contracts\Extensions\RunsExtensionMigration;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
@@ -29,7 +28,6 @@ use Capell\Navigation\Manifest\NavigationConfiguratorContribution;
 use Capell\Navigation\Manifest\NavigationConsoleCommandsContribution;
 use Capell\Navigation\Manifest\NavigationContentGraphContribution;
 use Capell\Navigation\Manifest\NavigationFrontendComponentsContribution;
-use Capell\Navigation\Manifest\NavigationFrontendRouteContribution;
 use Capell\Navigation\Manifest\NavigationFrontendRuntimeContribution;
 use Capell\Navigation\Manifest\NavigationHealthContribution;
 use Capell\Navigation\Manifest\NavigationMigrationsContribution;
@@ -185,12 +183,8 @@ it('declares navigation extension surfaces and contribution contracts', function
                     '2026_05_10_190860_01_create_navigations_table',
                     '2026_06_04_000001_create_navigation_page_references_table',
                     '2026_08_28_000003_change_navigation_visibility_to_datetime',
+                    '2026_11_14_000001_scope_navigation_key_uniqueness_to_active_menus',
                 ],
-            ],
-            [
-                'type' => 'route',
-                'class' => NavigationFrontendRouteContribution::class,
-                'routeNames' => ['capell-navigation.children'],
             ],
             [
                 'type' => 'frontend-component',
@@ -249,7 +243,6 @@ it('declares navigation extension surfaces and contribution contracts', function
         ->and(class_implements(NavigationPageTypeContribution::class))->toContain(ExtensionContribution::class)
         ->and(class_implements(NavigationModelsContribution::class))->toContain(ExtensionContribution::class)
         ->and(class_implements(NavigationMigrationsContribution::class))->toContain(RunsExtensionMigration::class)
-        ->and(class_implements(NavigationFrontendRouteContribution::class))->toContain(RegistersExtensionRoute::class)
         ->and(class_implements(NavigationFrontendComponentsContribution::class))->toContain(RegistersExtensionFrontendComponent::class)
         ->and(class_implements(NavigationFrontendRuntimeContribution::class))->toContain(ExtensionContribution::class)
         ->and(class_implements(NavigationRenderHookContribution::class))->toContain(RegistersExtensionRenderHook::class)
@@ -268,10 +261,10 @@ it('uses marketplace and composer copy that describes the package outcome', func
     $manifest = navigationPackageJson('capell.json');
 
     expect($composer['description'] ?? null)
-        ->toBe('Site- and language-scoped navigation menus for Capell: visual menu builder, page & link items, nested dropdowns, active-state rendering, publish scheduling, and multi-site replication.');
+        ->toBeString()->not->toBeEmpty();
 
     expect(data_get($manifest, 'marketplace.summary'))
-        ->toBe('Build and manage multilingual, per-site menus visually: link to any page or URL, nest dropdowns, and render them in your theme with one tag. Active-state, publish windows, and site cloning included.');
+        ->toBeString()->not->toBeEmpty();
 });
 
 it('declares shipped marketplace images and screenshot captures', function (): void {

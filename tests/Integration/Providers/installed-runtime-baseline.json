@@ -4,12 +4,12 @@
     "scenarios": {
         "default": {
             "source": {
-                "ref": "c92ce184be4d91c372f35ca125ea25f6c1308599",
-                "commit": "c92ce184be4d91c372f35ca125ea25f6c1308599",
+                "ref": "HEAD",
+                "commit": "9e834e1e94064ef912e11c9f2f62950a73043ae4",
                 "providers": {
                     "Providers/ConsoleServiceProvider.php": "1b5022e54266e2eee01169d1edc398a97821befc2054e14fd7ddc9e4f322502b",
                     "Providers/MigrationMetadataServiceProvider.php": "1407d5eed6a1bb67066f131873bd0904d704ad0ba7879385375eb456ba2de0cf",
-                    "Providers/NavigationServiceProvider.php": "497f15e550b1b15b425d5e95263195a246c8e331eb819470d9f2c81eafdc0c47"
+                    "Providers/NavigationServiceProvider.php": "f79b22b6a8ee1c6ab143f0130852741ec6c89f9b8f674269f5541a6629b013ed"
                 },
                 "configure": null
             },
@@ -123,16 +123,6 @@
                     "capell:navigation-setup": "Capell\\Navigation\\Console\\Commands\\SetupCommand",
                     "capell:navigation:screenshot-fixture": "Capell\\Navigation\\Console\\Commands\\SeedNavigationScreenshotFixtureCommand"
                 },
-                "config-defaults": {
-                    "capell-navigation.php": {
-                        "children.rate_limit_per_minute": 300
-                    }
-                },
-                "config-keys": [
-                    "capell-navigation",
-                    "capell-navigation.children",
-                    "capell-navigation.children.rate_limit_per_minute"
-                ],
                 "config-values": {
                     "app.providers": [
                         "Capell\\Navigation\\Providers\\NavigationServiceProvider",
@@ -186,6 +176,11 @@
                         [
                             "<package>/src/Providers/NavigationServiceProvider.php",
                             "Capell\\Navigation\\Providers\\NavigationServiceProvider::handlePageEligibilityChanged(Capell\\Core\\Events\\PageSaved|Capell\\Core\\Events\\PageDeleted $event):void bound=Capell\\Navigation\\Providers\\NavigationServiceProvider source=a39ad93827113cc5e1aeb18d49dce66c",
+                            []
+                        ],
+                        [
+                            "<package>/src/Providers/NavigationServiceProvider.php",
+                            "Capell\\Navigation\\Providers\\NavigationServiceProvider::handlePageDeleted(Capell\\Core\\Events\\PageDeleted $event):void bound=Capell\\Navigation\\Providers\\NavigationServiceProvider source=ac6e5e6329612504cdd5bdea7792e2f1",
                             []
                         ]
                     ],
@@ -291,6 +286,21 @@
                             "entry": [
                                 "<package>/src/Providers/NavigationServiceProvider.php",
                                 "Capell\\Navigation\\Providers\\NavigationServiceProvider::handlePageEligibilityChanged(Capell\\Core\\Events\\PageSaved|Capell\\Core\\Events\\PageDeleted $event):void bound=Capell\\Navigation\\Providers\\NavigationServiceProvider source=a39ad93827113cc5e1aeb18d49dce66c",
+                                []
+                            ]
+                        },
+                        {
+                            "after": [
+                                "Capell\\LayoutBuilder\\Listeners\\MaintainPublicWidgetSnapshotsListener",
+                                "handleDeleted"
+                            ],
+                            "before": [
+                                "Capell\\Frontend\\Listeners\\PurgeCdnCacheOnPageChangeListener",
+                                "handleDeleted"
+                            ],
+                            "entry": [
+                                "<package>/src/Providers/NavigationServiceProvider.php",
+                                "Capell\\Navigation\\Providers\\NavigationServiceProvider::handlePageDeleted(Capell\\Core\\Events\\PageDeleted $event):void bound=Capell\\Navigation\\Providers\\NavigationServiceProvider source=ac6e5e6329612504cdd5bdea7792e2f1",
                                 []
                             ]
                         }
@@ -544,6 +554,16 @@
                                         "type": "tailwind_source",
                                         "value": "resources/views/**/*.blade.php"
                                     }
+                                ],
+                                [
+                                    "Capell\\Core\\Data\\VendorAssetData",
+                                    {
+                                        "condition": null,
+                                        "packageName": "capell-app/navigation",
+                                        "secondaryValue": null,
+                                        "type": "tailwind_source",
+                                        "value": "src/Enums/HeaderNavigationBreakpoint.php"
+                                    }
                                 ]
                             ]
                         }
@@ -612,21 +632,6 @@
                         }
                     }
                 },
-                "routes": [
-                    [
-                        "capell-navigation.children",
-                        "_capell/navigation/children",
-                        ["GET", "HEAD"],
-                        ["web", "throttle:capell-navigation-children"],
-                        "Capell\\Navigation\\Http\\Controllers\\NavigationChildFragmentController",
-                        {
-                            "as": "capell-navigation.children",
-                            "domain": null,
-                            "prefix": "_capell/navigation",
-                            "where": []
-                        }
-                    ]
-                ],
                 "tagged-consumers": {
                     "capell.content-graph.extractor": [
                         "Capell\\Navigation\\Support\\ContentGraph\\NavigationContentGraphExtractor"
@@ -671,12 +676,20 @@
                             "type": "tailwind_source",
                             "value": "resources/views/**/*.blade.php"
                         }
+                    ],
+                    [
+                        "Capell\\Core\\Data\\VendorAssetData",
+                        {
+                            "condition": null,
+                            "packageName": "capell-app/navigation",
+                            "secondaryValue": null,
+                            "type": "tailwind_source",
+                            "value": "src/Enums/HeaderNavigationBreakpoint.php"
+                        }
                     ]
                 ],
                 "views": {
-                    "capell-navigation": [
-                        "<package>/src/Providers/../../resources/views"
-                    ]
+                    "capell-navigation": ["<package>/resources/views"]
                 }
             },
             "uninstalledSurfaces": {
@@ -697,11 +710,6 @@
                     "capell:navigation-demo": "Capell\\Navigation\\Console\\Commands\\DemoCommand",
                     "capell:navigation-setup": "Capell\\Navigation\\Console\\Commands\\SetupCommand",
                     "capell:navigation:screenshot-fixture": "Capell\\Navigation\\Console\\Commands\\SeedNavigationScreenshotFixtureCommand"
-                },
-                "config-defaults": {
-                    "capell-navigation.php": {
-                        "children.rate_limit_per_minute": 300
-                    }
                 },
                 "config-values": {
                     "app.providers": [

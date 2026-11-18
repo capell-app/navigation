@@ -48,7 +48,8 @@ app()->bind(\Capell\Navigation\Contracts\NavigationPageSyncer::class, ExampleNav
 `ResolveNavigationCacheExpiryAction::run($handles, $ttlSeconds = 300)` returns the
 earlier of the maximum lifetime and the next navigation/item visibility boundary.
 It includes unpublished scheduled candidates, recursively checks both starts and
-ends, and ignores malformed dates. Render-model and child-fragment caches use the
-same calculation; existing after-commit invalidation and cache stores remain intact.
+ends, and ignores malformed dates. The shared guest render-model cache uses the same
+calculation. Its keys carry a version that every menu, page or page URL change moves on,
+so invalidation works on stores without tags (file, database) as well as tagged stores.
 Applications caching prepared navigation can use this action with their handle
 selection and `ScalarizeNavigationDataAction` for enum-free scalar cache payloads.

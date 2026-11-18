@@ -7,6 +7,7 @@ namespace Capell\Navigation\Support\Loader;
 use Capell\Core\Contracts\Pageable;
 use Capell\Core\Enums\PageOrderEnum;
 use Capell\Core\Models\Language;
+use Capell\Core\Models\Page;
 use Capell\Core\Models\PageUrl;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
@@ -162,9 +163,10 @@ class NavigationItemsLoader
         $pageableIdsByType = $this->extractMenuItemsPagesByType(new Collection($items->all()));
 
         $pagesByMorphKey = $this->getPagesByMorphKey($pageableIdsByType);
+        $autoChildrenByMorphKey = $this->autoChildrenByMorphKey(new Collection($items->all()));
 
         // Cast to Illuminate\Support\Collection explicitly
-        $result = $this->menuItemPageSetup($this->navigation, new Collection($items->all()), $pagesByMorphKey);
+        $result = $this->menuItemPageSetup($this->navigation, new Collection($items->all()), $pagesByMorphKey, $autoChildrenByMorphKey);
 
         /** @var DataCollection<int, NavigationItemData> $navigationItems */
         $navigationItems = NavigationItemData::collect(array_values($result->all()), DataCollection::class);
@@ -175,13 +177,14 @@ class NavigationItemsLoader
     /**
      * @param  Collection<int, NavigationItemData>  $items
      * @param  array<string, Model&Pageable<Model>>  $pagesByMorphKey
+     * @param  array<string, Collection<int, Model&Pageable<Model>>>  $autoChildrenByMorphKey
      * @return DataCollection<int|string, NavigationItemData>
      */
-    protected function menuItemPageSetup(Navigation $navigation, Collection $items, array $pagesByMorphKey): DataCollection
+    protected function menuItemPageSetup(Navigation $navigation, Collection $items, array $pagesByMorphKey, array $autoChildrenByMorphKey = []): DataCollection
     {
         $result = [];
 
-        $items->each(function (NavigationItemData $item) use (&$result, $navigation, $pagesByMorphKey): void {
+        $items->each(function (NavigationItemData $item) use (&$result, $navigation, $pagesByMorphKey, $autoChildrenByMorphKey): void {
             $menuItem = [
                 'label' => $item->label,
                 'type' => $item->type,
@@ -195,36 +198,19 @@ class NavigationItemsLoader
 
             // Cast to Illuminate\Support\Collection explicitly
             if ($children->isNotEmpty()) {
-                $menuItem['children'] = $this->menuItemPageSetup($navigation, new Collection($children->all()), $pagesByMorphKey);
-            } elseif (isset($item->data['auto_children']) && $item->data['auto_children'] === true) {
+                $menuItem['children'] = $this->menuItemPageSetup($navigation, new Collection($children->all()), $pagesByMorphKey, $autoChildrenByMorphKey);
+            } elseif ($this->wantsAutoChildren($item)) {
                 $pageableReference = $this->extractPageableReference([
                     'data' => $item->data,
                     'type' => $item->type,
                 ]);
 
-                if ($pageableReference === null || $pageableReference['pageable_type'] !== $this->page->getMorphClass()) {
-                    $result[] = new NavigationItemData(...$menuItem);
+                $autoChildren = $pageableReference === null
+                    ? null
+                    : ($autoChildrenByMorphKey[$this->buildMorphLookupKey($pageableReference['pageable_type'], $pageableReference['pageable_id'])] ?? null);
 
-                    return;
-                }
-
-                $children = PageLoader::list(new PageListingRequestData(
-                    language: $this->language,
-                    site: $this->site,
-                    ordering: PageOrderEnum::Default,
-                    optionalLanguage: true,
-                    withChildren: true,
-                    cacheKeySuffix: 'parent-' . $pageableReference['pageable_id'],
-                    modifyQuery: function (BuilderContract $query) use ($pageableReference): void {
-                        $query->where(
-                            'parent_id',
-                            $pageableReference['pageable_id'],
-                        );
-                    },
-                ));
-
-                if ($children->isNotEmpty()) {
-                    $menuItem['children'] = NavigationItemData::fromPages($children);
+                if ($autoChildren instanceof Collection && $autoChildren->isNotEmpty()) {
+                    $menuItem['children'] = NavigationItemData::fromPages($autoChildren);
                 }
             }
 
@@ -425,8 +411,58 @@ class NavigationItemsLoader
     }
 
     /**
+     * Loads the children of every auto-children item in one listing per page model, whatever page type the
+     * visitor is currently on, instead of one listing per menu item.
+     *
+     * @param  Collection<int, NavigationItemData>  $items
+     * @return array<string, Collection<int, Model&Pageable<Model>>>
+     */
+    protected function autoChildrenByMorphKey(Collection $items): array
+    {
+        $parentIdsByType = $this->autoChildrenParentIdsByType($items);
+        $childrenByMorphKey = [];
+
+        foreach ($parentIdsByType as $pageableType => $parentIds) {
+            $modelClass = Relation::getMorphedModel($pageableType) ?? $pageableType;
+
+            if (! is_string($modelClass) || ! is_a($modelClass, Page::class, true)) {
+                continue;
+            }
+
+            sort($parentIds);
+
+            $children = PageLoader::list(new PageListingRequestData(
+                language: $this->language,
+                site: $this->site,
+                ordering: PageOrderEnum::Default,
+                optionalLanguage: true,
+                withChildren: true,
+                cacheKeySuffix: 'parents-' . implode(',', $parentIds),
+                morphModel: $pageableType,
+                modifyQuery: function (BuilderContract $query) use ($parentIds): void {
+                    $query->whereIn('parent_id', $parentIds);
+                },
+            ));
+
+            foreach ($children as $child) {
+                $parentId = $child->getAttribute('parent_id');
+
+                if (! is_numeric($parentId)) {
+                    continue;
+                }
+
+                $lookupKey = $this->buildMorphLookupKey($pageableType, (int) $parentId);
+                $childrenByMorphKey[$lookupKey] ??= collect();
+                $childrenByMorphKey[$lookupKey]->push($child);
+            }
+        }
+
+        return $childrenByMorphKey;
+    }
+
+    /**
      * @param  array<string, mixed>  $item
-     * @return array{pageable_id:int, pageable_type:string}|null
+     * @return array{pageable_id:int, pageable_type:non-empty-string}|null
      */
     protected function extractPageableReference(array $item): ?array
     {
@@ -446,6 +482,54 @@ class NavigationItemsLoader
     protected function buildMorphLookupKey(string $pageableType, int $pageableId): string
     {
         return $pageableType . ':' . $pageableId;
+    }
+
+    /**
+     * @param  Collection<int, NavigationItemData>  $items
+     * @return array<non-empty-string, list<int>>
+     */
+    private function autoChildrenParentIdsByType(Collection $items): array
+    {
+        $parentIdsByType = [];
+
+        foreach ($items as $item) {
+            /** @var Collection<int, NavigationItemData> $children */
+            $children = new Collection($item->children?->all() ?? []);
+
+            if ($children->isNotEmpty()) {
+                foreach ($this->autoChildrenParentIdsByType($children) as $pageableType => $parentIds) {
+                    $parentIdsByType[$pageableType] = array_values(array_unique([...($parentIdsByType[$pageableType] ?? []), ...$parentIds]));
+                }
+
+                continue;
+            }
+
+            if (! $this->wantsAutoChildren($item)) {
+                continue;
+            }
+
+            $pageableReference = $this->extractPageableReference([
+                'data' => $item->data,
+                'type' => $item->type,
+            ]);
+
+            if ($pageableReference === null) {
+                continue;
+            }
+
+            $parentIdsByType[$pageableReference['pageable_type']] ??= [];
+
+            if (! in_array($pageableReference['pageable_id'], $parentIdsByType[$pageableReference['pageable_type']], true)) {
+                $parentIdsByType[$pageableReference['pageable_type']][] = $pageableReference['pageable_id'];
+            }
+        }
+
+        return $parentIdsByType;
+    }
+
+    private function wantsAutoChildren(NavigationItemData $item): bool
+    {
+        return ($item->data['auto_children'] ?? false) === true;
     }
 
     /**

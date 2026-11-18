@@ -43,7 +43,7 @@
                     >
                         {{ $navigation->name }}
                         @if ($navigation->language && $navigation->language->flag)
-                            {!! $flagIconRenderer->render('flag-4x3-' . $navigation->language->flag, attributes: ['class' => 'ml-2 h-4 w-5']) !!}
+                            {!! $flagIconRenderer->render('flag-4x3-' . $navigation->language->flag, attributes: ['class' => 'ms-2 h-4 w-5']) !!}
                         @endif
                     </x-filament::link>
                 </li>

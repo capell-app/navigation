@@ -24,11 +24,17 @@ class NavigationFactory extends Factory
 
     protected $model = Navigation::class;
 
+    /**
+     * A navigation key is unique per site and language, and random slugs repeat eventually, so every
+     * default key starts with a process-wide sequence token.
+     */
+    private static int $keySequence = 0;
+
     public function definition(): array
     {
         return [
             'name' => $this->faker->name(),
-            'key' => $this->faker->slug(),
+            'key' => 'nav-' . ++self::$keySequence . '-' . $this->faker->slug(2),
             'items' => [],
             'blueprint_id' => Blueprint::factory()->navigation(),
             'language_id' => $this->faker->boolean() ? Language::factory() : null,

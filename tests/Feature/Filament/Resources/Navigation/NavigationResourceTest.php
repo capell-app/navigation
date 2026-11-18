@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Capell\Admin\Enums\NavigationGroupEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Navigation\Enums\NavigationHandle;
@@ -71,7 +72,7 @@ test('admin can see navigations', function (): void {
 });
 
 test('navigation appears in web pages navigation after sections', function (): void {
-    expect(NavigationResource::getNavigationGroup())->toBe((string) __('capell-admin::navigation.group_websites'))
+    expect(NavigationResource::getNavigationGroup())->toBe(NavigationGroupEnum::Website)
         ->and(NavigationResource::getNavigationSort())->toBe(6);
 });
 
