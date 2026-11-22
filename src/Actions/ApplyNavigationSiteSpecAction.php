@@ -14,6 +14,7 @@ use Capell\Navigation\Enums\NavigationItemType;
 use Capell\Navigation\Support\Creator\NavigationCreator;
 use Lorisleiva\Actions\Concerns\AsFake;
 use Lorisleiva\Actions\Concerns\AsObject;
+use Override;
 use RuntimeException;
 
 /**
@@ -28,12 +29,14 @@ final class ApplyNavigationSiteSpecAction implements SiteSpecApplier
         private readonly NavigationCreator $navigationCreator,
     ) {}
 
+    #[Override]
     public function key(): string
     {
         return 'navigation';
     }
 
     /** @param array<string, Page> $pagesBySlug */
+    #[Override]
     public function apply(CapellSiteSpecData $spec, Site $site, array $pagesBySlug): void
     {
         $this->handle($spec, $site, $pagesBySlug);
@@ -78,6 +81,8 @@ final class ApplyNavigationSiteSpecAction implements SiteSpecApplier
                 $navigationSpec->key,
                 $pageSlug,
             ));
+
+            $page->setRelation('site', $site);
 
             return [
                 'label' => NavigationCreator::getPageNavigationLabel($page, $language),

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Data\Rendering\FrontendRuntimeManifestData;
+use Capell\Core\Enums\Rendering\RenderingStrategyEnum;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Page;
 use Capell\Core\Models\Site;
 use Capell\Frontend\Data\FrontendContext;
-use Capell\Frontend\Data\FrontendRuntimeManifestData;
-use Capell\Frontend\Enums\RenderingStrategyEnum;
 use Capell\Navigation\Enums\NavigationHandle;
 use Capell\Navigation\Models\Navigation;
 use Capell\Navigation\Support\NavigationFrontendRuntimeManifestContributor;

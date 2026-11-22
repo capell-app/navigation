@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Capell\Navigation\Support\RenderHooks;
 
-use Capell\Frontend\Contracts\RenderHookExtensionInterface;
-use Capell\Frontend\Data\RenderHookContext;
+use Capell\Core\Contracts\Rendering\RenderHookExtensionInterface;
+use Capell\Core\Data\Rendering\RenderHookContext;
 use Capell\Navigation\Enums\HeaderNavigationBreakpoint;
 use Override;
 

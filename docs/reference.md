@@ -80,6 +80,7 @@ Navigation is an **Available** Capell package in the **Capell Essentials** produ
 - `BuildPageNavigationReferencesAction`
 - `CheckSavedNavigationItemsAction`
 - `EnsureNavigationItemKeysAction`
+- `ExportNavigationSiteSpecAction`
 - `RemovePageFromNavigationAction`
 - `ReplicateSiteNavigationsAction`
 - `ResolveNavigationCacheExpiryAction`

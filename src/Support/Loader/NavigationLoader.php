@@ -20,6 +20,7 @@ class NavigationLoader
     public static function getNavigation(NavigationHandle|string $key, Site $site, ?Language $language = null, bool $siteOnlyFallback = true): ?Navigation
     {
         $navigationKey = $key instanceof NavigationHandle ? $key->value : $key;
+        /** @var Collection<int, Navigation> $navigations */
         $navigations = $site->relationLoaded('navigations')
             ? $site->navigations->filter(
                 function (Model $navigation): bool {
@@ -40,6 +41,7 @@ class NavigationLoader
 
         if ($siteOnlyFallback && $navigation === null) {
             if (! $site->relationLoaded('navigations')) {
+                /** @var Collection<int, Navigation> $navigations */
                 $navigations = CapellCore::rememberCache(
                     CacheEnum::siteNavigations((int) $site->getKey()),
                     function () use ($site): Collection {
@@ -51,10 +53,14 @@ class NavigationLoader
                                 $query->where('site_id', $site->getKey())
                                     ->orWhereNull('site_id');
                             })
+                            ->with('blueprint')
                             ->publishedDate()
                             ->get();
                     },
                 );
+
+                // Collections cached before blueprint eager-loading still need the relation hydrated.
+                $navigations->loadMissing('blueprint');
             }
 
             $navigation = $navigations

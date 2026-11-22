@@ -9,7 +9,9 @@ use Capell\Admin\Enums\SchemaExtenderEnum;
 use Capell\Admin\Facades\CapellAdmin;
 use Capell\Core\Actions\Install\RegisterCommandsInCurrentProcessAction;
 use Capell\Core\Contracts\SiteSpec\SiteSpecApplier;
+use Capell\Core\Contracts\SiteSpec\SiteSpecExporter;
 use Capell\Core\Data\PageTypeData;
+use Capell\Core\Data\Rendering\RenderHookContext;
 use Capell\Core\Data\VendorAssetData;
 use Capell\Core\Events\PageDeleted;
 use Capell\Core\Events\PageSaved;
@@ -22,7 +24,6 @@ use Capell\Core\Support\Packages\InstalledRuntimeLifecycle;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Core\Support\Packages\RegistersInstalledRuntime;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
-use Capell\Frontend\Data\RenderHookContext;
 use Capell\Frontend\Data\RenderHookContributionData;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
 use Capell\Frontend\Enums\RenderHookLocation;
@@ -30,6 +31,7 @@ use Capell\Frontend\Support\Render\FrontendHookRegistrar;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\ApplyNavigationSiteSpecAction;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
+use Capell\Navigation\Actions\ExportNavigationSiteSpecAction;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
 use Capell\Navigation\Console\Commands\DemoCommand;
@@ -135,6 +137,8 @@ final class NavigationServiceProvider extends ServiceProvider
         if (! $this->app->bound(self::SiteSpecApplierRegisteredFlag)) {
             $this->app->singleton(ApplyNavigationSiteSpecAction::class);
             $this->app->tag([ApplyNavigationSiteSpecAction::class], SiteSpecApplier::TAG);
+            $this->app->singleton(ExportNavigationSiteSpecAction::class);
+            $this->app->tag([ExportNavigationSiteSpecAction::class], SiteSpecExporter::TAG);
             $this->app->instance(self::SiteSpecApplierRegisteredFlag, true);
         }
 

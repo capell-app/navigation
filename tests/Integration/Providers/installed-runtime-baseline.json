@@ -4,12 +4,12 @@
     "scenarios": {
         "default": {
             "source": {
-                "ref": "HEAD",
-                "commit": "9e834e1e94064ef912e11c9f2f62950a73043ae4",
+                "ref": "6b0cad81b401039f8a82f9087042da22e9582ddb",
+                "commit": "6b0cad81b401039f8a82f9087042da22e9582ddb",
                 "providers": {
                     "Providers/ConsoleServiceProvider.php": "1b5022e54266e2eee01169d1edc398a97821befc2054e14fd7ddc9e4f322502b",
                     "Providers/MigrationMetadataServiceProvider.php": "1407d5eed6a1bb67066f131873bd0904d704ad0ba7879385375eb456ba2de0cf",
-                    "Providers/NavigationServiceProvider.php": "f79b22b6a8ee1c6ab143f0130852741ec6c89f9b8f674269f5541a6629b013ed"
+                    "Providers/NavigationServiceProvider.php": "778074584d7d9dde0d1d9fffd449fbabf32e195e84734fc9dcfe373ebc019c73"
                 },
                 "configure": null
             },
@@ -49,6 +49,17 @@
                             {
                                 "abstract": "Capell\\Navigation\\Actions\\ApplyNavigationSiteSpecAction",
                                 "concrete": "Capell\\Navigation\\Actions\\ApplyNavigationSiteSpecAction"
+                            }
+                        ],
+                        "shared": true
+                    },
+                    "Capell\\Navigation\\Actions\\ExportNavigationSiteSpecAction": {
+                        "concrete": [
+                            "<vendor>/laravel/framework/src/Illuminate/Container/Container.php",
+                            "Illuminate\\Container\\Container( $container,  $parameters): bound=Illuminate\\Foundation\\Application",
+                            {
+                                "abstract": "Capell\\Navigation\\Actions\\ExportNavigationSiteSpecAction",
+                                "concrete": "Capell\\Navigation\\Actions\\ExportNavigationSiteSpecAction"
                             }
                         ],
                         "shared": true
@@ -645,6 +656,9 @@
                     "capell.site-spec.applier": [
                         "Capell\\Navigation\\Actions\\ApplyNavigationSiteSpecAction"
                     ],
+                    "capell.site-spec.exporter": [
+                        "Capell\\Navigation\\Actions\\ExportNavigationSiteSpecAction"
+                    ],
                     "capell.site_schema.extenders": [
                         "Capell\\Navigation\\Filament\\Extenders\\NavigationSiteExtender"
                     ]
@@ -661,6 +675,9 @@
                     ],
                     "capell.site-spec.applier": [
                         "Capell\\Navigation\\Actions\\ApplyNavigationSiteSpecAction"
+                    ],
+                    "capell.site-spec.exporter": [
+                        "Capell\\Navigation\\Actions\\ExportNavigationSiteSpecAction"
                     ],
                     "capell.site_schema.extenders": [
                         "Capell\\Navigation\\Filament\\Extenders\\NavigationSiteExtender"

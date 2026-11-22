@@ -93,7 +93,7 @@ test('themed header displays the main navigation menu', function (): void {
         ->assertElementExists('#header');
 });
 
-test('page renders without error when navigation exists with main handle', function (): void {
+test('renders a page with a configured navigation menu', function (NavigationHandle $handle): void {
     $site = Site::factory()->withTranslations()->create();
 
     $home = Page::factory()->site($site)->home()->withTranslations()->create();
@@ -105,7 +105,7 @@ test('page renders without error when navigation exists with main handle', funct
         ->site($site)
         ->language($language)
         ->state([
-            'key' => NavigationHandle::Main,
+            'key' => $handle,
             'items' => [
                 [
                     'type' => NavigationItemType::Page,
@@ -125,8 +125,12 @@ test('page renders without error when navigation exists with main handle', funct
         ])
         ->create();
 
-    get($page->pageUrl->full_url)->assertOk();
-});
+    get(navigationFeaturePageUrl($page))->assertOk();
+})->with([
+    'main' => NavigationHandle::Main,
+    'footer' => NavigationHandle::Footer,
+    'sub-footer' => NavigationHandle::SubFooter,
+]);
 
 test('anonymous frontend menu output leaks no admin internals', function (): void {
     $theme = Theme::factory()
@@ -259,76 +263,6 @@ function assertNavigationPublicOutputContainsNoAdminInternals(TestResponse $resp
         ->assertDontSee('/admin/', false)
         ->assertDontSee('NavigationResource', false);
 }
-
-test('page renders without error when navigation exists with footer handle', function (): void {
-    $site = Site::factory()->withTranslations()->create();
-
-    $home = Page::factory()->site($site)->home()->withTranslations()->create();
-    $page = Page::factory()->site($site)->withTranslations()->create();
-
-    $language = $site->languages->first();
-
-    Navigation::factory()
-        ->site($site)
-        ->language($language)
-        ->state([
-            'key' => NavigationHandle::Footer,
-            'items' => [
-                [
-                    'type' => NavigationItemType::Page,
-                    'data' => [
-                        'pageable_id' => $home->id,
-                        'pageable_type' => $home->getMorphClass(),
-                    ],
-                ],
-                [
-                    'type' => NavigationItemType::Page,
-                    'data' => [
-                        'pageable_id' => $page->id,
-                        'pageable_type' => $page->getMorphClass(),
-                    ],
-                ],
-            ],
-        ])
-        ->create();
-
-    get($page->pageUrl->full_url)->assertOk();
-});
-
-test('page renders without error when navigation exists with sub-footer handle', function (): void {
-    $site = Site::factory()->withTranslations()->create();
-
-    $home = Page::factory()->site($site)->home()->withTranslations()->create();
-    $page = Page::factory()->site($site)->withTranslations()->create();
-
-    $language = $site->languages->first();
-
-    Navigation::factory()
-        ->site($site)
-        ->language($language)
-        ->state([
-            'key' => NavigationHandle::SubFooter,
-            'items' => [
-                [
-                    'type' => NavigationItemType::Page,
-                    'data' => [
-                        'pageable_id' => $home->id,
-                        'pageable_type' => $home->getMorphClass(),
-                    ],
-                ],
-                [
-                    'type' => NavigationItemType::Page,
-                    'data' => [
-                        'pageable_id' => $page->id,
-                        'pageable_type' => $page->getMorphClass(),
-                    ],
-                ],
-            ],
-        ])
-        ->create();
-
-    get($page->pageUrl->full_url)->assertOk();
-});
 
 test('navigation renders auto_children for page item without error', function (): void {
     $site = Site::factory()->withTranslations()->create();

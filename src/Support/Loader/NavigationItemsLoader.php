@@ -32,8 +32,13 @@ class NavigationItemsLoader
 {
     private const string REQUEST_PAGE_CACHE_KEY = 'capell.navigation.pages_by_morph_key';
 
+    private const string REQUEST_CURRENT_PAGE_PUBLISHED_KEY = 'capell.navigation.current_page_published';
+
     /** @var array<string, array<string, Model&Pageable<Model>>> */
     protected static array $pagesByMorphKeyCache = [];
+
+    /** @var array<string, bool> */
+    protected static array $currentPagePublishedCache = [];
 
     /**
      * @param  Model&Pageable<Model>  $page
@@ -49,9 +54,11 @@ class NavigationItemsLoader
     public static function flushPageCache(): void
     {
         self::$pagesByMorphKeyCache = [];
+        self::$currentPagePublishedCache = [];
 
         if (app()->bound('request')) {
             request()->attributes->remove(self::REQUEST_PAGE_CACHE_KEY);
+            request()->attributes->remove(self::REQUEST_CURRENT_PAGE_PUBLISHED_KEY);
         }
     }
 
@@ -546,11 +553,40 @@ class NavigationItemsLoader
             return [];
         }
 
-        if (! $currentPage::query()->whereKey($currentPage->getKey())->publishedDate()->exists()) {
+        $morphKey = $this->buildMorphLookupKey($currentPage->getMorphClass(), (int) $currentPage->getKey());
+
+        if (! $this->currentPageIsPublished($currentPage, $morphKey)) {
             return [];
         }
 
-        return [$this->buildMorphLookupKey($currentPage->getMorphClass(), (int) $currentPage->getKey()) => $currentPage];
+        return [$morphKey => $currentPage];
+    }
+
+    /**
+     * Every menu on a page asks the same question about the same page, so answer it once per request.
+     */
+    private function currentPageIsPublished(Model $currentPage, string $morphKey): bool
+    {
+        $request = $this->currentRequest();
+        $cache = $request instanceof Request
+            ? $request->attributes->get(self::REQUEST_CURRENT_PAGE_PUBLISHED_KEY, [])
+            : self::$currentPagePublishedCache;
+        $cache = is_array($cache) ? $cache : [];
+
+        if (is_bool($cache[$morphKey] ?? null)) {
+            return $cache[$morphKey];
+        }
+
+        $published = $currentPage::query()->whereKey($currentPage->getKey())->publishedDate()->exists();
+        $cache[$morphKey] = $published;
+
+        if ($request instanceof Request) {
+            $request->attributes->set(self::REQUEST_CURRENT_PAGE_PUBLISHED_KEY, $cache);
+        } else {
+            self::$currentPagePublishedCache[$morphKey] = $published;
+        }
+
+        return $published;
     }
 
     /**

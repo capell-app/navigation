@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Capell\Navigation\Support;
 
 use Capell\Core\Contracts\Pageable;
+use Capell\Core\Data\Rendering\FrontendRuntimeManifestData;
 use Capell\Core\Models\Language;
 use Capell\Core\Models\Site;
 use Capell\Core\Models\SiteDomain;
 use Capell\Core\Models\Theme;
 use Capell\Frontend\Contracts\FrontendContextReader;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
-use Capell\Frontend\Data\FrontendRuntimeManifestData;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Data\NavigationRenderContextData;
 use Capell\Navigation\Enums\NavigationHandle;

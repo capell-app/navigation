@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use Capell\Core\Data\Rendering\FrontendRuntimeManifestData;
+use Capell\Core\Enums\Rendering\RenderingStrategyEnum;
 use Capell\Core\Facades\CapellCore;
 use Capell\Core\Models\Theme;
 use Capell\Frontend\Contracts\FrontendContextReader;
 use Capell\Frontend\Data\FrontendContext;
-use Capell\Frontend\Data\FrontendRuntimeManifestData;
 use Capell\Frontend\Enums\RenderHookLocation;
-use Capell\Frontend\Enums\RenderingStrategyEnum;
 use Capell\Frontend\Facades\Frontend;
 use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Data\NavigationItemData;
