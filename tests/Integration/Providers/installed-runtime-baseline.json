@@ -4,12 +4,12 @@
     "scenarios": {
         "default": {
             "source": {
-                "ref": "6b0cad81b401039f8a82f9087042da22e9582ddb",
-                "commit": "6b0cad81b401039f8a82f9087042da22e9582ddb",
+                "ref": "HEAD",
+                "commit": "f5b05526772cf183884dd4bbf252373eaca039e5",
                 "providers": {
                     "Providers/ConsoleServiceProvider.php": "1b5022e54266e2eee01169d1edc398a97821befc2054e14fd7ddc9e4f322502b",
                     "Providers/MigrationMetadataServiceProvider.php": "1407d5eed6a1bb67066f131873bd0904d704ad0ba7879385375eb456ba2de0cf",
-                    "Providers/NavigationServiceProvider.php": "778074584d7d9dde0d1d9fffd449fbabf32e195e84734fc9dcfe373ebc019c73"
+                    "Providers/NavigationServiceProvider.php": "b1ff650e126566671957be061ed3e36f99357f8f5c2881729ba20e3f75988f19"
                 },
                 "configure": null
             },
@@ -42,6 +42,17 @@
                     ]
                 ],
                 "bindings": {
+                    "Capell\\Frontend\\Contracts\\ApplicationNavigationResolver": {
+                        "concrete": [
+                            "<vendor>/laravel/framework/src/Illuminate/Container/Container.php",
+                            "Illuminate\\Container\\Container( $container,  $parameters): bound=Illuminate\\Foundation\\Application",
+                            {
+                                "abstract": "Capell\\Frontend\\Contracts\\ApplicationNavigationResolver",
+                                "concrete": "Capell\\Navigation\\Adapters\\ApplicationNavigationResolverAdapter"
+                            }
+                        ],
+                        "shared": true
+                    },
                     "Capell\\Navigation\\Actions\\ApplyNavigationSiteSpecAction": {
                         "concrete": [
                             "<vendor>/laravel/framework/src/Illuminate/Container/Container.php",

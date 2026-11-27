@@ -6,6 +6,7 @@
     "kind": "package",
     "capellApiVersion": "^1.0",
     "version": "1.0.0",
+    "launchStatus": "shipped",
     "description": "Build site menus by dragging, per site and language, with visitor-group links, scheduled publishing and a change preview.",
     "product": {
         "group": "Capell Essentials",

@@ -23,6 +23,7 @@ use Capell\Core\Support\ContentGraph\ContentGraphRegistry;
 use Capell\Core\Support\Packages\InstalledRuntimeLifecycle;
 use Capell\Core\Support\Packages\PackageSurfaceRegistrar;
 use Capell\Core\Support\Packages\RegistersInstalledRuntime;
+use Capell\Frontend\Contracts\ApplicationNavigationResolver;
 use Capell\Frontend\Contracts\FrontendRuntimeManifestContributor;
 use Capell\Frontend\Data\RenderHookContributionData;
 use Capell\Frontend\Enums\CacheEnum as FrontendCacheEnum;
@@ -32,6 +33,7 @@ use Capell\Frontend\Support\Render\RenderHookRegistry;
 use Capell\Navigation\Actions\ApplyNavigationSiteSpecAction;
 use Capell\Navigation\Actions\BuildNavigationRenderModelAction;
 use Capell\Navigation\Actions\ExportNavigationSiteSpecAction;
+use Capell\Navigation\Adapters\ApplicationNavigationResolverAdapter;
 use Capell\Navigation\Adapters\NavigationNamesResolverAdapter;
 use Capell\Navigation\Adapters\NavigationPageSyncerAdapter;
 use Capell\Navigation\Console\Commands\DemoCommand;
@@ -144,6 +146,7 @@ final class NavigationServiceProvider extends ServiceProvider
 
         $this->app->singleton(NavigationPageSyncer::class, NavigationPageSyncerAdapter::class);
         $this->app->singleton(NavigationNamesResolver::class, NavigationNamesResolverAdapter::class);
+        $this->app->singleton(ApplicationNavigationResolver::class, ApplicationNavigationResolverAdapter::class);
         $this->app->singleton(
             ConcreteNavigationNamesResolver::class,
             fn (Application $app): ConcreteNavigationNamesResolver => new ConcreteNavigationNamesResolver(

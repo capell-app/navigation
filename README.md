@@ -12,7 +12,7 @@ Menus can be published at once or on a date you choose. Copying a site copies it
 
 - **Price and availability:** Check current availability and price on the [Capell Marketplace listing](https://capell.app/marketplace/extensions/navigation).
 - **Licence:** Check the licence terms on the [Capell Marketplace listing](https://capell.app/marketplace/extensions/navigation).
-- **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0.79`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.79`.
+- **Requires:** `PHP ^8.4`, `capell-app/admin ^1.0.79`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.81`.
 - **Install:** `composer require capell-app/navigation`.
 
 ## Quick Start
@@ -32,7 +32,7 @@ The handle registry lets packages and themes contribute named menus without reac
 
 ## Limits And Pitfalls
 
-- Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0.79`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.79`.
+- Install the required Capell packages at the versions in `composer.json`: `capell-app/admin ^1.0.79`, `capell-app/core ^1.0.79`, `capell-app/frontend ^1.0.81`.
 - Run migrations before opening package resources or public routes.
 - Keep public Blade and cached HTML free of authoring markers, model IDs, permissions, signed editor URLs, and lazy database queries.
 - Custom write integrations must preserve invalidation for `navigation` cache tags.
